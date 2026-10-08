@@ -24,8 +24,12 @@ The site loads Magma the way a consumer does:
 - [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
   the icon path (`IconsSetService`) and the light/dark sync with Starlight's theme picker.
 - [`src/integrations/magma.mjs`](src/integrations/magma.mjs): injects that script into
-  every page and serves `@maggioli-design-system/svg-icons` under `/docs/svg/mgg/`, so
-  `<mds-icon name="mgg/...">` works in dev and in the build.
+  every page and runs [iconsauce](https://www.npmjs.com/package/@iconsauce/core) as Magma
+  does: every icon slug (`mi/<variant>/<name>`, `mdi/<name>`, `mgg/<name>`) found in the
+  sources, in the component usage examples and in the `svg-icons` list is copied to
+  `public/svg/` (gitignored), where `<mds-icon name="...">` fetches it. The globs are in
+  [`iconsauce.config.mjs`](iconsauce.config.mjs). In dev, a change under `src/` collects
+  them again.
 
 ## Languages
 

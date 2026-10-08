@@ -2,8 +2,8 @@
 import { defineCustomElements } from '@maggioli-design-system/magma/loader';
 import { IconsSetService } from '@maggioli-design-system/magma/services';
 
-// Where mds-icon fetches `<name>.svg` from: the svg-icons set is served under
-// `svg/mgg/`, so `<mds-icon name="mgg/...">` resolves as in Magma's own docs.
+// Where mds-icon fetches `<slug>.svg` from: iconsauce copies every slug the
+// site uses (`mi/...`, `mdi/...`, `mgg/...`) under `svg/`, see iconsauce.config.mjs.
 // Set before the components are defined, so no icon fetches from a wrong path.
 IconsSetService.setSvgPath(`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}svg/`);
 
