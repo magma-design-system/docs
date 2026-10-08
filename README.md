@@ -27,6 +27,17 @@ The site loads Magma the way a consumer does:
   every page and serves `@maggioli-design-system/svg-icons` under `/docs/svg/mgg/`, so
   `<mds-icon name="mgg/...">` works in dev and in the build.
 
+## Languages
+
+English is the default locale, at the site root; Italian is under `/it/`. Locales are
+defined in [`src/lib/i18n.mjs`](src/lib/i18n.mjs). UI strings live in one dictionary per
+locale, [`src/content/i18n/<lang>.json`](src/content/i18n/), and are read with
+`Astro.locals.t()`: never hard-code them in components. Pages are translated by adding the
+same path under `src/content/docs/<locale>/`; missing pages and strings fall back to
+English. Text generated from the Magma packages is English only.
+
+To add a locale: one entry in `locales` plus its `src/content/i18n/<lang>.json`.
+
 ## Develop
 
 ```bash
