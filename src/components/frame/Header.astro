@@ -31,6 +31,13 @@ const { t } = Astro.locals;
     await bar?.componentOnReady?.();
     bar?.shadowRoot?.querySelector('[part="hamburger"]')?.setAttribute('aria-label', header?.dataset.menuLabel ?? '');
   });
+
+  // The menu opens at the top: bring the current page of the section into view,
+  // a long list (the components) would hide it otherwise.
+  document.addEventListener('mdsModalOpen', (event) => {
+    if (event.target !== header) return;
+    header?.querySelector('.menu nav[data-section] [aria-current="page"]')?.scrollIntoView({ block: 'center' });
+  });
 </script>
 
 <style>

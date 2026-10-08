@@ -42,8 +42,39 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 <div class="search print:hidden"><Search /></div>
 
 <script>
+  // Each page is a new document, so the section navigation would start from the
+  // top on every page: a long list (the components) loses its place. Keep its
+  // scroll position for the section in sessionStorage.
+  const SCROLL_KEY = 'magma-docs:section-scroll';
+  const column = document.querySelector<HTMLElement>('.section-column');
+  const section = column?.querySelector<HTMLElement>('nav[data-section]')?.dataset.section;
+
+  window.addEventListener('pagehide', () => {
+    if (!column || !section) return;
+    try {
+      sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ section, top: column.scrollTop }));
+    } catch {}
+  });
+
+  /** Back to the stored position, then the current page in view if it is not. */
+  const restoreScroll = () => {
+    if (!column || !section || column.getClientRects().length === 0) return;
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(SCROLL_KEY) ?? 'null');
+      if (stored?.section === section) column.scrollTop = stored.top;
+    } catch {}
+    const current = column.querySelector('[aria-current="page"]');
+    if (!current) return;
+    const view = column.getBoundingClientRect();
+    const item = current.getBoundingClientRect();
+    if (item.top < view.top || item.bottom > view.bottom) {
+      column.scrollTop += item.top - view.top - (view.height - item.height) / 2;
+    }
+  };
+
   // Reveal the page once the Magma components of the frame shown at this width
-  // have hydrated (the inline script at the top holds it).
+  // have hydrated (the inline script at the top holds it): only then the
+  // section navigation has its final height and its scroll can be restored.
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
   const shown = [
     ...document.querySelectorAll<MagmaElement>('.frame :is(.header, .rail, .section-column, .right-column) *'),
@@ -53,7 +84,9 @@ const { hasSidebar } = Astro.locals.starlightRoute;
       await customElements.whenDefined(element.localName);
       await element.componentOnReady?.();
     }),
-  ).finally(() => delete document.documentElement.dataset.framePending);
+  )
+    .then(restoreScroll)
+    .finally(() => delete document.documentElement.dataset.framePending);
 </script>
 
 <style is:global>

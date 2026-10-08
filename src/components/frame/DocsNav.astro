@@ -32,7 +32,7 @@ const pages = entry ? pagesOf(entry.data) : [];
               aria-current={page.slug === path.slug ? 'page' : undefined}
               label={t(page.label)}
               variant="dark"
-              tone={page.slug === path.slug ? 'weak' : 'text'}
+              tone={page.slug === path.slug ? 'strong' : 'text'}
               size="sm"
             />
           </li>
