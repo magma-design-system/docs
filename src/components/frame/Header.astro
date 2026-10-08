@@ -18,7 +18,7 @@ const { t } = Astro.locals;
   <mds-header-bar>
     <Brand />
   </mds-header-bar>
-  <div slot="menu" class="menu">
+  <div slot="menu" class="flex flex-col gap-800 p-600">
     <SectionLinks />
     <DocsNav headingId="menu-docs-nav-heading" />
     <SectionNav headingId="menu-section-nav-heading" />
@@ -47,18 +47,7 @@ const { t } = Astro.locals;
   document.addEventListener('mdsModalOpen', (event) => {
     if (event.target !== header) return;
     header
-      ?.querySelector('.menu nav[data-section] [aria-current="page"]')
+      ?.querySelector('[slot="menu"] nav[data-section] [aria-current="page"]')
       ?.scrollIntoView({ block: 'center' });
   });
 </script>
-
-<style>
-  @layer components {
-    .menu {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem;
-      padding: 1.5rem;
-    }
-  }
-</style>

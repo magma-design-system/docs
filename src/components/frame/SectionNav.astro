@@ -15,18 +15,9 @@ const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url
 
 {section && (
   <nav aria-labelledby={headingId} data-section={section.id}>
-    <mds-text id={headingId} typography="h5" tag="h2">
+    <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
       {section.label}
     </mds-text>
-    <SectionEntries entries={section.group.entries} currentHref={currentHref} icon={section.icon} />
+    <SectionEntries entries={section.group.entries} currentHref={currentHref} />
   </nav>
 )}
-
-<style>
-  @layer components {
-    mds-text {
-      display: block;
-      margin-bottom: 1rem;
-    }
-  }
-</style>

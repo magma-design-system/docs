@@ -59,13 +59,71 @@
 @import '@maggioli-design-system/styles/dist/tailwind/theme.css';
 
 /*
-  Starlight content on Magma typography and the fixes the site needs, in the
-  `components` layer: above Starlight, below the utilities.
+  Variants of the site: `dark` follows Magma's mode classes on <html>
+  (pref-mode-*, set by mds-pref-mode), as the darkMode of Magma's Tailwind
+  preset does; `rail-collapsed` follows the state of the rail (Rail.astro).
+*/
+@custom-variant dark {
+  &:where(.pref-mode-dark, .pref-mode-dark *) {
+    @slot;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:where(.pref-mode-system, .pref-mode-system *) {
+      @slot;
+    }
+  }
+}
+
+@custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
+
+/*
+  The frame (src/components/frame/) styles its markup with utilities. What is
+  left here is markup the site does not render itself: <html>, <body>, the
+  content of the pages and Starlight's elements. In the `components` layer:
+  above Starlight, below the utilities.
 */
 @layer components {
   :root {
     --sl-font: var(--font-info);
     --sl-font-mono: var(--font-code);
+
+    /* Height of the mobile header (Header.astro): the desktop frame has none. */
+    --frame-header-height: --spacing(2200);
+
+    /*
+      Starlight: anchors land below the header, no mobile table of contents,
+      the content aligned to its column.
+    */
+    --sl-nav-height: var(--frame-header-height);
+    --sl-mobile-toc-height: 0rem;
+    --sl-content-margin-inline: 0;
+    --sl-content-pad-x: --spacing(600);
+
+    @variant desktop {
+      --frame-header-height: 0rem;
+      /* The column gap already separates the content from the section navigation. */
+      --sl-content-pad-x: 0rem;
+    }
+  }
+
+  body {
+    @apply bg-surface-raised text-fg-default desktop:bg-surface-default;
+  }
+
+  /* Until the frame has hydrated: see the inline script at the top of PageFrame.astro. */
+  :root[data-frame-pending] body {
+    @apply invisible;
+  }
+
+  /* No rule between the page title and the content. */
+  [data-frame-main] .content-panel + .content-panel {
+    @apply border-t-0;
+  }
+
+  /* Starlight's search trigger is replaced by the frame's buttons, its dialog is kept. */
+  [data-frame-search] site-search > button[data-open-modal] {
+    @apply hidden;
   }
 
   /*
@@ -74,59 +132,37 @@
     headings. Keep the reading measure.
   */
   p {
-    max-width: var(--spacing-text);
+    @apply max-w-(--spacing-text);
   }
 
   /*
     styles 17.0.0: base.css gives the body its font (--font-info, Karla) but
-    nothing to h1-h6, which inherit it. The title font and scale
-    (--font-title, Roboto, and --text-size-title-h*) are only applied by the
-    .typography-title-h* utilities: give them to the headings of the pages.
+    nothing to h1-h6, which inherit it. Give them the title font and scale
+    (--font-title, Roboto, and --text-size-title-h*: size, line height, weight,
+    letter spacing).
   */
-  :is(h1, h2, h3, h4, h5, h6) {
-    font-family: var(--font-title);
-  }
-
   h1 {
-    font-size: var(--text-size-title-h1);
-    font-weight: var(--text-size-title-h1--font-weight);
-    letter-spacing: var(--text-size-title-h1--letter-spacing);
-    line-height: var(--text-size-title-h1--line-height);
+    @apply font-title text-size-title-h1;
   }
 
   h2 {
-    font-size: var(--text-size-title-h2);
-    font-weight: var(--text-size-title-h2--font-weight);
-    letter-spacing: var(--text-size-title-h2--letter-spacing);
-    line-height: var(--text-size-title-h2--line-height);
+    @apply font-title text-size-title-h2;
   }
 
   h3 {
-    font-size: var(--text-size-title-h3);
-    font-weight: var(--text-size-title-h3--font-weight);
-    letter-spacing: var(--text-size-title-h3--letter-spacing);
-    line-height: var(--text-size-title-h3--line-height);
+    @apply font-title text-size-title-h3;
   }
 
   h4 {
-    font-size: var(--text-size-title-h4);
-    font-weight: var(--text-size-title-h4--font-weight);
-    letter-spacing: var(--text-size-title-h4--letter-spacing);
-    line-height: var(--text-size-title-h4--line-height);
+    @apply font-title text-size-title-h4;
   }
 
   h5 {
-    font-size: var(--text-size-title-h5);
-    font-weight: var(--text-size-title-h5--font-weight);
-    letter-spacing: var(--text-size-title-h5--letter-spacing);
-    line-height: var(--text-size-title-h5--line-height);
+    @apply font-title text-size-title-h5;
   }
 
   h6 {
-    font-size: var(--text-size-title-h6);
-    font-weight: var(--text-size-title-h6--font-weight);
-    letter-spacing: var(--text-size-title-h6--letter-spacing);
-    line-height: var(--text-size-title-h6--line-height);
+    @apply font-title text-size-title-h6;
   }
 
   /*
@@ -134,7 +170,7 @@
     documents no color property: icons placed on the page follow the text.
   */
   mds-icon {
-    fill: currentColor;
+    @apply fill-current;
   }
 
   /*
@@ -145,7 +181,6 @@
     property mds-header still sets.
   */
   mds-header-bar {
-    margin-inline: auto;
-    margin-block: var(--mds-header-inline-margin-current, 0);
+    @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
 }

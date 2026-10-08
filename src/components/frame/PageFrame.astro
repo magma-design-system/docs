@@ -23,27 +23,43 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   }
 </script>
 
-<div class="frame">
-  <div class="header print:hidden">
+<div
+  data-frame
+  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[auto_minmax(0,1fr)]"
+>
+  <div data-frame-header class="desktop:hidden print:hidden">
     <slot name="header" />
   </div>
-  <div class="rail print:hidden">
+  <div
+    data-frame-rail
+    class="hidden desktop:sticky desktop:top-0 desktop:flex desktop:h-screen print:hidden"
+  >
     <Rail />
   </div>
-  <div class="card">
+  <div
+    class:list={[
+      'desktop:my-400 desktop:me-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
+      hasSidebar
+        ? 'desktop:grid-cols-[--spacing(5200)_minmax(0,1fr)] desktop:gap-x-800'
+        : 'desktop:grid-cols-[minmax(0,1fr)]',
+    ]}
+  >
     {hasSidebar && (
-      <div class="section-column print:hidden">
+      <div
+        data-frame-section
+        class="hidden desktop:sticky desktop:top-0 desktop:block desktop:max-h-screen desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
+      >
         <slot name="sidebar" />
       </div>
     )}
-    <div class="main-frame">
+    <div class:list={[!hasSidebar && 'desktop:ps-800']}>
       <slot />
     </div>
   </div>
 </div>
 
 <!-- Pagefind search: one dialog, opened by the search buttons of the rail and of the menu. -->
-<div class="search print:hidden">
+<div data-frame-search class="print:hidden">
   <Search />
 </div>
 
@@ -52,7 +68,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   // top on every page: a long list (the components) loses its place. Keep its
   // scroll position for the section in sessionStorage.
   const SCROLL_KEY = 'magma-docs:section-scroll';
-  const column = document.querySelector<HTMLElement>('.section-column');
+  const column = document.querySelector<HTMLElement>('[data-frame-section]');
   const section = column?.querySelector<HTMLElement>('nav[data-section]')?.dataset.section;
 
   window.addEventListener('pagehide', () => {
@@ -84,7 +100,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
   const shown = [
     ...document.querySelectorAll<MagmaElement>(
-      '.frame :is(.header, .rail, .section-column, .right-column) *',
+      '[data-frame] :is([data-frame-header], [data-frame-rail], [data-frame-section], [data-frame-aside]) *',
     ),
   ].filter(
     (element) => element.localName.startsWith('mds-') && element.getClientRects().length > 0,
@@ -98,116 +114,3 @@ const { hasSidebar } = Astro.locals.starlightRoute;
     .then(restoreScroll)
     .finally(() => delete document.documentElement.dataset.framePending);
 </script>
-
-<style is:global>
-  @layer components {
-    :root:root {
-      --frame-header-height: 5.5rem;
-      --frame-column-width: 13rem;
-      --frame-gap: 2rem;
-      --frame-pad: 1.5rem;
-
-      /* Starlight: anchors land below the header, no mobile table of contents. */
-      --sl-nav-height: var(--frame-header-height);
-      --sl-mobile-toc-height: 0rem;
-      --sl-content-margin-inline: 0;
-      --sl-content-pad-x: var(--frame-pad);
-    }
-
-    @media (min-width: 64rem) {
-      :root:root {
-        --frame-header-height: 0rem;
-        --frame-pad: 2rem;
-        /* The column gap already separates the content from the section navigation. */
-        --sl-content-pad-x: 0rem;
-      }
-    }
-
-    /* No rule between the page title and the content. */
-    .main-pane .content-panel + .content-panel {
-      border-top: 0;
-    }
-
-    body {
-      background-color: rgb(var(--surface-neutral-raised));
-      color: rgb(var(--text-neutral-default));
-    }
-
-    /* Until the frame has hydrated: see the inline script at the top of the frame. */
-    :root[data-frame-pending] body {
-      visibility: hidden;
-    }
-
-    @media (min-width: 64rem) {
-      body {
-        background-color: rgb(var(--surface-neutral-default));
-      }
-    }
-
-    /* Starlight's trigger is replaced by the frame's buttons, its dialog is kept. */
-    .search site-search > button[data-open-modal] {
-      display: none;
-    }
-  }
-</style>
-
-<style>
-  @layer components {
-    .frame {
-      padding-top: var(--frame-header-height);
-    }
-
-    .rail,
-    .section-column {
-      display: none;
-    }
-
-    @media (min-width: 64rem) {
-      .header {
-        display: none;
-      }
-
-      .frame {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        min-height: 100vh;
-      }
-
-      .rail {
-        display: flex;
-        position: sticky;
-        top: 0;
-        height: 100vh;
-      }
-
-      .card {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        margin: 1rem 1rem 1rem 0;
-        border: 1px solid rgb(var(--border-neutral-muted));
-        border-radius: var(--radius-2xl);
-        background-color: rgb(var(--surface-neutral-raised));
-      }
-
-      .card:has(.section-column) {
-        grid-template-columns: var(--frame-column-width) minmax(0, 1fr);
-        column-gap: var(--frame-gap);
-      }
-
-      .card:not(:has(.section-column)) .main-frame {
-        padding-inline-start: var(--frame-pad);
-      }
-
-      .section-column {
-        display: block;
-        position: sticky;
-        top: 0;
-        align-self: start;
-        max-height: 100vh;
-        overflow-y: auto;
-        padding: var(--frame-pad) 0 var(--frame-pad) var(--frame-pad);
-        scrollbar-width: thin;
-      }
-    }
-  }
-</style>

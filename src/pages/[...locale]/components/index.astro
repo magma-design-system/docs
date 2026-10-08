@@ -19,7 +19,7 @@ const components = (await getCollection('components')).sort((a, b) => a.id.local
   frontmatter={{ title: t('components.title'), description: t('components.description') }}
 >
   <p>{t('components.description')}</p>
-  <ul class="components">
+  <ul class="columns-2xs ps-500">
     {components.map(({ id }) => (
       <li>
         <a href={componentHref(locale, id)}>{componentName(id)}</a> <code>{`<${id}>`}</code>
@@ -27,12 +27,3 @@ const components = (await getCollection('components')).sort((a, b) => a.id.local
     ))}
   </ul>
 </StarlightPage>
-
-<style>
-  @layer components {
-    .components {
-      columns: 16rem;
-      padding-inline-start: 1.25rem;
-    }
-  }
-</style>

@@ -1,7 +1,8 @@
 ---
 // Desktop rail: brand, the 8 sections and the preferences. Collapsed, it keeps
 // only the logo, which expands it again. The state is kept in localStorage and
-// restored before the first paint (inline script below).
+// restored before the first paint (inline script below); the `rail-collapsed`
+// variant (src/styles/magma.css) follows it.
 import Brand from './Brand.astro';
 import Logo from './Logo.astro';
 import Preferences from './Preferences.astro';
@@ -19,9 +20,9 @@ const { t } = Astro.locals;
   } catch {}
 </script>
 
-<div class="rail">
-  <div class="head">
-    <div class="expanded">
+<div class="flex w-6000 flex-col gap-1000 overflow-y-auto px-400 py-600 [scrollbar-width:thin] rail-collapsed:w-auto">
+  <div>
+    <div class="flex items-center justify-between gap-400 rail-collapsed:hidden">
       <Brand />
       <mds-button
         data-rail-toggle="collapse"
@@ -35,7 +36,7 @@ const { t } = Astro.locals;
       ></mds-button>
     </div>
     <button
-      class="collapsed"
+      class="hidden cursor-pointer rounded-lg border-0 bg-transparent p-0 focus-visible:[outline-offset:var(--magma-outline-focus-offset)] focus-visible:[outline:var(--magma-outline-focus)] rail-collapsed:inline-flex"
       type="button"
       data-rail-toggle="expand"
       aria-label={t('frame.rail.expand')}
@@ -45,7 +46,7 @@ const { t } = Astro.locals;
       <Logo />
     </button>
   </div>
-  <div class="body" id="rail-body">
+  <div class="flex flex-1 flex-col justify-between gap-1000 rail-collapsed:hidden" id="rail-body">
     <SectionLinks />
     <div data-preferences="rail">
       <Preferences />
@@ -72,59 +73,3 @@ const { t } = Astro.locals;
     });
   });
 </script>
-
-<style>
-  @layer components {
-    .rail {
-      display: flex;
-      flex-direction: column;
-      gap: 2.5rem;
-      width: 15rem;
-      padding: 1.5rem 1rem;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-
-    .expanded {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.5rem;
-    }
-
-    .collapsed {
-      display: none;
-      padding: 0;
-      border: 0;
-      border-radius: var(--radius-lg);
-      background: none;
-      cursor: pointer;
-    }
-
-    .body {
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 2.5rem;
-    }
-
-    :global([data-rail='collapsed']) .rail {
-      width: auto;
-    }
-
-    :global([data-rail='collapsed']) .expanded,
-    :global([data-rail='collapsed']) .body {
-      display: none;
-    }
-
-    :global([data-rail='collapsed']) .collapsed {
-      display: inline-flex;
-    }
-
-    .collapsed:focus-visible {
-      outline: var(--magma-outline-focus);
-      outline-offset: var(--magma-outline-focus-offset);
-    }
-  }
-</style>

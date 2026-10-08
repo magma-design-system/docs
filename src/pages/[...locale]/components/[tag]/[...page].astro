@@ -67,7 +67,7 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
-  <p class="built-against">
+  <p class="text-size-info-caption text-fg-muted">
     {t('component.generatedFrom')} <code>@maggioli-design-system/magma@{magmaVersion()}</code>
     <code>dist/documentation.json</code>. {t('component.encapsulation')}:{' '}
     <code>{data.encapsulation}</code>.
@@ -258,12 +258,3 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
       </>
     ))}
 </StarlightPage>
-
-<style>
-  @layer components {
-    .built-against {
-      font-size: var(--sl-text-sm);
-      color: var(--sl-color-gray-3);
-    }
-  }
-</style>

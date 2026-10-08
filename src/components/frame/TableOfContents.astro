@@ -13,21 +13,25 @@ const items = toc ? flatten(toc.items) : [];
 {toc && (
   <docs-toc>
     <nav aria-labelledby="toc-heading">
-      <mds-text id="toc-heading" typography="h5" tag="h2">
+      <mds-text class="mb-400 block" id="toc-heading" typography="h5" tag="h2">
         {t('tableOfContents.onThisPage')}
       </mds-text>
-      <div class="body">
+      <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-400">
         <mds-progress
-          class="indicator"
+          class="h-auto self-stretch [--mds-progress-duration:150ms]"
           direction="vertical"
           variant="dark"
           progress="0"
           aria-hidden="true"
         />
-        <ul>
+        <ul class="m-0 flex list-none flex-col gap-100 p-0">
           {items.map((item) => (
-            <li style={`--depth: ${item.depth - toc.minHeadingLevel}`}>
+            <li
+              class="ps-[calc(var(--depth)*--spacing(300))]"
+              style={`--depth: ${item.depth - toc.minHeadingLevel}`}
+            >
               <mds-button
+                class="max-w-full"
                 href={`#${item.slug}`}
                 role="link"
                 type="a"
@@ -126,41 +130,3 @@ const items = toc ? flatten(toc.items) : [];
 
   customElements.define('docs-toc', DocsToc);
 </script>
-
-<style>
-  @layer components {
-    mds-text {
-      display: block;
-      margin-bottom: 1rem;
-    }
-
-    .body {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      gap: 1rem;
-    }
-
-    .indicator {
-      --mds-progress-duration: 150ms;
-      align-self: stretch;
-      height: auto;
-    }
-
-    ul {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    li {
-      padding-inline-start: calc(var(--depth) * 0.75rem);
-    }
-
-    mds-button {
-      max-width: 100%;
-    }
-  }
-</style>

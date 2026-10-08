@@ -5,29 +5,21 @@ import logo from '@maggioli-design-system/identity/dist/internal/magma-design-sy
 import logoWhite from '@maggioli-design-system/identity/dist/internal/magma-design-system/logo-magma-white.svg?url';
 ---
 
-<span class="logo" aria-hidden="true">
-  <mds-img class="light" src={logo} alt="" width="200" height="200" loading="eager"></mds-img>
-  <mds-img class="dark" src={logoWhite} alt="" width="200" height="200" loading="eager"></mds-img>
+<span class="inline-flex size-1000 shrink-0" aria-hidden="true">
+  <mds-img
+    class="size-full [--mds-img-background:transparent] dark:hidden"
+    src={logo}
+    alt=""
+    width="200"
+    height="200"
+    loading="eager"
+  ></mds-img>
+  <mds-img
+    class="hidden size-full [--mds-img-background:transparent] dark:block"
+    src={logoWhite}
+    alt=""
+    width="200"
+    height="200"
+    loading="eager"
+  ></mds-img>
 </span>
-
-<style>
-  @layer components {
-    .logo {
-      display: inline-flex;
-      flex-shrink: 0;
-      width: 2.5rem;
-      height: 2.5rem;
-    }
-
-    mds-img {
-      --mds-img-background: transparent;
-      width: 100%;
-      height: 100%;
-    }
-
-    :global([data-theme='dark']) .light,
-    :global([data-theme='light']) .dark {
-      display: none;
-    }
-  }
-</style>

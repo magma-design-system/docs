@@ -22,9 +22,11 @@ The site loads Magma the way a consumer does:
   cascade layer order of the Magma install guide, with Starlight's layer placed between
   Magma's base and component layers, and Tailwind v4 set up as in Magma's Storybook:
   Tailwind's theme and utilities (no preflight) with Magma's theme, so Magma's classes work
-  (`gap-400` is 1rem, `grid-cols-full`, `w-full`, ...). The site's own styles, the
-  `<style>` of the components included, go in the `components` layer: a utility class
-  overrides them.
+  (`gap-400` is 1rem, `grid-cols-full`, `w-full`, ...). The frame is styled with these
+  utilities and Magma's tokens (breakpoints `tablet` and `desktop`, the spacing scale,
+  semantic colors); the few rules left in `magma.css` target markup the site does not
+  render itself (`<body>`, page content, Starlight's elements), in the `components`
+  layer, so a utility class overrides them.
 - [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
   the icon path (`IconsSetService`) and Starlight's `data-theme` kept on the scheme chosen
   with `mds-pref-mode`.

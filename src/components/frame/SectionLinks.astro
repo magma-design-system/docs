@@ -7,10 +7,11 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
 ---
 
 <nav aria-label={t('frame.sections')}>
-  <ul>
+  <ul class="m-0 flex list-none flex-col gap-100 p-0">
     {sections.map((section) => (
       <li>
         <mds-button
+          class="max-w-full"
           href={section.href}
           role="link"
           type="a"
@@ -24,20 +25,3 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
     ))}
   </ul>
 </nav>
-
-<style>
-  @layer components {
-    ul {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    mds-button {
-      max-width: 100%;
-    }
-  }
-</style>

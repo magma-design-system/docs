@@ -3,9 +3,9 @@
 // rail and in the mobile menu. Mode and language are Magma's own preference
 // components; src/scripts/magma.ts makes Starlight follow the mode.
 //
-// Rendered once, in the rail, and moved into the menu below 64rem: two
-// mds-pref-mode on a page undo each other's choice (each one applies its own
-// mode again on every render, magma 2.0.1).
+// Rendered once, in the rail, and moved into the menu below Magma's `desktop`
+// breakpoint: two mds-pref-mode on a page undo each other's choice (each one
+// applies its own mode again on every render, magma 2.0.1).
 import { locales } from '../../lib/i18n.mjs';
 import { REPOSITORY } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
@@ -20,8 +20,8 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
 }));
 ---
 
-<div class="preferences" id="preferences">
-  <div class="actions">
+<div class="grid grid-cols-full gap-400" id="preferences">
+  <div class="flex flex-col gap-100">
     <mds-button
       data-search-trigger
       type="button"
@@ -43,8 +43,8 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
       size="sm"
     ></mds-button>
   </div>
-  <mds-pref-mode size="sm"></mds-pref-mode>
-  <mds-pref-language size="sm" set={starlightRoute.lang}>
+  <mds-pref-mode class="relative w-full" size="sm"></mds-pref-mode>
+  <mds-pref-language class="relative w-full" size="sm" set={starlightRoute.lang}>
     {languages.map(({ lang, href }) => (
       <mds-pref-language-item
         code={lang}
@@ -56,8 +56,8 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
 </div>
 
 <script>
-  // Same breakpoint as the frame (PageFrame.astro): rail above, menu below.
-  const desktop = matchMedia('(min-width: 64rem)');
+  // Magma's `desktop` breakpoint (1024px), as in the frame: rail above, menu below.
+  const desktop = matchMedia('(min-width: 1024px)');
   const place = () => {
     const preferences = document.getElementById('preferences');
     const target = document.querySelector(
@@ -88,20 +88,3 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
     if (href && href !== window.location.pathname) window.location.assign(href);
   });
 </script>
-
-<style>
-  @layer components {
-    .preferences {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1rem;
-    }
-
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-  }
-</style>

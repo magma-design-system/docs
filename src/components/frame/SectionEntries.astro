@@ -5,23 +5,21 @@ import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 interface Props {
   entries: StarlightRouteData['sidebar'];
   currentHref: string | undefined;
-  /** Shown on the current link, as in the layout mockups. */
-  icon: string;
 }
 
-const { entries, currentHref, icon } = Astro.props;
+const { entries, currentHref } = Astro.props;
 ---
 
-<ul>
+<ul class="m-0 flex list-none flex-col gap-100 p-0">
   {entries.map((entry) =>
     entry.type === 'link' ? (
       <li>
         <mds-button
+          class="max-w-full"
           href={entry.href}
           role="link"
           type="a"
           aria-current={entry.href === currentHref ? 'page' : undefined}
-          icon={entry.href === currentHref ? icon : undefined}
           label={entry.label}
           variant="dark"
           tone={entry.href === currentHref ? 'strong' : 'text'}
@@ -29,38 +27,12 @@ const { entries, currentHref, icon } = Astro.props;
         />
       </li>
     ) : (
-      <li class="group">
-        <mds-text typography="h6" tag="h3">
+      <li class="mt-600">
+        <mds-text class="mb-200 block" typography="h6" tag="h3">
           {entry.label}
         </mds-text>
-        <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} />
+        <Astro.self entries={entry.entries} currentHref={currentHref} />
       </li>
     ),
   )}
 </ul>
-
-<style>
-  @layer components {
-    ul {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-
-    .group {
-      margin-top: 1.5rem;
-    }
-
-    .group mds-text {
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-
-    mds-button {
-      max-width: 100%;
-    }
-  }
-</style>

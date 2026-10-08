@@ -6,39 +6,17 @@ import Logo from './Logo.astro';
 const { t, starlightRoute } = Astro.locals;
 ---
 
-<a class="brand" href={`${localePrefix(starlightRoute.locale)}/`}>
+<a
+  class="flex min-w-0 items-center gap-300 rounded-lg text-fg-default no-underline"
+  href={`${localePrefix(starlightRoute.locale)}/`}
+>
   <Logo />
-  <span class="name">
-    <mds-text typography="h6" tag="span">
+  <span class="flex min-w-0 flex-col gap-50">
+    <mds-text class="whitespace-nowrap" typography="h6" tag="span">
       Magma
     </mds-text>
-    <mds-text typography="option" tag="span">
+    <mds-text class="whitespace-nowrap" typography="option" tag="span">
       {t('frame.brand.description')}
     </mds-text>
   </span>
 </a>
-
-<style>
-  @layer components {
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      min-width: 0;
-      border-radius: var(--radius-lg);
-      color: rgb(var(--text-neutral-default));
-      text-decoration: none;
-    }
-
-    .name {
-      display: flex;
-      flex-direction: column;
-      gap: 0.125rem;
-      min-width: 0;
-    }
-
-    mds-text {
-      white-space: nowrap;
-    }
-  }
-</style>

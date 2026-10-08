@@ -18,10 +18,10 @@ const pages = entry ? pagesOf(entry.data) : [];
 
 {path && pages.length > 0 && (
   <nav aria-labelledby={headingId}>
-    <mds-text id={headingId} typography="h5" tag="h2">
+    <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
       {t('component.documentation')}
     </mds-text>
-    <ul>
+    <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
       {pages.map((page) => (
         <li>
           <mds-button
@@ -39,22 +39,3 @@ const pages = entry ? pagesOf(entry.data) : [];
     </ul>
   </nav>
 )}
-
-<style>
-  @layer components {
-    mds-text {
-      display: block;
-      margin-bottom: 1rem;
-    }
-
-    ul {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.25rem;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-  }
-</style>
