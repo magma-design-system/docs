@@ -7,9 +7,11 @@ interface Props {
   currentHref: string | undefined;
   /** Shown on the current link, as in the layout mockups. */
   icon: string;
+  /** Tone of the current link. */
+  currentTone: 'weak' | 'strong';
 }
 
-const { entries, currentHref, icon } = Astro.props;
+const { entries, currentHref, icon, currentTone } = Astro.props;
 ---
 
 <ul>
@@ -25,7 +27,7 @@ const { entries, currentHref, icon } = Astro.props;
             icon={entry.href === currentHref ? icon : undefined}
             label={entry.label}
             variant="dark"
-            tone={entry.href === currentHref ? 'weak' : 'text'}
+            tone={entry.href === currentHref ? currentTone : 'text'}
             size="sm"
           />
         </li>
@@ -34,7 +36,7 @@ const { entries, currentHref, icon } = Astro.props;
           <mds-text typography="h6" tag="h3">
             {entry.label}
           </mds-text>
-          <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} />
+          <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} currentTone={currentTone} />
         </li>
       ),
     )

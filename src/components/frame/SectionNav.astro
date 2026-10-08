@@ -11,6 +11,9 @@ interface Props {
 
 const { headingId } = Astro.props;
 const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url.pathname);
+// The selected component stands out like the current section of the rail;
+// the other sections keep the lighter tone of the layout mockups.
+const currentTone = section?.id === 'components' ? 'strong' : 'weak';
 ---
 
 {
@@ -19,7 +22,7 @@ const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url
       <mds-text id={headingId} typography="h5" tag="h2">
         {section.label}
       </mds-text>
-      <SectionEntries entries={section.group.entries} currentHref={currentHref} icon={section.icon} />
+      <SectionEntries entries={section.group.entries} currentHref={currentHref} icon={section.icon} currentTone={currentTone} />
     </nav>
   )
 }
