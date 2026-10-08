@@ -64,6 +64,58 @@
   }
 
   /*
+    styles 17.0.0: base.css gives the body its font (--font-info, Karla) but
+    nothing to h1-h6, which inherit it. The title font and scale
+    (--font-title, Roboto, and --text-size-title-h*) are only applied by the
+    .typography-title-h* utilities: give them to the headings of the pages.
+  */
+  :is(h1, h2, h3, h4, h5, h6) {
+    font-family: var(--font-title);
+  }
+
+  h1 {
+    font-size: var(--text-size-title-h1);
+    font-weight: var(--text-size-title-h1--font-weight);
+    letter-spacing: var(--text-size-title-h1--letter-spacing);
+    line-height: var(--text-size-title-h1--line-height);
+  }
+
+  h2 {
+    font-size: var(--text-size-title-h2);
+    font-weight: var(--text-size-title-h2--font-weight);
+    letter-spacing: var(--text-size-title-h2--letter-spacing);
+    line-height: var(--text-size-title-h2--line-height);
+  }
+
+  h3 {
+    font-size: var(--text-size-title-h3);
+    font-weight: var(--text-size-title-h3--font-weight);
+    letter-spacing: var(--text-size-title-h3--letter-spacing);
+    line-height: var(--text-size-title-h3--line-height);
+  }
+
+  h4 {
+    font-size: var(--text-size-title-h4);
+    font-weight: var(--text-size-title-h4--font-weight);
+    letter-spacing: var(--text-size-title-h4--letter-spacing);
+    line-height: var(--text-size-title-h4--line-height);
+  }
+
+  h5 {
+    font-size: var(--text-size-title-h5);
+    font-weight: var(--text-size-title-h5--font-weight);
+    letter-spacing: var(--text-size-title-h5--letter-spacing);
+    line-height: var(--text-size-title-h5--line-height);
+  }
+
+  h6 {
+    font-size: var(--text-size-title-h6);
+    font-weight: var(--text-size-title-h6--font-weight);
+    letter-spacing: var(--text-size-title-h6--letter-spacing);
+    line-height: var(--text-size-title-h6--line-height);
+  }
+
+  /*
     mds-icon fills its SVG with the inherited `fill`, black by default, and
     documents no color property: icons placed on the page follow the text.
   */
