@@ -10,6 +10,19 @@ import Rail from './Rail.astro';
 const { hasSidebar } = Astro.locals.starlightRoute;
 ---
 
+<script is:inline>
+  // Every navigation loads a new page, and Magma's components stay hidden until
+  // they hydrate: painted at once, the frame would show up ~100ms after the
+  // content. On navigations within the site, hold the page until the frame is
+  // ready (module script below): the browser keeps the previous page on screen
+  // meanwhile. A first visit is not held, its assets are not cached yet. The
+  // timeout reveals the page anyway; without JavaScript nothing is held.
+  if (document.referrer.startsWith(location.origin)) {
+    document.documentElement.dataset.framePending = '';
+    setTimeout(() => delete document.documentElement.dataset.framePending, 1000);
+  }
+</script>
+
 <div class="frame">
   <div class="header print:hidden"><slot name="header" /></div>
   <div class="rail print:hidden"><Rail /></div>
@@ -27,6 +40,21 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 
 <!-- Pagefind search: one dialog, opened by the search buttons of the rail and of the menu. -->
 <div class="search print:hidden"><Search /></div>
+
+<script>
+  // Reveal the page once the Magma components of the frame shown at this width
+  // have hydrated (the inline script at the top holds it).
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+  const shown = [
+    ...document.querySelectorAll<MagmaElement>('.frame :is(.header, .rail, .section-column, .right-column) *'),
+  ].filter((element) => element.localName.startsWith('mds-') && element.getClientRects().length > 0);
+  Promise.all(
+    shown.map(async (element) => {
+      await customElements.whenDefined(element.localName);
+      await element.componentOnReady?.();
+    }),
+  ).finally(() => delete document.documentElement.dataset.framePending);
+</script>
 
 <style is:global>
   :root:root {
@@ -59,6 +87,11 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   body {
     background-color: rgb(var(--surface-neutral-raised));
     color: rgb(var(--text-neutral-default));
+  }
+
+  /* Until the frame has hydrated: see the inline script at the top of the frame. */
+  :root[data-frame-pending] body {
+    visibility: hidden;
   }
 
   @media (min-width: 64rem) {
