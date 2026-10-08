@@ -16,6 +16,10 @@
     root.setAttribute('data-magma-pref', '');
     root.classList.add(`pref-mode-${mode}`);
     root.dataset.theme =
-      mode === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : mode;
+      mode === 'system'
+        ? matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : mode;
   })();
 </script>

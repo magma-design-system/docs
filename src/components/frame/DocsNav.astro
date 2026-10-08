@@ -16,31 +16,29 @@ const entry = path && (await getEntry('components', path.tag));
 const pages = entry ? pagesOf(entry.data) : [];
 ---
 
-{
-  path && pages.length > 0 && (
-    <nav aria-labelledby={headingId}>
-      <mds-text id={headingId} typography="h5" tag="h2">
-        {t('component.documentation')}
-      </mds-text>
-      <ul>
-        {pages.map((page) => (
-          <li>
-            <mds-button
-              href={componentHref(locale, path.tag, page.slug)}
-              role="link"
-              type="a"
-              aria-current={page.slug === path.slug ? 'page' : undefined}
-              label={t(page.label)}
-              variant="dark"
-              tone={page.slug === path.slug ? 'strong' : 'text'}
-              size="sm"
-            />
-          </li>
-        ))}
-      </ul>
-    </nav>
-  )
-}
+{path && pages.length > 0 && (
+  <nav aria-labelledby={headingId}>
+    <mds-text id={headingId} typography="h5" tag="h2">
+      {t('component.documentation')}
+    </mds-text>
+    <ul>
+      {pages.map((page) => (
+        <li>
+          <mds-button
+            href={componentHref(locale, path.tag, page.slug)}
+            role="link"
+            type="a"
+            aria-current={page.slug === path.slug ? 'page' : undefined}
+            label={t(page.label)}
+            variant="dark"
+            tone={page.slug === path.slug ? 'strong' : 'text'}
+            size="sm"
+          />
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
 
 <style>
   mds-text {

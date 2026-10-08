@@ -13,16 +13,14 @@ const { headingId } = Astro.props;
 const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url.pathname);
 ---
 
-{
-  section && (
-    <nav aria-labelledby={headingId} data-section={section.id}>
-      <mds-text id={headingId} typography="h5" tag="h2">
-        {section.label}
-      </mds-text>
-      <SectionEntries entries={section.group.entries} currentHref={currentHref} icon={section.icon} />
-    </nav>
-  )
-}
+{section && (
+  <nav aria-labelledby={headingId} data-section={section.id}>
+    <mds-text id={headingId} typography="h5" tag="h2">
+      {section.label}
+    </mds-text>
+    <SectionEntries entries={section.group.entries} currentHref={currentHref} icon={section.icon} />
+  </nav>
+)}
 
 <style>
   mds-text {

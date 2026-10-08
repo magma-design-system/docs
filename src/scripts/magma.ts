@@ -19,7 +19,8 @@ defineCustomElements();
 const root = document.documentElement;
 const systemDark = matchMedia('(prefers-color-scheme: dark)');
 const syncScheme = () => {
-  const mode = (['light', 'dark'] as const).find((m) => root.classList.contains(`pref-mode-${m}`)) ?? 'system';
+  const mode =
+    (['light', 'dark'] as const).find((m) => root.classList.contains(`pref-mode-${m}`)) ?? 'system';
   const scheme = mode === 'system' ? (systemDark.matches ? 'dark' : 'light') : mode;
   if (root.dataset.theme !== scheme) root.dataset.theme = scheme;
 };

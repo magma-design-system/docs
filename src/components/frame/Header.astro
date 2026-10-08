@@ -9,7 +9,12 @@ import SectionNav from './SectionNav.astro';
 const { t } = Astro.locals;
 ---
 
-<mds-header appearance="inline" menu="all" nav="none" data-menu-label={t('menuButton.accessibleLabel')}>
+<mds-header
+  appearance="inline"
+  menu="all"
+  nav="none"
+  data-menu-label={t('menuButton.accessibleLabel')}
+>
   <mds-header-bar>
     <Brand />
   </mds-header-bar>
@@ -27,17 +32,23 @@ const { t } = Astro.locals;
   // with an inline SVG icon, which gets neither role nor name. Give it a name.
   // Tracked in https://github.com/magma-design-system/magma/issues/821
   const header = document.querySelector<HTMLElement>('mds-header[data-menu-label]');
-  const bar = header?.querySelector<HTMLElement & { componentOnReady?(): Promise<unknown> }>('mds-header-bar');
+  const bar = header?.querySelector<HTMLElement & { componentOnReady?(): Promise<unknown> }>(
+    'mds-header-bar',
+  );
   customElements.whenDefined('mds-header-bar').then(async () => {
     await bar?.componentOnReady?.();
-    bar?.shadowRoot?.querySelector('[part="hamburger"]')?.setAttribute('aria-label', header?.dataset.menuLabel ?? '');
+    bar?.shadowRoot
+      ?.querySelector('[part="hamburger"]')
+      ?.setAttribute('aria-label', header?.dataset.menuLabel ?? '');
   });
 
   // The menu opens at the top: bring the current page of the section into view,
   // a long list (the components) would hide it otherwise.
   document.addEventListener('mdsModalOpen', (event) => {
     if (event.target !== header) return;
-    header?.querySelector('.menu nav[data-section] [aria-current="page"]')?.scrollIntoView({ block: 'center' });
+    header
+      ?.querySelector('.menu nav[data-section] [aria-current="page"]')
+      ?.scrollIntoView({ block: 'center' });
   });
 </script>
 

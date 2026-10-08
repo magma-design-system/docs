@@ -15,16 +15,16 @@ const { t } = Astro.locals;
 const components = (await getCollection('components')).sort((a, b) => a.id.localeCompare(b.id));
 ---
 
-<StarlightPage frontmatter={{ title: t('components.title'), description: t('components.description') }}>
+<StarlightPage
+  frontmatter={{ title: t('components.title'), description: t('components.description') }}
+>
   <p>{t('components.description')}</p>
   <ul class="components">
-    {
-      components.map(({ id }) => (
-        <li>
-          <a href={componentHref(locale, id)}>{componentName(id)}</a> <code>{`<${id}>`}</code>
-        </li>
-      ))
-    }
+    {components.map(({ id }) => (
+      <li>
+        <a href={componentHref(locale, id)}>{componentName(id)}</a> <code>{`<${id}>`}</code>
+      </li>
+    ))}
   </ul>
 </StarlightPage>
 

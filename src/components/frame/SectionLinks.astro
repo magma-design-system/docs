@@ -8,22 +8,20 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
 
 <nav aria-label={t('frame.sections')}>
   <ul>
-    {
-      sections.map((section) => (
-        <li>
-          <mds-button
-            href={section.href}
-            role="link"
-            type="a"
-            aria-current={section.current ? 'page' : undefined}
-            icon={section.icon}
-            label={section.label}
-            variant="dark"
-            tone={section.current ? 'strong' : 'text'}
-          />
-        </li>
-      ))
-    }
+    {sections.map((section) => (
+      <li>
+        <mds-button
+          href={section.href}
+          role="link"
+          type="a"
+          aria-current={section.current ? 'page' : undefined}
+          icon={section.icon}
+          label={section.label}
+          variant="dark"
+          tone={section.current ? 'strong' : 'text'}
+        />
+      </li>
+    ))}
   </ul>
 </nav>
 

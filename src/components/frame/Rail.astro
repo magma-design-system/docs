@@ -31,7 +31,8 @@ const { t } = Astro.locals;
         aria-controls="rail-body"
         aria-expanded="true"
         variant="dark"
-        tone="text"></mds-button>
+        tone="text"
+      ></mds-button>
     </div>
     <button
       class="collapsed"
@@ -39,13 +40,16 @@ const { t } = Astro.locals;
       data-rail-toggle="expand"
       aria-label={t('frame.rail.expand')}
       aria-controls="rail-body"
-      aria-expanded="false">
+      aria-expanded="false"
+    >
       <Logo />
     </button>
   </div>
   <div class="body" id="rail-body">
     <SectionLinks />
-    <div data-preferences="rail"><Preferences /></div>
+    <div data-preferences="rail">
+      <Preferences />
+    </div>
   </div>
 </div>
 
@@ -62,7 +66,9 @@ const { t } = Astro.locals;
         localStorage.setItem(STORAGE_KEY, collapse ? 'collapsed' : 'expanded');
       } catch {}
       // The toggle just clicked is hidden now: keep the focus on the other one.
-      document.querySelector<HTMLElement>(`[data-rail-toggle="${collapse ? 'expand' : 'collapse'}"]`)?.focus();
+      document
+        .querySelector<HTMLElement>(`[data-rail-toggle="${collapse ? 'expand' : 'collapse'}"]`)
+        ?.focus();
     });
   });
 </script>

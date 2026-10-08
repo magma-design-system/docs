@@ -31,7 +31,9 @@ const links = (entries: SidebarEntry[]): SidebarLink[] =>
 export function frameNav(route: StarlightRouteData, pathname: string): FrameNav {
   const groups = route.sidebar.filter((entry): entry is SidebarGroup => entry.type === 'group');
   if (groups.length !== sectionConfig.length) {
-    throw new Error(`Expected one sidebar group per section of src/lib/nav.mjs, got ${groups.length}`);
+    throw new Error(
+      `Expected one sidebar group per section of src/lib/nav.mjs, got ${groups.length}`,
+    );
   }
 
   // The page itself, or else the longest link the path starts with:

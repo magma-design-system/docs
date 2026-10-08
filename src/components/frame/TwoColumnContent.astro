@@ -7,14 +7,14 @@ const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, lo
 ---
 
 <div class:list={['columns', { 'has-right-column': hasRightColumn }]}>
-  <div class="main-pane"><slot /></div>
-  {
-    hasRightColumn && (
-      <div class="right-column print:hidden">
-        <slot name="right-sidebar" />
-      </div>
-    )
-  }
+  <div class="main-pane">
+    <slot />
+  </div>
+  {hasRightColumn && (
+    <div class="right-column print:hidden">
+      <slot name="right-sidebar" />
+    </div>
+  )}
 </div>
 
 <style>

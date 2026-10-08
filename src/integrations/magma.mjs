@@ -43,7 +43,9 @@ function keepLoaderSideEffects() {
  * @returns {Promise<number>} number of icons
  */
 async function collectIcons(root, outDir) {
-  const config = await new IconsauceConfig().loadConfig(fileURLToPath(new URL(ICONSAUCE_CONFIG, root)));
+  const config = await new IconsauceConfig().loadConfig(
+    fileURLToPath(new URL(ICONSAUCE_CONFIG, root)),
+  );
   const icons = (await build(config))?.list ?? new Map();
   await rm(outDir, { recursive: true, force: true });
   for (const [slug, file] of icons) {

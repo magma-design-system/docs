@@ -13,32 +13,30 @@ const { entries, currentHref, icon } = Astro.props;
 ---
 
 <ul>
-  {
-    entries.map((entry) =>
-      entry.type === 'link' ? (
-        <li>
-          <mds-button
-            href={entry.href}
-            role="link"
-            type="a"
-            aria-current={entry.href === currentHref ? 'page' : undefined}
-            icon={entry.href === currentHref ? icon : undefined}
-            label={entry.label}
-            variant="dark"
-            tone={entry.href === currentHref ? 'strong' : 'text'}
-            size="sm"
-          />
-        </li>
-      ) : (
-        <li class="group">
-          <mds-text typography="h6" tag="h3">
-            {entry.label}
-          </mds-text>
-          <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} />
-        </li>
-      ),
-    )
-  }
+  {entries.map((entry) =>
+    entry.type === 'link' ? (
+      <li>
+        <mds-button
+          href={entry.href}
+          role="link"
+          type="a"
+          aria-current={entry.href === currentHref ? 'page' : undefined}
+          icon={entry.href === currentHref ? icon : undefined}
+          label={entry.label}
+          variant="dark"
+          tone={entry.href === currentHref ? 'strong' : 'text'}
+          size="sm"
+        />
+      </li>
+    ) : (
+      <li class="group">
+        <mds-text typography="h6" tag="h3">
+          {entry.label}
+        </mds-text>
+        <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} />
+      </li>
+    ),
+  )}
 </ul>
 
 <style>

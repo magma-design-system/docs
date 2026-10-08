@@ -51,7 +51,10 @@ export function componentsLoader(): Loader {
         const usage = [];
         for (const [key, markdown] of Object.entries<string>(component.usage ?? {})) {
           // Keys look like "1. Description": the number only sets the order.
-          usage.push({ title: key.replace(/^\d+\.\s*/, ''), html: await render(usageBody(markdown)) });
+          usage.push({
+            title: key.replace(/^\d+\.\s*/, ''),
+            html: await render(usageBody(markdown)),
+          });
         }
 
         const withHtml = async <T extends { docs?: string }>(items: T[]) =>
@@ -80,7 +83,9 @@ export function componentsLoader(): Loader {
 
       logger.info(`Loaded ${components.length} components from documentation.json`);
       if (deadLinks > 0) {
-        logger.warn(`Unlinked ${deadLinks} relative .md links not published with the package (magma#811)`);
+        logger.warn(
+          `Unlinked ${deadLinks} relative .md links not published with the package (magma#811)`,
+        );
       }
     },
   };

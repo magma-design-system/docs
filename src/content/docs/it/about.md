@@ -14,11 +14,11 @@ packaging, tracciato in
 
 ## Fonti
 
-| Contenuto | Pacchetto | File |
-| --------- | --------- | ---- |
-| Componenti | `@maggioli-design-system/magma` | `dist/documentation.json` |
-| Design token | `@maggioli-design-system/design-tokens`, `@maggioli-design-system/styles` | `dist/` |
-| Icone | `@maggioli-design-system/svg-icons`, `@maggioli-design-system/icons` | `dist/svg`, `dist/dictionary.json` |
+| Contenuto    | Pacchetto                                                                 | File                               |
+| ------------ | ------------------------------------------------------------------------- | ---------------------------------- |
+| Componenti   | `@maggioli-design-system/magma`                                           | `dist/documentation.json`          |
+| Design token | `@maggioli-design-system/design-tokens`, `@maggioli-design-system/styles` | `dist/`                            |
+| Icone        | `@maggioli-design-system/svg-icons`, `@maggioli-design-system/icons`      | `dist/svg`, `dist/dictionary.json` |
 
 ## Lingue
 

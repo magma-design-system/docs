@@ -9,8 +9,12 @@ const { t, starlightRoute } = Astro.locals;
 <a class="brand" href={`${localePrefix(starlightRoute.locale)}/`}>
   <Logo />
   <span class="name">
-    <mds-text typography="h6" tag="span">Magma</mds-text>
-    <mds-text typography="option" tag="span">{t('frame.brand.description')}</mds-text>
+    <mds-text typography="h6" tag="span">
+      Magma
+    </mds-text>
+    <mds-text typography="option" tag="span">
+      {t('frame.brand.description')}
+    </mds-text>
   </span>
 </a>
 

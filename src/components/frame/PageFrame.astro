@@ -24,22 +24,28 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 </script>
 
 <div class="frame">
-  <div class="header print:hidden"><slot name="header" /></div>
-  <div class="rail print:hidden"><Rail /></div>
+  <div class="header print:hidden">
+    <slot name="header" />
+  </div>
+  <div class="rail print:hidden">
+    <Rail />
+  </div>
   <div class="card">
-    {
-      hasSidebar && (
-        <div class="section-column print:hidden">
-          <slot name="sidebar" />
-        </div>
-      )
-    }
-    <div class="main-frame"><slot /></div>
+    {hasSidebar && (
+      <div class="section-column print:hidden">
+        <slot name="sidebar" />
+      </div>
+    )}
+    <div class="main-frame">
+      <slot />
+    </div>
   </div>
 </div>
 
 <!-- Pagefind search: one dialog, opened by the search buttons of the rail and of the menu. -->
-<div class="search print:hidden"><Search /></div>
+<div class="search print:hidden">
+  <Search />
+</div>
 
 <script>
   // Each page is a new document, so the section navigation would start from the
@@ -77,8 +83,12 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   // section navigation has its final height and its scroll can be restored.
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
   const shown = [
-    ...document.querySelectorAll<MagmaElement>('.frame :is(.header, .rail, .section-column, .right-column) *'),
-  ].filter((element) => element.localName.startsWith('mds-') && element.getClientRects().length > 0);
+    ...document.querySelectorAll<MagmaElement>(
+      '.frame :is(.header, .rail, .section-column, .right-column) *',
+    ),
+  ].filter(
+    (element) => element.localName.startsWith('mds-') && element.getClientRects().length > 0,
+  );
   Promise.all(
     shown.map(async (element) => {
       await customElements.whenDefined(element.localName);

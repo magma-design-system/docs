@@ -59,7 +59,10 @@ export const sections = [
 
 /** Starlight's `sidebar` config: one group per section, labelled from the UI dictionaries. */
 export function sidebar() {
-  return sections.map((section) => ({ ...sidebarLabel(`nav.${section.id}`), items: section.items() }));
+  return sections.map((section) => ({
+    ...sidebarLabel(`nav.${section.id}`),
+    items: section.items(),
+  }));
 }
 
 /**

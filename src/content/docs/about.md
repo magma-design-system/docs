@@ -13,11 +13,11 @@ something a consumer needs is missing from the packages, it is a packaging bug, 
 
 ## Sources
 
-| Content | Package | File |
-| ------- | ------- | ---- |
-| Components | `@maggioli-design-system/magma` | `dist/documentation.json` |
-| Design tokens | `@maggioli-design-system/design-tokens`, `@maggioli-design-system/styles` | `dist/` |
-| Icons | `@maggioli-design-system/svg-icons`, `@maggioli-design-system/icons` | `dist/svg`, `dist/dictionary.json` |
+| Content       | Package                                                                   | File                               |
+| ------------- | ------------------------------------------------------------------------- | ---------------------------------- |
+| Components    | `@maggioli-design-system/magma`                                           | `dist/documentation.json`          |
+| Design tokens | `@maggioli-design-system/design-tokens`, `@maggioli-design-system/styles` | `dist/`                            |
+| Icons         | `@maggioli-design-system/svg-icons`, `@maggioli-design-system/icons`      | `dist/svg`, `dist/dictionary.json` |
 
 ## Languages
 

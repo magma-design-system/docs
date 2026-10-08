@@ -12,7 +12,11 @@ export interface ComponentPage {
   /** Last segment of the URL, `undefined` for the component's main page. */
   slug: string | undefined;
   /** Key of the UI dictionaries. */
-  label: 'component.page.overview' | 'component.page.api' | 'component.page.css' | 'component.page.guidelines';
+  label:
+    | 'component.page.overview'
+    | 'component.page.api'
+    | 'component.page.css'
+    | 'component.page.guidelines';
   has: (data: ComponentData) => boolean;
 }
 
@@ -24,8 +28,18 @@ export const componentPages: ComponentPage[] = [
     label: 'component.page.api',
     has: (d) => d.props.length + d.events.length + d.methods.length + d.slots.length > 0,
   },
-  { id: 'css', slug: 'css', label: 'component.page.css', has: (d) => d.styles.length + d.parts.length > 0 },
-  { id: 'guidelines', slug: 'guidelines', label: 'component.page.guidelines', has: (d) => d.usage.length > 0 },
+  {
+    id: 'css',
+    slug: 'css',
+    label: 'component.page.css',
+    has: (d) => d.styles.length + d.parts.length > 0,
+  },
+  {
+    id: 'guidelines',
+    slug: 'guidelines',
+    label: 'component.page.guidelines',
+    has: (d) => d.usage.length > 0,
+  },
 ];
 
 export const pagesOf = (data: ComponentData) => componentPages.filter((page) => page.has(data));
