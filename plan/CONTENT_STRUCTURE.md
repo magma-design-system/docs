@@ -58,10 +58,13 @@ UI strings live in a per-locale dictionary, never hard-coded in components. Untr
 pages fall back to English with a notice. Text generated from Magma packages is English
 only until Magma publishes translations.
 
-## Open questions (layout)
+## Layout decisions
 
-1. User block at the bottom of the rail: what does it represent on a public static site?
-2. Page footer "created by / modified by": names and dates from git, roles from a data file?
-3. Component preview: inline (driven by the attributes table) vs iframe for full demos.
-4. Component "Documentation" column (Anatomy, API, CSS, Features, Guidelines,
-   Installation): sub-pages or sections? Anatomy and Features do not exist in the package.
+1. No user block in the rail: it came from the earlier Strapi plan (authenticated
+   editorial editing) and has no meaning on a static site.
+2. Page footer "created by / modified by": names and dates from git history, roles from a
+   data file (`authors.json`, email -> name and role).
+3. Component preview: inline, driven by the attributes table. Iframe only for full demos.
+4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Guidelines,
+   Installation) is a sub-page of the component. What goes into Anatomy is still to be
+   defined.
