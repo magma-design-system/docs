@@ -90,16 +90,18 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
 </script>
 
 <style>
-  .preferences {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
+  @layer components {
+    .preferences {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
 
-  .actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
   }
 </style>

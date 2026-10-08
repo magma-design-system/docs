@@ -74,55 +74,57 @@ const { t } = Astro.locals;
 </script>
 
 <style>
-  .rail {
-    display: flex;
-    flex-direction: column;
-    gap: 2.5rem;
-    width: 15rem;
-    padding: 1.5rem 1rem;
-    overflow-y: auto;
-    scrollbar-width: thin;
-  }
+  @layer components {
+    .rail {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      width: 15rem;
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
 
-  .expanded {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
+    .expanded {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
 
-  .collapsed {
-    display: none;
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-lg);
-    background: none;
-    cursor: pointer;
-  }
+    .collapsed {
+      display: none;
+      padding: 0;
+      border: 0;
+      border-radius: var(--radius-lg);
+      background: none;
+      cursor: pointer;
+    }
 
-  .body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 2.5rem;
-  }
+    .body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2.5rem;
+    }
 
-  :global([data-rail='collapsed']) .rail {
-    width: auto;
-  }
+    :global([data-rail='collapsed']) .rail {
+      width: auto;
+    }
 
-  :global([data-rail='collapsed']) .expanded,
-  :global([data-rail='collapsed']) .body {
-    display: none;
-  }
+    :global([data-rail='collapsed']) .expanded,
+    :global([data-rail='collapsed']) .body {
+      display: none;
+    }
 
-  :global([data-rail='collapsed']) .collapsed {
-    display: inline-flex;
-  }
+    :global([data-rail='collapsed']) .collapsed {
+      display: inline-flex;
+    }
 
-  .collapsed:focus-visible {
-    outline: var(--magma-outline-focus);
-    outline-offset: var(--magma-outline-focus-offset);
+    .collapsed:focus-visible {
+      outline: var(--magma-outline-focus);
+      outline-offset: var(--magma-outline-focus-offset);
+    }
   }
 </style>

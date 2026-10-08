@@ -35,8 +35,10 @@
     "@maggioli-design-system/magma-react": "2.0.1",
     "@maggioli-design-system/styles": "17.0.0",
     "@maggioli-design-system/svg-icons": "4.5.0",
+    "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.8",
-    "normalize.css": "8.0.1"
+    "normalize.css": "8.0.1",
+    "tailwindcss": "4.3.3"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",

@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import tailwindcss from '@tailwindcss/vite';
 import magma from './src/integrations/magma.mjs';
 import { locales } from './src/lib/i18n.mjs';
 import { sidebar } from './src/lib/nav.mjs';
@@ -38,4 +39,8 @@ export default defineConfig({
     }),
     magma(),
   ],
+  vite: {
+    // Tailwind v4: the utilities used in the sources, Magma's theme (src/styles/magma.css).
+    plugins: [tailwindcss()],
+  },
 });

@@ -19,24 +19,26 @@ const { t, starlightRoute } = Astro.locals;
 </a>
 
 <style>
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-    border-radius: var(--radius-lg);
-    color: rgb(var(--text-neutral-default));
-    text-decoration: none;
-  }
+  @layer components {
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      min-width: 0;
+      border-radius: var(--radius-lg);
+      color: rgb(var(--text-neutral-default));
+      text-decoration: none;
+    }
 
-  .name {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-    min-width: 0;
-  }
+    .name {
+      display: flex;
+      flex-direction: column;
+      gap: 0.125rem;
+      min-width: 0;
+    }
 
-  mds-text {
-    white-space: nowrap;
+    mds-text {
+      white-space: nowrap;
+    }
   }
 </style>

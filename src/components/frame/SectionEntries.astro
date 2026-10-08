@@ -40,25 +40,27 @@ const { entries, currentHref, icon } = Astro.props;
 </ul>
 
 <style>
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+  @layer components {
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
 
-  .group {
-    margin-top: 1.5rem;
-  }
+    .group {
+      margin-top: 1.5rem;
+    }
 
-  .group mds-text {
-    display: block;
-    margin-bottom: 0.5rem;
-  }
+    .group mds-text {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
 
-  mds-button {
-    max-width: 100%;
+    mds-button {
+      max-width: 100%;
+    }
   }
 </style>

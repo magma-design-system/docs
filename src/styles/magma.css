@@ -8,8 +8,9 @@
   Starlight puts all its styles in the `starlight` layer. This file is the first
   entry of `customCss`, which Starlight imports before its own layers, so the
   statement below fixes the order of every layer on the site: Magma's reset,
-  fonts, tokens and base styles sit under Starlight, Magma's components,
-  utilities and the site overrides sit above it.
+  fonts, tokens and base styles sit under Starlight; the site's own styles
+  (`components`, also the <style> of the frame), Tailwind's utilities and the
+  overrides sit above it, so a utility class beats the site's styles.
 */
 @layer reset, vendor, theme, base, starlight, components, utilities, overrides;
 
@@ -39,16 +40,29 @@
 
 /*
   Not in assets.md: the typography tokens (--font-*, --text-size-*) as plain
-  custom properties. Components carry their own fallbacks, the site reads the
-  tokens directly because it does not use Tailwind.
+  custom properties, read directly by the site's styles, and the semantic color
+  layer (--magma-*), which the Tailwind colors below point to. Both are imported
+  by Magma's own Storybook (projects/stencil/.storybook/styles.css).
 */
 @import '@maggioli-design-system/styles/dist/css/typography.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/semantic.css' layer(theme);
 
 /*
-  Starlight frame on Magma typography. The frame itself is replaced with Magma
-  components in a later change; page content keeps using these variables.
+  Tailwind v4, set up as in Magma's Storybook (.storybook/tailwind.css): its
+  theme and utilities, no preflight (Magma and Starlight have their resets),
+  then Magma's theme, whose tokens replace Tailwind's defaults: with
+  `--spacing: 0.0025rem`, `gap-400` is 1rem. Classes are collected from the
+  sources by @tailwindcss/vite (astro.config.mjs).
 */
-@layer overrides {
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@maggioli-design-system/styles/dist/tailwind/theme.css';
+
+/*
+  Starlight content on Magma typography and the fixes the site needs, in the
+  `components` layer: above Starlight, below the utilities.
+*/
+@layer components {
   :root {
     --sl-font: var(--font-info);
     --sl-font-mono: var(--font-code);

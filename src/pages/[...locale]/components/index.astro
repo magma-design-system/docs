@@ -29,8 +29,10 @@ const components = (await getCollection('components')).sort((a, b) => a.id.local
 </StarlightPage>
 
 <style>
-  .components {
-    columns: 16rem;
-    padding-inline-start: 1.25rem;
+  @layer components {
+    .components {
+      columns: 16rem;
+      padding-inline-start: 1.25rem;
+    }
   }
 </style>

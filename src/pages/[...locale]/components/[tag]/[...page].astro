@@ -260,8 +260,10 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
 </StarlightPage>
 
 <style>
-  .built-against {
-    font-size: var(--sl-text-sm);
-    color: var(--sl-color-gray-3);
+  @layer components {
+    .built-against {
+      font-size: var(--sl-text-sm);
+      color: var(--sl-color-gray-3);
+    }
   }
 </style>

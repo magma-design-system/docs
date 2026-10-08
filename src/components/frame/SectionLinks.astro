@@ -26,16 +26,18 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
 </nav>
 
 <style>
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+  @layer components {
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
 
-  mds-button {
-    max-width: 100%;
+    mds-button {
+      max-width: 100%;
+    }
   }
 </style>

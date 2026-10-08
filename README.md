@@ -20,7 +20,11 @@ The site loads Magma the way a consumer does:
 
 - [`src/styles/magma.css`](src/styles/magma.css): normalize, fonts and Magma styles in the
   cascade layer order of the Magma install guide, with Starlight's layer placed between
-  Magma's base and component layers.
+  Magma's base and component layers, and Tailwind v4 set up as in Magma's Storybook:
+  Tailwind's theme and utilities (no preflight) with Magma's theme, so Magma's classes work
+  (`gap-400` is 1rem, `grid-cols-full`, `w-full`, ...). The site's own styles, the
+  `<style>` of the components included, go in the `components` layer: a utility class
+  overrides them.
 - [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
   the icon path (`IconsSetService`) and Starlight's `data-theme` kept on the scheme chosen
   with `mds-pref-mode`.
@@ -72,6 +76,9 @@ To add a locale: one entry in `locales` plus its `src/content/i18n/<lang>.json`.
 npm ci
 npm run dev
 ```
+
+Formatting follows the Magma monorepo's Prettier config (`.prettierrc`), with the Astro
+plugin: `npm run format` writes, `npm run format:check` checks.
 
 The site is served under `/docs/` (see `base` in `astro.config.mjs`).
 

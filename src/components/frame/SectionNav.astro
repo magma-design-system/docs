@@ -23,8 +23,10 @@ const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url
 )}
 
 <style>
-  mds-text {
-    display: block;
-    margin-bottom: 1rem;
+  @layer components {
+    mds-text {
+      display: block;
+      margin-bottom: 1rem;
+    }
   }
 </style>

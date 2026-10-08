@@ -41,18 +41,20 @@ const pages = entry ? pagesOf(entry.data) : [];
 )}
 
 <style>
-  mds-text {
-    display: block;
-    margin-bottom: 1rem;
-  }
+  @layer components {
+    mds-text {
+      display: block;
+      margin-bottom: 1rem;
+    }
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
+    ul {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
   }
 </style>

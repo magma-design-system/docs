@@ -53,10 +53,12 @@ const { t } = Astro.locals;
 </script>
 
 <style>
-  .menu {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    padding: 1.5rem;
+  @layer components {
+    .menu {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      padding: 1.5rem;
+    }
   }
 </style>

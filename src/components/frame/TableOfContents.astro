@@ -128,37 +128,39 @@ const items = toc ? flatten(toc.items) : [];
 </script>
 
 <style>
-  mds-text {
-    display: block;
-    margin-bottom: 1rem;
-  }
+  @layer components {
+    mds-text {
+      display: block;
+      margin-bottom: 1rem;
+    }
 
-  .body {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 1rem;
-  }
+    .body {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 1rem;
+    }
 
-  .indicator {
-    --mds-progress-duration: 150ms;
-    align-self: stretch;
-    height: auto;
-  }
+    .indicator {
+      --mds-progress-duration: 150ms;
+      align-self: stretch;
+      height: auto;
+    }
 
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+    ul {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
 
-  li {
-    padding-inline-start: calc(var(--depth) * 0.75rem);
-  }
+    li {
+      padding-inline-start: calc(var(--depth) * 0.75rem);
+    }
 
-  mds-button {
-    max-width: 100%;
+    mds-button {
+      max-width: 100%;
+    }
   }
 </style>
