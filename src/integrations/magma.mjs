@@ -16,6 +16,7 @@ const LOADER = '@maggioli-design-system/magma/loader';
  * `./loader` points to) extend HTMLElement. Without it every component throws
  * "Failed to construct 'HTMLElement'" on upgrade. Dev is not affected, the
  * dependency optimizer ignores `sideEffects`. Keep that one module whole.
+ * Tracked in https://github.com/magma-design-system/magma/issues/817
  * @returns {import('vite').Plugin}
  */
 function keepLoaderSideEffects() {
