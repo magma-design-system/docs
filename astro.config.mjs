@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import magma from './src/integrations/magma.mjs';
 import { componentTags } from './src/lib/magma.mjs';
 
 export default defineConfig({
@@ -10,6 +11,8 @@ export default defineConfig({
     starlight({
       title: 'Magma',
       description: 'Maggioli Group Design System',
+      // First entry: it declares the cascade layer order for the whole site.
+      customCss: ['./src/styles/magma.css'],
       social: [
         {
           icon: 'github',
@@ -35,5 +38,6 @@ export default defineConfig({
         },
       ],
     }),
+    magma(),
   ],
 });

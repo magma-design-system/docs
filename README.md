@@ -14,6 +14,19 @@ bug: track it in [#1](https://github.com/magma-design-system/docs/issues/1).
 
 All Magma access goes through [`src/lib/magma.mjs`](src/lib/magma.mjs).
 
+## Magma in the page
+
+The site loads Magma the way a consumer does:
+
+- [`src/styles/magma.css`](src/styles/magma.css): normalize, fonts and Magma styles in the
+  cascade layer order of the Magma install guide, with Starlight's layer placed between
+  Magma's base and component layers.
+- [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
+  the icon path (`IconsSetService`) and the light/dark sync with Starlight's theme picker.
+- [`src/integrations/magma.mjs`](src/integrations/magma.mjs): injects that script into
+  every page and serves `@maggioli-design-system/svg-icons` under `/docs/svg/mgg/`, so
+  `<mds-icon name="mgg/...">` works in dev and in the build.
+
 ## Develop
 
 ```bash

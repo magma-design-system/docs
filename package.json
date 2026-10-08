@@ -17,6 +17,10 @@
   },
   "dependencies": {
     "@astrojs/starlight": "0.42.5",
+    "@fontsource/karla": "5.1.0",
+    "@fontsource/merriweather": "5.1.0",
+    "@fontsource/roboto": "5.1.0",
+    "@fontsource/roboto-mono": "5.1.0",
     "@maggioli-design-system/design-tokens": "15.0.1",
     "@maggioli-design-system/icons": "1.94.0",
     "@maggioli-design-system/identity": "2.1.1",
@@ -25,7 +29,8 @@
     "@maggioli-design-system/magma-react": "2.0.1",
     "@maggioli-design-system/styles": "17.0.0",
     "@maggioli-design-system/svg-icons": "4.5.0",
-    "astro": "7.3.8"
+    "astro": "7.3.8",
+    "normalize.css": "8.0.1"
   },
   "devDependencies": {
     "@astrojs/check": "0.9.10",
