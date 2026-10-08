@@ -1,0 +1,31 @@
+---
+// The Magma mark from @maggioli-design-system/identity, in its blue and white
+// versions: the white one is shown on the dark scheme.
+import logo from '@maggioli-design-system/identity/dist/internal/magma-design-system/logo-magma.svg?url';
+import logoWhite from '@maggioli-design-system/identity/dist/internal/magma-design-system/logo-magma-white.svg?url';
+---
+
+<span class="logo" aria-hidden="true">
+  <mds-img class="light" src={logo} alt="" width="200" height="200" loading="eager"></mds-img>
+  <mds-img class="dark" src={logoWhite} alt="" width="200" height="200" loading="eager"></mds-img>
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  mds-img {
+    --mds-img-background: transparent;
+    width: 100%;
+    height: 100%;
+  }
+
+  :global([data-theme='dark']) .light,
+  :global([data-theme='light']) .dark {
+    display: none;
+  }
+</style>

@@ -70,4 +70,16 @@
   mds-icon {
     fill: currentColor;
   }
+
+  /*
+    Starlight's reset sets `margin: 0` on every element, and a page style beats
+    the :host and ::slotted() rules of a component. mds-header-bar is centered
+    by its :host margins and spaced by the ::slotted() margins of mds-header
+    (the inline appearance): put them back, the spacing comes from the custom
+    property mds-header still sets.
+  */
+  mds-header-bar {
+    margin-inline: auto;
+    margin-block: var(--mds-header-inline-margin-current, 0);
+  }
 }

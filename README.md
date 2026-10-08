@@ -22,7 +22,8 @@ The site loads Magma the way a consumer does:
   cascade layer order of the Magma install guide, with Starlight's layer placed between
   Magma's base and component layers.
 - [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
-  the icon path (`IconsSetService`) and the light/dark sync with Starlight's theme picker.
+  the icon path (`IconsSetService`) and Starlight's `data-theme` kept on the scheme chosen
+  with `mds-pref-mode`.
 - [`src/integrations/magma.mjs`](src/integrations/magma.mjs): injects that script into
   every page and runs [iconsauce](https://www.npmjs.com/package/@iconsauce/core) as Magma
   does: every icon slug (`mi/<variant>/<name>`, `mdi/<name>`, `mgg/<name>`) found in the
@@ -30,6 +31,29 @@ The site loads Magma the way a consumer does:
   `public/svg/` (gitignored), where `<mds-icon name="...">` fetches it. The globs are in
   [`iconsauce.config.mjs`](iconsauce.config.mjs). In dev, a change under `src/` collects
   them again.
+
+## Frame
+
+Starlight is the engine (routing, content, i18n, search); the frame around the content is
+built with Magma components, following the layout decisions in `plan/CONTENT_STRUCTURE.md`
+(added by [#3](https://github.com/magma-design-system/docs/pull/3)). The overrides are in
+[`src/components/frame/`](src/components/frame/), listed in `astro.config.mjs`:
+
+- **Rail** (desktop): brand, the 8 sections as `mds-button` links, search, the repository
+  link, `mds-pref-mode` and `mds-pref-language`. It collapses to the logo only; the state is
+  kept in `localStorage`.
+- **Section navigation**: the pages of the current section, first column of the card.
+- **Right column**: on component pages, the "Documentation" column with the component's
+  sub-pages; elsewhere, the table of contents with a reading indicator (a vertical
+  `mds-progress`).
+- **Mobile header** (below 64rem): `mds-header` with the brand; its menu holds the
+  sections, the component sub-pages, the section navigation and the preferences. The right
+  column stays down to 48rem.
+
+The sections are defined once in [`src/lib/nav.mjs`](src/lib/nav.mjs), which builds
+Starlight's sidebar: one group per section, the first item is where the rail links. Each
+component has a main page and the sub-pages its `documentation.json` data allows (API, CSS,
+Guidelines): [`src/lib/components.ts`](src/lib/components.ts).
 
 ## Languages
 

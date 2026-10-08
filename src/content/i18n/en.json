@@ -1,13 +1,24 @@
 {
-  "nav.startHere": "Start here",
+  "nav.introduction": "Introduction",
+  "nav.foundation": "Foundation",
+  "nav.tokens": "Tokens",
+  "nav.icons": "Icons",
   "nav.components": "Components",
+  "nav.components.overview": "All components",
+  "nav.brand": "Brand assets",
+  "nav.development": "Development",
+  "nav.community": "Community",
+
+  "frame.brand.description": "Maggioli Design System",
+  "frame.sections": "Sections",
+  "frame.rail.collapse": "Collapse the navigation",
+  "frame.rail.expand": "Expand the navigation",
+  "frame.repository": "Magma on GitHub",
 
   "component.generatedFrom": "Generated from",
   "component.encapsulation": "Encapsulation",
   "component.sourceLanguage": "This page is generated from the Magma packages, which are documented in English only.",
   "component.overview": "Overview",
-  "component.usage": "Usage",
-  "component.api": "API",
   "component.props": "Props",
   "component.events": "Events",
   "component.methods": "Methods",
@@ -30,5 +41,13 @@
   "component.required": "required",
   "component.attribute": "attribute",
   "component.default": "default",
-  "component.defaultSlot": "(default)"
+  "component.defaultSlot": "(default)",
+  "component.documentation": "Documentation",
+  "component.page.overview": "Overview",
+  "component.page.api": "API",
+  "component.page.css": "CSS",
+  "component.page.guidelines": "Guidelines",
+
+  "components.title": "Components",
+  "components.description": "The web components of Magma, generated from the documentation of the installed package."
 }

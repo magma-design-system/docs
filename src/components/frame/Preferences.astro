@@ -1,0 +1,98 @@
+---
+// Search, repository link, light/dark mode and language: at the bottom of the
+// rail and in the mobile menu. Mode and language are Magma's own preference
+// components; src/scripts/magma.ts makes Starlight follow the mode.
+//
+// Rendered once, in the rail, and moved into the menu below 64rem: two
+// mds-pref-mode on a page undo each other's choice (each one applies its own
+// mode again on every render, magma 2.0.1).
+import { locales } from '../../lib/i18n.mjs';
+import { REPOSITORY } from '../../lib/nav.mjs';
+import { localePrefix } from '../../lib/frame';
+
+const { t, starlightRoute } = Astro.locals;
+
+// The same page in every locale: the path below the locale prefix does not change.
+const path = Astro.url.pathname.slice(localePrefix(starlightRoute.locale).length) || '/';
+const languages = Object.entries(locales).map(([key, { lang }]) => ({
+  lang,
+  href: `${localePrefix(key === 'root' ? undefined : key)}${path}`,
+}));
+---
+
+<div class="preferences" id="preferences">
+  <div class="actions">
+    <mds-button
+      data-search-trigger
+      type="button"
+      icon="mi/baseline/search"
+      label={t('search.label')}
+      variant="dark"
+      tone="text"
+      size="sm"></mds-button>
+    <mds-button
+      href={REPOSITORY}
+      target="blank"
+      role="link"
+      type="a"
+      icon="mdi/github"
+      label={t('frame.repository')}
+      variant="dark"
+      tone="text"
+      size="sm"></mds-button>
+  </div>
+  <mds-pref-mode size="sm"></mds-pref-mode>
+  <mds-pref-language size="sm" set={starlightRoute.lang}>
+    {
+      languages.map(({ lang, href }) => (
+        <mds-pref-language-item code={lang} data-href={href} selected={lang === starlightRoute.lang} />
+      ))
+    }
+  </mds-pref-language>
+</div>
+
+<script>
+  // Same breakpoint as the frame (PageFrame.astro): rail above, menu below.
+  const desktop = matchMedia('(min-width: 64rem)');
+  const place = () => {
+    const preferences = document.getElementById('preferences');
+    const target = document.querySelector(`[data-preferences="${desktop.matches ? 'rail' : 'menu'}"]`);
+    if (preferences && target && preferences.parentElement !== target) target.append(preferences);
+  };
+  place();
+  desktop.addEventListener('change', place);
+
+  // One search dialog per page (Starlight's, in PageFrame): every trigger opens it.
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('[data-search-trigger]')) return;
+    // Once open, the dialog closes on the next click that reaches `window` on
+    // anything with an `href` property: mds-button has one.
+    event.stopPropagation();
+    document.querySelector<HTMLButtonElement>('site-search button[data-open-modal]')?.click();
+  });
+
+  // Picking a language opens the same page in that locale.
+  document.addEventListener('mdsPrefLanguageChange', (event) => {
+    const { language } = (event as CustomEvent<{ language: string }>).detail;
+    const item = (event.target as Element).querySelector<HTMLElement>(
+      `mds-pref-language-item[code="${language}"]`,
+    );
+    const href = item?.dataset.href;
+    if (href && href !== window.location.pathname) window.location.assign(href);
+  });
+</script>
+
+<style>
+  .preferences {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+</style>

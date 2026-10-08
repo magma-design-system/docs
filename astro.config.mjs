@@ -2,8 +2,21 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import magma from './src/integrations/magma.mjs';
-import { componentTags } from './src/lib/magma.mjs';
-import { locales, sidebarLabel } from './src/lib/i18n.mjs';
+import { locales } from './src/lib/i18n.mjs';
+import { sidebar } from './src/lib/nav.mjs';
+
+/** Starlight components replaced by the frame built with Magma components. */
+const frame = Object.fromEntries(
+  [
+    'Header',
+    'PageFrame',
+    'PageSidebar',
+    'Sidebar',
+    'TableOfContents',
+    'ThemeProvider',
+    'TwoColumnContent',
+  ].map((name) => [name, `./src/components/frame/${name}.astro`]),
+);
 
 export default defineConfig({
   site: 'https://magma-design-system.github.io',
@@ -16,30 +29,12 @@ export default defineConfig({
       locales,
       // First entry: it declares the cascade layer order for the whole site.
       customCss: ['./src/styles/magma.css'],
-      social: [
-        {
-          icon: 'github',
-          label: 'GitHub',
-          href: 'https://github.com/magma-design-system/magma',
-        },
-      ],
+      components: frame,
       editLink: {
         baseUrl: 'https://github.com/magma-design-system/docs/edit/main/',
       },
-      sidebar: [
-        {
-          ...sidebarLabel('nav.startHere'),
-          items: [{ slug: 'about' }],
-        },
-        {
-          ...sidebarLabel('nav.components'),
-          collapsed: true,
-          items: componentTags().map((tag) => ({
-            label: tag,
-            link: `/components/${tag}/`,
-          })),
-        },
-      ],
+      // One group per section of the rail: src/lib/nav.mjs.
+      sidebar: sidebar(),
     }),
     magma(),
   ],

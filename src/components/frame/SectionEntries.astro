@@ -1,0 +1,66 @@
+---
+// Links of a section, nested groups shown as sub-headings.
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+
+interface Props {
+  entries: StarlightRouteData['sidebar'];
+  currentHref: string | undefined;
+  /** Shown on the current link, as in the layout mockups. */
+  icon: string;
+}
+
+const { entries, currentHref, icon } = Astro.props;
+---
+
+<ul>
+  {
+    entries.map((entry) =>
+      entry.type === 'link' ? (
+        <li>
+          <mds-button
+            href={entry.href}
+            role="link"
+            type="a"
+            aria-current={entry.href === currentHref ? 'page' : undefined}
+            icon={entry.href === currentHref ? icon : undefined}
+            label={entry.label}
+            variant="dark"
+            tone={entry.href === currentHref ? 'weak' : 'text'}
+            size="sm"
+          />
+        </li>
+      ) : (
+        <li class="group">
+          <mds-text typography="h6" tag="h3">
+            {entry.label}
+          </mds-text>
+          <Astro.self entries={entry.entries} currentHref={currentHref} icon={icon} />
+        </li>
+      ),
+    )
+  }
+</ul>
+
+<style>
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .group {
+    margin-top: 1.5rem;
+  }
+
+  .group mds-text {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  mds-button {
+    max-width: 100%;
+  }
+</style>

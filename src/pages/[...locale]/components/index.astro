@@ -1,0 +1,36 @@
+---
+// Landing page of the Components section: every component, linking to its page.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+import { componentHref } from '../../../lib/components';
+import { localeParams } from '../../../lib/i18n.mjs';
+import { componentName } from '../../../lib/nav.mjs';
+
+export function getStaticPaths() {
+  return localeParams.map((locale) => ({ params: { locale } }));
+}
+
+const { locale } = Astro.params;
+const { t } = Astro.locals;
+const components = (await getCollection('components')).sort((a, b) => a.id.localeCompare(b.id));
+---
+
+<StarlightPage frontmatter={{ title: t('components.title'), description: t('components.description') }}>
+  <p>{t('components.description')}</p>
+  <ul class="components">
+    {
+      components.map(({ id }) => (
+        <li>
+          <a href={componentHref(locale, id)}>{componentName(id)}</a> <code>{`<${id}>`}</code>
+        </li>
+      ))
+    }
+  </ul>
+</StarlightPage>
+
+<style>
+  .components {
+    columns: 16rem;
+    padding-inline-start: 1.25rem;
+  }
+</style>

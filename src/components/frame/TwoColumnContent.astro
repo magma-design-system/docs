@@ -1,0 +1,43 @@
+---
+// Page content and the right column (PageSidebar), inside the card.
+import { parseComponentPath } from '../../lib/components';
+
+const { toc, locale } = Astro.locals.starlightRoute;
+const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, locale) !== undefined;
+---
+
+<div class:list={['columns', { 'has-right-column': hasRightColumn }]}>
+  <div class="main-pane"><slot /></div>
+  {
+    hasRightColumn && (
+      <div class="right-column print:hidden">
+        <slot name="right-sidebar" />
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .right-column {
+    display: none;
+  }
+
+  @media (min-width: 48rem) {
+    .has-right-column {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--frame-column-width);
+      gap: var(--frame-gap);
+    }
+
+    .right-column {
+      display: block;
+      position: sticky;
+      top: var(--frame-header-height);
+      align-self: start;
+      max-height: calc(100vh - var(--frame-header-height));
+      overflow-y: auto;
+      padding: var(--frame-pad) var(--frame-pad) var(--frame-pad) 0;
+      scrollbar-width: thin;
+    }
+  }
+</style>
