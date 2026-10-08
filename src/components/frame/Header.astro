@@ -24,7 +24,8 @@ const { t } = Astro.locals;
 
 <script>
   // magma 2.0.1: the menu button of mds-header-bar is an icon-only mds-button
-  // with no label, so it has no accessible name. Give it one.
+  // with an inline SVG icon, which gets neither role nor name. Give it a name.
+  // Tracked in https://github.com/magma-design-system/magma/issues/821
   const header = document.querySelector<HTMLElement>('mds-header[data-menu-label]');
   const bar = header?.querySelector<HTMLElement & { componentOnReady?(): Promise<unknown> }>('mds-header-bar');
   customElements.whenDefined('mds-header-bar').then(async () => {
