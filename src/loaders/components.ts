@@ -16,21 +16,44 @@ function unlinkUnpublished(markdown: string): { text: string; count: number } {
   return { text, count };
 }
 
+const HEADING = /^(#{1,6})(?=\s)/;
+
 /**
- * Usage entries are pages of their own (the Guidelines sub-page), each under
- * an h2: their "####" headings become h3.
+ * Moves the headings so the shallowest one becomes `level`, keeping how they
+ * nest. Fenced code is left alone: there a leading "#" is a comment.
  */
-function usageBody(markdown: string): string {
-  return markdown.replace(/^####(#*)\s/gm, '###$1 ');
+function nestHeadings(markdown: string, level: number): string {
+  let fenced = false;
+  const lines = markdown.split('\n').map((text) => {
+    if (/^\s*(```|~~~)/.test(text)) fenced = !fenced;
+    return { text, depth: fenced ? 0 : (HEADING.exec(text)?.[1].length ?? 0) };
+  });
+  const depths = lines.map((line) => line.depth).filter((depth) => depth > 0);
+  if (depths.length === 0) return markdown;
+  const shift = level - Math.min(...depths);
+  return lines
+    .map(({ text, depth }) =>
+      depth > 0 ? '#'.repeat(Math.min(6, depth + shift)) + text.slice(depth) : text,
+    )
+    .join('\n');
 }
 
 /**
- * Drops the leading "# mds-tag" heading (the page already has a title) and
- * demotes the other headings by one level, so they nest under "Overview".
+ * What the readme adds to the usage Description: no leading "# mds-tag"
+ * heading (the page already has a title) and no generic intro, which is also
+ * the component's `docs` (the page description). In magma 2.0.1 105 readmes
+ * out of 114 have nothing else.
  */
-function readmeBody(markdown: string): string {
-  return markdown.replace(/^#\s+[^\n]*\n+/, '').replace(/^(#{2,5})\s/gm, '#$1 ');
+function readmeExtra(markdown: string, intro: string): string {
+  return markdown
+    .replace(/^#\s+[^\n]*\n+/, '')
+    .replace(intro.trim(), '')
+    .trim();
 }
+
+/** Usage files of a component, by name: "1. Description" -> "description". */
+const USAGE = ['description', 'pattern', 'antipattern'] as const;
+type Usage = (typeof USAGE)[number];
 
 export function componentsLoader(): Loader {
   return {
@@ -40,33 +63,43 @@ export function componentsLoader(): Loader {
       let deadLinks = 0;
 
       const render = async (markdown: string | undefined) => {
-        if (!markdown?.trim()) return '';
+        if (!markdown?.trim()) return { html: '', headings: [] };
         const { text, count } = unlinkUnpublished(markdown);
         deadLinks += count;
-        return (await renderMarkdown(text)).html;
+        const { html, metadata } = await renderMarkdown(text);
+        return { html, headings: metadata?.headings ?? [] };
       };
+      const toHtml = async (markdown: string | undefined) => (await render(markdown)).html;
 
       store.clear();
       for (const component of components) {
-        const usage = [];
+        const usage: Partial<Record<Usage, string>> = {};
         for (const [key, markdown] of Object.entries<string>(component.usage ?? {})) {
           // Keys look like "1. Description": the number only sets the order.
-          usage.push({
-            title: key.replace(/^\d+\.\s*/, ''),
-            html: await render(usageBody(markdown)),
-          });
+          const name = key.replace(/^\d+\.\s*/, '').toLowerCase();
+          if (USAGE.includes(name as Usage)) {
+            usage[name as Usage] = markdown;
+          } else {
+            logger.warn(`${component.tag}: usage "${key}" has no place on the site, left out`);
+          }
         }
 
         const withHtml = async <T extends { docs?: string }>(items: T[]) =>
-          Promise.all(items.map(async (item) => ({ ...item, docsHtml: await render(item.docs) })));
+          Promise.all(items.map(async (item) => ({ ...item, docsHtml: await toHtml(item.docs) })));
 
         const data = await parseData({
           id: component.tag,
           data: {
             tag: component.tag,
             summary: component.docs ?? '',
-            readmeHtml: await render(readmeBody(component.readme ?? '')),
-            usage,
+            // The Overview: the description under its h2, then the readme.
+            descriptionHtml: await toHtml(nestHeadings(usage.description ?? '', 3)),
+            readmeHtml: await toHtml(
+              nestHeadings(readmeExtra(component.readme ?? '', component.docs ?? ''), 3),
+            ),
+            // Sub-pages of their own: their entries are the h2 of the page.
+            pattern: await render(nestHeadings(usage.pattern ?? '', 2)),
+            antipattern: await render(nestHeadings(usage.antipattern ?? '', 2)),
             props: await withHtml(component.props),
             events: await withHtml(component.events),
             methods: await withHtml(component.methods),

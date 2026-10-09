@@ -71,7 +71,9 @@ built with Magma components, following the layout decisions in `plan/CONTENT_STR
 The sections are defined once in [`src/lib/nav.mjs`](src/lib/nav.mjs), which builds
 Starlight's sidebar: one group per section, the first item is where the rail links. Each
 component has a main page and the sub-pages its `documentation.json` data allows (API, CSS,
-Guidelines): [`src/lib/components.ts`](src/lib/components.ts).
+Pattern, Antipattern): [`src/lib/components.ts`](src/lib/components.ts). The main page opens
+with the Description usage file, the other two usage files are the Pattern and Antipattern
+sub-pages.
 
 ## Languages
 

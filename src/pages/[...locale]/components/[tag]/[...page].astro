@@ -34,7 +34,8 @@ const link = (tag: string) => componentHref(locale, tag);
 const contentLang = locale ? 'en' : undefined;
 
 const title = page.id === 'overview' ? `<${data.tag}>` : `<${data.tag}> ${t(page.label)}`;
-const usageSlug = (title: string) => `usage-${title.toLowerCase()}`;
+// Pattern and Antipattern pages are a usage file each, headings included.
+const guide = page.id === 'pattern' || page.id === 'antipattern' ? data[page.id] : undefined;
 
 const sections = {
   overview: [
@@ -59,11 +60,14 @@ const sections = {
     },
     { id: 'parts', label: t('component.parts'), show: data.parts.length > 0 },
   ],
-  guidelines: data.usage.map((u) => ({ id: usageSlug(u.title), label: u.title, show: true })),
+  pattern: [],
+  antipattern: [],
 }[page.id].filter((section) => section.show);
 const label = (id: string) => sections.find((section) => section.id === id)?.label;
 
-const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
+const headings =
+  guide?.headings ??
+  sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
 
 // Table cells stay on one line: mds-table scrolls sideways when it is wider
 // than the page. Descriptions are paragraphs, which Magma's reset.css caps at
@@ -89,7 +93,10 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
   {page.id === 'overview' && (
     <>
       <h2 id="overview">{label('overview')}</h2>
-      <div lang={contentLang} set:html={data.readmeHtml} />
+      <div lang={contentLang}>
+        <Fragment set:html={data.descriptionHtml} />
+        <Fragment set:html={data.readmeHtml} />
+      </div>
 
       {label('dependencies') && (
         <>
@@ -125,13 +132,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
     </>
   )}
 
-  {page.id === 'guidelines' &&
-    data.usage.map((u) => (
-      <div lang={contentLang}>
-        <h2 id={usageSlug(u.title)}>{u.title}</h2>
-        <Fragment set:html={u.html} />
-      </div>
-    ))}
+  {guide && <div lang={contentLang} set:html={guide.html} />}
 
   {page.id === 'api' && data.props.length > 0 && (
     <>
