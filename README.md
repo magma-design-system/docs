@@ -20,12 +20,46 @@ The site loads Magma the way a consumer does:
 
 - [`src/styles/magma.css`](src/styles/magma.css): normalize, fonts and Magma styles in the
   cascade layer order of the Magma install guide, with Starlight's layer placed between
-  Magma's base and component layers.
+  Magma's base and component layers, and Tailwind v4 set up as in Magma's Storybook:
+  Tailwind's theme and utilities (no preflight) with Magma's theme, so Magma's classes work
+  (`gap-400` is 1rem, `grid-cols-full`, `w-full`, ...). The frame is styled with these
+  utilities and Magma's tokens (breakpoints `tablet` and `desktop`, the spacing scale,
+  semantic colors); the few rules left in `magma.css` target markup the site does not
+  render itself (`<body>`, page content, Starlight's elements), in the `components`
+  layer, so a utility class overrides them.
 - [`src/scripts/magma.ts`](src/scripts/magma.ts): the lazy loader (`defineCustomElements`),
-  the icon path (`IconsSetService`) and the light/dark sync with Starlight's theme picker.
+  the icon path (`IconsSetService`) and Starlight's `data-theme` kept on the scheme chosen
+  with `mds-pref-mode`.
 - [`src/integrations/magma.mjs`](src/integrations/magma.mjs): injects that script into
-  every page and serves `@maggioli-design-system/svg-icons` under `/docs/svg/mgg/`, so
-  `<mds-icon name="mgg/...">` works in dev and in the build.
+  every page and runs [iconsauce](https://www.npmjs.com/package/@iconsauce/core) as Magma
+  does: every icon slug (`mi/<variant>/<name>`, `mdi/<name>`, `mgg/<name>`) found in the
+  sources, in the component usage examples and in the `svg-icons` list is copied to
+  `public/svg/` (gitignored), where `<mds-icon name="...">` fetches it. The globs are in
+  [`iconsauce.config.mjs`](iconsauce.config.mjs). In dev, a change under `src/` collects
+  them again.
+
+## Frame
+
+Starlight is the engine (routing, content, i18n, search); the frame around the content is
+built with Magma components, following the layout decisions in `plan/CONTENT_STRUCTURE.md`
+(added by [#3](https://github.com/magma-design-system/docs/pull/3)). The overrides are in
+[`src/components/frame/`](src/components/frame/), listed in `astro.config.mjs`:
+
+- **Rail** (desktop): brand, the 8 sections as `mds-button` links, search, the repository
+  link, `mds-pref-mode` and `mds-pref-language`. It collapses to the logo only; the state is
+  kept in `localStorage`.
+- **Section navigation**: the pages of the current section, first column of the card.
+- **Right column**: on component pages, the "Documentation" column with the component's
+  sub-pages; elsewhere, the table of contents with a reading indicator (a vertical
+  `mds-progress`).
+- **Mobile header** (below 64rem): `mds-header` with the brand; its menu holds the
+  sections, the component sub-pages, the section navigation and the preferences. The right
+  column stays down to 48rem.
+
+The sections are defined once in [`src/lib/nav.mjs`](src/lib/nav.mjs), which builds
+Starlight's sidebar: one group per section, the first item is where the rail links. Each
+component has a main page and the sub-pages its `documentation.json` data allows (API, CSS,
+Guidelines): [`src/lib/components.ts`](src/lib/components.ts).
 
 ## Languages
 
@@ -44,6 +78,9 @@ To add a locale: one entry in `locales` plus its `src/content/i18n/<lang>.json`.
 npm ci
 npm run dev
 ```
+
+Formatting follows the Magma monorepo's Prettier config (`.prettierrc`), with the Astro
+plugin: `npm run format` writes, `npm run format:check` checks.
 
 The site is served under `/docs/` (see `base` in `astro.config.mjs`).
 

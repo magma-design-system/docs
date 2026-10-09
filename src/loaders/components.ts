@@ -17,6 +17,14 @@ function unlinkUnpublished(markdown: string): { text: string; count: number } {
 }
 
 /**
+ * Usage entries are pages of their own (the Guidelines sub-page), each under
+ * an h2: their "####" headings become h3.
+ */
+function usageBody(markdown: string): string {
+  return markdown.replace(/^####(#*)\s/gm, '###$1 ');
+}
+
+/**
  * Drops the leading "# mds-tag" heading (the page already has a title) and
  * demotes the other headings by one level, so they nest under "Overview".
  */
@@ -43,7 +51,10 @@ export function componentsLoader(): Loader {
         const usage = [];
         for (const [key, markdown] of Object.entries<string>(component.usage ?? {})) {
           // Keys look like "1. Description": the number only sets the order.
-          usage.push({ title: key.replace(/^\d+\.\s*/, ''), html: await render(markdown) });
+          usage.push({
+            title: key.replace(/^\d+\.\s*/, ''),
+            html: await render(usageBody(markdown)),
+          });
         }
 
         const withHtml = async <T extends { docs?: string }>(items: T[]) =>
@@ -72,7 +83,9 @@ export function componentsLoader(): Loader {
 
       logger.info(`Loaded ${components.length} components from documentation.json`);
       if (deadLinks > 0) {
-        logger.warn(`Unlinked ${deadLinks} relative .md links not published with the package (magma#811)`);
+        logger.warn(
+          `Unlinked ${deadLinks} relative .md links not published with the package (magma#811)`,
+        );
       }
     },
   };

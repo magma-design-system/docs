@@ -1,0 +1,22 @@
+---
+// Logo and name of the site, linking to the home page of the current locale.
+import { localePrefix } from '../../lib/frame';
+import Logo from './Logo.astro';
+
+const { t, starlightRoute } = Astro.locals;
+---
+
+<a
+  class="flex min-w-0 items-center gap-300 rounded-lg text-fg-default no-underline"
+  href={`${localePrefix(starlightRoute.locale)}/`}
+>
+  <Logo />
+  <span class="flex min-w-0 flex-col gap-50">
+    <mds-text class="whitespace-nowrap" typography="h6" tag="span">
+      Magma
+    </mds-text>
+    <mds-text class="whitespace-nowrap" typography="option" tag="span">
+      {t('frame.brand.description')}
+    </mds-text>
+  </span>
+</a>

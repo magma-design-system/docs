@@ -1,0 +1,116 @@
+---
+// The frame of every page, replacing Starlight's (layout mockups in
+// plan/CONTENT_STRUCTURE.md). Desktop: rail on the page background, then a card
+// with the section navigation, the content and the right column. Below 64rem:
+// the mobile header (Header.astro) with everything else in its menu, the right
+// column down to 48rem.
+import Search from '@astrojs/starlight/components/Search.astro';
+import Rail from './Rail.astro';
+
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+
+<script is:inline>
+  // Every navigation loads a new page, and Magma's components stay hidden until
+  // they hydrate: painted at once, the frame would show up ~100ms after the
+  // content. On navigations within the site, hold the page until the frame is
+  // ready (module script below): the browser keeps the previous page on screen
+  // meanwhile. A first visit is not held, its assets are not cached yet. The
+  // timeout reveals the page anyway; without JavaScript nothing is held.
+  if (document.referrer.startsWith(location.origin)) {
+    document.documentElement.dataset.framePending = '';
+    setTimeout(() => delete document.documentElement.dataset.framePending, 1000);
+  }
+</script>
+
+<div
+  data-frame
+  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[auto_minmax(0,1fr)]"
+>
+  <div data-frame-header class="desktop:hidden print:hidden">
+    <slot name="header" />
+  </div>
+  <div
+    data-frame-rail
+    class="hidden desktop:sticky desktop:top-0 desktop:flex desktop:h-screen print:hidden"
+  >
+    <Rail />
+  </div>
+  <div
+    class:list={[
+      'desktop:my-400 desktop:me-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
+      hasSidebar
+        ? 'desktop:grid-cols-[--spacing(5200)_minmax(0,1fr)] desktop:gap-x-800'
+        : 'desktop:grid-cols-[minmax(0,1fr)]',
+    ]}
+  >
+    {hasSidebar && (
+      <div
+        data-frame-section
+        class="hidden desktop:sticky desktop:top-0 desktop:block desktop:max-h-screen desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
+      >
+        <slot name="sidebar" />
+      </div>
+    )}
+    <div class:list={[!hasSidebar && 'desktop:ps-800']}>
+      <slot />
+    </div>
+  </div>
+</div>
+
+<!-- Pagefind search: one dialog, opened by the search buttons of the rail and of the menu. -->
+<div data-frame-search class="print:hidden">
+  <Search />
+</div>
+
+<script>
+  // Each page is a new document, so the section navigation would start from the
+  // top on every page: a long list (the components) loses its place. Keep its
+  // scroll position for the section in sessionStorage.
+  const SCROLL_KEY = 'magma-docs:section-scroll';
+  const column = document.querySelector<HTMLElement>('[data-frame-section]');
+  const section = column?.querySelector<HTMLElement>('nav[data-section]')?.dataset.section;
+
+  window.addEventListener('pagehide', () => {
+    if (!column || !section) return;
+    try {
+      sessionStorage.setItem(SCROLL_KEY, JSON.stringify({ section, top: column.scrollTop }));
+    } catch {}
+  });
+
+  /** Back to the stored position, then the current page in view if it is not. */
+  const restoreScroll = () => {
+    if (!column || !section || column.getClientRects().length === 0) return;
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(SCROLL_KEY) ?? 'null');
+      if (stored?.section === section) column.scrollTop = stored.top;
+    } catch {}
+    const current = column.querySelector('[aria-current="page"]');
+    if (!current) return;
+    const view = column.getBoundingClientRect();
+    const item = current.getBoundingClientRect();
+    if (item.top < view.top || item.bottom > view.bottom) {
+      column.scrollTop += item.top - view.top - (view.height - item.height) / 2;
+    }
+  };
+
+  // Reveal the page once the Magma components of the frame shown at this width
+  // have hydrated (the inline script at the top holds it): only then the
+  // section navigation has its final height and its scroll can be restored.
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+  const shown = [
+    ...document.querySelectorAll<MagmaElement>(
+      '[data-frame] :is([data-frame-header], [data-frame-rail], [data-frame-section], [data-frame-aside]) *',
+    ),
+  ].filter(
+    (element) => element.localName.startsWith('mds-') && element.getClientRects().length > 0,
+  );
+  Promise.all(
+    shown.map(async (element) => {
+      await customElements.whenDefined(element.localName);
+      await element.componentOnReady?.();
+    }),
+  )
+    .then(restoreScroll)
+    .finally(() => delete document.documentElement.dataset.framePending);
+</script>

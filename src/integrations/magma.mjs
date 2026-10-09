@@ -1,12 +1,15 @@
 // Wires Magma into the site: the client setup script on every page and the
-// svg-icons set served next to the pages. Styles go through Starlight's
-// `customCss` instead, which fixes their place in the cascade layer order.
-import { cp, readFile } from 'node:fs/promises';
-import { join } from 'node:path';
-import { svgIconsDir } from '../lib/magma.mjs';
+// icons the site uses, collected by iconsauce and served next to the pages.
+// Styles go through Starlight's `customCss` instead, which fixes their place in
+// the cascade layer order.
+import { cp, rm } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { build, IconsauceConfig } from '@iconsauce/core';
 
-/** URL path, under the site base, where mds-icon finds the `mgg/` set. */
-const ICONS_PATH = 'svg/mgg/';
+/** Folder of `publicDir` where mds-icon fetches `<slug>.svg` (see src/scripts/magma.ts). */
+const ICONS_DIR = 'svg/';
+
+const ICONSAUCE_CONFIG = 'iconsauce.config.mjs';
 
 const LOADER = '@maggioli-design-system/magma/loader';
 
@@ -31,41 +34,56 @@ function keepLoaderSideEffects() {
   };
 }
 
+/**
+ * Copies every icon slug found by iconsauce to `<outDir>/<slug>.svg`, what the
+ * iconsauce CLI does with `--output-svg`. Generated, so the folder is
+ * gitignored and rebuilt from scratch.
+ * @param {URL} root
+ * @param {URL} outDir
+ * @returns {Promise<number>} number of icons
+ */
+async function collectIcons(root, outDir) {
+  const config = await new IconsauceConfig().loadConfig(
+    fileURLToPath(new URL(ICONSAUCE_CONFIG, root)),
+  );
+  const icons = (await build(config))?.list ?? new Map();
+  await rm(outDir, { recursive: true, force: true });
+  for (const [slug, file] of icons) {
+    await cp(file.toString(), fileURLToPath(new URL(`${slug}.svg`, outDir)));
+  }
+  return icons.size;
+}
+
 /** @returns {import('astro').AstroIntegration} */
 export default function magma() {
-  let base = '/';
+  /** @type {URL} */
+  let root;
+  /** @type {URL} */
+  let outDir;
 
   return {
     name: 'magma',
     hooks: {
-      'astro:config:setup': ({ config, injectScript, updateConfig }) => {
-        base = config.base.replace(/\/?$/, '/');
+      'astro:config:setup': async ({ config, injectScript, updateConfig, logger }) => {
+        root = config.root;
+        outDir = new URL(ICONS_DIR, config.publicDir);
         updateConfig({ vite: { plugins: [keepLoaderSideEffects()] } });
         injectScript('page', `import '/src/scripts/magma.ts';`);
+        logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons in public/${ICONS_DIR}`);
       },
 
-      // Dev: serve the icons straight from node_modules. Astro's dev server
-      // strips the base from `req.url`; `originalUrl` keeps the requested path.
-      'astro:server:setup': ({ server }) => {
-        const prefix = `${base}${ICONS_PATH}`;
-        server.middlewares.use(async (req, res, next) => {
-          const url = req.originalUrl ?? req.url ?? '';
-          const name = url.startsWith(prefix) ? url.slice(prefix.length).split('?')[0] : '';
-          if (!/^[a-z0-9-]+\.svg$/.test(name)) return next();
-          try {
-            const svg = await readFile(join(svgIconsDir(), name));
-            res.setHeader('Content-Type', 'image/svg+xml');
-            res.end(svg);
-          } catch {
-            next();
-          }
+      // Dev: collect again when a source file adds or drops a slug.
+      'astro:server:setup': ({ server, logger }) => {
+        const src = fileURLToPath(new URL('src/', root));
+        /** @type {ReturnType<typeof setTimeout> | undefined} */
+        let timer;
+        server.watcher.on('all', (_event, file) => {
+          if (!file.startsWith(src)) return;
+          clearTimeout(timer);
+          timer = setTimeout(async () => {
+            logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons`);
+          }, 300);
         });
-      },
-
-      // Build: copy the icons into the output.
-      'astro:build:done': async ({ dir, logger }) => {
-        await cp(svgIconsDir(), new URL(ICONS_PATH, dir), { recursive: true });
-        logger.info(`Copied svg-icons to ${ICONS_PATH}`);
       },
     },
   };

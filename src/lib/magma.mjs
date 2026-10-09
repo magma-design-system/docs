@@ -55,14 +55,6 @@ export function magmaVersion(pkg = 'magma') {
 }
 
 /**
- * Directory of the prebuilt SVG icons of @maggioli-design-system/svg-icons.
- * Files are flat (`<name>.svg`); `dist/iconsauce.json` names them `mgg/<name>`.
- */
-export function svgIconsDir() {
-  return join(packageDir('svg-icons'), 'dist/svg');
-}
-
-/**
  * Sorted list of component tags, used by the sidebar and the routes.
  * @returns {string[]}
  */

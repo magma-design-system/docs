@@ -1,0 +1,260 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
+import { localeParams } from '../../../../lib/i18n.mjs';
+import { magmaVersion } from '../../../../lib/magma.mjs';
+
+// One page per component and sub-page (src/lib/components.ts): the main page
+// (overview) and the sub-pages documentation.json has data for.
+export async function getStaticPaths() {
+  const components = await getCollection('components');
+  return localeParams.flatMap((locale) =>
+    components.flatMap((entry) =>
+      pagesOf(entry.data).map((page) => ({
+        params: { locale, tag: entry.id, page: page.slug },
+        props: { entry, page },
+      })),
+    ),
+  );
+}
+
+interface Props {
+  entry: CollectionEntry<'components'>;
+  page: ComponentPage;
+}
+
+const { data } = Astro.props.entry;
+const { page } = Astro.props;
+const { locale } = Astro.params;
+const { t } = Astro.locals;
+const link = (tag: string) => componentHref(locale, tag);
+
+// Everything below the notice comes from the Magma packages, in English only.
+const contentLang = locale ? 'en' : undefined;
+
+const title = page.id === 'overview' ? `<${data.tag}>` : `<${data.tag}> ${t(page.label)}`;
+const usageSlug = (title: string) => `usage-${title.toLowerCase()}`;
+
+const sections = {
+  overview: [
+    { id: 'overview', label: t('component.overview'), show: true },
+    {
+      id: 'dependencies',
+      label: t('component.dependencies'),
+      show: data.dependencies.length > 0 || data.dependents.length > 0,
+    },
+  ],
+  api: [
+    { id: 'props', label: t('component.props'), show: data.props.length > 0 },
+    { id: 'events', label: t('component.events'), show: data.events.length > 0 },
+    { id: 'methods', label: t('component.methods'), show: data.methods.length > 0 },
+    { id: 'slots', label: t('component.slots'), show: data.slots.length > 0 },
+  ],
+  css: [
+    {
+      id: 'css-custom-properties',
+      label: t('component.cssCustomProperties'),
+      show: data.styles.length > 0,
+    },
+    { id: 'parts', label: t('component.parts'), show: data.parts.length > 0 },
+  ],
+  guidelines: data.usage.map((u) => ({ id: usageSlug(u.title), label: u.title, show: true })),
+}[page.id].filter((section) => section.show);
+const label = (id: string) => sections.find((section) => section.id === id)?.label;
+
+const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
+---
+
+<StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
+  <p class="text-size-info-caption text-fg-muted">
+    {t('component.generatedFrom')} <code>@maggioli-design-system/magma@{magmaVersion()}</code>
+    <code>dist/documentation.json</code>. {t('component.encapsulation')}:{' '}
+    <code>{data.encapsulation}</code>.
+    {locale && (
+      <>
+        <br />
+        {t('component.sourceLanguage')}
+      </>
+    )}
+  </p>
+
+  {page.id === 'overview' && (
+    <>
+      <h2 id="overview">{label('overview')}</h2>
+      <div lang={contentLang} set:html={data.readmeHtml} />
+
+      {label('dependencies') && (
+        <>
+          <h2 id="dependencies">{label('dependencies')}</h2>
+          {data.dependencies.length > 0 && (
+            <p>
+              {t('component.uses')}:{' '}
+              {data.dependencies.map((tag, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={link(tag)}>
+                    <code>{tag}</code>
+                  </a>
+                </>
+              ))}
+            </p>
+          )}
+          {data.dependents.length > 0 && (
+            <p>
+              {t('component.usedBy')}:{' '}
+              {data.dependents.map((tag, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={link(tag)}>
+                    <code>{tag}</code>
+                  </a>
+                </>
+              ))}
+            </p>
+          )}
+        </>
+      )}
+    </>
+  )}
+
+  {page.id === 'guidelines' &&
+    data.usage.map((u) => (
+      <div lang={contentLang}>
+        <h2 id={usageSlug(u.title)}>{u.title}</h2>
+        <Fragment set:html={u.html} />
+      </div>
+    ))}
+
+  {page.id === 'api' && data.props.length > 0 && (
+    <>
+      <h2 id="props">{label('props')}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{t('component.column.property')}</th>
+            <th>{t('component.column.type')}</th>
+            <th>{t('component.column.description')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.props.map((p: any) => (
+            <tr>
+              <td>
+                <code>{p.name}</code>
+                {p.required && ` (${t('component.required')})`}
+                {p.attr && p.attr !== p.name && (
+                  <>
+                    <br />
+                    {t('component.attribute')}: <code>{p.attr}</code>
+                  </>
+                )}
+              </td>
+              <td>
+                <code>{p.type}</code>
+                {p.default !== undefined && (
+                  <>
+                    <br />
+                    {t('component.default')}: <code>{p.default}</code>
+                  </>
+                )}
+              </td>
+              <td lang={contentLang} set:html={p.docsHtml} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )}
+
+  {page.id === 'api' && data.events.length > 0 && (
+    <>
+      <h2 id="events">{label('events')}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{t('component.column.event')}</th>
+            <th>{t('component.column.detail')}</th>
+            <th>{t('component.column.description')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.events.map((e: any) => (
+            <tr>
+              <td>
+                <code>{e.event}</code>
+              </td>
+              <td>
+                <code>{e.detail}</code>
+              </td>
+              <td lang={contentLang} set:html={e.docsHtml} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )}
+
+  {page.id === 'api' && data.methods.length > 0 && (
+    <>
+      <h2 id="methods">{label('methods')}</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>{t('component.column.method')}</th>
+            <th>{t('component.column.signature')}</th>
+            <th>{t('component.column.description')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data.methods.map((m: any) => (
+            <tr>
+              <td>
+                <code>{m.name}</code>
+              </td>
+              <td>
+                <code>{m.signature}</code>
+              </td>
+              <td lang={contentLang} set:html={m.docsHtml} />
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
+  )}
+
+  {[
+    { page: 'api', id: 'slots', column: t('component.column.slot'), items: data.slots },
+    {
+      page: 'css',
+      id: 'css-custom-properties',
+      column: t('component.column.name'),
+      items: data.styles,
+    },
+    { page: 'css', id: 'parts', column: t('component.column.part'), items: data.parts },
+  ]
+    .filter((section) => section.page === page.id && section.items.length > 0)
+    .map((section) => (
+      <>
+        <h2 id={section.id}>{label(section.id)}</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>{section.column}</th>
+              <th>{t('component.column.description')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {section.items.map((item) => (
+              <tr>
+                <td>
+                  <code>{item.name || t('component.defaultSlot')}</code>
+                </td>
+                <td lang={contentLang} set:html={item.docsHtml} />
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </>
+    ))}
+</StarlightPage>
