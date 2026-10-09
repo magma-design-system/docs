@@ -81,17 +81,36 @@ export default function magma() {
         logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons in public/${ICONS_DIR}`);
       },
 
-      // Dev: collect again when a source file adds or drops a slug.
+      // Dev: collect again when a source file adds or drops a slug. One run at
+      // a time, since a run empties the folder another one copies into: a
+      // change during a run queues a single run after it.
       'astro:server:setup': ({ server, logger }) => {
         const src = fileURLToPath(new URL('src/', root));
         /** @type {ReturnType<typeof setTimeout> | undefined} */
         let timer;
+        let running = false;
+        let queued = false;
+        const collect = async () => {
+          if (running) {
+            queued = true;
+            return;
+          }
+          running = true;
+          do {
+            queued = false;
+            try {
+              logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons`);
+            } catch (error) {
+              // Logged, not thrown: the next change collects again.
+              logger.error(`iconsauce: ${error}`);
+            }
+          } while (queued);
+          running = false;
+        };
         server.watcher.on('all', (_event, file) => {
           if (!file.startsWith(src)) return;
           clearTimeout(timer);
-          timer = setTimeout(async () => {
-            logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons`);
-          }, 300);
+          timer = setTimeout(collect, 300);
         });
       },
     },
