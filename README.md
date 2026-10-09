@@ -36,7 +36,11 @@ The site loads Magma the way a consumer does:
   sources, in the component usage examples and in the `svg-icons` list is copied to
   `public/svg/` (gitignored), where `<mds-icon name="...">` fetches it. The globs are in
   [`iconsauce.config.mjs`](iconsauce.config.mjs). In dev, a change under `src/` collects
-  them again.
+  them again. It also renders Markdown tables as `mds-table`
+  ([`src/lib/markdown-tables.mjs`](src/lib/markdown-tables.mjs)), cells on one line
+  (`whitespace-nowrap`): the table takes the width of the page and `mds-table` scrolls
+  it sideways, instead of squeezing its columns. The component pages build their tables
+  with `mds-table` the same way.
 
 ## Frame
 
