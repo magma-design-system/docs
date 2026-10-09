@@ -9,6 +9,7 @@ import { sidebar } from './src/lib/nav.mjs';
 /** Starlight components replaced by the frame built with Magma components. */
 const frame = Object.fromEntries(
   [
+    'Footer',
     'Header',
     'PageFrame',
     'PageSidebar',
@@ -34,6 +35,8 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/magma-design-system/docs/edit/main/',
       },
+      // The page footer (Footer.astro) has no previous/next links.
+      pagination: false,
       // One group per section of the rail: src/lib/nav.mjs.
       sidebar: sidebar(),
     }),
