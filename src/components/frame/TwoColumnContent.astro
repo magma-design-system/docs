@@ -6,7 +6,12 @@ const { toc, locale } = Astro.locals.starlightRoute;
 const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, locale) !== undefined;
 ---
 
-<div class:list={[hasRightColumn && 'tablet:grid tablet:grid-cols-[4fr_1fr] tablet:gap-800']}>
+<div
+  class:list={[
+    hasRightColumn &&
+      'tablet:grid tablet:grid-cols-[minmax(0,4fr)_minmax(--spacing(5200),1fr)] tablet:gap-800',
+  ]}
+>
   <div data-frame-main>
     <slot />
   </div>
