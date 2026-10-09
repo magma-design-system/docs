@@ -2,7 +2,8 @@
 // Light/dark mode before the first paint. The picker is mds-pref-mode, which
 // stores the choice in localStorage (`mdsPrefMode`) and sets `pref-mode-*` on
 // <html>; Starlight's styles read `data-theme`, resolved here from the same
-// choice. src/scripts/magma.ts keeps the two in sync afterwards.
+// choice. src/scripts/magma.ts keeps the two in sync afterwards, PageFrame.astro
+// carries them over when pages change in place.
 ---
 
 <script is:inline>

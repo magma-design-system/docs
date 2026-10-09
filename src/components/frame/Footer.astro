@@ -83,13 +83,17 @@ const events = (
 <script>
   import { relativeDate } from '../../lib/dates';
 
-  // The build wrote how long ago from the build date: count from today.
-  document.querySelectorAll<HTMLElement>('[data-footer-date]').forEach((label) => {
-    const { footerDate, footerTemplate } = label.dataset;
-    if (!footerDate || !footerTemplate) return;
-    label.textContent = footerTemplate.replace(
-      '{date}',
-      relativeDate(new Date(footerDate), document.documentElement.lang),
-    );
-  });
+  // The build wrote how long ago from the build date: count from today, on
+  // every page (pages change in place, PageFrame.astro).
+  const countFromToday = () =>
+    document.querySelectorAll<HTMLElement>('[data-footer-date]').forEach((label) => {
+      const { footerDate, footerTemplate } = label.dataset;
+      if (!footerDate || !footerTemplate) return;
+      label.textContent = footerTemplate.replace(
+        '{date}',
+        relativeDate(new Date(footerDate), document.documentElement.lang),
+      );
+    });
+  countFromToday();
+  document.addEventListener('astro:after-swap', countFromToday);
 </script>

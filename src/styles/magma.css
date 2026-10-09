@@ -111,11 +111,6 @@
     @apply bg-surface-raised text-fg-default desktop:bg-surface-default;
   }
 
-  /* Until the frame has hydrated: see the inline script at the top of PageFrame.astro. */
-  :root[data-frame-pending] body {
-    @apply invisible;
-  }
-
   /* No rule between the page title and the content. */
   [data-frame-main] .content-panel + .content-panel {
     @apply border-t-0;

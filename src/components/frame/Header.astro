@@ -29,25 +29,30 @@ const { t } = Astro.locals;
 
 <script>
   // magma 2.0.1: the menu button of mds-header-bar is an icon-only mds-button
-  // with an inline SVG icon, which gets neither role nor name. Give it a name.
+  // with an inline SVG icon, which gets neither role nor name. Give it a name,
+  // on every page: the header is not kept across pages (PageFrame.astro).
   // Tracked in https://github.com/magma-design-system/magma/issues/821
-  const header = document.querySelector<HTMLElement>('mds-header[data-menu-label]');
-  const bar = header?.querySelector<HTMLElement & { componentOnReady?(): Promise<unknown> }>(
-    'mds-header-bar',
-  );
-  customElements.whenDefined('mds-header-bar').then(async () => {
+  const nameMenuButton = async () => {
+    const header = document.querySelector<HTMLElement>('mds-header[data-menu-label]');
+    const bar = header?.querySelector<HTMLElement & { componentOnReady?(): Promise<unknown> }>(
+      'mds-header-bar',
+    );
+    await customElements.whenDefined('mds-header-bar');
     await bar?.componentOnReady?.();
     bar?.shadowRoot
       ?.querySelector('[part="hamburger"]')
       ?.setAttribute('aria-label', header?.dataset.menuLabel ?? '');
-  });
+  };
+  nameMenuButton();
+  document.addEventListener('astro:after-swap', nameMenuButton);
 
   // The menu opens at the top: bring the current page of the section into view,
   // a long list (the components) would hide it otherwise.
   document.addEventListener('mdsModalOpen', (event) => {
-    if (event.target !== header) return;
+    const header = event.target;
+    if (!(header instanceof HTMLElement) || !header.matches('mds-header[data-menu-label]')) return;
     header
-      ?.querySelector('[slot="menu"] nav[data-section] [aria-current="page"]')
+      .querySelector('[slot="menu"] nav[data-section] [aria-current="page"]')
       ?.scrollIntoView({ block: 'center' });
   });
 </script>

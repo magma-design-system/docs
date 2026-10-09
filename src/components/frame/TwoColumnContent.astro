@@ -17,6 +17,7 @@ const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, lo
   {hasRightColumn && (
     <div
       data-frame-aside
+      transition:persist="frame-aside"
       class="hidden tablet:sticky tablet:top-(--frame-header-height) tablet:block tablet:max-h-[calc(100vh-var(--frame-header-height))] tablet:self-start tablet:overflow-y-auto tablet:py-600 tablet:pe-600 desktop:py-800 desktop:pe-800 [scrollbar-width:thin] print:hidden"
     >
       <slot name="right-sidebar" />
