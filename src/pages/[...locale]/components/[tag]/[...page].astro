@@ -1,0 +1,254 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
+import { localeParams } from '../../../../lib/i18n.mjs';
+import { magmaVersion } from '../../../../lib/magma.mjs';
+
+// One page per component and sub-page (src/lib/components.ts): the main page
+// (overview) and the sub-pages documentation.json has data for.
+export async function getStaticPaths() {
+  const components = await getCollection('components');
+  return localeParams.flatMap((locale) =>
+    components.flatMap((entry) =>
+      pagesOf(entry.data).map((page) => ({
+        params: { locale, tag: entry.id, page: page.slug },
+        props: { entry, page },
+      })),
+    ),
+  );
+}
+
+interface Props {
+  entry: CollectionEntry<'components'>;
+  page: ComponentPage;
+}
+
+const { data } = Astro.props.entry;
+const { page } = Astro.props;
+const { locale } = Astro.params;
+const { t } = Astro.locals;
+const link = (tag: string) => componentHref(locale, tag);
+
+// Everything below the notice comes from the Magma packages, in English only.
+const contentLang = locale ? 'en' : undefined;
+
+const title = page.id === 'overview' ? `<${data.tag}>` : `<${data.tag}> ${t(page.label)}`;
+// Pattern and Antipattern pages are a usage file each, headings included.
+const guide = page.id === 'pattern' || page.id === 'antipattern' ? data[page.id] : undefined;
+
+const sections = {
+  overview: [
+    { id: 'overview', label: t('component.overview'), show: true },
+    {
+      id: 'dependencies',
+      label: t('component.dependencies'),
+      show: data.dependencies.length > 0 || data.dependents.length > 0,
+    },
+  ],
+  api: [
+    { id: 'props', label: t('component.props'), show: data.props.length > 0 },
+    { id: 'events', label: t('component.events'), show: data.events.length > 0 },
+    { id: 'methods', label: t('component.methods'), show: data.methods.length > 0 },
+    { id: 'slots', label: t('component.slots'), show: data.slots.length > 0 },
+  ],
+  css: [
+    {
+      id: 'css-custom-properties',
+      label: t('component.cssCustomProperties'),
+      show: data.styles.length > 0,
+    },
+    { id: 'parts', label: t('component.parts'), show: data.parts.length > 0 },
+  ],
+  pattern: [],
+  antipattern: [],
+}[page.id].filter((section) => section.show);
+const label = (id: string) => sections.find((section) => section.id === id)?.label;
+
+const headings =
+  guide?.headings ??
+  sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
+
+// Table cells stay on one line: mds-table scrolls sideways when it is wider
+// than the page. Descriptions are paragraphs, which Magma's reset.css caps at
+// 75ch and wraps again (`text-wrap: pretty`). `max-w-[none]`, not `max-w-none`:
+// Magma's Tailwind theme has `--spacing-none: 0px`, so that one is 0.
+const CELL = 'whitespace-nowrap';
+const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowrap';
+---
+
+<StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
+  <p class="text-size-info-caption text-fg-muted">
+    {t('component.generatedFrom')} <code>@maggioli-design-system/magma@{magmaVersion()}</code>
+    <code>dist/documentation.json</code>. {t('component.encapsulation')}:{' '}
+    <code>{data.encapsulation}</code>.
+    {locale && (
+      <>
+        <br />
+        {t('component.sourceLanguage')}
+      </>
+    )}
+  </p>
+
+  {page.id === 'overview' && (
+    <>
+      <h2 id="overview">{label('overview')}</h2>
+      <div lang={contentLang} set:html={data.descriptionHtml} />
+
+      {label('dependencies') && (
+        <>
+          <h2 id="dependencies">{label('dependencies')}</h2>
+          {data.dependencies.length > 0 && (
+            <p>
+              {t('component.uses')}:{' '}
+              {data.dependencies.map((tag, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={link(tag)}>
+                    <code>{tag}</code>
+                  </a>
+                </>
+              ))}
+            </p>
+          )}
+          {data.dependents.length > 0 && (
+            <p>
+              {t('component.usedBy')}:{' '}
+              {data.dependents.map((tag, i) => (
+                <>
+                  {i > 0 && ', '}
+                  <a href={link(tag)}>
+                    <code>{tag}</code>
+                  </a>
+                </>
+              ))}
+            </p>
+          )}
+        </>
+      )}
+    </>
+  )}
+
+  {guide && <div lang={contentLang} set:html={guide.html} />}
+
+  {page.id === 'api' && data.props.length > 0 && (
+    <>
+      <h2 id="props">{label('props')}</h2>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.property')} />
+          <mds-table-header-cell label={t('component.column.attribute')} />
+          <mds-table-header-cell label={t('component.column.type')} />
+          <mds-table-header-cell label={t('component.column.default')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
+          {data.props.map((p: any) => (
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
+                <code>{p.name}</code>
+                {p.required && ` (${t('component.required')})`}
+              </mds-table-cell>
+              {/* Only when it differs from the name, so those stand out. */}
+              <mds-table-cell class={CELL}>
+                {p.attr && p.attr !== p.name && <code>{p.attr}</code>}
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
+                <code>{p.type}</code>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
+                {p.default !== undefined && <code>{p.default}</code>}
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={p.docsHtml} />
+            </mds-table-row>
+          ))}
+        </mds-table-body>
+      </mds-table>
+    </>
+  )}
+
+  {page.id === 'api' && data.events.length > 0 && (
+    <>
+      <h2 id="events">{label('events')}</h2>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.event')} />
+          <mds-table-header-cell label={t('component.column.detail')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
+          {data.events.map((e: any) => (
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
+                <code>{e.event}</code>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
+                <code>{e.detail}</code>
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={e.docsHtml} />
+            </mds-table-row>
+          ))}
+        </mds-table-body>
+      </mds-table>
+    </>
+  )}
+
+  {page.id === 'api' && data.methods.length > 0 && (
+    <>
+      <h2 id="methods">{label('methods')}</h2>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.method')} />
+          <mds-table-header-cell label={t('component.column.signature')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
+          {data.methods.map((m: any) => (
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
+                <code>{m.name}</code>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
+                <code>{m.signature}</code>
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={m.docsHtml} />
+            </mds-table-row>
+          ))}
+        </mds-table-body>
+      </mds-table>
+    </>
+  )}
+
+  {[
+    { page: 'api', id: 'slots', column: t('component.column.slot'), items: data.slots },
+    {
+      page: 'css',
+      id: 'css-custom-properties',
+      column: t('component.column.name'),
+      items: data.styles,
+    },
+    { page: 'css', id: 'parts', column: t('component.column.part'), items: data.parts },
+  ]
+    .filter((section) => section.page === page.id && section.items.length > 0)
+    .map((section) => (
+      <>
+        <h2 id={section.id}>{label(section.id)}</h2>
+        <mds-table>
+          <mds-table-header>
+            <mds-table-header-cell label={section.column} />
+            <mds-table-header-cell label={t('component.column.description')} />
+          </mds-table-header>
+          <mds-table-body>
+            {section.items.map((item) => (
+              <mds-table-row>
+                <mds-table-cell class={CELL}>
+                  <code>{item.name || t('component.defaultSlot')}</code>
+                </mds-table-cell>
+                <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={item.docsHtml} />
+              </mds-table-row>
+            ))}
+          </mds-table-body>
+        </mds-table>
+      </>
+    ))}
+</StarlightPage>

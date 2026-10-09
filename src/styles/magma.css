@@ -1,0 +1,189 @@
+/*
+  Magma styles, fonts and the bridge to Starlight.
+
+  Order and files follow the canonical setup shipped with Magma
+  (magma-angular/agents/assets.md, "Import order (mandatory)"). The magma and
+  magma-react tarballs do not ship that guide yet: magma#809.
+
+  Starlight puts all its styles in the `starlight` layer. This file is the first
+  entry of `customCss`, which Starlight imports before its own layers, so the
+  statement below fixes the order of every layer on the site: Magma's reset,
+  fonts, tokens and base styles sit under Starlight; the site's own styles
+  (`components`, also the <style> of the frame), Tailwind's utilities and the
+  overrides sit above it, so a utility class beats the site's styles.
+*/
+@layer reset, vendor, theme, base, starlight, components, utilities, overrides;
+
+@import 'normalize.css' layer(reset);
+
+/*
+  Fonts. assets.md lists the minimum weights; the styles README adds
+  Merriweather 300 and Roboto 900, which the title scale uses (font-weight 900).
+*/
+@import '@fontsource/karla/400.css' layer(vendor);
+@import '@fontsource/karla/700.css' layer(vendor);
+@import '@fontsource/merriweather/300.css' layer(vendor);
+@import '@fontsource/merriweather/400.css' layer(vendor);
+@import '@fontsource/merriweather/700.css' layer(vendor);
+@import '@fontsource/roboto/500.css' layer(vendor);
+@import '@fontsource/roboto/700.css' layer(vendor);
+@import '@fontsource/roboto/900.css' layer(vendor);
+@import '@fontsource/roboto-mono/400.css' layer(vendor);
+
+@import '@maggioli-design-system/styles/dist/css/colors-rgb.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/reset.css' layer(reset);
+@import '@maggioli-design-system/styles/dist/css/hydrated.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/transitions.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/animations.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/globals.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/base.css' layer(base);
+
+/*
+  Not in assets.md: the typography tokens (--font-*, --text-size-*) as plain
+  custom properties, read directly by the site's styles, and the semantic color
+  layer (--magma-*), which the Tailwind colors below point to. Both are imported
+  by Magma's own Storybook (projects/stencil/.storybook/styles.css).
+*/
+@import '@maggioli-design-system/styles/dist/css/typography.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/semantic.css' layer(theme);
+
+/*
+  Tailwind v4, set up as in Magma's Storybook (.storybook/tailwind.css): its
+  theme and utilities, no preflight (Magma and Starlight have their resets),
+  then Magma's theme, whose tokens replace Tailwind's defaults: with
+  `--spacing: 0.0025rem`, `gap-400` is 1rem. Classes are collected from the
+  sources by @tailwindcss/vite (astro.config.mjs).
+*/
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@maggioli-design-system/styles/dist/tailwind/theme.css';
+
+/*
+  Variants of the site: `dark` follows Magma's mode classes on <html>
+  (pref-mode-*, set by mds-pref-mode), as the darkMode of Magma's Tailwind
+  preset does; `rail-collapsed` follows the state of the rail (Rail.astro).
+*/
+@custom-variant dark {
+  &:where(.pref-mode-dark, .pref-mode-dark *) {
+    @slot;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    &:where(.pref-mode-system, .pref-mode-system *) {
+      @slot;
+    }
+  }
+}
+
+@custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
+
+/*
+  The frame (src/components/frame/) styles its markup with utilities. What is
+  left here is markup the site does not render itself: <html>, <body>, the
+  content of the pages and Starlight's elements. In the `components` layer:
+  above Starlight, below the utilities.
+*/
+@layer components {
+  :root {
+    --sl-font: var(--font-info);
+    --sl-font-mono: var(--font-code);
+
+    /* Height of the mobile header (Header.astro): the desktop frame has none. */
+    --frame-header-height: --spacing(2200);
+
+    /*
+      Where the sticky columns stop: where they start, so they do not move when
+      they stick. Below the mobile header; on desktop inside the card, below
+      its margin and border (PageFrame.astro).
+    */
+    --frame-sticky-top: var(--frame-header-height);
+
+    /*
+      Starlight: anchors land below the header, no mobile table of contents,
+      the content aligned to its column.
+    */
+    --sl-nav-height: var(--frame-header-height);
+    --sl-mobile-toc-height: 0rem;
+    --sl-content-margin-inline: 0;
+    --sl-content-pad-x: --spacing(600);
+
+    @variant desktop {
+      --frame-header-height: 0rem;
+      --frame-sticky-top: calc(--spacing(400) + 1px);
+      /* The column gap already separates the content from the section navigation. */
+      --sl-content-pad-x: 0rem;
+    }
+  }
+
+  body {
+    @apply bg-surface-raised text-fg-default desktop:bg-surface-default;
+  }
+
+  /* No rule between the page title and the content. */
+  [data-frame-main] .content-panel + .content-panel {
+    @apply border-t-0;
+  }
+
+  /* Starlight's search trigger is replaced by the frame's buttons, its dialog is kept. */
+  [data-frame-search] site-search > button[data-open-modal] {
+    @apply hidden;
+  }
+
+  /*
+    styles 17.0.0: reset.css caps paragraphs at --spacing-text (75ch), then
+    base.css caps them at --spacing-title (30ch), the measure meant for
+    headings. Keep the reading measure.
+  */
+  p {
+    @apply max-w-(--spacing-text);
+  }
+
+  /*
+    styles 17.0.0: base.css gives the body its font (--font-info, Karla) but
+    nothing to h1-h6, which inherit it. Give them the title font and scale
+    (--font-title, Roboto, and --text-size-title-h*: size, line height, weight,
+    letter spacing).
+  */
+  h1 {
+    @apply font-title text-size-title-h1;
+  }
+
+  h2 {
+    @apply font-title text-size-title-h2;
+  }
+
+  h3 {
+    @apply font-title text-size-title-h3;
+  }
+
+  h4 {
+    @apply font-title text-size-title-h4;
+  }
+
+  h5 {
+    @apply font-title text-size-title-h5;
+  }
+
+  h6 {
+    @apply font-title text-size-title-h6;
+  }
+
+  /*
+    mds-icon fills its SVG with the inherited `fill`, black by default, and
+    documents no color property: icons placed on the page follow the text.
+  */
+  mds-icon {
+    @apply fill-current;
+  }
+
+  /*
+    Starlight's reset sets `margin: 0` on every element, and a page style beats
+    the :host and ::slotted() rules of a component. mds-header-bar is centered
+    by its :host margins and spaced by the ::slotted() margins of mds-header
+    (the inline appearance): put them back, the spacing comes from the custom
+    property mds-header still sets.
+  */
+  mds-header-bar {
+    @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
+  }
+}

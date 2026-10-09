@@ -1,0 +1,8 @@
+# build output and generated files
+dist/
+.astro/
+public/svg/
+package-lock.json
+
+# local, untracked
+.claude/

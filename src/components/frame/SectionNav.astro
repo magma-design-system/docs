@@ -1,0 +1,23 @@
+---
+// Pages of the current section: the first column of the card on desktop, part
+// of the mobile menu below that.
+import { frameNav } from '../../lib/frame';
+import SectionEntries from './SectionEntries.astro';
+
+interface Props {
+  /** Unique per page: the component is rendered twice (frame and mobile menu). */
+  headingId: string;
+}
+
+const { headingId } = Astro.props;
+const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url.pathname);
+---
+
+{section && (
+  <nav aria-labelledby={headingId} data-section={section.id}>
+    <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
+      {section.label}
+    </mds-text>
+    <SectionEntries entries={section.group.entries} currentHref={currentHref} />
+  </nav>
+)}

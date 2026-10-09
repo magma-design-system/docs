@@ -1,0 +1,13 @@
+---
+// Right column: the "Documentation" column on component pages, the table of
+// contents with the reading indicator elsewhere. Hidden on mobile, as in the
+// layout mockups.
+import { parseComponentPath } from '../../lib/components';
+import DocsNav from './DocsNav.astro';
+import TableOfContents from './TableOfContents.astro';
+
+const { toc, locale } = Astro.locals.starlightRoute;
+const isComponent = parseComponentPath(Astro.url.pathname, locale) !== undefined;
+---
+
+{isComponent ? <DocsNav headingId="docs-nav-heading" /> : toc && <TableOfContents />}

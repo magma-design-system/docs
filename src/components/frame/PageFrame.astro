@@ -1,0 +1,187 @@
+---
+// The frame of every page, replacing Starlight's (layout mockups in
+// plan/CONTENT_STRUCTURE.md). Desktop: rail on the page background, then a card
+// with the section navigation, the content and the right column. Below 64rem:
+// the mobile header (Header.astro) with everything else in its menu, the right
+// column down to 48rem.
+//
+// Pages change in place (Astro's ClientRouter, Head.astro). The columns marked
+// `transition:persist` stay mounted from page to page while their links are
+// the same (script below): their Magma components do not hydrate again, the
+// section navigation keeps its scroll position.
+import Search from '@astrojs/starlight/components/Search.astro';
+import Rail from './Rail.astro';
+
+const { hasSidebar } = Astro.locals.starlightRoute;
+---
+
+<div
+  data-frame
+  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[1fr_minmax(0,4fr)] desktop:rail-collapsed:grid-cols-[auto_minmax(0,1fr)]"
+>
+  <div data-frame-header class="desktop:hidden print:hidden">
+    <slot name="header" />
+  </div>
+  <div
+    data-frame-rail
+    transition:persist="frame-rail"
+    class="hidden desktop:sticky desktop:top-0 desktop:flex desktop:h-screen print:hidden"
+  >
+    <Rail />
+  </div>
+  <div
+    class:list={[
+      'desktop:my-400 desktop:me-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
+      hasSidebar
+        ? 'desktop:grid-cols-[1fr_minmax(0,4fr)] desktop:gap-x-800'
+        : 'desktop:grid-cols-[minmax(0,1fr)]',
+    ]}
+  >
+    {hasSidebar && (
+      <div
+        data-frame-section
+        transition:persist="frame-section"
+        class="hidden desktop:sticky desktop:top-(--frame-sticky-top) desktop:block desktop:max-h-[calc(100vh-var(--frame-sticky-top))] desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
+      >
+        <slot name="sidebar" />
+      </div>
+    )}
+    <div class:list={[!hasSidebar && 'desktop:ps-800']}>
+      <slot />
+    </div>
+  </div>
+</div>
+
+<!--
+  Pagefind search: one dialog, opened by the search buttons of the rail and of
+  the menu. Kept across pages: Starlight sets it up once, on DOMContentLoaded.
+-->
+<div data-frame-search transition:persist="frame-search" class="print:hidden">
+  <Search />
+</div>
+
+<script>
+  import {
+    navigate,
+    type TransitionBeforePreparationEvent,
+    type TransitionBeforeSwapEvent,
+  } from 'astro:transitions/client';
+
+  const PERSIST = 'data-astro-transition-persist';
+
+  // mds-button follows its `href` with `location.href` (no <a>, magma#806),
+  // which the router does not see: send its links within the site through it.
+  document.addEventListener(
+    'click',
+    (event) => {
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+        return;
+      const button =
+        event.target instanceof Element ? event.target.closest('mds-button[href]') : null;
+      if (!button || button.getAttribute('target') === 'blank') return;
+      const url = new URL(button.getAttribute('href') ?? '', location.href);
+      // Other sites, and anchors of this page, are left to mds-button.
+      if (url.origin !== location.origin || (url.pathname === location.pathname && url.hash))
+        return;
+      event.preventDefault();
+      event.stopPropagation();
+      navigate(url.href);
+    },
+    { capture: true },
+  );
+
+  // Another language is a full load: the columns and the search kept by the
+  // router are in the language of this page.
+  document.addEventListener('astro:before-preparation', (event) => {
+    const preparation = event as TransitionBeforePreparationEvent;
+    const load = preparation.loader;
+    preparation.loader = async () => {
+      await load();
+      if (preparation.newDocument.documentElement.lang !== document.documentElement.lang) {
+        preparation.preventDefault();
+      }
+    };
+  });
+
+  /** Links of a column, in order: the same links make the same column. */
+  const links = (column: ParentNode) => [
+    ...column.querySelectorAll<HTMLElement>('nav mds-button[href]'),
+  ];
+  const hrefs = (column: ParentNode) => links(column).map((link) => link.getAttribute('href'));
+
+  let sectionScroll = 0;
+
+  document.addEventListener('astro:before-swap', (event) => {
+    const next = (event as TransitionBeforeSwapEvent).newDocument;
+
+    // <html> takes the attributes of the new page: keep the ones set on this
+    // side (mode and theme, ThemeProvider.astro and mds-pref-mode; rail, Rail.astro).
+    const root = document.documentElement;
+    for (const name of ['data-theme', 'data-magma-pref', 'data-rail']) {
+      const value = root.getAttribute(name);
+      if (value === null) next.documentElement.removeAttribute(name);
+      else next.documentElement.setAttribute(name, value);
+    }
+    next.documentElement.classList.add(
+      ...[...root.classList].filter((name) => name.startsWith('pref-mode-')),
+    );
+    const mode = root.style.getPropertyValue('--magma-pref-mode');
+    if (mode) next.documentElement.style.setProperty('--magma-pref-mode', mode);
+
+    // A column is kept when the new page has the same links in it, and only
+    // which one is current changes. Other links (another section, another
+    // component, the table of contents of a page) make a new column.
+    for (const column of next.querySelectorAll(`[${PERSIST}]`)) {
+      const kept = document.querySelector(`[${PERSIST}="${column.getAttribute(PERSIST)}"]`);
+      if (!kept) continue;
+      const nextHrefs = hrefs(column);
+      if (
+        nextHrefs.some((href) => href?.startsWith('#')) ||
+        nextHrefs.join() !== hrefs(kept).join()
+      ) {
+        column.removeAttribute(PERSIST);
+        continue;
+      }
+      const nextLinks = links(column);
+      links(kept).forEach((link, i) => {
+        for (const name of ['aria-current', 'tone']) {
+          const value = nextLinks[i].getAttribute(name);
+          if (value === null) link.removeAttribute(name);
+          else link.setAttribute(name, value);
+        }
+      });
+    }
+
+    sectionScroll = document.querySelector('[data-frame-section]')?.scrollTop ?? 0;
+  });
+
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+
+  /** The current page of the section navigation in view, once its links have their height. */
+  const showCurrent = async () => {
+    const column = document.querySelector<HTMLElement>('[data-frame-section]');
+    if (!column || column.getClientRects().length === 0) return;
+    await Promise.all(
+      [...column.querySelectorAll<MagmaElement>('mds-button')].map(async (element) => {
+        await customElements.whenDefined(element.localName);
+        await element.componentOnReady?.();
+      }),
+    );
+    const current = column.querySelector('[aria-current="page"]');
+    if (!current) return;
+    const view = column.getBoundingClientRect();
+    const item = current.getBoundingClientRect();
+    if (item.top < view.top || item.bottom > view.bottom) {
+      column.scrollTop += item.top - view.top - (view.height - item.height) / 2;
+    }
+  };
+
+  document.addEventListener('astro:after-swap', () => {
+    // A kept column can lose its scroll position on the move (browsers
+    // without `moveBefore`): put it back before the new page is shown.
+    const column = document.querySelector('[data-frame-section]');
+    if (column?.hasAttribute(PERSIST)) column.scrollTop = sectionScroll;
+    showCurrent();
+  });
+  showCurrent();
+</script>

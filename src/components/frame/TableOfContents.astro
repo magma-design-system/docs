@@ -1,0 +1,132 @@
+---
+// "On this page" with a reading indicator: a vertical mds-progress along the
+// list, filled down to the section being read and moving with the scroll.
+const { t, starlightRoute } = Astro.locals;
+const { toc } = starlightRoute;
+
+type Item = NonNullable<typeof toc>['items'][number];
+const flatten = (items: Item[]): Item[] =>
+  items.flatMap((item) => [item, ...flatten(item.children)]);
+const items = toc ? flatten(toc.items) : [];
+---
+
+{toc && (
+  <docs-toc>
+    <nav aria-labelledby="toc-heading">
+      <mds-text class="mb-400 block" id="toc-heading" typography="h5" tag="h2">
+        {t('tableOfContents.onThisPage')}
+      </mds-text>
+      <div class="grid grid-cols-[auto_minmax(0,1fr)] gap-400">
+        <mds-progress
+          class="h-auto self-stretch [--mds-progress-duration:150ms]"
+          direction="vertical"
+          variant="dark"
+          progress="0"
+          aria-hidden="true"
+        />
+        <ul class="m-0 flex list-none flex-col gap-100 p-0">
+          {items.map((item) => (
+            <li
+              class="ps-[calc(var(--depth)*--spacing(300))]"
+              style={`--depth: ${item.depth - toc.minHeadingLevel}`}
+            >
+              <mds-button
+                class="max-w-full"
+                href={`#${item.slug}`}
+                role="link"
+                type="a"
+                label={item.text}
+                variant="dark"
+                tone="text"
+                size="sm"
+                truncate="none"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </nav>
+  </docs-toc>
+)}
+
+<script>
+  /**
+   * Progress along the list as a function of the scroll position: when the
+   * heading of item `i` reaches the reading line, the bar is filled down to the
+   * bottom of item `i`; between two headings it moves linearly; at the end of
+   * the page it is full. The item being read gets `aria-current`.
+   */
+  class DocsToc extends HTMLElement {
+    private indicator = this.querySelector('mds-progress');
+    private list = this.querySelector('ul');
+    private items: { link: HTMLElement; heading: HTMLElement }[] = [];
+    private current?: HTMLElement;
+    // The list grows when its mds-button hydrate, the page when its content loads.
+    private resize = new ResizeObserver(() => this.update());
+
+    connectedCallback() {
+      this.items = [...this.querySelectorAll<HTMLElement>('li > mds-button')].flatMap((link) => {
+        const heading = document.getElementById(
+          decodeURIComponent(link.getAttribute('href')!.slice(1)),
+        );
+        return heading ? [{ link, heading }] : [];
+      });
+      // Browsers fire `scroll` at most once per frame.
+      window.addEventListener('scroll', this.update, { passive: true });
+      if (this.list) this.resize.observe(this.list);
+      this.resize.observe(document.body);
+      this.update();
+    }
+
+    disconnectedCallback() {
+      window.removeEventListener('scroll', this.update);
+      this.resize.disconnect();
+    }
+
+    private update = () => {
+      if (!this.indicator || !this.list || this.items.length === 0) return;
+      const list = this.list.getBoundingClientRect();
+      if (list.height === 0) return; // column hidden at this width
+
+      const root = document.documentElement;
+      const maxScroll = Math.max(0, root.scrollHeight - window.innerHeight);
+      // Where a heading lands when its link is followed.
+      const line = (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0) + 1;
+
+      // (scroll position, progress) pairs, both non-decreasing.
+      let previous = 0;
+      const knots = this.items.map(({ link, heading }) => {
+        const top = heading.getBoundingClientRect().top + window.scrollY - line;
+        previous = Math.min(maxScroll, Math.max(previous, top));
+        const bottom = link.closest('li')!.getBoundingClientRect().bottom;
+        return { scroll: previous, progress: (bottom - list.top) / list.height };
+      });
+      knots.push({ scroll: maxScroll, progress: 1 });
+
+      const y = window.scrollY;
+      let index = 0;
+      let progress = knots[0].progress;
+      for (let i = 0; i < knots.length - 1; i++) {
+        const from = knots[i];
+        const to = knots[i + 1];
+        if (y < from.scroll) break;
+        index = Math.min(i, this.items.length - 1);
+        const span = to.scroll - from.scroll;
+        progress =
+          span > 0
+            ? from.progress + (to.progress - from.progress) * Math.min(1, (y - from.scroll) / span)
+            : to.progress;
+      }
+
+      this.indicator.setAttribute('progress', Math.min(1, Math.max(0, progress)).toFixed(4));
+      const link = this.items[index].link;
+      if (link !== this.current) {
+        this.current?.removeAttribute('aria-current');
+        link.setAttribute('aria-current', 'true');
+        this.current = link;
+      }
+    };
+  }
+
+  customElements.define('docs-toc', DocsToc);
+</script>

@@ -1,0 +1,27 @@
+---
+// The 8 sections of the site, in the rail and in the mobile menu.
+import { frameNav } from '../../lib/frame';
+
+const { t, starlightRoute } = Astro.locals;
+const { sections } = frameNav(starlightRoute, Astro.url.pathname);
+---
+
+<nav aria-label={t('frame.sections')}>
+  <ul class="m-0 flex list-none flex-col gap-100 p-0">
+    {sections.map((section) => (
+      <li>
+        <mds-button
+          class="max-w-full"
+          href={section.href}
+          role="link"
+          type="a"
+          aria-current={section.current ? 'page' : undefined}
+          icon={section.icon}
+          label={section.label}
+          variant="dark"
+          tone={section.current ? 'strong' : 'text'}
+        />
+      </li>
+    ))}
+  </ul>
+</nav>

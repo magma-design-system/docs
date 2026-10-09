@@ -1,0 +1,99 @@
+---
+// Page footer (layout decision 2 in plan/CONTENT_STRUCTURE.md): who modified the
+// page last and who created it, from the git history of its source file
+// (src/lib/history.ts), with name and role from src/content/authors.json, then
+// the button to edit the page on GitHub. Pages without a source file (the
+// component pages, generated from Magma) have neither, so no footer. Replaces
+// Starlight's footer: no previous/next links, as in the layout mockups.
+import { getCollection } from 'astro:content';
+import { relativeDate } from '../../lib/dates';
+import { pageHistory } from '../../lib/history';
+
+const { t, starlightRoute } = Astro.locals;
+const { entry, editUrl, lang } = starlightRoute;
+
+const history = pageHistory(entry.filePath);
+const authors = new Map(
+  (await getCollection('authors')).map(({ id, data }) => [id.toLowerCase(), data]),
+);
+
+const events = (
+  [
+    ['frame.footer.modified', history?.modified],
+    ['frame.footer.created', history?.created],
+  ] as const
+).flatMap(([key, commit]) => {
+  if (!commit) return [];
+  const author = authors.get(commit.email);
+  // `{date}` is filled in here and again in the browser (script below).
+  const template = t(key, { date: '{date}', interpolation: { escapeValue: false } });
+  return [
+    {
+      date: commit.date,
+      template,
+      label: template.replace('{date}', relativeDate(commit.date, lang)),
+      name: author?.name ?? commit.name,
+      role: author?.role,
+    },
+  ];
+});
+---
+
+{(events.length > 0 || editUrl) && (
+  <footer class="mt-1200 grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-x-600">
+    {events.map((event) => (
+      <div class="flex min-w-0 flex-col gap-200">
+        <mds-text
+          class="uppercase"
+          typography="label"
+          tag="p"
+          title={event.date.toLocaleDateString(lang, { dateStyle: 'long', timeZone: 'UTC' })}
+          data-footer-date={event.date.toISOString()}
+          data-footer-template={event.template}
+        >
+          {event.label}
+        </mds-text>
+        <mds-author>
+          <mds-text typography="h6" tag="p">
+            {event.name}
+          </mds-text>
+          {event.role && (
+            <mds-text typography="caption" tag="p">
+              {event.role}
+            </mds-text>
+          )}
+        </mds-author>
+      </div>
+    ))}
+    {editUrl && (
+      <mds-button
+        class="col-start-3 self-end print:hidden"
+        href={editUrl.href}
+        role="link"
+        type="a"
+        icon="mi/baseline/edit"
+        aria-label={t('page.editLink')}
+        variant="dark"
+        tone="weak"
+      />
+    )}
+  </footer>
+)}
+
+<script>
+  import { relativeDate } from '../../lib/dates';
+
+  // The build wrote how long ago from the build date: count from today, on
+  // every page (pages change in place, PageFrame.astro).
+  const countFromToday = () =>
+    document.querySelectorAll<HTMLElement>('[data-footer-date]').forEach((label) => {
+      const { footerDate, footerTemplate } = label.dataset;
+      if (!footerDate || !footerTemplate) return;
+      label.textContent = footerTemplate.replace(
+        '{date}',
+        relativeDate(new Date(footerDate), document.documentElement.lang),
+      );
+    });
+  countFromToday();
+  document.addEventListener('astro:after-swap', countFromToday);
+</script>

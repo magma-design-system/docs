@@ -1,0 +1,104 @@
+---
+// Search, repository link, light/dark mode and language: at the bottom of the
+// rail and in the mobile menu. Mode and language are Magma's own preference
+// components; src/scripts/magma.ts makes Starlight follow the mode.
+//
+// Rendered once, in the rail, and moved into the menu below Magma's `desktop`
+// breakpoint: two mds-pref-mode on a page undo each other's choice (each one
+// applies its own mode again on every render, magma 2.0.1).
+import { locales } from '../../lib/i18n.mjs';
+import { REPOSITORY } from '../../lib/nav.mjs';
+import { localePrefix } from '../../lib/frame';
+
+const { t, starlightRoute } = Astro.locals;
+
+// The same page in every locale: the path below the locale prefix does not change.
+const path = Astro.url.pathname.slice(localePrefix(starlightRoute.locale).length) || '/';
+const languages = Object.entries(locales).map(([key, { lang }]) => ({
+  lang,
+  href: `${localePrefix(key === 'root' ? undefined : key)}${path}`,
+}));
+---
+
+<div class="grid grid-cols-full gap-400" id="preferences">
+  <div class="flex flex-col gap-100">
+    <mds-button
+      data-search-trigger
+      type="button"
+      icon="mi/baseline/search"
+      label={t('search.label')}
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+    <mds-button
+      href={REPOSITORY}
+      target="blank"
+      role="link"
+      type="a"
+      icon="mdi/github"
+      label={t('frame.repository')}
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+  </div>
+  <mds-pref-mode class="relative w-full" size="sm"></mds-pref-mode>
+  <mds-pref-language class="relative w-full" size="sm" set={starlightRoute.lang}>
+    {languages.map(({ lang, href }) => (
+      <mds-pref-language-item
+        code={lang}
+        data-href={href}
+        selected={lang === starlightRoute.lang}
+      />
+    ))}
+  </mds-pref-language>
+</div>
+
+<script>
+  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
+  // Magma's `desktop` breakpoint (1024px), as in the frame: rail above, menu below.
+  const desktop = matchMedia('(min-width: 1024px)');
+  const place = (where = desktop.matches ? 'rail' : 'menu') => {
+    const preferences = document.getElementById('preferences');
+    const target = document.querySelector(`[data-preferences="${where}"]`);
+    if (preferences && target && preferences.parentElement !== target) target.append(preferences);
+  };
+  place();
+  desktop.addEventListener('change', () => place());
+
+  // Pages change in place (PageFrame.astro): the rail is kept, the menu is
+  // not. Back to the rail before the change, then where the width wants them.
+  // The language links lead to the new page in each language.
+  document.addEventListener('astro:before-swap', (event) => {
+    place('rail');
+    const next = (event as TransitionBeforeSwapEvent).newDocument;
+    document.querySelectorAll<HTMLElement>('#preferences [data-href]').forEach((item) => {
+      const code = item.getAttribute('code');
+      const href = next.querySelector<HTMLElement>(`#preferences [code="${code}"]`)?.dataset.href;
+      if (href) item.dataset.href = href;
+    });
+  });
+  document.addEventListener('astro:after-swap', () => place());
+
+  // One search dialog per page (Starlight's, in PageFrame): every trigger opens it.
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('[data-search-trigger]'))
+      return;
+    // Once open, the dialog closes on the next click that reaches `window` on
+    // anything with an `href` property: mds-button has one.
+    event.stopPropagation();
+    document.querySelector<HTMLButtonElement>('site-search button[data-open-modal]')?.click();
+  });
+
+  // Picking a language opens the same page in that locale.
+  document.addEventListener('mdsPrefLanguageChange', (event) => {
+    const { language } = (event as CustomEvent<{ language: string }>).detail;
+    const item = (event.target as Element).querySelector<HTMLElement>(
+      `mds-pref-language-item[code="${language}"]`,
+    );
+    const href = item?.dataset.href;
+    if (href && href !== window.location.pathname) window.location.assign(href);
+  });
+</script>
