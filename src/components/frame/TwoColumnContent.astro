@@ -8,7 +8,8 @@ const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, lo
 
 <div
   class:list={[
-    hasRightColumn && 'tablet:grid tablet:grid-cols-[minmax(0,1fr)_--spacing(5200)] tablet:gap-800',
+    hasRightColumn &&
+      'tablet:grid tablet:grid-cols-[minmax(0,4fr)_minmax(--spacing(5200),1fr)] tablet:gap-800',
   ]}
 >
   <div data-frame-main>

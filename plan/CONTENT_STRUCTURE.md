@@ -6,16 +6,16 @@ Decided on 2026-10-08.
 
 ## Navigation (8 rail items)
 
-| Rail | Pages | Source |
-| ---- | ----- | ------ |
-| Introduction (home) | What Magma is, Why Magma, Adoption levels | deck |
-| Foundation | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming) | deck + new writing |
-| Tokens | Colors, typography, motion, spacing, editor autocomplete setup | `design-tokens`, `styles` |
-| Icons | Library, semantic dictionary | `svg-icons`, `icons` |
-| Components | One page per component | `magma/dist/documentation.json` |
-| Brands / Assets | Logos, illustrations, avatars | `identity` |
-| Development | Install (Vanilla / React / Angular), integrating existing vs new products, versioning and migrations, AI agents | deck + `AGENTS.md` |
-| Community | Support, feature requests, contributions, training | deck + Magma GitHub issue templates |
+| Rail                | Pages                                                                                                           | Source                              |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                       | deck                                |
+| Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                    | deck + new writing                  |
+| Tokens              | Colors, typography, motion, spacing, editor autocomplete setup                                                  | `design-tokens`, `styles`           |
+| Icons               | Library, semantic dictionary                                                                                    | `svg-icons`, `icons`                |
+| Components          | One page per component                                                                                          | `magma/dist/documentation.json`     |
+| Brands / Assets     | Logos, illustrations, avatars                                                                                   | `identity`                          |
+| Development         | Install (Vanilla / React / Angular), integrating existing vs new products, versioning and migrations, AI agents | deck + `AGENTS.md`                  |
+| Community           | Support, feature requests, contributions, training                                                              | deck + Magma GitHub issue templates |
 
 Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes only from
 `node_modules`. Guidelines prose (principles, content design, patterns) is written here.
