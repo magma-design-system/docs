@@ -39,19 +39,11 @@ function nestHeadings(markdown: string, level: number): string {
 }
 
 /**
- * What the readme adds to the usage Description: no leading "# mds-tag"
- * heading (the page already has a title) and no generic intro, which is also
- * the component's `docs` (the page description). In magma 2.0.1 105 readmes
- * out of 114 have nothing else.
+ * Usage files of a component, by name: "1. Description" -> "description".
+ * They are the whole hand-written documentation of a component, as in Magma's
+ * per-component agent docs. The readme is not used: beyond a generic intro it
+ * is outdated or repeats them (magma#842).
  */
-function readmeExtra(markdown: string, intro: string): string {
-  return markdown
-    .replace(/^#\s+[^\n]*\n+/, '')
-    .replace(intro.trim(), '')
-    .trim();
-}
-
-/** Usage files of a component, by name: "1. Description" -> "description". */
 const USAGE = ['description', 'pattern', 'antipattern'] as const;
 type Usage = (typeof USAGE)[number];
 
@@ -92,11 +84,8 @@ export function componentsLoader(): Loader {
           data: {
             tag: component.tag,
             summary: component.docs ?? '',
-            // The Overview: the description under its h2, then the readme.
+            // The Overview, under its h2.
             descriptionHtml: await toHtml(nestHeadings(usage.description ?? '', 3)),
-            readmeHtml: await toHtml(
-              nestHeadings(readmeExtra(component.readme ?? '', component.docs ?? ''), 3),
-            ),
             // Sub-pages of their own: their entries are the h2 of the page.
             pattern: await render(nestHeadings(usage.pattern ?? '', 2)),
             antipattern: await render(nestHeadings(usage.antipattern ?? '', 2)),

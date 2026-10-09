@@ -93,10 +93,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
   {page.id === 'overview' && (
     <>
       <h2 id="overview">{label('overview')}</h2>
-      <div lang={contentLang}>
-        <Fragment set:html={data.descriptionHtml} />
-        <Fragment set:html={data.readmeHtml} />
-      </div>
+      <div lang={contentLang} set:html={data.descriptionHtml} />
 
       {label('dependencies') && (
         <>

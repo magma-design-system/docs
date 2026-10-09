@@ -37,7 +37,6 @@ export const collections = {
       tag: z.string(),
       summary: z.string(),
       descriptionHtml: z.string(),
-      readmeHtml: z.string(),
       pattern: guide,
       antipattern: guide,
       props: z.array(documented),
