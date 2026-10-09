@@ -41,7 +41,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
       <div
         data-frame-section
         transition:persist="frame-section"
-        class="hidden desktop:sticky desktop:top-0 desktop:block desktop:max-h-screen desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
+        class="hidden desktop:sticky desktop:top-(--frame-sticky-top) desktop:block desktop:max-h-[calc(100vh-var(--frame-sticky-top))] desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
       >
         <slot name="sidebar" />
       </div>

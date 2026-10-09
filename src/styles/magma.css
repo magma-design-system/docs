@@ -92,6 +92,13 @@
     --frame-header-height: --spacing(2200);
 
     /*
+      Where the sticky columns stop: where they start, so they do not move when
+      they stick. Below the mobile header; on desktop inside the card, below
+      its margin and border (PageFrame.astro).
+    */
+    --frame-sticky-top: var(--frame-header-height);
+
+    /*
       Starlight: anchors land below the header, no mobile table of contents,
       the content aligned to its column.
     */
@@ -102,6 +109,7 @@
 
     @variant desktop {
       --frame-header-height: 0rem;
+      --frame-sticky-top: calc(--spacing(400) + 1px);
       /* The column gap already separates the content from the section navigation. */
       --sl-content-pad-x: 0rem;
     }
