@@ -151,8 +151,10 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
                 <code>{p.name}</code>
                 {p.required && ` (${t('component.required')})`}
               </mds-table-cell>
-              {/* Also when it matches the name: an empty cell means no attribute. */}
-              <mds-table-cell class={CELL}>{p.attr && <code>{p.attr}</code>}</mds-table-cell>
+              {/* Only when it differs from the name, so those stand out. */}
+              <mds-table-cell class={CELL}>
+                {p.attr && p.attr !== p.name && <code>{p.attr}</code>}
+              </mds-table-cell>
               <mds-table-cell class={CELL}>
                 <code>{p.type}</code>
               </mds-table-cell>
