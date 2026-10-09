@@ -65,6 +65,8 @@ only until Magma publishes translations.
 2. Page footer "created by / modified by": names and dates from git history, roles from a
    data file (`authors.json`, email -> name and role).
 3. Component preview: inline, driven by the attributes table. Iframe only for full demos.
-4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Guidelines,
-   Installation) is a sub-page of the component. What goes into Anatomy is still to be
-   defined.
+4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Pattern,
+   Antipattern, Installation) is a sub-page of the component. What goes into Anatomy is
+   still to be defined. The usage Description opens the component's main page (Overview);
+   Pattern and Antipattern are separate sub-pages, so the right and the wrong forms are
+   never mixed (decided 2026-10-09).

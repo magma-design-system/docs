@@ -7,6 +7,11 @@ import { componentsLoader } from './loaders/components';
 import en from './content/i18n/en.json';
 
 const documented = z.looseObject({ name: z.string(), docsHtml: z.string() });
+// A usage file rendered as a page: its headings make the table of contents.
+const guide = z.object({
+  html: z.string(),
+  headings: z.array(z.object({ depth: z.number(), slug: z.string(), text: z.string() })),
+});
 
 // The keys of the English dictionary are the site's UI strings. Every other
 // locale may leave some out: Starlight falls back to English.
@@ -31,8 +36,9 @@ export const collections = {
     schema: z.object({
       tag: z.string(),
       summary: z.string(),
-      readmeHtml: z.string(),
-      usage: z.array(z.object({ title: z.string(), html: z.string() })),
+      descriptionHtml: z.string(),
+      pattern: guide,
+      antipattern: guide,
       props: z.array(documented),
       events: z.array(z.looseObject({ event: z.string(), docsHtml: z.string() })),
       methods: z.array(documented),

@@ -48,7 +48,8 @@
   "component.page.overview": "Overview",
   "component.page.api": "API",
   "component.page.css": "CSS",
-  "component.page.guidelines": "Guidelines",
+  "component.page.pattern": "Pattern",
+  "component.page.antipattern": "Antipattern",
 
   "components.title": "Components",
   "components.description": "The web components of Magma, generated from the documentation of the installed package."

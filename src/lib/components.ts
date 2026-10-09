@@ -1,14 +1,16 @@
 // Sub-pages of a component page, listed in the "Documentation" column of the
 // frame (plan/CONTENT_STRUCTURE.md, layout decision 4). A sub-page exists only
 // when documentation.json has its data: Anatomy, Features and Installation have
-// no source yet and are left out until they do.
+// no source yet and are left out until they do. Pattern and Antipattern are two
+// of the usage files (the third, Description, opens the overview), split so the
+// right and the wrong forms are never on the same page.
 import type { CollectionEntry } from 'astro:content';
 import { localePrefix } from './frame';
 
 type ComponentData = CollectionEntry<'components'>['data'];
 
 export interface ComponentPage {
-  id: 'overview' | 'api' | 'css' | 'guidelines';
+  id: 'overview' | 'api' | 'css' | 'pattern' | 'antipattern';
   /** Last segment of the URL, `undefined` for the component's main page. */
   slug: string | undefined;
   /** Key of the UI dictionaries. */
@@ -16,7 +18,8 @@ export interface ComponentPage {
     | 'component.page.overview'
     | 'component.page.api'
     | 'component.page.css'
-    | 'component.page.guidelines';
+    | 'component.page.pattern'
+    | 'component.page.antipattern';
   has: (data: ComponentData) => boolean;
 }
 
@@ -35,10 +38,16 @@ export const componentPages: ComponentPage[] = [
     has: (d) => d.styles.length + d.parts.length > 0,
   },
   {
-    id: 'guidelines',
-    slug: 'guidelines',
-    label: 'component.page.guidelines',
-    has: (d) => d.usage.length > 0,
+    id: 'pattern',
+    slug: 'pattern',
+    label: 'component.page.pattern',
+    has: (d) => d.pattern.html !== '',
+  },
+  {
+    id: 'antipattern',
+    slug: 'antipattern',
+    label: 'component.page.antipattern',
+    has: (d) => d.antipattern.html !== '',
   },
 ];
 
