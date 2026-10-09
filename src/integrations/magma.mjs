@@ -1,10 +1,12 @@
-// Wires Magma into the site: the client setup script on every page and the
-// icons the site uses, collected by iconsauce and served next to the pages.
+// Wires Magma into the site: the client setup script on every page, the icons
+// the site uses, collected by iconsauce and served next to the pages, and the
+// Markdown tables rendered as mds-table (src/lib/markdown-tables.mjs).
 // Styles go through Starlight's `customCss` instead, which fixes their place in
 // the cascade layer order.
 import { cp, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { build, IconsauceConfig } from '@iconsauce/core';
+import { magmaTables } from '../lib/markdown-tables.mjs';
 
 /** Folder of `publicDir` where mds-icon fetches `<slug>.svg` (see src/scripts/magma.ts). */
 const ICONS_DIR = 'svg/';
@@ -69,6 +71,13 @@ export default function magma() {
         outDir = new URL(ICONS_DIR, config.publicDir);
         updateConfig({ vite: { plugins: [keepLoaderSideEffects()] } });
         injectScript('page', `import '/src/scripts/magma.ts';`);
+        // Markdown tables as mds-table, on Astro's Markdown processor (Satteri):
+        // `markdown.rehypePlugins` would need the unified processor instead.
+        const markdown = config.markdown.processor;
+        if (!markdown?.options?.hastPlugins) {
+          throw new Error('magma: expected the Satteri Markdown processor (Astro 7 default)');
+        }
+        markdown.options.hastPlugins.push(magmaTables());
         logger.info(`iconsauce: ${await collectIcons(root, outDir)} icons in public/${ICONS_DIR}`);
       },
 

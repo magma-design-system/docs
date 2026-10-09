@@ -64,6 +64,13 @@ const sections = {
 const label = (id: string) => sections.find((section) => section.id === id)?.label;
 
 const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
+
+// Table cells stay on one line: mds-table scrolls sideways when it is wider
+// than the page. Descriptions are paragraphs, which Magma's reset.css caps at
+// 75ch and wraps again (`text-wrap: pretty`). `max-w-[none]`, not `max-w-none`:
+// Magma's Tailwind theme has `--spacing-none: 0px`, so that one is 0.
+const CELL = 'whitespace-nowrap';
+const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowrap';
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
@@ -129,18 +136,16 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
   {page.id === 'api' && data.props.length > 0 && (
     <>
       <h2 id="props">{label('props')}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>{t('component.column.property')}</th>
-            <th>{t('component.column.type')}</th>
-            <th>{t('component.column.description')}</th>
-          </tr>
-        </thead>
-        <tbody>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.property')} />
+          <mds-table-header-cell label={t('component.column.type')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
           {data.props.map((p: any) => (
-            <tr>
-              <td>
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
                 <code>{p.name}</code>
                 {p.required && ` (${t('component.required')})`}
                 {p.attr && p.attr !== p.name && (
@@ -149,8 +154,8 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
                     {t('component.attribute')}: <code>{p.attr}</code>
                   </>
                 )}
-              </td>
-              <td>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
                 <code>{p.type}</code>
                 {p.default !== undefined && (
                   <>
@@ -158,68 +163,64 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
                     {t('component.default')}: <code>{p.default}</code>
                   </>
                 )}
-              </td>
-              <td lang={contentLang} set:html={p.docsHtml} />
-            </tr>
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={p.docsHtml} />
+            </mds-table-row>
           ))}
-        </tbody>
-      </table>
+        </mds-table-body>
+      </mds-table>
     </>
   )}
 
   {page.id === 'api' && data.events.length > 0 && (
     <>
       <h2 id="events">{label('events')}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>{t('component.column.event')}</th>
-            <th>{t('component.column.detail')}</th>
-            <th>{t('component.column.description')}</th>
-          </tr>
-        </thead>
-        <tbody>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.event')} />
+          <mds-table-header-cell label={t('component.column.detail')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
           {data.events.map((e: any) => (
-            <tr>
-              <td>
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
                 <code>{e.event}</code>
-              </td>
-              <td>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
                 <code>{e.detail}</code>
-              </td>
-              <td lang={contentLang} set:html={e.docsHtml} />
-            </tr>
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={e.docsHtml} />
+            </mds-table-row>
           ))}
-        </tbody>
-      </table>
+        </mds-table-body>
+      </mds-table>
     </>
   )}
 
   {page.id === 'api' && data.methods.length > 0 && (
     <>
       <h2 id="methods">{label('methods')}</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>{t('component.column.method')}</th>
-            <th>{t('component.column.signature')}</th>
-            <th>{t('component.column.description')}</th>
-          </tr>
-        </thead>
-        <tbody>
+      <mds-table>
+        <mds-table-header>
+          <mds-table-header-cell label={t('component.column.method')} />
+          <mds-table-header-cell label={t('component.column.signature')} />
+          <mds-table-header-cell label={t('component.column.description')} />
+        </mds-table-header>
+        <mds-table-body>
           {data.methods.map((m: any) => (
-            <tr>
-              <td>
+            <mds-table-row>
+              <mds-table-cell class={CELL}>
                 <code>{m.name}</code>
-              </td>
-              <td>
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
                 <code>{m.signature}</code>
-              </td>
-              <td lang={contentLang} set:html={m.docsHtml} />
-            </tr>
+              </mds-table-cell>
+              <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={m.docsHtml} />
+            </mds-table-row>
           ))}
-        </tbody>
-      </table>
+        </mds-table-body>
+      </mds-table>
     </>
   )}
 
@@ -237,24 +238,22 @@ const headings = sections.map((section) => ({ depth: 2, slug: section.id, text: 
     .map((section) => (
       <>
         <h2 id={section.id}>{label(section.id)}</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>{section.column}</th>
-              <th>{t('component.column.description')}</th>
-            </tr>
-          </thead>
-          <tbody>
+        <mds-table>
+          <mds-table-header>
+            <mds-table-header-cell label={section.column} />
+            <mds-table-header-cell label={t('component.column.description')} />
+          </mds-table-header>
+          <mds-table-body>
             {section.items.map((item) => (
-              <tr>
-                <td>
+              <mds-table-row>
+                <mds-table-cell class={CELL}>
                   <code>{item.name || t('component.defaultSlot')}</code>
-                </td>
-                <td lang={contentLang} set:html={item.docsHtml} />
-              </tr>
+                </mds-table-cell>
+                <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={item.docsHtml} />
+              </mds-table-row>
             ))}
-          </tbody>
-        </table>
+          </mds-table-body>
+        </mds-table>
       </>
     ))}
 </StarlightPage>
