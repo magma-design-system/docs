@@ -139,7 +139,9 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
       <mds-table>
         <mds-table-header>
           <mds-table-header-cell label={t('component.column.property')} />
+          <mds-table-header-cell label={t('component.column.attribute')} />
           <mds-table-header-cell label={t('component.column.type')} />
+          <mds-table-header-cell label={t('component.column.default')} />
           <mds-table-header-cell label={t('component.column.description')} />
         </mds-table-header>
         <mds-table-body>
@@ -148,21 +150,16 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
               <mds-table-cell class={CELL}>
                 <code>{p.name}</code>
                 {p.required && ` (${t('component.required')})`}
-                {p.attr && p.attr !== p.name && (
-                  <>
-                    <br />
-                    {t('component.attribute')}: <code>{p.attr}</code>
-                  </>
-                )}
+              </mds-table-cell>
+              {/* Only when it differs from the name, so those stand out. */}
+              <mds-table-cell class={CELL}>
+                {p.attr && p.attr !== p.name && <code>{p.attr}</code>}
               </mds-table-cell>
               <mds-table-cell class={CELL}>
                 <code>{p.type}</code>
-                {p.default !== undefined && (
-                  <>
-                    <br />
-                    {t('component.default')}: <code>{p.default}</code>
-                  </>
-                )}
+              </mds-table-cell>
+              <mds-table-cell class={CELL}>
+                {p.default !== undefined && <code>{p.default}</code>}
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={p.docsHtml} />
             </mds-table-row>
