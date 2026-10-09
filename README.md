@@ -55,6 +55,14 @@ built with Magma components, following the layout decisions in `plan/CONTENT_STR
 - **Mobile header** (below 64rem): `mds-header` with the brand; its menu holds the
   sections, the component sub-pages, the section navigation and the preferences. The right
   column stays down to 48rem.
+- **Page footer**: who modified the page last and who created it, from the git history of
+  its source file ([`src/lib/history.ts`](src/lib/history.ts)), and a button to edit the
+  page on GitHub. Names and roles come from
+  [`src/content/authors.json`](src/content/authors.json), keyed by commit email: add
+  yourself there with your first page, or the footer shows your git name and no role.
+  Pages generated from Magma (the components) have no footer. The deploy workflow fetches
+  the whole history (`fetch-depth: 0`): in a shallow clone the footer leaves out the
+  authors.
 
 The sections are defined once in [`src/lib/nav.mjs`](src/lib/nav.mjs), which builds
 Starlight's sidebar: one group per section, the first item is where the rail links. Each

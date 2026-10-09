@@ -14,6 +14,8 @@
   "frame.rail.collapse": "Collapse the navigation",
   "frame.rail.expand": "Expand the navigation",
   "frame.repository": "Magma on GitHub",
+  "frame.footer.modified": "Modified {{date}}",
+  "frame.footer.created": "Created {{date}}",
 
   "component.generatedFrom": "Generated from",
   "component.encapsulation": "Encapsulation",

@@ -1,4 +1,5 @@
 import { defineCollection } from 'astro:content';
+import { file } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
@@ -19,6 +20,12 @@ const uiStrings = z.object(
 export const collections = {
   docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
   i18n: defineCollection({ loader: i18nLoader(), schema: i18nSchema({ extend: uiStrings }) }),
+  // The people who write the pages, by the email of their commits: the name
+  // and role shown in the page footer (src/components/frame/Footer.astro).
+  authors: defineCollection({
+    loader: file('src/content/authors.json'),
+    schema: z.object({ name: z.string(), role: z.string() }),
+  }),
   components: defineCollection({
     loader: componentsLoader(),
     schema: z.object({
