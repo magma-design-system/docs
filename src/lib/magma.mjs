@@ -15,9 +15,16 @@ const require = createRequire(import.meta.url);
  * `exports` map of @maggioli-design-system/magma 2.0.1 does not expose
  * `./dist/documentation.json` nor `./package.json`, so
  * `require('@maggioli-design-system/magma/dist/documentation.json')` throws.
+ * Packages without an `exports` map (svg-icons has no entry point at all) are
+ * found through their package.json.
  */
 export function packageDir(pkg) {
   const name = `@maggioli-design-system/${pkg}`;
+  try {
+    return dirname(require.resolve(`${name}/package.json`));
+  } catch {
+    // blocked by the `exports` map: walk up from the main entry point
+  }
   let dir = dirname(require.resolve(name));
   while (dir !== dirname(dir)) {
     try {
@@ -45,6 +52,14 @@ export function loadComponentDocs() {
 /** Installed version of a Magma package, for "built against" notices. */
 export function magmaVersion(pkg = 'magma') {
   return readJson(pkg, 'package.json').version;
+}
+
+/**
+ * Directory of the prebuilt SVG icons of @maggioli-design-system/svg-icons.
+ * Files are flat (`<name>.svg`); `dist/iconsauce.json` names them `mgg/<name>`.
+ */
+export function svgIconsDir() {
+  return join(packageDir('svg-icons'), 'dist/svg');
 }
 
 /**

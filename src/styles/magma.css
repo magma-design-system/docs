@@ -1,0 +1,73 @@
+/*
+  Magma styles, fonts and the bridge to Starlight.
+
+  Order and files follow the canonical setup shipped with Magma
+  (magma-angular/agents/assets.md, "Import order (mandatory)"). The magma and
+  magma-react tarballs do not ship that guide yet: magma#809.
+
+  Starlight puts all its styles in the `starlight` layer. This file is the first
+  entry of `customCss`, which Starlight imports before its own layers, so the
+  statement below fixes the order of every layer on the site: Magma's reset,
+  fonts, tokens and base styles sit under Starlight, Magma's components,
+  utilities and the site overrides sit above it.
+*/
+@layer reset, vendor, theme, base, starlight, components, utilities, overrides;
+
+@import 'normalize.css' layer(reset);
+
+/*
+  Fonts. assets.md lists the minimum weights; the styles README adds
+  Merriweather 300 and Roboto 900, which the title scale uses (font-weight 900).
+*/
+@import '@fontsource/karla/400.css' layer(vendor);
+@import '@fontsource/karla/700.css' layer(vendor);
+@import '@fontsource/merriweather/300.css' layer(vendor);
+@import '@fontsource/merriweather/400.css' layer(vendor);
+@import '@fontsource/merriweather/700.css' layer(vendor);
+@import '@fontsource/roboto/500.css' layer(vendor);
+@import '@fontsource/roboto/700.css' layer(vendor);
+@import '@fontsource/roboto/900.css' layer(vendor);
+@import '@fontsource/roboto-mono/400.css' layer(vendor);
+
+@import '@maggioli-design-system/styles/dist/css/colors-rgb.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/reset.css' layer(reset);
+@import '@maggioli-design-system/styles/dist/css/hydrated.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/transitions.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/animations.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/globals.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/base.css' layer(base);
+
+/*
+  Not in assets.md: the typography tokens (--font-*, --text-size-*) as plain
+  custom properties. Components carry their own fallbacks, the site reads the
+  tokens directly because it does not use Tailwind.
+*/
+@import '@maggioli-design-system/styles/dist/css/typography.css' layer(theme);
+
+/*
+  Starlight frame on Magma typography. The frame itself is replaced with Magma
+  components in a later change; page content keeps using these variables.
+*/
+@layer overrides {
+  :root {
+    --sl-font: var(--font-info);
+    --sl-font-mono: var(--font-code);
+  }
+
+  /*
+    styles 17.0.0: reset.css caps paragraphs at --spacing-text (75ch), then
+    base.css caps them at --spacing-title (30ch), the measure meant for
+    headings. Keep the reading measure.
+  */
+  p {
+    max-width: var(--spacing-text);
+  }
+
+  /*
+    mds-icon fills its SVG with the inherited `fill`, black by default, and
+    documents no color property: icons placed on the page follow the text.
+  */
+  mds-icon {
+    fill: currentColor;
+  }
+}

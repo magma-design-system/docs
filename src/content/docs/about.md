@@ -18,3 +18,9 @@ something a consumer needs is missing from the packages, it is a packaging bug, 
 | Components | `@maggioli-design-system/magma` | `dist/documentation.json` |
 | Design tokens | `@maggioli-design-system/design-tokens`, `@maggioli-design-system/styles` | `dist/` |
 | Icons | `@maggioli-design-system/svg-icons`, `@maggioli-design-system/icons` | `dist/svg`, `dist/dictionary.json` |
+
+## Languages
+
+English is the default language, Italian the second one. Text generated from the Magma
+packages is English only until Magma publishes translations. Pages not translated yet show
+the English version with a notice.
