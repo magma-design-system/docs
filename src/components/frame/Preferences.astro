@@ -56,17 +56,31 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
 </div>
 
 <script>
+  import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
+
   // Magma's `desktop` breakpoint (1024px), as in the frame: rail above, menu below.
   const desktop = matchMedia('(min-width: 1024px)');
-  const place = () => {
+  const place = (where = desktop.matches ? 'rail' : 'menu') => {
     const preferences = document.getElementById('preferences');
-    const target = document.querySelector(
-      `[data-preferences="${desktop.matches ? 'rail' : 'menu'}"]`,
-    );
+    const target = document.querySelector(`[data-preferences="${where}"]`);
     if (preferences && target && preferences.parentElement !== target) target.append(preferences);
   };
   place();
-  desktop.addEventListener('change', place);
+  desktop.addEventListener('change', () => place());
+
+  // Pages change in place (PageFrame.astro): the rail is kept, the menu is
+  // not. Back to the rail before the change, then where the width wants them.
+  // The language links lead to the new page in each language.
+  document.addEventListener('astro:before-swap', (event) => {
+    place('rail');
+    const next = (event as TransitionBeforeSwapEvent).newDocument;
+    document.querySelectorAll<HTMLElement>('#preferences [data-href]').forEach((item) => {
+      const code = item.getAttribute('code');
+      const href = next.querySelector<HTMLElement>(`#preferences [code="${code}"]`)?.dataset.href;
+      if (href) item.dataset.href = href;
+    });
+  });
+  document.addEventListener('astro:after-swap', () => place());
 
   // One search dialog per page (Starlight's, in PageFrame): every trigger opens it.
   document.addEventListener('click', (event) => {
