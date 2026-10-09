@@ -17,7 +17,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
 
 <div
   data-frame
-  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[auto_minmax(0,1fr)]"
+  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[1fr_4fr]"
 >
   <div data-frame-header class="desktop:hidden print:hidden">
     <slot name="header" />
@@ -33,7 +33,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
     class:list={[
       'desktop:my-400 desktop:me-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
       hasSidebar
-        ? 'desktop:grid-cols-[--spacing(5200)_minmax(0,1fr)] desktop:gap-x-800'
+        ? 'desktop:grid-cols-[1fr_4fr] desktop:gap-x-800'
         : 'desktop:grid-cols-[minmax(0,1fr)]',
     ]}
   >
