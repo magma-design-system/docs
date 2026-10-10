@@ -4,8 +4,8 @@
 // components; src/scripts/magma.ts makes Starlight follow the mode.
 //
 // Rendered once, in the rail, and moved into the menu below Magma's `desktop`
-// breakpoint: two mds-pref-mode on a page undo each other's choice (each one
-// applies its own mode again on every render, magma 2.0.1).
+// breakpoint: one set of controls for both. (Up to magma 2.0.1 a second
+// mds-pref-mode also undid the choice made in the first one, magma#789.)
 import { locales } from '../../lib/i18n.mjs';
 import { REPOSITORY } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
