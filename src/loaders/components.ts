@@ -1,19 +1,33 @@
 import type { Loader } from 'astro/loaders';
 import { loadComponentDocs } from '../lib/magma.mjs';
 
-// Relative links to .md files that are not published with the package
-// (SPEC.md, docs/COMPONENTS.md, ...): they are dead outside the monorepo.
-// Keep the link text, drop the link.
-// Tracked in https://github.com/magma-design-system/magma/issues/811
-const RELATIVE_MD_LINK = /\[([^\]]+)\]\((?!https?:|#)[^)]*\.md(?:#[^)]*)?\)/g;
+// Relative links to .md files. The usage docs are written next to the
+// per-component docs of the package (dist/collection/components/<tag>/), so a
+// link to another component (`../mds-button/AGENTS.md`) becomes a link to its
+// page on the site. The others lead to Magma's agent guides
+// (`../../../../agents/*.md`) or to the component's own AGENTS.md, which have
+// no page on the site: keep the link text, drop the link.
+const RELATIVE_MD_LINK = /\[([^\]]+)\]\((?!https?:|#)([^)]*\.md)(?:#[^)]*)?\)/g;
+const COMPONENT_DOC = /^\.\.\/(mds-[a-z0-9-]+)\/AGENTS\.md$/;
 
-function unlinkUnpublished(markdown: string): { text: string; count: number } {
-  let count = 0;
-  const text = markdown.replace(RELATIVE_MD_LINK, (_, label: string) => {
-    count++;
+/**
+ * Rewrites the relative .md links of a usage doc for a page `depth` levels
+ * below the component's main page (0 for the overview, 1 for its sub-pages).
+ * Links between pages stay relative, so they keep the locale of the page.
+ */
+function rewriteLinks(
+  markdown: string,
+  depth: number,
+  tags: Set<string>,
+): { text: string; unlinked: number } {
+  let unlinked = 0;
+  const text = markdown.replace(RELATIVE_MD_LINK, (_, label: string, target: string) => {
+    const tag = COMPONENT_DOC.exec(target)?.[1];
+    if (tag && tags.has(tag)) return `[${label}](${'../'.repeat(depth + 1)}${tag}/)`;
+    unlinked++;
     return label;
   });
-  return { text, count };
+  return { text, unlinked };
 }
 
 const HEADING = /^(#{1,6})(?=\s)/;
@@ -52,16 +66,19 @@ export function componentsLoader(): Loader {
     name: 'magma-components',
     async load({ store, logger, parseData, renderMarkdown, generateDigest }) {
       const { components } = loadComponentDocs();
-      let deadLinks = 0;
+      const tags = new Set<string>(components.map((c: { tag: string }) => c.tag));
+      let unlinked = 0;
 
-      const render = async (markdown: string | undefined) => {
+      // `depth`: 0 for what goes on the overview, 1 for the sub-pages.
+      const render = async (markdown: string | undefined, depth: number) => {
         if (!markdown?.trim()) return { html: '', headings: [] };
-        const { text, count } = unlinkUnpublished(markdown);
-        deadLinks += count;
-        const { html, metadata } = await renderMarkdown(text);
+        const rewritten = rewriteLinks(markdown, depth, tags);
+        unlinked += rewritten.unlinked;
+        const { html, metadata } = await renderMarkdown(rewritten.text);
         return { html, headings: metadata?.headings ?? [] };
       };
-      const toHtml = async (markdown: string | undefined) => (await render(markdown)).html;
+      const toHtml = async (markdown: string | undefined, depth: number) =>
+        (await render(markdown, depth)).html;
 
       store.clear();
       for (const component of components) {
@@ -76,8 +93,11 @@ export function componentsLoader(): Loader {
           }
         }
 
+        // On the API and CSS sub-pages.
         const withHtml = async <T extends { docs?: string }>(items: T[]) =>
-          Promise.all(items.map(async (item) => ({ ...item, docsHtml: await toHtml(item.docs) })));
+          Promise.all(
+            items.map(async (item) => ({ ...item, docsHtml: await toHtml(item.docs, 1) })),
+          );
 
         const data = await parseData({
           id: component.tag,
@@ -85,10 +105,10 @@ export function componentsLoader(): Loader {
             tag: component.tag,
             summary: component.docs ?? '',
             // The Overview, under its h2.
-            descriptionHtml: await toHtml(nestHeadings(usage.description ?? '', 3)),
+            descriptionHtml: await toHtml(nestHeadings(usage.description ?? '', 3), 0),
             // Sub-pages of their own: their entries are the h2 of the page.
-            pattern: await render(nestHeadings(usage.pattern ?? '', 2)),
-            antipattern: await render(nestHeadings(usage.antipattern ?? '', 2)),
+            pattern: await render(nestHeadings(usage.pattern ?? '', 2), 1),
+            antipattern: await render(nestHeadings(usage.antipattern ?? '', 2), 1),
             props: await withHtml(component.props),
             events: await withHtml(component.events),
             methods: await withHtml(component.methods),
@@ -104,10 +124,8 @@ export function componentsLoader(): Loader {
       }
 
       logger.info(`Loaded ${components.length} components from documentation.json`);
-      if (deadLinks > 0) {
-        logger.warn(
-          `Unlinked ${deadLinks} relative .md links not published with the package (magma#811)`,
-        );
+      if (unlinked > 0) {
+        logger.info(`Unlinked ${unlinked} links to agent docs that have no page on the site`);
       }
     },
   };
