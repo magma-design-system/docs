@@ -16,7 +16,7 @@ const ICONSAUCE_CONFIG = 'iconsauce.config.mjs';
 const LOADER = '@maggioli-design-system/magma/loader';
 
 /**
- * magma 2.0.1 declares `"sideEffects": ["**\/*.css"]`, so production builds
+ * magma 2.1.0 still declares `"sideEffects": ["**\/*.css"]`, so production builds
  * drop the top of loader/index.js: the shim that lets the ES5 build (the one
  * `./loader` points to) extend HTMLElement. Without it every component throws
  * "Failed to construct 'HTMLElement'" on upgrade. Dev is not affected, the
