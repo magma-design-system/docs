@@ -24,7 +24,12 @@ const items = toc ? flatten(toc.items) : [];
           progress="0"
           aria-hidden="true"
         />
-        <ul class="m-0 flex list-none flex-col gap-100 p-0">
+        {/*
+          The column is narrow: a word longer than it breaks with a hyphen,
+          in the language of the page, not anywhere (the overflow-wrap the
+          items inherit).
+        */}
+        <ul class="m-0 flex list-none flex-col gap-100 p-0 hyphens-auto">
           {items.map((item) => (
             <li
               class="ps-[calc(var(--depth)*--spacing(300))]"
