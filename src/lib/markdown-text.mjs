@@ -62,9 +62,11 @@ const ANCHORED = new Set(['h2', 'h3']);
 
 /**
  * The anchor of a heading: an icon button that links to it (the link icon is
- * collected by iconsauce from this file). Heading.astro writes the same.
+ * collected by iconsauce from this file). Heading.astro writes the same. A
+ * click also copies the address of the heading (HeadingAnchors.astro).
  */
 export const ANCHOR = {
+  'data-heading-anchor': '',
   icon: 'mi/baseline/link',
   variant: 'dark',
   class: 'mt-0',

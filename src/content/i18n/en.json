@@ -69,6 +69,8 @@
   "copy.label": "Copy {{value}}",
   "copy.done": "{{value}} copied to the clipboard",
   "copy.failed": "Could not copy {{value}}",
+  "heading.linkCopied": "Link to the section copied to the clipboard",
+  "heading.linkNotCopied": "Could not copy the link to the section",
 
   "components.title": "Components",
   "components.description": "How to start using the web components of Magma in Vanilla JS, React and Angular, and the list of all of them, generated from the installed package.",

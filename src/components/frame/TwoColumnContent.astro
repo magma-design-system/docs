@@ -1,5 +1,6 @@
 ---
 // Page content and the right column (PageSidebar), inside the card.
+import HeadingAnchors from '../HeadingAnchors.astro';
 import { parseComponentPath } from '../../lib/components';
 
 const { toc, locale } = Astro.locals.starlightRoute;
@@ -8,17 +9,18 @@ const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, lo
 
 <div
   class:list={[
-    hasRightColumn && 'tablet:grid tablet:grid-cols-[minmax(0px,720px)_200px] tablet:gap-0',
+    hasRightColumn && 'tablet:grid tablet:grid-cols-[minmax(0px,720px)_1fr] tablet:gap-0',
   ]}
 >
   <div data-frame-main>
     <slot />
+    <HeadingAnchors />
   </div>
   {hasRightColumn && (
     <div
       data-frame-aside
       transition:persist="frame-aside"
-      class="hidden tablet:sticky tablet:top-(--frame-sticky-top) tablet:block tablet:max-h-[calc(100vh-var(--frame-sticky-top))] tablet:self-start tablet:overflow-y-auto tablet:p-600 desktop:p-800 [scrollbar-width:thin] print:hidden"
+      class="w-full hidden tablet:sticky tablet:top-(--frame-sticky-top) tablet:block tablet:max-h-[calc(100vh-var(--frame-sticky-top))] tablet:self-start tablet:overflow-y-auto tablet:p-600 desktop:p-800 [scrollbar-width:thin] print:hidden"
     >
       <slot name="right-sidebar" />
     </div>
