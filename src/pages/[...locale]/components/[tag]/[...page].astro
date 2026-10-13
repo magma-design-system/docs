@@ -1,9 +1,15 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import Code from '../../../../components/Code.astro';
+import CopyStatus from '../../../../components/CopyStatus.astro';
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TypeLabels from '../../../../components/TypeLabels.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
 import { localeParams } from '../../../../lib/i18n.mjs';
 import { magmaVersion } from '../../../../lib/magma.mjs';
+import { TEXT } from '../../../../lib/markdown-text.mjs';
+import { typeSortValue, unquote } from '../../../../lib/types';
 
 // One page per component and sub-page (src/lib/components.ts): the main page
 // (overview) and the sub-pages documentation.json has data for.
@@ -70,59 +76,65 @@ const headings =
   sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
 
 // Table cells stay on one line: mds-table scrolls sideways when it is wider
-// than the page. Descriptions are paragraphs, which Magma's reset.css caps at
-// 75ch and wraps again (`text-wrap: pretty`). `max-w-[none]`, not `max-w-none`:
-// Magma's Tailwind theme has `--spacing-none: 0px`, so that one is 0.
+// than the page. Descriptions are mds-text paragraphs, which keep the reading
+// measure (TEXT.paragraph) and wrap again (`text-wrap: pretty` on their host).
+// `max-w-[none]`, not `max-w-none`: Magma's Tailwind theme has
+// `--spacing-none: 0px`, so that one is 0.
 const CELL = 'whitespace-nowrap';
-const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowrap';
+const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:whitespace-nowrap';
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
-  <p class="text-size-info-caption text-fg-muted">
-    {t('component.generatedFrom')} <code>@maggioli-design-system/magma@{magmaVersion()}</code>
-    <code>dist/documentation.json</code>. {t('component.encapsulation')}:{' '}
-    <code>{data.encapsulation}</code>.
+  <mds-text typography="caption" tag="p" class:list={[TEXT.block, 'text-fg-muted']}>
+    {t('component.generatedFrom')}{' '}
+    <Code typography="hack">@maggioli-design-system/magma@{magmaVersion()}</Code>
+    <Code typography="hack">dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
+    <Code typography="hack">{data.encapsulation}</Code>.
     {locale && (
       <>
         <br />
         {t('component.sourceLanguage')}
       </>
     )}
-  </p>
+  </mds-text>
 
   {page.id === 'overview' && (
     <>
-      <h2 id="overview">{label('overview')}</h2>
+      <mds-text id="overview" typography="h2" tag="h2" class={TEXT.heading.h2}>
+        {label('overview')}
+      </mds-text>
       <div lang={contentLang} set:html={data.descriptionHtml} />
 
       {label('dependencies') && (
         <>
-          <h2 id="dependencies">{label('dependencies')}</h2>
+          <mds-text id="dependencies" typography="h2" tag="h2" class={TEXT.heading.h2}>
+            {label('dependencies')}
+          </mds-text>
           {data.dependencies.length > 0 && (
-            <p>
+            <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
               {t('component.uses')}:{' '}
               {data.dependencies.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
                   <a href={link(tag)}>
-                    <code>{tag}</code>
+                    <Code>{tag}</Code>
                   </a>
                 </>
               ))}
-            </p>
+            </mds-text>
           )}
           {data.dependents.length > 0 && (
-            <p>
+            <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
               {t('component.usedBy')}:{' '}
               {data.dependents.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
                   <a href={link(tag)}>
-                    <code>{tag}</code>
+                    <Code>{tag}</Code>
                   </a>
                 </>
               ))}
-            </p>
+            </mds-text>
           )}
         </>
       )}
@@ -133,33 +145,56 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
 
   {page.id === 'api' && data.props.length > 0 && (
     <>
-      <h2 id="props">{label('props')}</h2>
-      <mds-table>
+      <mds-text id="props" typography="h2" tag="h2" class={TEXT.heading.h2}>
+        {label('props')}
+      </mds-text>
+      <mds-table interactive>
         <mds-table-header>
-          <mds-table-header-cell label={t('component.column.property')} />
-          <mds-table-header-cell label={t('component.column.attribute')} />
-          <mds-table-header-cell label={t('component.column.type')} />
-          <mds-table-header-cell label={t('component.column.default')} />
+          {/* Sorted by each cell's `value`: what the cell shows, as text. */}
+          <mds-table-header-cell label={t('component.column.property')} sortable />
+          <mds-table-header-cell label={t('component.column.attribute')} sortable />
+          <mds-table-header-cell label={t('component.column.type')} sortable />
+          <mds-table-header-cell label={t('component.column.default')} sortable />
           <mds-table-header-cell label={t('component.column.description')} />
         </mds-table-header>
         <mds-table-body>
           {data.props.map((p: any) => (
-            <mds-table-row>
-              <mds-table-cell class={CELL}>
-                <code>{p.name}</code>
+            <mds-table-row data-copy-scope>
+              <mds-table-cell class={CELL} value={p.name}>
+                <Code typography="hack" name copy={p.name}>
+                  {p.name}
+                </Code>
                 {p.required && ` (${t('component.required')})`}
               </mds-table-cell>
-              {/* Only when it differs from the name, so those stand out. */}
-              <mds-table-cell class={CELL}>
-                {p.attr && p.attr !== p.name && <code>{p.attr}</code>}
+              {/* A dash when it is the name itself, so the ones that differ stand out. */}
+              <mds-table-cell class={CELL} value={p.attr === p.name ? '-' : (p.attr ?? '')}>
+                {p.attr === p.name ? (
+                  <mds-text typography="hack" tag="span" class="text-fg-muted">
+                    -
+                  </mds-text>
+                ) : (
+                  p.attr && (
+                    <Code typography="hack" name copy={p.attr}>
+                      {p.attr}
+                    </Code>
+                  )
+                )}
               </mds-table-cell>
-              <mds-table-cell class={CELL}>
-                <code>{p.type}</code>
+              <mds-table-cell class={CELL} value={typeSortValue(p.type)}>
+                <TypeLabels type={p.type} />
               </mds-table-cell>
-              <mds-table-cell class={CELL}>
-                {p.default !== undefined && <code>{p.default}</code>}
+              <mds-table-cell
+                class={CELL}
+                value={p.default !== undefined ? unquote(p.default) : ''}
+              >
+                {p.default !== undefined && (
+                  <Code typography="hack" copy={unquote(p.default)}>
+                    {unquote(p.default)}
+                  </Code>
+                )}
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={p.docsHtml} />
+              <CopyStatus />
             </mds-table-row>
           ))}
         </mds-table-body>
@@ -169,8 +204,10 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
 
   {page.id === 'api' && data.events.length > 0 && (
     <>
-      <h2 id="events">{label('events')}</h2>
-      <mds-table>
+      <mds-text id="events" typography="h2" tag="h2" class={TEXT.heading.h2}>
+        {label('events')}
+      </mds-text>
+      <mds-table interactive>
         <mds-table-header>
           <mds-table-header-cell label={t('component.column.event')} />
           <mds-table-header-cell label={t('component.column.detail')} />
@@ -178,14 +215,19 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
         </mds-table-header>
         <mds-table-body>
           {data.events.map((e: any) => (
-            <mds-table-row>
+            <mds-table-row data-copy-scope>
               <mds-table-cell class={CELL}>
-                <code>{e.event}</code>
+                <Code typography="hack" name copy={e.event}>
+                  {e.event}
+                </Code>
               </mds-table-cell>
               <mds-table-cell class={CELL}>
-                <code>{e.detail}</code>
+                <Code typography="hack" copy={e.detail}>
+                  {e.detail}
+                </Code>
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={e.docsHtml} />
+              <CopyStatus />
             </mds-table-row>
           ))}
         </mds-table-body>
@@ -195,8 +237,10 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
 
   {page.id === 'api' && data.methods.length > 0 && (
     <>
-      <h2 id="methods">{label('methods')}</h2>
-      <mds-table>
+      <mds-text id="methods" typography="h2" tag="h2" class={TEXT.heading.h2}>
+        {label('methods')}
+      </mds-text>
+      <mds-table interactive>
         <mds-table-header>
           <mds-table-header-cell label={t('component.column.method')} />
           <mds-table-header-cell label={t('component.column.signature')} />
@@ -204,14 +248,19 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
         </mds-table-header>
         <mds-table-body>
           {data.methods.map((m: any) => (
-            <mds-table-row>
+            <mds-table-row data-copy-scope>
               <mds-table-cell class={CELL}>
-                <code>{m.name}</code>
+                <Code typography="hack" name copy={m.name}>
+                  {m.name}
+                </Code>
               </mds-table-cell>
               <mds-table-cell class={CELL}>
-                <code>{m.signature}</code>
+                <Code typography="hack" copy={m.signature}>
+                  {m.signature}
+                </Code>
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={m.docsHtml} />
+              <CopyStatus />
             </mds-table-row>
           ))}
         </mds-table-body>
@@ -232,23 +281,33 @@ const DESCRIPTION = 'whitespace-nowrap [&_p]:max-w-[none] [&_p]:whitespace-nowra
     .filter((section) => section.page === page.id && section.items.length > 0)
     .map((section) => (
       <>
-        <h2 id={section.id}>{label(section.id)}</h2>
-        <mds-table>
+        <mds-text id={section.id} typography="h2" tag="h2" class={TEXT.heading.h2}>
+          {label(section.id)}
+        </mds-text>
+        <mds-table interactive>
           <mds-table-header>
             <mds-table-header-cell label={section.column} />
             <mds-table-header-cell label={t('component.column.description')} />
           </mds-table-header>
           <mds-table-body>
             {section.items.map((item) => (
-              <mds-table-row>
+              <mds-table-row data-copy-scope>
                 <mds-table-cell class={CELL}>
-                  <code>{item.name || t('component.defaultSlot')}</code>
+                  {/* The default slot has no name to copy. */}
+                  <Code typography="hack" name copy={item.name || undefined}>
+                    {item.name || t('component.defaultSlot')}
+                  </Code>
                 </mds-table-cell>
                 <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={item.docsHtml} />
+                {/* The default slot has nothing to copy: a note keeps its action cell. */}
+                <CopyStatus note={item.name ? undefined : t('component.defaultSlotAction')} />
               </mds-table-row>
             ))}
           </mds-table-body>
         </mds-table>
       </>
     ))}
+
+  {/* Values of the tables are copied when clicked (not the descriptions); each row says so. */}
+  {(page.id === 'api' || page.id === 'css') && <CopyToClipboard />}
 </StarlightPage>

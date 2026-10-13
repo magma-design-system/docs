@@ -25,6 +25,7 @@
 @import '@fontsource/roboto/700.css' layer(vendor);
 @import '@fontsource/roboto/900.css' layer(vendor);
 @import '@fontsource/roboto-mono/400.css' layer(vendor);
+@import '@fontsource/roboto-mono/700.css' layer(vendor);
 
 @import '@maggioli-design-system/styles/dist/css/colors-rgb.css' layer(theme);
 @import '@maggioli-design-system/styles/dist/css/typography.css' layer(theme);

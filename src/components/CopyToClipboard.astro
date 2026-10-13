@@ -1,0 +1,108 @@
+---
+// Copy to the clipboard for any value of the page marked `data-copy="<text>"`
+// (Code.astro and TypeValue.astro take a `copy` prop): once the clipboard is
+// available they become buttons, copied on click, Enter or Space. The element
+// marked `data-copy-scope` around a value (a table row) shows what happened
+// in its `data-copy-status` (CopyStatus.astro); screen readers hear it from
+// the live region below. One per page, wherever the values are.
+const { t } = Astro.locals;
+// `{value}` is filled in by the script below.
+const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
+  t(key, { value: '{value}', interpolation: { escapeValue: false } });
+---
+
+<span
+  class="sr-only"
+  role="status"
+  data-copy-live
+  data-label={template('copy.label')}
+  data-done={template('copy.done')}
+  data-failed={template('copy.failed')}
+></span>
+
+<script>
+  const SELECTOR = '[data-copy]';
+  const BUTTON = ['cursor-pointer', 'focus-bounce', 'focus-visible:focus-bounce--focused'];
+  // Status colors: one or the other, never both.
+  const IDLE = 'text-fg-muted';
+  const DONE = 'text-success-fg';
+  /** How long a row says "Copied", in milliseconds. */
+  const SHOWN = 1500;
+
+  const live = () => document.querySelector<HTMLElement>('[data-copy-live]');
+  const fill = (template: string | undefined, value: string) =>
+    template?.replaceAll('{value}', value) ?? '';
+  const timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
+
+  /** The values of the page as buttons, when there is a clipboard to copy to. */
+  const enhance = () => {
+    if (!navigator.clipboard) return;
+    const label = live()?.dataset.label;
+    for (const value of document.querySelectorAll<HTMLElement>(SELECTOR)) {
+      if (value.getAttribute('role') === 'button') continue;
+      value.setAttribute('role', 'button');
+      value.tabIndex = 0;
+      value.setAttribute('aria-label', fill(label, value.dataset.copy ?? ''));
+      value.classList.add(...BUTTON);
+    }
+    for (const status of document.querySelectorAll<HTMLElement>('[data-copy-status]')) {
+      status.classList.remove('hidden');
+    }
+  };
+
+  /** "Copied" (or not) in the status of the value's row, for a moment. */
+  const report = (value: HTMLElement, copied: boolean) => {
+    const status = value
+      .closest('[data-copy-scope]')
+      ?.querySelector<HTMLElement>('[data-copy-status]');
+    if (!status) return;
+    status.dataset.idle ??= status.textContent ?? '';
+    status.textContent = (copied ? status.dataset.copied : status.dataset.failed) ?? '';
+    if (copied) status.classList.replace(IDLE, DONE);
+    clearTimeout(timers.get(status));
+    timers.set(
+      status,
+      setTimeout(() => {
+        status.textContent = status.dataset.idle ?? '';
+        status.classList.replace(DONE, IDLE);
+      }, SHOWN),
+    );
+  };
+
+  const copy = async (value: HTMLElement) => {
+    const text = value.dataset.copy ?? '';
+    let copied = true;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      copied = false;
+    }
+    report(value, copied);
+    const region = live();
+    if (region)
+      region.textContent = fill(copied ? region.dataset.done : region.dataset.failed, text);
+  };
+
+  /** The value an event is about, if it is one of the copy buttons. */
+  const target = (event: Event) => {
+    const value = event.target instanceof Element ? event.target.closest(SELECTOR) : null;
+    return value instanceof HTMLElement && value.getAttribute('role') === 'button'
+      ? value
+      : undefined;
+  };
+
+  document.addEventListener('click', (event) => {
+    const value = target(event);
+    if (value) copy(value);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const value = target(event);
+    if (!value) return;
+    event.preventDefault();
+    copy(value);
+  });
+  // Every page the router shows, the first one included.
+  document.addEventListener('astro:page-load', enhance);
+  enhance();
+</script>

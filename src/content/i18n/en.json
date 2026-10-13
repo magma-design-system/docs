@@ -44,12 +44,20 @@
   "component.column.part": "Part",
   "component.required": "required",
   "component.defaultSlot": "(default)",
+  "component.defaultSlotAction": "No slot name",
   "component.documentation": "Documentation",
   "component.page.overview": "Overview",
   "component.page.api": "API",
   "component.page.css": "CSS",
   "component.page.pattern": "Pattern",
   "component.page.antipattern": "Antipattern",
+
+  "copy.hint": "Click to copy",
+  "copy.copied": "Copied",
+  "copy.notCopied": "Not copied",
+  "copy.label": "Copy {{value}}",
+  "copy.done": "{{value}} copied to the clipboard",
+  "copy.failed": "Could not copy {{value}}",
 
   "components.title": "Components",
   "components.description": "The web components of Magma, generated from the documentation of the installed package."
