@@ -53,6 +53,13 @@
 @import '@maggioli-design-system/styles/dist/tailwind/utilities.css';
 
 /*
+  The examples the component previews run (src/pages/example/[tag].astro) use
+  Magma's utilities too: the Pattern usage files hold the same markup as
+  documentation.json, without the rest of it.
+*/
+@source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/pattern.md';
+
+/*
   Variants of the site: `dark` follows Magma's mode classes on <html>
   (pref-mode-*, set by mds-pref-mode), as the darkMode of Magma's Tailwind
   preset does; `rail-collapsed` follows the state of the rail (Rail.astro).

@@ -1,9 +1,11 @@
 // Sub-pages of a component page, listed in the "Documentation" column of the
 // frame (plan/CONTENT_STRUCTURE.md, layout decision 4). A sub-page exists only
 // when documentation.json has its data: Anatomy, Features and Installation have
-// no source yet and are left out until they do. Pattern and Antipattern are two
-// of the usage files (the third, Description, opens the overview), split so the
-// right and the wrong forms are never on the same page.
+// no source yet and are left out until they do. The overview opens with the
+// preview of the component (Playground.astro), then its description. Pattern
+// and Antipattern are two of the usage files (the third, Description, is the
+// overview's text), split so the right and the wrong forms are never on the
+// same page.
 import type { CollectionEntry } from 'astro:content';
 import { localePrefix } from './frame';
 

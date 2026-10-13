@@ -1,0 +1,54 @@
+---
+// The live preview of a component, shown in an iframe on its overview
+// (src/components/Playground.astro): the first example of its Pattern usage
+// file, alone on a page with Magma's styles and loader, away from the styles
+// of the site. Scripts of the example run as they are written. One page per
+// component for every language: the examples are in Italian only.
+// The example flows as on any page, so each component takes the width it has
+// there (a badge its own, a field or a table the whole line; in a flex row
+// fields shrink to nothing), in the middle of the frame's height and without
+// Astro's dev toolbar, which would cover it in dev.
+import { getCollection, type CollectionEntry } from 'astro:content';
+import '../../styles/magma.css';
+
+export async function getStaticPaths() {
+  const components = await getCollection('components');
+  return components
+    .filter((entry) => entry.data.example !== '')
+    .map((entry) => ({ params: { tag: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'components'>;
+}
+
+const { tag, example } = Astro.props.entry.data;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{`<${tag}>`}</title>
+    <script is:inline>
+      // The light or dark mode of the page around it before the first paint:
+      // Magma's tokens follow the pref-mode-* class of <html>. Playground.astro
+      // keeps it in sync afterwards.
+      try {
+        for (const name of parent.document.documentElement.classList) {
+          if (name.startsWith('pref-mode-')) document.documentElement.classList.add(name);
+        }
+      } catch {
+        // Opened on its own, or from another site: Magma's default.
+      }
+    </script>
+  </head>
+  <body
+    data-preview
+    class="m-0 flex min-h-5000 flex-col justify-center bg-surface-raised p-800 [&>astro-dev-toolbar]:hidden"
+  >
+    <div class="space-y-400" set:html={example} />
+  </body>
+</html>

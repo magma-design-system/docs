@@ -1,0 +1,14 @@
+---
+// A UI string (src/content/i18n/) with inline code: the parts between
+// backticks become Code, as in Markdown. The dictionaries stay plain text,
+// readable and easy to translate.
+import Code from './Code.astro';
+
+interface Props {
+  text: string;
+}
+
+const parts = Astro.props.text.split('`');
+---
+
+{parts.map((part, i) => (i % 2 === 1 ? <Code>{part}</Code> : part))}

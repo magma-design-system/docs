@@ -1,9 +1,45 @@
 ---
 // Title of the page as mds-text, replacing Starlight's <h1>. `_top` is the id
 // Starlight gives it: the first entry of the table of contents links to it.
+// Component pages get a header instead: the name of the component as the
+// title, its tag under it, then where the page comes from, close together.
+// Their sub-pages are named by the "Documentation" column (DocsNav.astro).
+import { getEntry } from 'astro:content';
+import Code from '../Code.astro';
+import { parseComponentPath } from '../../lib/components';
+import { magmaVersion } from '../../lib/magma.mjs';
 import { TEXT } from '../../lib/markdown-text.mjs';
+import { componentName } from '../../lib/nav.mjs';
+
+const { entry, locale } = Astro.locals.starlightRoute;
+const { t } = Astro.locals;
+const path = parseComponentPath(Astro.url.pathname, locale);
+const component = path && (await getEntry('components', path.tag));
 ---
 
-<mds-text id="_top" typography="h1" tag="h1" class:list={[TEXT.heading.h1, 'mt-400']}>
-  {Astro.locals.starlightRoute.entry.data.title}
-</mds-text>
+{component ? (
+  <div class="mt-400">
+    <mds-text id="_top" typography="h2" tag="h1" class={TEXT.heading.h1}>
+      {componentName(component.data.tag)}
+    </mds-text>
+    <mds-text typography="h3" tag="p" class={TEXT.block}>
+      {`<${component.data.tag}>`}
+    </mds-text>
+    <mds-text typography="caption" tag="p" class:list={[TEXT.block, 'mt-400 text-fg-muted']}>
+      {t('component.generatedFrom')}{' '}
+      <Code typography="hack">@maggioli-design-system/magma@{magmaVersion()}</Code>
+      <Code typography="hack">dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
+      <Code typography="hack">{component.data.encapsulation}</Code>.
+      {locale && (
+        <>
+          <br />
+          {t('component.sourceLanguage')}
+        </>
+      )}
+    </mds-text>
+  </div>
+) : (
+  <mds-text id="_top" typography="h2" tag="h1" class:list={[TEXT.heading.h1, 'mt-400']}>
+    {entry.data.title}
+  </mds-text>
+)}

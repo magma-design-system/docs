@@ -40,3 +40,30 @@ export function componentTags() {
     .components.map((/** @type {{ tag: string }} */ c) => c.tag)
     .sort();
 }
+
+/** An icon slug: `mi/<variant>/<name>`, `mdi/<name>` or `mgg/<name>`. */
+export const ICON_SLUG =
+  /\b(?:mi\/(?:baseline|outline|round|sharp|two-tone)\/[a-z0-9-]+|mdi\/[a-z0-9-]+|mgg\/[a-z0-9-]+)/g;
+
+/**
+ * The icons the usage docs of the components use most, most used first: the
+ * choice of the icon controls of the previews (src/components/Playground.astro).
+ * iconsauce collects them, since it reads documentation.json.
+ * @param {number} limit
+ * @returns {string[]}
+ */
+export function usageIcons(limit) {
+  /** @type {Map<string, number>} */
+  const counts = new Map();
+  for (const component of loadComponentDocs().components) {
+    for (const markdown of Object.values(component.usage ?? {})) {
+      for (const [slug] of String(markdown).matchAll(ICON_SLUG)) {
+        counts.set(slug, (counts.get(slug) ?? 0) + 1);
+      }
+    }
+  }
+  return [...counts]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([slug]) => slug);
+}

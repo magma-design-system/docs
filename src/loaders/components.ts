@@ -61,6 +61,20 @@ function nestHeadings(markdown: string, level: number): string {
 const USAGE = ['description', 'pattern', 'antipattern'] as const;
 type Usage = (typeof USAGE)[number];
 
+const HTML_FENCE = /^```html[^\n]*\n([\s\S]*?)^```/m;
+
+/**
+ * The first HTML example of the Pattern usage file, its canonical form (the
+ * patterns go from the most common to the most specialized): the markup of
+ * the component's preview (src/pages/example/[tag].astro). Empty when it does
+ * not use the component itself, as for the parts another component renders
+ * (mds-calendar-cell, mds-paginator-item): there is nothing of its own to try.
+ */
+function firstExample(markdown: string | undefined, tag: string): string {
+  const html = markdown && HTML_FENCE.exec(markdown)?.[1];
+  return html && new RegExp(`<${tag}[\\s>]`).test(html) ? html.trim() : '';
+}
+
 export function componentsLoader(): Loader {
   return {
     name: 'magma-components',
@@ -109,6 +123,7 @@ export function componentsLoader(): Loader {
             // Sub-pages of their own: their entries are the h2 of the page.
             pattern: await render(nestHeadings(usage.pattern ?? '', 2), 1),
             antipattern: await render(nestHeadings(usage.antipattern ?? '', 2), 1),
+            example: firstExample(usage.pattern, component.tag),
             props: await withHtml(component.props),
             events: await withHtml(component.events),
             methods: await withHtml(component.methods),

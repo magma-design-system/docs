@@ -3,12 +3,16 @@ import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import Code from '../../../../components/Code.astro';
 import CopyStatus from '../../../../components/CopyStatus.astro';
+import Heading from '../../../../components/Heading.astro';
 import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import Playground from '../../../../components/Playground.astro';
 import TypeLabels from '../../../../components/TypeLabels.astro';
+import UiText from '../../../../components/UiText.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
+import { propControl } from '../../../../lib/controls';
 import { localeParams } from '../../../../lib/i18n.mjs';
-import { magmaVersion } from '../../../../lib/magma.mjs';
 import { TEXT } from '../../../../lib/markdown-text.mjs';
+import { componentName } from '../../../../lib/nav.mjs';
 import { typeSortValue, unquote } from '../../../../lib/types';
 
 // One page per component and sub-page (src/lib/components.ts): the main page
@@ -36,15 +40,25 @@ const { locale } = Astro.params;
 const { t } = Astro.locals;
 const link = (tag: string) => componentHref(locale, tag);
 
-// Everything below the notice comes from the Magma packages, in English only.
+// What comes from the Magma packages is in English only (the header says so,
+// src/components/frame/PageTitle.astro).
 const contentLang = locale ? 'en' : undefined;
 
-const title = page.id === 'overview' ? `<${data.tag}>` : `<${data.tag}> ${t(page.label)}`;
+// The <title> of the page. What the page shows is the component's header
+// (src/components/frame/PageTitle.astro).
+const name = componentName(data.tag);
+const title = page.id === 'overview' ? name : `${name} ${t(page.label)}`;
 // Pattern and Antipattern pages are a usage file each, headings included.
 const guide = page.id === 'pattern' || page.id === 'antipattern' ? data[page.id] : undefined;
 
 const sections = {
   overview: [
+    // The preview's controls (Playground.astro).
+    {
+      id: 'props',
+      label: t('component.props'),
+      show: data.example !== '' && data.props.some((prop) => propControl(prop) !== undefined),
+    },
     { id: 'overview', label: t('component.overview'), show: true },
     {
       id: 'dependencies',
@@ -71,6 +85,19 @@ const sections = {
 }[page.id].filter((section) => section.show);
 const label = (id: string) => sections.find((section) => section.id === id)?.label;
 
+// What slots are, then only what applies to this component's slots.
+const namedSlot = data.slots.find((slot) => slot.name)?.name;
+const slotsIntro = [
+  t('component.slots.intro'),
+  data.slots.some((slot) => !slot.name) && t('component.slots.default'),
+  data.slots.some((slot) => !slot.name) &&
+    data.props.some((prop) => prop.name === 'label') &&
+    t('component.slots.label'),
+  // Astro escapes the text: i18next does not need to.
+  namedSlot &&
+    t('component.slots.named', { name: namedSlot, interpolation: { escapeValue: false } }),
+].filter(Boolean);
+
 const headings =
   guide?.headings ??
   sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
@@ -85,31 +112,18 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
-  <mds-text typography="caption" tag="p" class:list={[TEXT.block, 'text-fg-muted']}>
-    {t('component.generatedFrom')}{' '}
-    <Code typography="hack">@maggioli-design-system/magma@{magmaVersion()}</Code>
-    <Code typography="hack">dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
-    <Code typography="hack">{data.encapsulation}</Code>.
-    {locale && (
-      <>
-        <br />
-        {t('component.sourceLanguage')}
-      </>
-    )}
-  </mds-text>
+  {page.id === 'overview' && data.example !== '' && (
+    <Playground tag={data.tag} props={data.props} example={data.example} />
+  )}
 
   {page.id === 'overview' && (
     <>
-      <mds-text id="overview" typography="h2" tag="h2" class={TEXT.heading.h2}>
-        {label('overview')}
-      </mds-text>
+      <Heading id="overview" typography="h3" text={label('overview') ?? ''} />
       <div lang={contentLang} set:html={data.descriptionHtml} />
 
       {label('dependencies') && (
         <>
-          <mds-text id="dependencies" typography="h2" tag="h2" class={TEXT.heading.h2}>
-            {label('dependencies')}
-          </mds-text>
+          <Heading id="dependencies" typography="h3" text={label('dependencies') ?? ''} />
           {data.dependencies.length > 0 && (
             <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
               {t('component.uses')}:{' '}
@@ -143,10 +157,17 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
 
   {guide && <div lang={contentLang} set:html={guide.html} />}
 
+  {page.id === 'api' && (
+    <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <UiText text={t('component.api.intro')} />
+    </mds-text>
+  )}
+
   {page.id === 'api' && data.props.length > 0 && (
     <>
-      <mds-text id="props" typography="h2" tag="h2" class={TEXT.heading.h2}>
-        {label('props')}
+      <Heading id="props" typography="h3" text={label('props') ?? ''} />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        <UiText text={t('component.api.props')} />
       </mds-text>
       <mds-table interactive>
         <mds-table-header>
@@ -204,9 +225,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
 
   {page.id === 'api' && data.events.length > 0 && (
     <>
-      <mds-text id="events" typography="h2" tag="h2" class={TEXT.heading.h2}>
-        {label('events')}
-      </mds-text>
+      <Heading id="events" typography="h3" text={label('events') ?? ''} />
       <mds-table interactive>
         <mds-table-header>
           <mds-table-header-cell label={t('component.column.event')} />
@@ -237,9 +256,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
 
   {page.id === 'api' && data.methods.length > 0 && (
     <>
-      <mds-text id="methods" typography="h2" tag="h2" class={TEXT.heading.h2}>
-        {label('methods')}
-      </mds-text>
+      <Heading id="methods" typography="h3" text={label('methods') ?? ''} />
       <mds-table interactive>
         <mds-table-header>
           <mds-table-header-cell label={t('component.column.method')} />
@@ -281,9 +298,12 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
     .filter((section) => section.page === page.id && section.items.length > 0)
     .map((section) => (
       <>
-        <mds-text id={section.id} typography="h2" tag="h2" class={TEXT.heading.h2}>
-          {label(section.id)}
-        </mds-text>
+        <Heading id={section.id} typography="h3" text={label(section.id) ?? ''} />
+        {section.id === 'slots' && (
+          <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+            <UiText text={slotsIntro.join(' ')} />
+          </mds-text>
+        )}
         <mds-table interactive>
           <mds-table-header>
             <mds-table-header-cell label={section.column} />
