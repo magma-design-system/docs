@@ -1,0 +1,151 @@
+---
+title: Versioni e migrazioni
+description: 'Come sono numerate le versioni di Magma, come aggiornare un progetto e come passarlo da Magma 1 a Magma 2 con il codemod.'
+---
+
+import FrameworkTabs from '../../../../components/FrameworkTabs.astro';
+import MagmaVersions from '../../../../components/MagmaVersions.astro';
+
+Ogni pacchetto di Magma ha la sua versione e le sue note di rilascio. Cosa significa una
+nuova versione per il tuo progetto lo dice il suo numero: questa pagina spiega come leggerlo,
+come aggiornare e come passare un progetto da Magma 1 a Magma 2.
+
+## Come sono numerate le versioni
+
+I pacchetti seguono il versionamento semantico, ognuno per conto suo: magma, styles,
+design-tokens, svg-icons, icons e identity escono quando cambia il loro codice, con un
+rilascio per pacchetto nelle [release del repository di Magma](https://github.com/magma-design-system/magma/releases)
+(`magma@2.1.0`, `styles@17.0.1`, ...).
+
+- **Patch** (da 2.1.0 a 2.1.1): solo correzioni.
+- **Minor** (da 2.0.1 a 2.1.0): qualcosa di nuovo, niente di tolto.
+- **Major** (da 1.12 a 2.0): un cambiamento che rompe la compatibilità. Qualcosa che il tuo
+  progetto usa può smettere di funzionare: leggi le note di migrazione prima di aggiornare.
+
+Per magma il confine tra minor e major è controllato a ogni modifica: l'API pubblica dei
+componenti (proprietà con i loro valori e default, eventi, metodi, slot) viene confrontata
+con l'ultimo rilascio. Una rimozione o una restrizione, come meno valori accettati, un nuovo
+default, una nuova proprietà obbligatoria o una firma cambiata, può uscire solo in una
+major; un'aggiunta richiede almeno una minor.
+
+magma-react e magma-angular escono insieme a magma, con la stessa versione, e ognuno
+richiede esattamente quella versione di magma. magma richiede styles e design-tokens come
+intervalli: una patch o una minor arriva al tuo progetto con `npm update`, una major solo
+con un nuovo rilascio di magma. Le versioni di questo sito:
+
+<MagmaVersions />
+
+## Aggiornare
+
+Aggiorna magma e il suo wrapper insieme, alla stessa versione:
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```bash
+npm i @maggioli-design-system/magma@latest @maggioli-design-system/styles@latest @maggioli-design-system/design-tokens@latest
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```bash
+npm i @maggioli-design-system/magma-react@latest @maggioli-design-system/magma@latest @maggioli-design-system/styles@latest @maggioli-design-system/design-tokens@latest
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```bash
+npm i @maggioli-design-system/magma-angular@latest @maggioli-design-system/magma@latest @maggioli-design-system/styles@latest @maggioli-design-system/design-tokens@latest
+```
+
+</Fragment>
+</FrameworkTabs>
+
+Poi leggi le note di rilascio di ogni versione tra quella che avevi e la nuova. Le guide per
+agenti dentro i pacchetti hanno la loro stessa versione: dopo un aggiornamento, un agente AI
+legge le guide della versione installata (vedi [Sviluppo agentico](../agentic-development/)).
+
+Un progetto che resta su Magma 1 lo installa con il tag `v1-latest`, dove escono le
+correzioni di Magma 1:
+
+```bash
+npm i @maggioli-design-system/magma@v1-latest
+```
+
+## Da Magma 1 a Magma 2
+
+Magma 2 cambia il nome di alcuni valori, proprietà, classi e componenti, e porta gli stili a
+Tailwind 4. Gran parte del lavoro lo fa un codemod; il resto è una lista che ti dà lui.
+
+### 1. Aggiorna i pacchetti e gli stili
+
+Installa Magma 2 come nel primo passaggio di [Installazione](../installation/#pacchetti):
+magma 2 richiede styles 17 o successiva e design-tokens 15 o successiva. Poi sostituisci gli
+import del foglio di stile globale con quelli di [Stili](../installation/#stili): Magma 2
+aggiunge i ruoli di colore (`semantic.css`) e i temi con nome (`themes.css`), in un ordine
+fisso di cascade layer. Il tema Tailwind di Magma ora richiede Tailwind 4, configurato in
+CSS: l'aggiornamento della tua configurazione di Tailwind segue la guida di aggiornamento di
+Tailwind.
+
+### 2. Esegui il codemod
+
+`@maggioli-design-system/magma-codemods` riscrive l'HTML, i componenti React (JSX e TSX), i
+template Angular e il CSS del tuo progetto. Richiede Node 22 o successivo. Eseguilo prima
+senza modifiche: stampa il diff di ogni file e un riepilogo, e non scrive nulla.
+
+```bash
+npx @maggioli-design-system/magma-codemods --path ./src
+```
+
+I template esterni di Angular (file `.html`) richiedono `--framework angular`, altrimenti
+vengono letti come HTML semplice. Quando il diff è giusto, eseguilo di nuovo con `--write`,
+che modifica i file:
+
+```bash
+npx @maggioli-design-system/magma-codemods --path ./src --write
+```
+
+`--write` non parte se git ha modifiche non committate, così `git checkout` lo annulla
+sempre. Eseguilo una volta sola: alcune rinomine formano una catena, come `rounded-xl` che
+diventa `rounded-md` mentre `rounded-md` diventa `rounded-2xs`, e una seconda esecuzione sul
+codice già migrato le sposterebbe ancora.
+
+Cosa cambia, in breve:
+
+- **Tone**: `ghost` diventa `outline`; `quiet` diventa `text` su `mds-button`,
+  `mds-radial-menu` e `mds-radial-menu-item`, `weak` ovunque altro.
+- **Proprietà booleane in forma negativa**, il cui default ora è spento: `arrow` diventa
+  `hide-arrow`, `backdrop` diventa `hide-backdrop`, `cockade` diventa `hide-cockade`,
+  `closable` diventa `disable-close`, `visible` diventa `dismissed`, e così via.
+- **Testo in `label`**: il testo dentro `mds-breadcrumb-item` e `mds-tab-item` deve passare
+  nella loro `label`, perché Magma 2 non lo mostra più; su `mds-button` è la forma
+  preferita. `slot="default"` sparisce.
+- **Modalità e tema**: il controllo chiaro e scuro `mds-pref-theme` diventa `mds-pref-mode`,
+  e le classi `pref-theme-*` diventano `pref-mode-*`. In Magma 2, `mds-pref-theme` sceglie un
+  tema con nome: senza il codemod, una pagina mostra quel selettore dove c'era il controllo
+  della modalità, senza errori. La scelta salvata dall'utente si sposta da sola.
+- **Proprietà CSS personalizzate** rinominate, come `--mds-*-ghost-*` in `--mds-*-outline-*`,
+  e quelle rimosse segnalate.
+- **Classi Tailwind** del tema di Magma: ombre, la famiglia degli anelli (`shadow-outline-*`
+  in `shadow-ring-*`), la scala dei raggi, gli spessori dei bordi e i gap.
+- **Default cambiati**: dove Magma 2 ha un nuovo default, il codemod scrive quello vecchio,
+  così la pagina resta com'era. `mds-dropdown` riceve `disable-auto-placement`, `mds-banner`
+  riceve `variant="light"`, `mds-label` riceve `truncate="none"`.
+
+### 3. Completa a mano
+
+Il riepilogo elenca quello che il codemod segnala senza cambiarlo: valori dinamici come
+`tone={tone}` o `[tone]="tone"`, spread di proprietà, contenuto degli slot con del markup,
+proprietà e slot rimossi. Poi cerca nei tuoi script, che il codemod non legge:
+
+- Proprietà e attributi impostati da codice (`el.backdrop = false`,
+  `setAttribute('cockade', '')`) e listener di eventi.
+- `mds-pref-theme` e `pref-theme-` in selettori e controlli sulle classi.
+- Chiamate a `updateLang()`, rimosso in Magma 2: cancellale. I componenti seguono
+  `<html lang>`, e un `lang` su un singolo componente non conta più.
+
+Il [README del codemod](https://www.npmjs.com/package/@maggioli-design-system/magma-codemods)
+elenca ogni regola, e il [README di magma](https://www.npmjs.com/package/@maggioli-design-system/magma)
+i cambiamenti di ogni componente.

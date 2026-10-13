@@ -48,7 +48,12 @@ export const sections = [
   {
     id: 'development',
     icon: 'mi/outline/code',
-    items: () => [{ slug: 'development' }, { slug: 'development/installation' }],
+    items: () => [
+      { slug: 'development' },
+      { slug: 'development/installation' },
+      { slug: 'development/agentic-development' },
+      { slug: 'development/versions' },
+    ],
   },
   {
     id: 'community',
