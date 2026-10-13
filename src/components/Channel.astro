@@ -1,0 +1,42 @@
+---
+// A communication channel of Magma, as mds-card: in the header, the channel as
+// mds-entity (its icon, its name and what it is) and a button that opens it in
+// a new tab; below, what it is for (the slot). Inside Channels.astro.
+interface Props {
+  name: string;
+  kind: string;
+  /** An mds-icon slug, collected by iconsauce from the page that uses it. */
+  icon: string;
+  href: string;
+  action: string;
+}
+
+const { name, kind, icon, href, action } = Astro.props;
+---
+
+<mds-card>
+  <mds-card-header>
+    <mds-entity icon={icon}>
+      <mds-text typography="h6" tag="h3">
+        {name}
+      </mds-text>
+      <mds-text slot="detail" typography="caption">
+        {kind}
+      </mds-text>
+    </mds-entity>
+    <mds-button
+      slot="action"
+      href={href}
+      target="blank"
+      role="link"
+      label={action}
+      icon="mi/baseline/open-in-new"
+      icon-position="right"
+      variant="primary"
+      tone="outline"
+    ></mds-button>
+  </mds-card-header>
+  <mds-card-content>
+    <slot />
+  </mds-card-content>
+</mds-card>
