@@ -89,7 +89,7 @@
       they stick. Below the mobile header; on desktop inside the card, below
       its margin and border (PageFrame.astro).
     */
-    --frame-sticky-top: var(--frame-header-height);
+    --frame-sticky-top: calc(var(--frame-header-height) + --spacing(600));
 
     /*
       Starlight: anchors land below the header, no mobile table of contents,
