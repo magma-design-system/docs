@@ -1,8 +1,50 @@
 ---
 title: Sviluppo
-description: Installare e usare Magma in progetti Vanilla, React e Angular.
+description: Installare e usare Magma in progetti Vanilla, React e Angular, e le regole da seguire quando lo usi.
 ---
 
 Come installare Magma in progetti Vanilla, React e Angular, come lavorare con gli agenti AI,
 come introdurlo in prodotti esistenti e nuovi, e come cambiano le sue versioni. Le altre
 pagine di questa sezione sono in scrittura.
+
+## Regole di sviluppo
+
+Le regole che valgono per ogni componente di Magma, con qualsiasi framework. Ogni componente
+aggiunge le sue nelle pagine Pattern e Antipattern della sua
+[documentazione](../components/).
+
+- **Usa il componente, non l'elemento.** Quando un componente `mds-*` fa il lavoro, usalo al
+  posto di un `<button>`, di un `<input>` o di un `<a>` che esegue un'azione. Non mettere un
+  componente interattivo dentro un altro: `<a><mds-button></mds-button></a>` diventa un
+  `mds-button` con `href`.
+- **Leggi l'API, non indovinarla.** La stessa proprietà accetta valori diversi su componenti
+  diversi: `tone="outline"` va bene su `mds-button` e non su `mds-banner`, che accetta solo
+  `strong`, `weak` e `box`. La pagina API di ogni componente elenca i valori.
+- **Togli un attributo booleano per spegnerlo.** Mai `disabled="false"`: l'attributo resta
+  sull'elemento, e selettori e script lo vedono ancora impostato. Metti `disabled` sul
+  componente, non su un elemento che lo contiene.
+- **Preferisci `label` allo slot.** Quando un componente ha la proprietà `label`, scrivi lì
+  il testo. Lo slot predefinito accetta testo semplice, salvo dove il componente dice
+  altrimenti; gli slot con nome accettano solo i nomi che il componente documenta.
+- **Tieni insieme i componenti composti.** Un figlio, come `mds-accordion-item`, va
+  direttamente dentro il suo genitore, senza elementi in mezzo, e mai da solo.
+- **Ascolta gli eventi di Magma.** Usa gli eventi `mds*` del componente, come
+  `mdsInputChange`, con i dati in `event.detail`, non `change` o `input`. Un componente senza
+  eventi suoi, come `mds-button`, si ascolta con `click`.
+- **Personalizza attraverso l'API.** Modifica un componente dall'esterno prima con le sue
+  proprietà CSS personalizzate, poi con le sue part documentate. Part non documentate,
+  classi interne, `>>>` e `/deep/` si rompono a ogni rilascio.
+- **Colori dai ruoli, modalità scura da Magma.** Usa i ruoli di colore, come
+  `bg-surface-default` e `text-fg-muted`, non colori fissi come `bg-white`. Non scrivere
+  regole `prefers-color-scheme`: modalità scura, contrasto e movimento ridotto vengono dalle
+  classi e dai componenti delle preferenze.
+- **Icone per nome.** Scrivi il nome di un'icona, come `mi/baseline/email`, mai un `<svg>`
+  nel markup e mai un import da un pacchetto di icone. Un pulsante con la sola icona ha
+  bisogno di `label` o di `aria-label`.
+- **Focus con le utility di Magma.** Usa `focus-bounce` sugli elementi interattivi e
+  `focus-zoom` sui link, non contorni `:focus` scritti a mano.
+- **Form come form native.** I campi di Magma funzionano dentro un `<form>` come i
+  controlli nativi: con un `name` vengono inviati, azzerati e validati dalla form stessa.
+
+I pacchetti contengono le stesse regole per gli agenti AI, in `agents/conventions.md` e
+`agents/anti-patterns.md`: vedi [Sviluppo agentico](agentic-development/).
