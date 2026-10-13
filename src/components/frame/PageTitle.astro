@@ -1,0 +1,9 @@
+---
+// Title of the page as mds-text, replacing Starlight's <h1>. `_top` is the id
+// Starlight gives it: the first entry of the table of contents links to it.
+import { TEXT } from '../../lib/markdown-text.mjs';
+---
+
+<mds-text id="_top" typography="h1" tag="h1" class:list={[TEXT.heading.h1, 'mt-400']}>
+  {Astro.locals.starlightRoute.entry.data.title}
+</mds-text>

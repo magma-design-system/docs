@@ -1,0 +1,32 @@
+---
+// Inline code as mds-text with Magma's look for code, as the Markdown pages
+// have it (src/lib/markdown-text.mjs): `snippet` in running text, `hack`
+// (smaller, no ring, lighter background) where it has to stay compact, as in
+// table cells. `name`: what a table row is about, in bold and without
+// background. `copy`: the text copied when it is clicked
+// (CopyToClipboard.astro).
+import { TEXT } from '../lib/markdown-text.mjs';
+
+interface Props {
+  typography?: 'snippet' | 'hack';
+  name?: boolean;
+  copy?: string;
+}
+
+const { typography = 'snippet', name = false, copy } = Astro.props;
+---
+
+<mds-text
+  typography={typography}
+  tag="code"
+  class={name ? TEXT.name : TEXT.code[typography]}
+  data-copy={copy}
+>
+  {name ? (
+    <strong>
+      <slot />
+    </strong>
+  ) : (
+    <slot />
+  )}
+</mds-text>

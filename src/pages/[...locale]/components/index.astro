@@ -2,7 +2,9 @@
 // Landing page of the Components section: every component, linking to its page.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection } from 'astro:content';
+import Code from '../../../components/Code.astro';
 import { componentHref } from '../../../lib/components';
+import { TEXT } from '../../../lib/markdown-text.mjs';
 import { localeParams } from '../../../lib/i18n.mjs';
 import { componentName } from '../../../lib/nav.mjs';
 
@@ -18,12 +20,15 @@ const components = (await getCollection('components')).sort((a, b) => a.id.local
 <StarlightPage
   frontmatter={{ title: t('components.title'), description: t('components.description') }}
 >
-  <p>{t('components.description')}</p>
-  <ul class="columns-2xs ps-500">
+  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+    {t('components.description')}
+  </mds-text>
+  {/* mds-list is a grid: columns of the grid, filled row by row. */}
+  <mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(6000),1fr))]">
     {components.map(({ id }) => (
-      <li>
-        <a href={componentHref(locale, id)}>{componentName(id)}</a> <code>{`<${id}>`}</code>
-      </li>
+      <mds-list-item typography="detail" class={TEXT.listItem}>
+        <a href={componentHref(locale, id)}>{componentName(id)}</a> <Code>{`<${id}>`}</Code>
+      </mds-list-item>
     ))}
-  </ul>
+  </mds-list>
 </StarlightPage>
