@@ -2,6 +2,13 @@
 // A communication channel of Magma, as mds-card: in the header, the channel as
 // mds-entity (its icon, its name and what it is) and a button that opens it in
 // a new tab; below, what it is for (the slot). Inside Channels.astro.
+// `variant` and `tone` color the icon of the entity: the values mds-entity
+// accepts, typed by the installed Magma.
+import type {
+  ThemeFullVariantAvatarType,
+  ToneMinimalVariantType,
+} from '@maggioli-design-system/magma';
+
 interface Props {
   name: string;
   kind: string;
@@ -9,14 +16,16 @@ interface Props {
   icon: string;
   href: string;
   action: string;
+  variant?: ThemeFullVariantAvatarType;
+  tone?: ToneMinimalVariantType;
 }
 
-const { name, kind, icon, href, action } = Astro.props;
+const { name, kind, icon, href, action, variant, tone } = Astro.props;
 ---
 
 <mds-card>
   <mds-card-header>
-    <mds-entity icon={icon}>
+    <mds-entity icon={icon} variant={variant} tone={tone}>
       <mds-text typography="h6" tag="h3">
         {name}
       </mds-text>
@@ -36,7 +45,7 @@ const { name, kind, icon, href, action } = Astro.props;
       tone="outline"
     ></mds-button>
   </mds-card-header>
-  <mds-card-content>
+  <mds-card-content class="pt-0">
     <slot />
   </mds-card-content>
 </mds-card>
