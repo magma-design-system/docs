@@ -1,0 +1,49 @@
+---
+// The Magma packages of the install guide with their versions, read from the
+// installed packages (magmaRequirements() in src/lib/magma.mjs): magma and
+// its wrappers as the site installs them, styles and design-tokens as the
+// ranges magma declares.
+import Code from './Code.astro';
+import { magmaRequirements } from '../lib/magma.mjs';
+
+const { t } = Astro.locals;
+const v = magmaRequirements();
+const range = t('install.versions.range', { version: v.magma });
+const rows = [
+  { pkg: 'magma', version: v.magma, note: t('install.versions.installed') },
+  { pkg: 'magma-react', version: v.react, note: t('install.versions.wrapper') },
+  {
+    pkg: 'magma-angular',
+    version: v.angular,
+    note: `${t('install.versions.wrapper')}, ${t('install.versions.angular', { range: v.angularCore, interpolation: { escapeValue: false } })}`,
+  },
+  { pkg: 'styles', version: v.styles, note: range },
+  { pkg: 'design-tokens', version: v.designTokens, note: range },
+];
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('install.versions.package')} />
+    <mds-table-header-cell label={t('install.versions.version')} />
+    <mds-table-header-cell label={t('install.versions.note')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ pkg, version, note }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <Code name>{`@maggioli-design-system/${pkg}`}</Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{version}</Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            {note}
+          </mds-text>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

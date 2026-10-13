@@ -1,9 +1,15 @@
 ---
-// Landing page of the Components section: every component, linking to its page.
+// Landing page of the Components section: how to start using the components
+// in each framework (the whole setup is in Development > Installation), then
+// every component, linking to its page.
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Code as CodeBlock } from '@astrojs/starlight/components';
 import { getCollection } from 'astro:content';
-import Code from '../../../components/Code.astro';
+import FrameworkTabs from '../../../components/FrameworkTabs.astro';
+import Heading from '../../../components/Heading.astro';
+import UiText from '../../../components/UiText.astro';
 import { componentHref } from '../../../lib/components';
+import { localePrefix } from '../../../lib/frame';
 import { TEXT } from '../../../lib/markdown-text.mjs';
 import { localeParams } from '../../../lib/i18n.mjs';
 import { componentName } from '../../../lib/nav.mjs';
@@ -15,19 +21,127 @@ export function getStaticPaths() {
 const { locale } = Astro.params;
 const { t } = Astro.locals;
 const components = (await getCollection('components')).sort((a, b) => a.id.localeCompare(b.id));
+const guideHref = `${localePrefix(locale)}/development/installation/`;
+
+// The same two components in every framework, as the tested setups of the
+// installation guide write them.
+const MARKUP = `<mds-text typography="h3" tag="h1">Hello Magma</mds-text>
+<mds-button variant="primary" tone="strong">Save</mds-button>`;
+
+const VANILLA_REGISTER = `import {
+  defineCustomElementMdsButton,
+  defineCustomElementMdsText,
+} from '@maggioli-design-system/magma/components';
+
+defineCustomElementMdsButton();
+defineCustomElementMdsText();`;
+
+const REACT_APP = `import { MdsButton, MdsText } from '@maggioli-design-system/magma-react';
+
+export default function App() {
+  return (
+    <>
+      <MdsText typography="h3" tag="h1">Hello Magma</MdsText>
+      <MdsButton variant="primary" tone="strong">Save</MdsButton>
+    </>
+  );
+}`;
+
+const ANGULAR_COMPONENT = `import { Component } from '@angular/core';
+import { MdsButton, MdsText } from '@maggioli-design-system/magma-angular';
+
+@Component({
+  selector: 'app-root',
+  imports: [MdsButton, MdsText],
+  templateUrl: './app.html',
+})
+export class App {}`;
+
+const headings = [
+  { depth: 2, slug: 'quick-start', text: t('components.quickStart') },
+  { depth: 2, slug: 'all-components', text: t('components.all') },
+];
 ---
 
 <StarlightPage
   frontmatter={{ title: t('components.title'), description: t('components.description') }}
+  headings={headings}
 >
   <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-    {t('components.description')}
+    {t('components.intro')}
   </mds-text>
-  {/* mds-list is a grid: columns of the grid, filled row by row. */}
-  <mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(6000),1fr))]">
+
+  <Heading id="quick-start" text={t('components.quickStart')} />
+  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+    {t('components.quickStart.intro')}
+  </mds-text>
+
+  <FrameworkTabs>
+    <Fragment slot="vanilla">
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.install')}
+      </mds-text>
+      <CodeBlock code="npm i @maggioli-design-system/magma" lang="bash" />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        <UiText text={t('components.quickStart.vanilla.register')} />
+      </mds-text>
+      <CodeBlock code={VANILLA_REGISTER} lang="js" title="src/main.js" />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.vanilla.use')}
+      </mds-text>
+      <CodeBlock code={MARKUP} lang="html" title="index.html" />
+    </Fragment>
+
+    <Fragment slot="react">
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.installWrapper')}
+      </mds-text>
+      <CodeBlock
+        code="npm i @maggioli-design-system/magma-react @maggioli-design-system/magma"
+        lang="bash"
+      />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.react.use')}
+      </mds-text>
+      <CodeBlock code={REACT_APP} lang="jsx" title="src/App.jsx" />
+    </Fragment>
+
+    <Fragment slot="angular">
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.installWrapper')}
+      </mds-text>
+      <CodeBlock
+        code="npm i @maggioli-design-system/magma-angular @maggioli-design-system/magma"
+        lang="bash"
+      />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        <UiText text={t('components.quickStart.angular.register')} />
+      </mds-text>
+      <CodeBlock code={ANGULAR_COMPONENT} lang="ts" title="src/app/app.ts" />
+      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+        {t('components.quickStart.angular.use')}
+      </mds-text>
+      <CodeBlock code={MARKUP} lang="html" title="src/app/app.html" />
+    </Fragment>
+  </FrameworkTabs>
+
+  <mds-banner
+    variant="info"
+    icon="mi/baseline/info"
+    headline={t('components.quickStart.next.title')}
+  >
+    <mds-text typography="detail">{t('components.quickStart.next')}</mds-text>
+    <mds-button slot="action" href={guideHref} role="link" variant="info" tone="strong">
+      {t('components.quickStart.guide')}
+    </mds-button>
+  </mds-banner>
+
+  <Heading id="all-components" text={t('components.all')} />
+  {/* mds-list is a grid: columns of at least 10rem, filled row by row. */}
+  <mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(4000),1fr))]">
     {components.map(({ id }) => (
       <mds-list-item typography="detail" class={TEXT.listItem}>
-        <a href={componentHref(locale, id)}>{componentName(id)}</a> <Code>{`<${id}>`}</Code>
+        <a href={componentHref(locale, id)}>{componentName(id)}</a>
       </mds-list-item>
     ))}
   </mds-list>

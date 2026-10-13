@@ -4,7 +4,7 @@
   "nav.tokens": "Tokens",
   "nav.icons": "Icons",
   "nav.components": "Components",
-  "nav.components.overview": "All components",
+  "nav.components.overview": "Using components",
   "nav.brand": "Brand assets",
   "nav.development": "Development",
   "nav.community": "Community",
@@ -71,5 +71,27 @@
   "copy.failed": "Could not copy {{value}}",
 
   "components.title": "Components",
-  "components.description": "The web components of Magma, generated from the documentation of the installed package."
+  "components.description": "How to start using the web components of Magma in Vanilla JS, React and Angular, and the list of all of them, generated from the installed package.",
+  "components.intro": "Magma components are web components: custom elements you write like HTML tags, with any framework or without one. React and Angular get a wrapper package that turns them into components of their own.",
+  "components.quickStart": "Quick start",
+  "components.quickStart.intro": "Install the package for your framework, register the components you use and write them in your markup. Your choice of framework is kept for the other pages.",
+  "components.quickStart.install": "Install the package:",
+  "components.quickStart.installWrapper": "Install the wrapper and the package it wraps:",
+  "components.quickStart.vanilla.register": "In the entry point of the app, register the components you use: each `defineCustomElement*` function registers a component and the ones it contains.",
+  "components.quickStart.vanilla.use": "Then write them like HTML tags:",
+  "components.quickStart.react.use": "Import the components you use from the wrapper: importing one registers it.",
+  "components.quickStart.angular.register": "Add the components you use to the `imports` of your component: each one registers itself.",
+  "components.quickStart.angular.use": "Then write them in its template like HTML tags:",
+  "components.quickStart.next.title": "Styles, fonts and icons",
+  "components.quickStart.next": "The components also need Magma's styles and fonts, and mds-icon the icon files: the installation guide sets them up for each framework.",
+  "components.quickStart.guide": "Installation guide",
+  "components.all": "All components",
+
+  "install.versions.package": "Package",
+  "install.versions.version": "Version",
+  "install.versions.note": "Note",
+  "install.versions.installed": "the version this site is built with",
+  "install.versions.wrapper": "the same version as magma",
+  "install.versions.angular": "Angular {{range}}",
+  "install.versions.range": "the range magma {{version}} declares"
 }
