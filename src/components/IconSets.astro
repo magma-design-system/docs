@@ -1,0 +1,60 @@
+---
+// The icon sets of the Icons section, for its landing page: name (a link to
+// the page of the set), slug, how many icons and the package they come from,
+// counted from the installed packages (src/lib/icons.mjs).
+import Code from './Code.astro';
+import { ICON_SETS, iconSet, type IconSetId } from '../lib/icons.mjs';
+import { localePrefix } from '../lib/frame';
+
+const { t, starlightRoute } = Astro.locals;
+const { lang, locale } = starlightRoute;
+
+const PAGES: Record<IconSetId, { page: string; slug: string; pkg: string }> = {
+  mgg: { page: 'maggioli', slug: 'mgg/<name>', pkg: '@maggioli-design-system/svg-icons' },
+  mi: { page: 'material-icons', slug: 'mi/<style>/<name>', pkg: '@material-icons/svg' },
+  mdi: { page: 'material-design-icons', slug: 'mdi/<name>', pkg: '@mdi/svg' },
+};
+
+const rows = ICON_SETS.map((id) => {
+  const { icons, styles } = iconSet(id);
+  const count = icons.length.toLocaleString(lang);
+  return {
+    ...PAGES[id],
+    name: t(`icons.setName.${id}` as never),
+    href: `${localePrefix(locale)}/icons/${PAGES[id].page}/`,
+    count: styles.length ? t('icons.sets.styles', { count, styles: styles.length }) : count,
+  };
+});
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('icons.sets.set')} />
+    <mds-table-header-cell label={t('icons.sets.slug')} />
+    <mds-table-header-cell label={t('icons.sets.icons')} />
+    <mds-table-header-cell label={t('icons.sets.package')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ name, href, slug, count, pkg }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            <a href={href}>{name}</a>
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{slug}</Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            {count}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{pkg}</Code>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

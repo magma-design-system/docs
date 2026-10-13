@@ -1,0 +1,381 @@
+---
+// The icons of a set on its pages (src/lib/icon-pages.ts), copied on click,
+// never all of them at once: the icons of the page's category, while a
+// search looks through the whole set instead. Either way the tiles come in
+// blocks as the page scrolls, from the set's JSON
+// (src/pages/icons/[set].json.ts), which the page loads once it shows.
+// Material Icons add a tab for each style, which changes every slug; the
+// style picked last stays from page to page.
+import CopyExample from './CopyExample.astro';
+import CopyToClipboard from './CopyToClipboard.astro';
+import { iconSet, slugOf, type IconSetId } from '../lib/icons.mjs';
+
+interface Props {
+  set: IconSetId;
+  /** The category of the page; none for a set without categories. */
+  category?: string;
+}
+
+const { set, category } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { styles, categories, icons } = iconSet(set);
+const src = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}icons/${set}.json`;
+
+/** `{name}` placeholders, filled in by the script below. */
+const template = (key: string, values: Record<string, string> = {}) =>
+  t(key as never, { ...values, interpolation: { escapeValue: false } });
+
+/** The icon the example of the formats shows. */
+const EXAMPLES: Record<IconSetId, string> = {
+  mgg: 'ai-brain',
+  mi: 'content-copy',
+  mdi: 'account-circle',
+};
+const example = icons.find(({ name }) => name === EXAMPLES[set]) ?? icons[0];
+
+const current = categories.find(({ id }) => id === category);
+const heading = current && (current.label ?? t(`icons.set.category.${current.id}` as never));
+
+const formats = ['slug', 'mdsIcon', 'font'];
+---
+
+<div
+  class="not-content my-600 flex flex-col gap-600"
+  data-icon-set={set}
+  data-src={src}
+  data-styles={styles.join(' ')}
+  data-category={category}
+  data-count={template('icons.set.count', { count: '{count}' })}
+  data-count-search={template('icons.set.countSearch', { count: '{count}' })}
+  data-empty={template('icons.set.empty', { query: '{query}' })}
+  data-deprecated={t('icons.set.deprecated')}
+>
+  <div class="grid flex-wrap items-center gap-x-400 gap-y-200">
+    <mds-input-field label={t('icons.copies')}>
+      <mds-input-select
+        accessible-name={t('icons.copyAs')}
+        data-icon-format
+        class="mt-0 w-auto min-w-[14rem]"
+      >
+        {formats.map((format) => (
+          <option value={format}>{t(`icons.format.${format}` as never)}</option>
+        ))}
+      </mds-input-select>
+    </mds-input-field>
+    <CopyExample text={slugOf(set, example.name)}>
+      <span data-icon-example data-name={example.name}>
+        {slugOf(set, example.name)}
+      </span>
+    </CopyExample>
+  </div>
+
+  {/*
+    Search, styles and category stay in sight above the tiles, right below
+    the mobile header or at the top of the window on desktop: no gap above
+    them where the tiles would show. The background hides the tiles under
+    them. The styles change the slugs of the tiles in place, wherever the
+    page is scrolled to.
+  */}
+  <div class="sticky top-(--frame-header-height) z-10 -mx-200 flex flex-col gap-300 bg-surface-raised px-200 py-300">
+    <mds-input
+      type="search"
+      icon="mi/baseline/search"
+      accessible-name={t('icons.search')}
+      placeholder={template('icons.set.search', {
+        count: icons.length.toLocaleString(starlightRoute.lang),
+      })}
+      data-icon-search
+      class="mt-0"
+    />
+    {styles.length > 0 && (
+      <mds-tab size="sm" data-icon-styles class="mt-0">
+        {styles.map((style, index) => (
+          <mds-tab-item
+            type="button"
+            value={style}
+            label={style}
+            selected={index === 0 || undefined}
+            class="mt-0"
+          />
+        ))}
+      </mds-tab>
+    )}
+    <div class="flex flex-wrap items-center justify-between gap-300">
+      {heading && (
+        <mds-text typography="h5" tag="h2" class="my-0" data-icon-heading>
+          {heading}
+        </mds-text>
+      )}
+      <span class="flex items-center gap-200" aria-live="polite">
+        <mds-text typography="caption" tag="span" class="my-0 text-fg-muted" data-icon-count>
+          {t('icons.set.loading')}
+        </mds-text>
+        <mds-text
+          typography="caption"
+          tag="span"
+          class="hidden my-0 text-fg-muted"
+          aria-hidden="true"
+          data-copy-status
+          data-copied={t('copy.copied')}
+          data-failed={t('copy.notCopied')}
+        >
+          {t('icons.hint')}
+        </mds-text>
+      </span>
+    </div>
+  </div>
+
+  {/* Columns of at least 8rem: 5 in the content column of a desktop, 2 on phones. */}
+  <div
+    class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(3200),1fr))] gap-200"
+    data-icon-grid
+  ></div>
+  {/* Coming into sight, it brings the next block of tiles. */}
+  <div class="h-px" data-icon-more></div>
+
+  <mds-text
+    typography="detail"
+    tag="p"
+    class="hidden my-0 text-fg-muted"
+    data-icon-empty
+  ></mds-text>
+
+  <CopyToClipboard />
+</div>
+
+<script>
+  import {
+    SLUG_FORMATS,
+    TILE,
+    copyLabel,
+    enhanceCopies,
+    fill,
+    formatKey,
+    showCopies,
+    storage,
+  } from '../scripts/icon-tiles';
+
+  /** Tiles per block. */
+  const BLOCK = 120;
+  /** The category of the deprecated icons (DEPRECATED_CATEGORY in src/lib/icons.mjs). */
+  const DEPRECATED = 'deprecated';
+  /** How far below the window the next block is already there, in pixels. */
+  const AHEAD = 800;
+
+  interface Icon {
+    name: string;
+    categories: string[];
+    /** Name and keywords, lowercase, for the search. */
+    text: string;
+  }
+  interface SetData {
+    categories: string[];
+    icons: [string, number[], string][];
+  }
+  type Field = HTMLElement & { value?: string };
+  /** localStorage key of the style of Material Icons picked last. */
+  const STYLE_KEY = 'magma-docs:icon-style';
+
+  async function setup(root: HTMLElement) {
+    const set = root.dataset.iconSet ?? '';
+    const styles = (root.dataset.styles ?? '').split(' ').filter(Boolean);
+    const grid = root.querySelector<HTMLElement>('[data-icon-grid]')!;
+    const sentinel = root.querySelector<HTMLElement>('[data-icon-more]')!;
+    const search = root.querySelector<Field>('[data-icon-search]')!;
+    const heading = root.querySelector<HTMLElement>('[data-icon-heading]');
+    const format = root.querySelector<Field>('[data-icon-format]')!;
+    const count = root.querySelector<HTMLElement>('[data-icon-count]')!;
+    const empty = root.querySelector<HTMLElement>('[data-icon-empty]')!;
+    const example = root.querySelector<HTMLElement>('[data-icon-example]')!;
+    const options = (field: Field | null) =>
+      [...(field?.querySelectorAll('option') ?? [])].map((option) => option.value);
+
+    // The state of the page, from its address when it has one, else the
+    // style picked last.
+    const params = new URL(location.href).searchParams;
+    const pick = (values: (string | null)[], allowed: string[]) =>
+      values.find((value) => value && allowed.includes(value)) ?? allowed[0];
+    const state = {
+      style: pick([params.get('style'), storage.get(STYLE_KEY)], styles) ?? '',
+      category: root.dataset.category ?? '',
+      query: params.get('q') ?? '',
+      format: pick([storage.get(formatKey('iconsauce'))], options(format)) ?? 'slug',
+    };
+    search.value = state.query;
+    format.value = state.format;
+    for (const item of root.querySelectorAll('[data-icon-styles] mds-tab-item')) {
+      item.toggleAttribute('selected', item.getAttribute('value') === state.style);
+    }
+
+    const slug = (name: string) => (set === 'mi' ? `mi/${state.style}/${name}` : `${set}/${name}`);
+    const copied = (name: string) => (SLUG_FORMATS[state.format] ?? SLUG_FORMATS.slug)(slug(name));
+
+    const data: SetData = await (await fetch(root.dataset.src ?? '')).json();
+    const icons: Icon[] = data.icons.map(([name, ids, keywords]) => ({
+      name,
+      categories: ids.map((id) => data.categories[id]),
+      text: `${name} ${keywords}`.toLowerCase(),
+    }));
+
+    /** The icons to show: those of the search in the whole set, or of the category. */
+    const matches = () => {
+      const words = state.query
+        .toLowerCase()
+        .split(/[\s_]+/)
+        .filter(Boolean);
+      if (words.length === 0) {
+        return state.category
+          ? icons.filter((icon) => icon.categories.includes(state.category))
+          : icons;
+      }
+      // The names that are the search first, then those that start with it,
+      // then those that hold it, then the icons found by their keywords.
+      const joined = words.join('-');
+      // Deprecated icons after the others.
+      const rank = ({ name, categories }: Icon) =>
+        (name === joined ? 0 : name.startsWith(joined) ? 1 : name.includes(words[0]) ? 2 : 3) +
+        (categories.includes(DEPRECATED) ? 4 : 0);
+      return icons
+        .filter((icon) => words.every((word) => icon.text.includes(word)))
+        .map((icon) => ({ icon, rank: rank(icon) }))
+        .sort((a, b) => a.rank - b.rank || a.icon.name.localeCompare(b.icon.name))
+        .map(({ icon }) => icon);
+    };
+
+    const tile = ({ name, categories }: Icon) => {
+      const element = document.createElement('div');
+      element.className = TILE;
+      element.dataset.iconTile = '';
+      element.dataset.name = name;
+      element.dataset.slug = slug(name);
+      element.dataset.copy = copied(name);
+      element.dataset.copyLabel = slug(name);
+      const icon = document.createElement('mds-icon');
+      icon.setAttribute('name', slug(name));
+      icon.className = 'w-800 fill-current';
+      const text = document.createElement('mds-text');
+      text.setAttribute('typography', 'hack');
+      text.setAttribute('tag', 'span');
+      text.className = 'block w-full break-words';
+      text.textContent = name;
+      element.append(icon, text);
+      if (categories.includes(DEPRECATED)) {
+        const note = document.createElement('mds-text');
+        note.setAttribute('typography', 'caption');
+        note.setAttribute('tag', 'span');
+        note.className = 'my-0 text-fg-muted';
+        note.textContent = root.dataset.deprecated ?? '';
+        element.append(note);
+      }
+      return element;
+    };
+
+    let list: Icon[] = [];
+    let shown = 0;
+
+    /** Blocks of tiles until the next one would start below the window. */
+    const fillUp = () => {
+      while (shown < list.length && sentinel.getBoundingClientRect().top < innerHeight + AHEAD) {
+        const block = list.slice(shown, shown + BLOCK);
+        grid.append(...block.map(tile));
+        shown += block.length;
+      }
+      enhanceCopies();
+    };
+    new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) fillUp();
+      },
+      { rootMargin: `0px 0px ${AHEAD}px 0px` },
+    ).observe(sentinel);
+
+    /** The tiles of the search or of the category, the first blocks of them. */
+    const render = () => {
+      list = matches();
+      shown = 0;
+      grid.replaceChildren();
+      fillUp();
+      const searching = state.query.trim() !== '';
+      heading?.classList.toggle('hidden', searching);
+      count.textContent = fill(searching ? root.dataset.countSearch : root.dataset.count, {
+        count: list.length.toLocaleString(document.documentElement.lang),
+      });
+      empty.textContent = fill(root.dataset.empty, { query: state.query });
+      empty.classList.toggle('hidden', list.length > 0);
+      remember();
+    };
+
+    /** The address keeps what differs from the page as it opens. */
+    const remember = () => {
+      const url = new URL(location.href);
+      const entries = { q: state.query, style: state.style === styles[0] ? '' : state.style };
+      for (const [key, value] of Object.entries(entries)) {
+        if (value) url.searchParams.set(key, value);
+        else url.searchParams.delete(key);
+      }
+      history.replaceState(history.state, '', url);
+    };
+
+    /** The tiles already there, after a change of style or format. */
+    const relabel = () => {
+      for (const element of grid.querySelectorAll<HTMLElement>('[data-icon-tile]')) {
+        const name = element.dataset.name ?? '';
+        if (element.dataset.slug !== slug(name)) {
+          element.dataset.slug = slug(name);
+          if (!element.hasAttribute('data-copied')) {
+            element.querySelector('mds-icon')?.setAttribute('name', slug(name));
+          }
+        }
+        element.dataset.copy = copied(name);
+        element.dataset.copyLabel = slug(name);
+        if (element.getAttribute('role') === 'button') {
+          element.setAttribute('aria-label', copyLabel(slug(name)));
+        }
+      }
+      example.textContent = copied(example.dataset.name ?? '');
+    };
+
+    root.addEventListener('mdsTabChange', (event) => {
+      const style = (event as CustomEvent<{ value?: string }>).detail.value;
+      if (!style || style === state.style || !styles.includes(style)) return;
+      state.style = style;
+      storage.set(STYLE_KEY, style);
+      // The same icons in another style: the tiles stay, with new slugs, so
+      // the page keeps its length and its scroll.
+      relabel();
+      remember();
+    });
+
+    let typing: ReturnType<typeof setTimeout> | undefined;
+    search.addEventListener('mdsInputChange', (event) => {
+      const query = String((event as CustomEvent<{ value?: string }>).detail.value ?? '').trim();
+      if (query === state.query) return;
+      state.query = query;
+      clearTimeout(typing);
+      typing = setTimeout(render, 150);
+    });
+
+    format.addEventListener('mdsInputSelectChange', (event) => {
+      const value = String((event as CustomEvent<{ value?: unknown }>).detail.value ?? '');
+      if (!SLUG_FORMATS[value] || value === state.format) return;
+      state.format = value;
+      storage.set(formatKey('iconsauce'), value);
+      relabel();
+    });
+
+    showCopies(root);
+    relabel();
+    render();
+  }
+
+  // Every page the router shows, the first one included.
+  const init = () => {
+    for (const root of document.querySelectorAll<HTMLElement>('[data-icon-set]')) {
+      if (root.dataset.ready !== undefined) continue;
+      root.dataset.ready = '';
+      setup(root);
+    }
+  };
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

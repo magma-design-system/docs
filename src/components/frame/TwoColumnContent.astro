@@ -2,9 +2,13 @@
 // Page content and the right column (PageSidebar), inside the card.
 import HeadingAnchors from '../HeadingAnchors.astro';
 import { parseComponentPath } from '../../lib/components';
+import { parseIconSetPath } from '../../lib/icon-pages';
 
 const { toc, locale } = Astro.locals.starlightRoute;
-const hasRightColumn = Boolean(toc) || parseComponentPath(Astro.url.pathname, locale) !== undefined;
+const hasRightColumn =
+  Boolean(toc) ||
+  parseComponentPath(Astro.url.pathname, locale) !== undefined ||
+  (parseIconSetPath(Astro.url.pathname, locale)?.categories.length ?? 0) > 0;
 ---
 
 <div

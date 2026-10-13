@@ -1,13 +1,16 @@
 ---
-// Right column: the "Documentation" column on component pages, the table of
-// contents with the reading indicator elsewhere. Hidden on mobile, as in the
-// layout mockups.
+// Right column: the sub-pages column on component pages ("Documentation")
+// and icon set pages ("Categories"), the table of contents with the reading
+// indicator elsewhere. Hidden on mobile, as in the layout mockups.
 import { parseComponentPath } from '../../lib/components';
+import { parseIconSetPath } from '../../lib/icon-pages';
 import DocsNav from './DocsNav.astro';
 import TableOfContents from './TableOfContents.astro';
 
 const { toc, locale } = Astro.locals.starlightRoute;
-const isComponent = parseComponentPath(Astro.url.pathname, locale) !== undefined;
+const hasSubPages =
+  parseComponentPath(Astro.url.pathname, locale) !== undefined ||
+  (parseIconSetPath(Astro.url.pathname, locale)?.categories.length ?? 0) > 0;
 ---
 
-{isComponent ? <DocsNav headingId="docs-nav-heading" /> : toc && <TableOfContents />}
+{hasSubPages ? <DocsNav headingId="docs-nav-heading" /> : toc && <TableOfContents />}

@@ -1,0 +1,99 @@
+---
+// A line of code with a button that copies it: the code on Magma's light
+// background for code (as Code.astro), an icon mds-button at its right end.
+// The button copies the text the line shows when it is clicked, so a script
+// can change the text (the examples of the icon pages follow the format
+// picked). Its icon turns into a check for a moment, and screen readers hear
+// the copy from the live region of CopyToClipboard.astro, which the page
+// needs. `text`: the text the line starts with, for the button's label.
+import { TEXT } from '../lib/markdown-text.mjs';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const { t } = Astro.locals;
+const label = (value: string) => t('copy.label', { value, interpolation: { escapeValue: false } });
+---
+
+<div
+  class="flex min-w-0 items-center gap-200 rounded-(--radius-3xs) bg-wash-soft p-200 rounded-md"
+  data-copy-example
+  data-label={label('{value}')}
+>
+  <mds-text
+    typography="hack"
+    tag="code"
+    class={`${TEXT.block} min-w-0 flex-1 bg-transparent shadow-none [overflow-wrap:anywhere]`}
+    data-copy-example-text
+  >
+    <slot />
+  </mds-text>
+  <mds-button
+    icon="mi/baseline/content-copy"
+    variant="light"
+    tone="strong"
+    size="sm"
+    class="mt-0 shrink-0"
+    aria-label={label(text)}
+    data-copy-example-button
+  ></mds-button>
+</div>
+
+<script>
+  const ICON = 'mi/baseline/content-copy';
+  const COPIED_ICON = 'mi/baseline/check';
+  /** How long the button shows the check, in milliseconds. */
+  const SHOWN = 1500;
+
+  const fill = (template: string | undefined, value: string) =>
+    template?.replaceAll('{value}', value) ?? '';
+
+  function setup(example: HTMLElement) {
+    const text = example.querySelector<HTMLElement>('[data-copy-example-text]');
+    const button = example.querySelector<HTMLElement>('[data-copy-example-button]');
+    if (!text || !button) return;
+    if (!navigator.clipboard) {
+      button.remove();
+      return;
+    }
+    const value = () => text.textContent?.trim() ?? '';
+    // The label names the text the line shows now.
+    const relabel = () => button.setAttribute('aria-label', fill(example.dataset.label, value()));
+    new MutationObserver(relabel).observe(text, {
+      characterData: true,
+      childList: true,
+      subtree: true,
+    });
+    relabel();
+
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    button.addEventListener('click', async () => {
+      const copying = value();
+      let copied = true;
+      try {
+        await navigator.clipboard.writeText(copying);
+      } catch {
+        copied = false;
+      }
+      const live = document.querySelector<HTMLElement>('[data-copy-live]');
+      if (live) live.textContent = fill(copied ? live.dataset.done : live.dataset.failed, copying);
+      if (!copied) return;
+      button.setAttribute('icon', COPIED_ICON);
+      clearTimeout(timer);
+      timer = setTimeout(() => button.setAttribute('icon', ICON), SHOWN);
+    });
+  }
+
+  // Every page the router shows, the first one included.
+  const init = () => {
+    for (const example of document.querySelectorAll<HTMLElement>('[data-copy-example]')) {
+      if (example.dataset.ready !== undefined) continue;
+      example.dataset.ready = '';
+      setup(example);
+    }
+  };
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

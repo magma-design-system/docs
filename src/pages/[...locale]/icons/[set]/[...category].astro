@@ -1,0 +1,55 @@
+---
+// The pages of the icon sets: the page of a set shows its first category,
+// each other category has a page of its own (src/lib/icon-pages.ts), listed
+// in the "Categories" column of the frame. A set without categories (Maggioli,
+// until svg-icons publishes them) has one page with all its icons.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import IconSet from '../../../../components/IconSet.astro';
+import UiText from '../../../../components/UiText.astro';
+import { ICON_SET_PAGES } from '../../../../lib/icon-pages';
+import { ICON_SETS, iconSet, type IconSetId } from '../../../../lib/icons.mjs';
+import { localeParams } from '../../../../lib/i18n.mjs';
+import { TEXT } from '../../../../lib/markdown-text.mjs';
+
+export function getStaticPaths() {
+  return localeParams.flatMap((locale) =>
+    ICON_SETS.flatMap((set) => {
+      const [first, ...others] = iconSet(set).categories;
+      return [first, ...others].map((category) => ({
+        params: {
+          locale,
+          set: ICON_SET_PAGES[set],
+          category: category && category !== first ? category.id : undefined,
+        },
+        props: { set, category: category?.id },
+      }));
+    }),
+  );
+}
+
+interface Props {
+  set: IconSetId;
+  category: string | undefined;
+}
+
+const { set, category } = Astro.props;
+const { t } = Astro.locals;
+const title = t(`icons.page.${set}.title` as never);
+const found = iconSet(set).categories.find(({ id }) => id === category);
+const categoryLabel = found && (found.label ?? t(`icons.set.category.${found.id}` as never));
+---
+
+<StarlightPage
+  frontmatter={{
+    title,
+    description: t(`icons.page.${set}.description` as never),
+    // Each category gets a <title> of its own.
+    head: categoryLabel ? [{ tag: 'title', content: `${categoryLabel} - ${title} | Magma` }] : [],
+  }}
+  headings={[]}
+>
+  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+    <UiText text={t(`icons.page.${set}.intro` as never)} />
+  </mds-text>
+  <IconSet set={set} category={category} />
+</StarlightPage>

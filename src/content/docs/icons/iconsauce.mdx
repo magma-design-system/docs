@@ -1,0 +1,253 @@
+---
+title: Using iconsauce
+description: 'Icons with iconsauce, the tool Magma uses: every icon as an SVG file with the dump, or the icons of your sources as an icon font.'
+---
+
+iconsauce is the open source tool Magma uses for its icons. It works like Tailwind does with
+class names: it reads your sources, finds the icon slugs (`mi/baseline/home`, `mdi/github`,
+`mgg/ai-brain`) and writes those icons out, as SVG files or as an icon font. Any way of
+serving the SVG files works with Magma; iconsauce is the one Magma uses itself, and the one
+this guide follows.
+
+It writes the icons in two forms:
+
+| Output    | Flag                                | Writes                   | For                             |
+| --------- | ----------------------------------- | ------------------------ | ------------------------------- |
+| SVG files | `--output-dump-svg`, `--output-svg` | a file per icon          | `mds-icon` and the `icon` props |
+| Icon font | `--output-css`                      | a CSS file with the font | classes in your own markup      |
+
+Magma components always load SVG files: an app that uses them needs the files. The icon font
+is for the icons of your own markup, and one run of iconsauce can write both.
+
+## How it works
+
+Each icon set is a plugin, a package that knows where the set is installed and how its slugs
+look:
+
+| Plugin                      | Slug                | Icons     | Set                   |
+| --------------------------- | ------------------- | --------- | --------------------- |
+| `@iconsauce/material-icons` | `mi/<style>/<name>` | 4 x 2,191 | Material Icons        |
+| `@iconsauce/mdi-svg`        | `mdi/<name>`        | 7,447     | Material Design Icons |
+| `@iconsauce/mgg-icons`      | `mgg/<name>`        | 318       | Maggioli              |
+
+`<style>` is `baseline`, `outline`, `round` or `sharp`. Each plugin reads its set from the
+package it depends on: `@material-icons/svg`, `@mdi/svg` and
+`@maggioli-design-system/svg-icons`.
+
+iconsauce looks for slugs in every file the config lists, in any kind of text: an attribute,
+a class, a string in JavaScript, a value in JSON. It finds whole slugs only: an icon whose
+name the app puts together at runtime (`` `mi/baseline/${name}` ``) or receives from an API is
+not found in the sources. For those, write every slug the app can use somewhere in the
+sources, or copy every icon with the dump.
+
+## Install
+
+```bash
+npm i -D @iconsauce/core @iconsauce/material-icons @iconsauce/mdi-svg @iconsauce/mgg-icons
+```
+
+The config sits in the root of the project and lists, in `content`, the files where the app
+writes icon slugs:
+
+```js title="iconsauce.config.mjs"
+import mi from '@iconsauce/material-icons';
+import mdi from '@iconsauce/mdi-svg';
+import mgg from '@iconsauce/mgg-icons';
+
+export default {
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx,html}'],
+  plugin: [mi, mdi, mgg],
+};
+```
+
+| Key            | Default           | What it does                      |
+| -------------- | ----------------- | --------------------------------- |
+| `content`      | -                 | Required: the files to read       |
+| `plugin`       | the three plugins | The icon sets                     |
+| `fontSize`     | `24px`            | Size of the icons of the font     |
+| `fontFamily`   | `iconsauce`       | Name of the icon font             |
+| `center`       | `false`           | Centers each icon in its glyph    |
+| `skipWarnings` | `true`            | Goes on past a slug no plugin has |
+| `verbose`      | `false`           | Reports each step                 |
+
+The globs of `content` are relative to the root of the project. Leave out of `plugin` the sets
+the app does not use. A slug that no plugin has is reported and left out; with
+`skipWarnings: false` iconsauce stops instead. `center` is not for sets drawn on a pixel
+grid, like Material Icons.
+
+The `iconsauce` command comes with `@iconsauce/core`: the npm scripts below run it.
+
+## SVG files
+
+`mds-icon` loads each icon from a folder the app serves: with the folder `/svg/`, the icon
+`mi/baseline/home` comes from `/svg/mi/baseline/home.svg`. iconsauce writes the files in that
+layout, one folder per set and per style:
+
+```text title="public/svg/"
+mdi/
+  github.svg
+mgg/
+  ai-brain.svg
+mi/
+  baseline/
+    content-copy.svg
+    home.svg
+  outline/
+    home.svg
+  round/
+  sharp/
+```
+
+### Every icon, with the dump
+
+`--output-dump-svg` copies every icon of the plugins in the config into the folder, whatever
+the sources use. Every slug works at once: the ones in the sources, the ones the app puts
+together at runtime and the ones that come from an API or a CMS.
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-dump-svg ./public/svg",
+  "postinstall": "npm run icons"
+}
+```
+
+The dump depends only on the icon sets installed, not on the sources: after each install is
+enough, and `postinstall` does it. With the three plugins it writes 16,529 files, 6.8 MB of SVG
+(iconsauce 2.0.1, October 2026); the plugins left out of the config are left out of the dump
+too. The folder is generated, so keep `public/svg/` out of git. The config still needs
+`content`, even when the dump is all iconsauce writes.
+
+### Only the icons you use
+
+`--output-svg` copies only the icons the sources name, so it runs before every start and
+every build of the app:
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-svg ./public/svg",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons"
+}
+```
+
+A few files instead of thousands, and only the slugs written whole in the sources. The
+[installation guide](../../development/installation/#icons) sets it up for Vanilla JS, React
+and Angular; this site works the same way.
+
+### Use them
+
+Tell `mds-icon` the address of the folder before the first icon shows, as the installation
+guide does in [Set the folder](../../development/installation/#set-the-folder), then write the
+slugs:
+
+```html
+<mds-icon name="mi/baseline/content-copy"></mds-icon>
+<mds-button icon="mdi/github">GitHub</mds-button>
+```
+
+## Icon font
+
+`--output-css` writes a CSS file with a font of the icons the sources use, embedded in the
+file, and a class for each slug. It follows the sources, like `--output-svg`, so it runs
+before every start and every build:
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-css ./src/icons.css",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons"
+}
+```
+
+Import the file in the global stylesheet of the app, then write the slug as a class:
+
+```css title="Global stylesheet"
+@import './icons.css';
+```
+
+```html
+<i class="mi/baseline/content-copy" aria-hidden="true"></i>
+```
+
+The class holds slashes, and HTML allows them: iconsauce escapes them in the CSS. What it
+writes looks like this:
+
+{/* prettier-ignore */}
+```css title="src/icons.css"
+@font-face {
+  font-family: "iconsauce";
+  src: url("data:font/truetype;charset=utf-8;base64,...") format("truetype");
+}
+
+[class^="mi/"], [class*=" mi/"] {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: "iconsauce" !important;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.mi\/baseline\/content-copy::before { content: "\ea01" }
+```
+
+An icon of the font is a character: it takes the color of the text around it. Its size does
+not follow the text: the class sets `font-size` to the `fontSize` of the config, 24px, so an
+icon of another size needs a `font-size` of its own. It says nothing to screen readers: keep
+`aria-hidden="true"` on it and give the control it sits in a label of its own.
+
+To have both the files for the components and the font for your markup, give one run both
+flags: `--output-svg ./public/svg --output-css ./src/icons.css`.
+
+## Finding an icon
+
+The pages of the three sets list every icon iconsauce has, in the versions this site
+installs: [Maggioli SVG Icons](../maggioli/), [Material Icons](../material-icons/) and
+[Material Design Icons](../material-design-icons/). Each one shows its icons by category and
+searches them by name and by tag; a click copies the slug. Elsewhere:
+
+- **Material Icons**: Google's catalog, in [Google Fonts](https://fonts.google.com/icons?icon.set=Material+Icons),
+  with the Material Icons set picked (not Material Symbols). The slug takes the name with
+  dashes for underscores and the style as iconsauce names it: Filled is `baseline`, Outlined
+  `outline`, Rounded `round`, Sharp `sharp`. `content_copy` in the Outlined style is
+  `mi/outline/content-copy`. Two-tone icons have no slug.
+- **Material Design Icons**: the [Pictogrammers library](https://pictogrammers.com/library/mdi/).
+  The slug is the name as it is: `mdi/` and `account-circle`.
+- **Every slug at once**: `--output-dump-dictionary ./icons.json` writes the slugs of every
+  icon of the plugins as a JSON list, to search or to check that a slug exists.
+
+The catalogs show their latest icons, while the versions installed decide which ones exist: a
+slug that the installed set does not have is reported by iconsauce and left out.
+
+## From the icons package
+
+`@maggioli-design-system/icons` is deprecated. It holds the icons of Magma's dictionary under
+names that say what they are for, like `action-copy`: as an icon font (`dist/mgg-icons.css`, a class `mgg-icons-<name>` for
+each icon), as a TypeScript enum (`MggIcons`) and as SVG files (`dist/svg/<name>.svg`). An app
+that uses it writes:
+
+```css
+@import '@maggioli-design-system/icons/dist/mgg-icons.css';
+```
+
+```html
+<i class="mgg-icons-action-copy"></i>
+```
+
+Every name of the package has an iconsauce slug that draws the same icon:
+[Icons package (legacy)](../icons-package/) shows it under each name. To move to iconsauce:
+
+1. Install iconsauce and write its config, as in [Install](#install).
+2. Replace each name with its slug: `mgg-icons-action-copy` becomes
+   `mi/baseline/content-copy`, `MggIcons.ActionCopy` the string `'mi/baseline/content-copy'`.
+3. Pick the output. To keep the icons as classes in your markup, generate the
+   [icon font](#icon-font): its icons have the same default size, 24px. To move them to
+   `mds-icon`, write the [SVG files](#svg-files).
+4. Remove the import of `mgg-icons.css` and uninstall `@maggioli-design-system/icons`.
+
+Google has redrawn some Material Icons since the package was built. Five names keep their old
+drawing under another slug, which the list shows: `design-palette` is
+`mi/baseline/color-lens`, and `avatar-placeholder-user`, `cards-view`, `columns-view` and
+`view-comfy` are Material Design Icons. `data-analytics` and `data-bar-chart` have no identical
+drawing left: their slug, `mi/baseline/bar-chart`, is the current one, with thicker bars.

@@ -1,10 +1,14 @@
 ---
 // Copy to the clipboard for any value of the page marked `data-copy="<text>"`
 // (Code.astro and TypeValue.astro take a `copy` prop): once the clipboard is
-// available they become buttons, copied on click, Enter or Space. The element
-// marked `data-copy-scope` around a value (a table row) shows what happened
-// in its `data-copy-status` (CopyStatus.astro); screen readers hear it from
-// the live region below. One per page, wherever the values are.
+// available they become buttons, copied on click, Enter or Space. Their label
+// names the text, or `data-copy-label` when the text is long, as markup. The
+// element marked `data-copy-scope` around a value (a table row) shows what
+// happened in its `data-copy-status` (CopyStatus.astro); screen readers hear
+// it from the live region below. Each copy also sends a `copied` event from
+// the value (`detail.copied`: whether it worked). Values added after the page
+// loads become buttons on a `copy:enhance` event on the document. One per
+// page, wherever the values are.
 const { t } = Astro.locals;
 // `{value}` is filled in by the script below.
 const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
@@ -42,7 +46,10 @@ const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
       if (value.getAttribute('role') === 'button') continue;
       value.setAttribute('role', 'button');
       value.tabIndex = 0;
-      value.setAttribute('aria-label', fill(label, value.dataset.copy ?? ''));
+      value.setAttribute(
+        'aria-label',
+        fill(label, value.dataset.copyLabel ?? value.dataset.copy ?? ''),
+      );
       value.classList.add(...BUTTON);
     }
     for (const status of document.querySelectorAll<HTMLElement>('[data-copy-status]')) {
@@ -78,6 +85,7 @@ const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
       copied = false;
     }
     report(value, copied);
+    value.dispatchEvent(new CustomEvent('copied', { bubbles: true, detail: { copied } }));
     const region = live();
     if (region)
       region.textContent = fill(copied ? region.dataset.done : region.dataset.failed, text);
@@ -102,7 +110,9 @@ const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
     event.preventDefault();
     copy(value);
   });
-  // Every page the router shows, the first one included.
+  // Every page the router shows, the first one included, and the values a
+  // page adds later (`copy:enhance`, as the icon pages do).
   document.addEventListener('astro:page-load', enhance);
+  document.addEventListener('copy:enhance', enhance);
   enhance();
 </script>
