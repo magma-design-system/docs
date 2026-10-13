@@ -7,7 +7,9 @@
 // reading), inline code mds-text `snippet`, or `hack` (smaller) in table
 // cells (code blocks stay as they are),
 // lists mds-list and mds-list-item, rules mds-hr. Ordered lists stay <ol>:
-// mds-list has no numbered form.
+// mds-list has no numbered form. Section headings (h2, h3) get an anchor in
+// front of them, an mds-button that links to them (`anchoredHeading`), in
+// place of Starlight's, which the deeper ones lose.
 //
 // mds-text and mds-list-item are meant for plain text, while Markdown puts
 // code, links and bold in paragraphs and list items. mds-text is a flex box,
@@ -24,13 +26,25 @@ import { satteriHeadingIdsPlugin } from '@astrojs/markdown-satteri';
  */
 export const TEXT = {
   block: 'block',
+  // `scroll-mt-600`: a link to a heading leaves 1.5rem above it. Starlight's
+  // scroll padding (1.5rem and --sl-nav-height) stops right at the bottom of
+  // the mobile header, which sits 1.5rem below the top of the page.
   heading: {
-    h1: 'block',
-    h2: 'block mt-1200 first:mt-0',
-    h3: 'block mt-1000 first:mt-0',
-    h4: 'block mt-800 first:mt-0',
-    h5: 'block mt-800 first:mt-0',
-    h6: 'block mt-800 first:mt-0',
+    h1: 'block scroll-mt-600',
+    h2: 'block scroll-mt-600 mt-1200 first:mt-0',
+    h3: 'block scroll-mt-600 mt-1000 first:mt-0',
+    h4: 'block scroll-mt-600 mt-800 first:mt-0',
+    h5: 'block scroll-mt-600 mt-800 first:mt-0',
+    h6: 'block scroll-mt-600 mt-800 first:mt-0',
+  },
+  // The heading of an anchored row (below), without the space above it.
+  headingText: 'block scroll-mt-600',
+  // A heading with its anchor, in a row that takes the space above the
+  // heading. `not-content`: Starlight would put 1rem above the heading, since
+  // it follows the anchor.
+  anchored: {
+    h2: 'not-content flex items-center gap-300 mt-1200 first:mt-0',
+    h3: 'not-content flex items-center gap-300 mt-1000 first:mt-0',
   },
   paragraph: 'block max-w-(--spacing-text)',
   // mds-text gives `tag="code"` its own look (background, ring, radius):
@@ -43,6 +57,34 @@ export const TEXT = {
 };
 
 const HEADINGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
+/** The headings that get an anchor: the sections of a page and their parts. */
+const ANCHORED = new Set(['h2', 'h3']);
+
+/**
+ * The anchor of a heading: an icon button that links to it (the link icon is
+ * collected by iconsauce from this file). Heading.astro writes the same.
+ */
+export const ANCHOR = {
+  icon: 'mi/baseline/link',
+  variant: 'dark',
+  class: 'mt-0',
+  tone: 'text',
+  size: 'md',
+};
+
+/** Starlight's label for the anchor, for text that Starlight did not give one. */
+const anchorLabel = (/** @type {string} */ title) => `Section titled \u201c${title}\u201d`;
+
+/** The text of an element, without its markup. */
+const textOf = (/** @type {any} */ node) =>
+  node.type === 'text' ? node.value : (node.children ?? []).map(textOf).join('');
+
+/** The classes of an element, however the processor wrote them. */
+const classesOf = (/** @type {any} */ node) =>
+  [node.properties?.className, node.properties?.class]
+    .flat()
+    .filter(Boolean)
+    .flatMap((value) => String(value).split(/\s+/));
 
 /**
  * @param {string} tagName
@@ -85,15 +127,24 @@ function convert(node, heading, compact = false) {
   const children = () => (node.children ?? []).map((child) => convert(child, heading, inCell));
   const tag = node.tagName;
 
-  if (HEADINGS.has(tag)) {
-    const id = heading(node);
-    return element(
-      'mds-text',
-      { ...own(node), ...(id && { id }), typography: tag, tag },
-      TEXT.heading[/** @type {keyof typeof TEXT.heading} */ (tag)],
-      children(),
+  // Starlight's heading with its anchor: the heading with ours instead,
+  // under Starlight's label, which is in the language of the page.
+  if (tag === 'div' && classesOf(node).includes('sl-heading-wrapper')) {
+    const inner = (node.children ?? []).filter(
+      (/** @type {any} */ child) => child.type === 'element',
     );
+    const title = inner.find((/** @type {any} */ child) => HEADINGS.has(child.tagName));
+    const link = inner.find((/** @type {any} */ child) =>
+      classesOf(child).includes('sl-anchor-link'),
+    );
+    const label =
+      link &&
+      (link.children ?? []).find((/** @type {any} */ child) =>
+        classesOf(child).includes('sr-only'),
+      );
+    if (title) return convertHeading(title, heading, label ? textOf(label) : undefined);
   }
+  if (HEADINGS.has(tag)) return convertHeading(node, heading);
   if (tag === 'p') {
     return element(
       'mds-text',
@@ -130,6 +181,42 @@ function convert(node, heading, compact = false) {
   }
   if (tag === 'hr') return element('mds-hr', own(node), '', []);
   return { ...node, children: children() };
+}
+
+/**
+ * A heading as mds-text, with its typography and tag; h2 and h3 with an anchor
+ * in front of them (Heading.astro writes the same). `label`: the anchor's
+ * accessible name, Starlight's English one if not given.
+ * @param {any} node
+ * @param {(heading: any) => string | undefined} heading
+ * @param {string} [label]
+ */
+function convertHeading(node, heading, label) {
+  const tag = node.tagName;
+  const id = heading(node);
+  const children = (node.children ?? []).map((/** @type {any} */ child) => convert(child, heading));
+  if (!id || !ANCHORED.has(tag)) {
+    return element(
+      'mds-text',
+      { ...own(node), ...(id && { id }), typography: tag, tag },
+      TEXT.heading[/** @type {keyof typeof TEXT.heading} */ (tag)],
+      children,
+    );
+  }
+  return element('div', {}, TEXT.anchored[/** @type {keyof typeof TEXT.anchored} */ (tag)], [
+    element(
+      'mds-button',
+      {
+        href: `#${id}`,
+        role: 'link',
+        ...ANCHOR,
+        'aria-label': label ?? anchorLabel(textOf(node)),
+      },
+      '',
+      [],
+    ),
+    element('mds-text', { ...own(node), id, typography: tag, tag }, TEXT.headingText, children),
+  ]);
 }
 
 export function magmaText() {
