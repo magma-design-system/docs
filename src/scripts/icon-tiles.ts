@@ -71,3 +71,35 @@ export function showCopies(root: HTMLElement) {
     );
   });
 }
+
+/**
+ * The sticky bars of the page (search, styles, category) that stick right
+ * now get `data-stuck`, and with it the shadow that parts them from the
+ * tiles scrolling under them. One listener for every bar of every page the
+ * router shows: the bars that left the page are dropped.
+ */
+const bars = new Set<HTMLElement>();
+let frame = 0;
+const checkBars = () => {
+  frame = 0;
+  for (const bar of bars) {
+    if (!bar.isConnected) {
+      bars.delete(bar);
+      continue;
+    }
+    const top = parseFloat(getComputedStyle(bar).top) || 0;
+    bar.toggleAttribute('data-stuck', scrollY > 0 && bar.getBoundingClientRect().top <= top + 0.5);
+  }
+};
+const scheduleBars = () => {
+  frame ||= requestAnimationFrame(checkBars);
+};
+
+export function markStuck(bar: HTMLElement) {
+  if (bars.size === 0) {
+    addEventListener('scroll', scheduleBars, { passive: true });
+    addEventListener('resize', scheduleBars);
+  }
+  bars.add(bar);
+  scheduleBars();
+}

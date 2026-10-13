@@ -85,11 +85,15 @@ const example = icons.find(({ name }) => name === 'action-copy')!;
   </div>
 
   {/*
-    Search and sets stay in sight above the tiles, right below the mobile
-    header or at the top of the window on desktop. The background hides the
-    tiles that scroll under them.
+    Search and sets stay in sight above the tiles: right below the mobile
+    header (--frame-sticky-top is where it ends), at the top of the window on
+    desktop. While they stick, a blurred background and a shadow part them
+    from the tiles under them (markStuck).
   */}
-  <div class="sticky top-(--frame-header-height) z-10 -mx-200 flex flex-col gap-300 bg-surface-raised px-200 py-300">
+  <div
+    class="sticky top-(--frame-sticky-top) desktop:top-0 z-10 -mx-200 flex flex-col gap-300 rounded-xl bg-surface-raised/80 px-200 py-300 backdrop-blur-md transition-cosmetic data-stuck:shadow-(--shadow-md-sharp)"
+    data-icon-bar
+  >
     <mds-input
       type="search"
       icon="mi/baseline/search"
@@ -173,7 +177,7 @@ const example = icons.find(({ name }) => name === 'action-copy')!;
 </div>
 
 <script>
-  import { fill, formatKey, showCopies, storage } from '../scripts/icon-tiles';
+  import { fill, formatKey, markStuck, showCopies, storage } from '../scripts/icon-tiles';
 
   /** What a click on a tile copies, by format. */
   const FORMATS: Record<string, (tile: DOMStringMap) => string> = {
@@ -258,6 +262,8 @@ const example = icons.find(({ name }) => name === 'action-copy')!;
       update();
     });
 
+    const bar = root.querySelector<HTMLElement>('[data-icon-bar]');
+    if (bar) markStuck(bar);
     showCopies(root);
     update();
   }

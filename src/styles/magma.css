@@ -94,10 +94,12 @@
 
     /*
       Where the sticky columns stop: where they start, so they do not move when
-      they stick. Below the mobile header; on desktop inside the card, below
-      its margin and border (PageFrame.astro).
+      they stick. Right below the bar of the mobile header, which mds-header
+      spaces from the top by --mds-header-inline-margin-mobile (16px) up to
+      767px and by --mds-header-inline-margin (24px) from 768px; on desktop
+      inside the card, below its margin and border (PageFrame.astro).
     */
-    --frame-sticky-top: calc(var(--frame-header-height) + --spacing(600));
+    --frame-sticky-top: calc(var(--frame-header-height) + --spacing(400));
 
     /*
       Starlight: anchors land below the header, no mobile table of contents,
@@ -107,6 +109,10 @@
     --sl-mobile-toc-height: 0rem;
     --sl-content-margin-inline: 0;
     --sl-content-pad-x: --spacing(600);
+
+    @variant tablet {
+      --frame-sticky-top: calc(var(--frame-header-height) + --spacing(600));
+    }
 
     @variant desktop {
       --frame-header-height: 0rem;
