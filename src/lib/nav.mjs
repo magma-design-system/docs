@@ -25,7 +25,17 @@ export const sections = [
   {
     id: 'tokens',
     icon: 'mi/outline/palette',
-    items: () => [{ slug: 'tokens' }],
+    items: () => [
+      { slug: 'tokens' },
+      { slug: 'tokens/color' },
+      { slug: 'tokens/typography' },
+      { slug: 'tokens/space-and-layout' },
+      { slug: 'tokens/shape-and-depth' },
+      { slug: 'tokens/motion' },
+      { slug: 'tokens/themes-and-preferences' },
+      { slug: 'tokens/tailwind' },
+      { slug: 'tokens/figma' },
+    ],
   },
   {
     id: 'icons',

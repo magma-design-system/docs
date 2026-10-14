@@ -1,0 +1,85 @@
+---
+// The color families of one palette group (`palette.tone`, `palette.label`,
+// ...) as strips: the family's own color, then its steps from 01 to 10 and
+// its seed. Each swatch paints with its custom property, so the strips flip
+// with the mode, and copies the property's name on click
+// (CopyToClipboard.astro, once per page).
+import Code from './Code.astro';
+import UiText from './UiText.astro';
+import { formatValue, tokensIn, type Token } from '../lib/tokens.mjs';
+
+interface Props {
+  /** A palette group: `palette.tone`, `palette.status`, `palette.label`, ... */
+  group: string;
+}
+
+const { group } = Astro.props;
+const { t } = Astro.locals;
+
+const families = new Map<string, { root?: Token; steps: Token[] }>();
+for (const token of tokensIn(group) as Token[]) {
+  const family = token.name.slice(group.length + 1).split('.')[0];
+  const entry = families.get(family) ?? { steps: [] };
+  if (token.path.endsWith('.$root')) entry.root = token;
+  else entry.steps.push(token);
+  families.set(family, entry);
+}
+// Steps from 01 to 10, the seed last.
+const order = (token: Token) => (/^\d+$/.test(token.key) ? Number(token.key) : 100);
+for (const entry of families.values()) entry.steps.sort((a, b) => order(a) - order(b));
+
+const label = (token: Token) => `${token.css} ${formatValue(token)}`;
+---
+
+<div class="not-content mt-600 flex flex-col gap-800">
+  {[...families].map(([family, { root, steps }]) => (
+    <div class="flex flex-col gap-300">
+      <div class="flex flex-wrap items-center gap-x-400 gap-y-100">
+        {root?.css ? (
+          <Code name copy={root.css}>
+            {root.css}
+          </Code>
+        ) : (
+          <Code name>{family}</Code>
+        )}
+        {root && (
+          <mds-text typography="caption" tag="span" class="my-0 text-fg-muted">
+            {root.target ? (
+              <UiText text={t('tokens.aliasOf', { target: root.target })} />
+            ) : (
+              formatValue(root)
+            )}
+          </mds-text>
+        )}
+      </div>
+      <div class="grid grid-cols-6 gap-200 tablet:grid-cols-12">
+        {root?.css && (
+          <span class="flex flex-col gap-100">
+            <span
+              class="block h-1000 rounded-md shadow-outline-weak"
+              style={`background: rgb(var(${root.css}))`}
+              title={label(root)}
+              data-copy={root.css}
+            ></span>
+            <mds-text typography="caption" tag="span" class="my-0 text-center text-fg-muted">
+              {t('tokens.ramp.base')}
+            </mds-text>
+          </span>
+        )}
+        {steps.map((step) => (
+          <span class="flex flex-col gap-100">
+            <span
+              class="block h-1000 rounded-md shadow-outline-weak"
+              style={`background: rgb(var(${step.css}))`}
+              title={label(step)}
+              data-copy={step.css}
+            ></span>
+            <mds-text typography="caption" tag="span" class="my-0 text-center text-fg-muted">
+              {step.key}
+            </mds-text>
+          </span>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>

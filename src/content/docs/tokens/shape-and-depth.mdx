@@ -1,0 +1,90 @@
+---
+title: Shape and depth
+description: Corner radius and the corner shape axis, border widths, shadows, elevation and depth, layers, and the global decisions you may override.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../components/TokenTable.astro';
+
+## Corner radius
+
+Magma draws its corners as squircles by default, and a squircle cuts a much smaller
+corner than a round one at the same radius. So the corner shape and the radius scale move
+together, as one axis: `data-corner-shape="round"` or `"squircle"`, on `<html>` or on any
+element for its subtree.
+
+In your own CSS take radii from the Magma scale, which follows the axis:
+
+```css
+.card {
+  border-radius: var(--magma-radius-lg);
+  corner-shape: var(--magma-corner-shape);
+}
+```
+
+<TokenTable tokens="magma.radius" />
+
+Tailwind's `rounded-*` classes read the primitives below, which stay the same under every
+shape: `rounded-md` is always the round 12px. For the axis write
+`rounded-(--magma-radius-md)`. The `squircle-*` steps are the ones tuned for the squircle.
+
+<TokenTable tokens="radius" />
+
+## Borders
+
+Border widths. Tailwind 4 has no namespace for them, so `border-xs` does not exist: write
+`border-(length:--border-xs)`.
+
+<TokenTable tokens="border" />
+
+## Shadows
+
+In light mode the surfaces above the page are close to it, so a raised element needs a
+shadow to stand off: `mds-card` uses `shadow-md-sharp`, `mds-modal` `shadow-2xl`. The ring
+shadows are drawn with the darkest neutral and change in dark mode.
+
+<TokenTable tokens="shadow" />
+
+## Elevation and depth
+
+The elevations the components use, multiplied by `--depth`. A flat theme
+(`data-theme-depth="flat"` on `<html>`) sets the depth to 0 and takes the shadows away.
+
+<TokenTable tokens={['mds.elevation', 'depth']} />
+
+## Layers
+
+The stacking order of what floats above the page, from the header up.
+
+<TokenTable
+  tokens={[
+    'magma.header',
+    'magma.notification',
+    'magma.modal',
+    'magma.backdrop.z-index',
+    'magma.dropdown',
+    'magma.tooltip',
+    'magma.theme',
+    'magma.context',
+  ]}
+/>
+
+## Global decisions
+
+The scrim under modals, the opacity of disabled elements and the focus outline. Override
+them only inside the `overrides` cascade layer:
+
+```css
+@layer overrides {
+  :root {
+    --magma-disabled-opacity: 0.35;
+  }
+}
+```
+
+<TokenTable
+  tokens={['magma.backdrop', 'magma.overlay', 'magma.disabled', 'magma.outline']}
+  exclude={['magma.backdrop.z-index']}
+/>
+
+<CopyToClipboard />

@@ -1,0 +1,71 @@
+---
+// What one modifier of the resolver changes (src/lib/tokens.mjs): one column
+// per context of the modifier, one row per token whose value differs between
+// them, in the given mode. The values are computed for each condition, so
+// the swatches are static colors: the page is in one condition only.
+// Values are copied on click (CopyToClipboard.astro, once per page).
+import Code from './Code.astro';
+import CopyStatus from './CopyStatus.astro';
+import { colorOf, formatResolved, modifiers, tokenSet, type Token } from '../lib/tokens.mjs';
+
+interface Props {
+  /** A modifier of the resolver: `theme`, `corner-shape`, `theme-depth`. */
+  modifier: string;
+  /** The mode the values are taken in. */
+  mode?: 'light' | 'dark';
+  /** Leave out the internal tokens (`--magma-tint-*`), as by default. */
+  internal?: boolean;
+}
+
+const { modifier, mode = 'light', internal = false } = Astro.props;
+const { t } = Astro.locals;
+
+const contexts = modifiers().find((m) => m.name === modifier)?.contexts ?? [];
+const sets = contexts.map((context) => tokenSet({ mode, [modifier]: context }));
+const [first] = sets;
+const rows = [...first.values()]
+  .filter((token: Token) => token.css && (internal || token.tier !== 'internal'))
+  .map((token: Token) => ({
+    token,
+    values: sets.map((set) => set.get(token.path) as Token),
+  }))
+  .filter(({ values }) => new Set(values.map((v) => formatResolved(v))).size > 1);
+
+const contextLabel = (context: string) =>
+  t(`tokens.context.${context}` as never, { defaultValue: context });
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table interactive>
+  <mds-table-header>
+    <mds-table-header-cell label={t('tokens.column.token')} />
+    {contexts.map((context) => (
+      <mds-table-header-cell label={contextLabel(context)} />
+    ))}
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ token, values }) => (
+      <mds-table-row data-copy-scope>
+        <mds-table-cell class={CELL}>
+          <Code name copy={token.css}>
+            {token.css}
+          </Code>
+        </mds-table-cell>
+        {values.map((value) => (
+          <mds-table-cell class={CELL}>
+            <span class="flex items-center gap-200">
+              {value.type === 'color' && (
+                <span
+                  class="block size-600 shrink-0 rounded-sm shadow-outline-weak"
+                  style={`background: ${colorOf(value)}`}
+                ></span>
+              )}
+              <Code copy={formatResolved(value)}>{formatResolved(value)}</Code>
+            </span>
+          </mds-table-cell>
+        ))}
+        <CopyStatus />
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

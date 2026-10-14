@@ -1,0 +1,38 @@
+---
+title: Animazioni
+description: Le durate, le curve e le transizioni di Magma, e come rispettano la preferenza per meno movimento.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../../components/TokenTable.astro';
+
+## Durate
+
+Tailwind 4 non ha un namespace per le durate: `duration-200` sono i 200ms di Tailwind, non
+il token. Per usare il token scrivi `duration-(--duration-200)`.
+
+<TokenTable tokens="duration" />
+
+## Curve
+
+Ogni curva è disegnata dai suoi punti di controllo; le curve `back` superano i loro
+estremi.
+
+<TokenTable tokens="ease" />
+
+## Transizioni
+
+Le proprietà che Magma anima, in due elenchi: `cosmetic` per i cambi di colore, ombra e
+dimensione, `size` solo per i cambi di dimensione. Le utility `transition-cosmetic` e
+`transition-size` li applicano con la durata e la curva predefinite.
+
+<TokenTable cssOnly="transition-property" />
+
+## Meno movimento
+
+La preferenza per il movimento è una classe su `<html>`, `pref-animation-reduce`, scritta
+da `mds-pref-animation` o presa dal sistema: sotto di essa i componenti accorciano o
+tolgono le loro animazioni. Fai lo stesso con le tue transizioni, invece di aggiungere una
+tua media query.
+
+<CopyToClipboard />

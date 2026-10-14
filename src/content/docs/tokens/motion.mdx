@@ -1,0 +1,37 @@
+---
+title: Motion
+description: The durations, easings and transitions of Magma, and how they meet the reduced motion preference.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../components/TokenTable.astro';
+
+## Durations
+
+Tailwind 4 has no namespace for durations: `duration-200` is Tailwind's own 200ms, not the
+token. To use the token write `duration-(--duration-200)`.
+
+<TokenTable tokens="duration" />
+
+## Easings
+
+Each curve is drawn from its control points; the `back` curves overshoot their ends.
+
+<TokenTable tokens="ease" />
+
+## Transitions
+
+The properties Magma animates, in two lists: `cosmetic` for color, shadow and size
+changes, `size` for size changes only. The utilities `transition-cosmetic` and
+`transition-size` set them with the default duration and easing.
+
+<TokenTable cssOnly="transition-property" />
+
+## Reduced motion
+
+The motion preference is a class on `<html>`, `pref-animation-reduce`, written by
+`mds-pref-animation` or taken from the system: the components shorten or drop their
+animations under it. Do the same with your own transitions, rather than adding a media
+query of your own.
+
+<CopyToClipboard />

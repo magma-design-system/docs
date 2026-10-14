@@ -1,0 +1,91 @@
+---
+title: Forma e profondità
+description: I raggi degli angoli e l'asse della loro forma, gli spessori dei bordi, le ombre, l'elevazione e la profondità, i livelli e le decisioni globali che puoi sovrascrivere.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../../components/TokenTable.astro';
+
+## Raggi degli angoli
+
+Magma disegna gli angoli come squircle, e uno squircle taglia un angolo molto più piccolo
+di uno tondo a parità di raggio. Per questo la forma degli angoli e la scala dei raggi si
+muovono insieme, come un solo asse: `data-corner-shape="round"` o `"squircle"`, su
+`<html>` o su qualsiasi elemento per il suo sottoalbero.
+
+Nel tuo CSS prendi i raggi dalla scala di Magma, che segue l'asse:
+
+```css
+.card {
+  border-radius: var(--magma-radius-lg);
+  corner-shape: var(--magma-corner-shape);
+}
+```
+
+<TokenTable tokens="magma.radius" />
+
+Le classi `rounded-*` di Tailwind leggono i primitivi qui sotto, che restano uguali con
+ogni forma: `rounded-md` è sempre il tondo da 12px. Per seguire l'asse scrivi
+`rounded-(--magma-radius-md)`. I passi `squircle-*` sono quelli calibrati per lo squircle.
+
+<TokenTable tokens="radius" />
+
+## Bordi
+
+Gli spessori dei bordi. Tailwind 4 non ha un namespace per loro, quindi `border-xs` non
+esiste: scrivi `border-(length:--border-xs)`.
+
+<TokenTable tokens="border" />
+
+## Ombre
+
+In modalità chiara le superfici sopra la pagina le sono vicine, quindi un elemento
+rialzato ha bisogno di un'ombra per staccarsi: `mds-card` usa `shadow-md-sharp`,
+`mds-modal` `shadow-2xl`. Le ombre ad anello sono disegnate con il neutro più scuro e
+cambiano in modalità scura.
+
+<TokenTable tokens="shadow" />
+
+## Elevazione e profondità
+
+Le elevazioni usate dai componenti, moltiplicate per `--depth`. Un tema piatto
+(`data-theme-depth="flat"` su `<html>`) porta la profondità a 0 e toglie le ombre.
+
+<TokenTable tokens={['mds.elevation', 'depth']} />
+
+## Livelli
+
+L'ordine di sovrapposizione di ciò che galleggia sopra la pagina, dall'intestazione in su.
+
+<TokenTable
+  tokens={[
+    'magma.header',
+    'magma.notification',
+    'magma.modal',
+    'magma.backdrop.z-index',
+    'magma.dropdown',
+    'magma.tooltip',
+    'magma.theme',
+    'magma.context',
+  ]}
+/>
+
+## Decisioni globali
+
+Il velo sotto le modali, l'opacità degli elementi disabilitati e il contorno del focus.
+Sovrascrivili solo dentro il cascade layer `overrides`:
+
+```css
+@layer overrides {
+  :root {
+    --magma-disabled-opacity: 0.35;
+  }
+}
+```
+
+<TokenTable
+  tokens={['magma.backdrop', 'magma.overlay', 'magma.disabled', 'magma.outline']}
+  exclude={['magma.backdrop.z-index']}
+/>
+
+<CopyToClipboard />

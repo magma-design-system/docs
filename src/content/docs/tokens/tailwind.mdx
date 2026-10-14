@@ -1,0 +1,62 @@
+---
+title: Tailwind
+description: How Tailwind 4 reads the tokens of Magma, the classes that read another token than their name says, and Magma's own utilities.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TailwindMap from '../../../components/TailwindMap.astro';
+
+Magma's Tailwind theme replaces Tailwind's defaults with the tokens of Magma. Import it in
+your Tailwind entry point after Tailwind's own theme and utilities, without its preflight
+(Magma has its own reset):
+
+```css
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@maggioli-design-system/styles/dist/tailwind/theme.css';
+@import '@maggioli-design-system/styles/dist/tailwind/typography.css';
+@import '@maggioli-design-system/styles/dist/tailwind/utilities.css';
+```
+
+The whole setup, the cascade layers included, is in [Installation](../../development/installation/).
+Everything on this page is generated from `styles/dist/tailwind/consumption.json`, which
+Magma builds from Tailwind's own design system.
+
+## How a token becomes a class
+
+The theme publishes each token as a variable of a Tailwind namespace:
+`--magma-text-muted` is `--color-fg-muted`, so the `--color` utilities take it with the
+key `fg-muted`: `text-fg-muted`, `bg-fg-muted`, `border-fg-muted`. The numeric steps come
+from `--spacing: 0.0025rem`: `gap-400` is `400 x 0.0025rem`, 1rem.
+
+<TailwindMap part="namespaces" />
+
+## Classes that read another token
+
+Where two namespaces share a key, some classes read the other one. The width utilities
+read the spacing first: `max-w-xs` is `--spacing-xs`, not `--container-xs`. For the token
+in the last column, write its arbitrary value: `max-w-(--container-xs)`.
+
+<TailwindMap part="shadowed" />
+
+## Tokens no utility reads
+
+Tailwind 4 has no namespace for border widths and durations: `border-xs` does not exist
+and `duration-200` is Tailwind's own 200ms. Use the arbitrary value.
+
+<TailwindMap part="unread" />
+
+## Magma utilities
+
+The `@utility` classes of styles and design-tokens, with the tokens and Tailwind variables
+they read.
+
+<TailwindMap part="utilities" />
+
+## Tailwind 3
+
+The package `main` of styles is a Tailwind 3 preset, with the layers in `dist/tailwind3/`.
+It does not work with Tailwind 4 and is legacy: this page and the consumption map cover
+Tailwind 4 only.
+
+<CopyToClipboard />

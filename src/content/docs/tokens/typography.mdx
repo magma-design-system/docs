@@ -1,0 +1,50 @@
+---
+title: Typography
+description: The type scale of Magma, the classes that set each style, its font families and line heights.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../components/TokenTable.astro';
+import TypeScale from '../../../components/TypeScale.astro';
+
+Magma sets text in four families of styles: `title` for headings and actions, `info` for
+the text of the interface, `read` for long reading, `code` for code. Set a style as a
+whole, through one class or one prop, rather than composing a font, a size and a weight:
+the style keeps them together, with its line height and letter spacing.
+
+## Type scale
+
+Each style below is set with `mds-text`, in the component's own `typography`; its first
+column is what the style looks like on this page.
+
+<TypeScale />
+
+Three ways to set a style:
+
+```html
+<mds-text typography="h3">Invoices</mds-text>
+<h2 class="text-title-h3">Invoices</h2>
+<p class="typography-read-paragraph">Plain CSS, no Tailwind.</p>
+```
+
+- **`mds-text`** takes the style in its `typography` prop; `variant="read"` switches
+  `paragraph`, `detail` and `caption` from the `info` family to the `read` one.
+- **Tailwind**: the `text-<family>-<style>` utilities of `styles/dist/tailwind/typography.css`.
+- **Plain CSS**: the `typography-<family>-<style>` classes of
+  `styles/dist/css/utility-typography.css`, imported in the `utilities` layer.
+
+## Font families
+
+<TokenTable tokens="font" />
+
+Magma does not bundle the fonts. Load the weights of the scale, for example with
+Fontsource: Roboto 500, 700 and 900 (titles and actions), Karla 400 and 700 (interface
+text), Merriweather 300, 400 and 700 (reading text), Roboto Mono 400 (code).
+
+## Line heights
+
+The leading scale the styles take their line height from, also for text set by hand.
+
+<TokenTable tokens="leading" />
+
+<CopyToClipboard />

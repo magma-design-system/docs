@@ -1,0 +1,45 @@
+---
+title: Space and layout
+description: The spacing of Magma, its sizing scale, the text measures, containers, breakpoints and aspect ratios.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../components/TokenTable.astro';
+
+## Spacing
+
+Magma's Tailwind theme sets `--spacing` to `0.0025rem`, so a numeric step reads as a
+size: `p-100` is `100 x 0.0025rem`, a quarter rem (4px), `gap-400` is 1rem. Next to the
+numbers come the named steps, and the text measures in `ch`: the widths that keep a line
+readable (`max-w-text` for running text).
+
+<TokenTable tokens="spacing" cssOnly="spacing" />
+
+## Sizing scale
+
+The numeric steps the spacing, container, border and radius tokens are made of. They have
+no custom property of their own: in Tailwind each one is a step of every spacing utility.
+
+<TokenTable tokens="size" />
+
+## Containers
+
+Widths for content blocks and container queries. In Magma's theme the width utilities
+read the spacing of the same name before the container: `max-w-xs` is `--spacing-xs`, so
+write `max-w-(--container-xs)` for the container. The container query variants (`@md:`)
+read the containers.
+
+<TokenTable tokens="container" />
+
+## Breakpoints
+
+Tailwind variants, not utilities: `tablet:` applies from that width up, `max-tablet:`
+below it.
+
+<TokenTable tokens="breakpoint" />
+
+## Aspect ratios
+
+<TokenTable tokens="aspect" />
+
+<CopyToClipboard />

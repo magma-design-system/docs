@@ -1,0 +1,63 @@
+---
+title: Tailwind
+description: Come Tailwind 4 legge i token di Magma, le classi che leggono un token diverso da quello del loro nome, e le utility di Magma.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TailwindMap from '../../../../components/TailwindMap.astro';
+
+Il tema Tailwind di Magma sostituisce i valori predefiniti di Tailwind con i token di
+Magma. Importalo nel punto di ingresso di Tailwind dopo il tema e le utility di Tailwind,
+senza il suo preflight (Magma ha il suo reset):
+
+```css
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@maggioli-design-system/styles/dist/tailwind/theme.css';
+@import '@maggioli-design-system/styles/dist/tailwind/typography.css';
+@import '@maggioli-design-system/styles/dist/tailwind/utilities.css';
+```
+
+La configurazione completa, compresi i cascade layer, è in
+[Installazione](../../development/installation/). Tutto quello che c'è in questa pagina è
+generato da `styles/dist/tailwind/consumption.json`, che Magma costruisce dal design
+system di Tailwind stesso.
+
+## Come un token diventa una classe
+
+Il tema pubblica ogni token come variabile di un namespace di Tailwind:
+`--magma-text-muted` è `--color-fg-muted`, quindi le utility di `--color` lo prendono con
+la chiave `fg-muted`: `text-fg-muted`, `bg-fg-muted`, `border-fg-muted`. I passi numerici
+vengono da `--spacing: 0.0025rem`: `gap-400` è `400 x 0.0025rem`, 1rem.
+
+<TailwindMap part="namespaces" />
+
+## Classi che leggono un altro token
+
+Dove due namespace hanno la stessa chiave, alcune classi leggono l'altro. Le utility di
+larghezza leggono prima la spaziatura: `max-w-xs` è `--spacing-xs`, non `--container-xs`.
+Per il token dell'ultima colonna scrivi il suo valore arbitrario: `max-w-(--container-xs)`.
+
+<TailwindMap part="shadowed" />
+
+## Token che nessuna utility legge
+
+Tailwind 4 non ha un namespace per gli spessori dei bordi e per le durate: `border-xs` non
+esiste e `duration-200` sono i 200ms di Tailwind. Usa il valore arbitrario.
+
+<TailwindMap part="unread" />
+
+## Utility di Magma
+
+Le classi `@utility` di styles e design-tokens, con i token e le variabili di Tailwind che
+leggono.
+
+<TailwindMap part="utilities" />
+
+## Tailwind 3
+
+Il `main` del pacchetto styles è un preset per Tailwind 3, con i layer in
+`dist/tailwind3/`. Non funziona con Tailwind 4 ed è legacy: questa pagina e la mappa di
+consumo riguardano solo Tailwind 4.
+
+<CopyToClipboard />

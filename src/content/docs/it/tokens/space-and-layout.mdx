@@ -1,0 +1,46 @@
+---
+title: Spazi e layout
+description: Le spaziature di Magma, la sua scala di dimensioni, le misure del testo, i container, i breakpoint e le proporzioni.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../../components/TokenTable.astro';
+
+## Spaziature
+
+Il tema Tailwind di Magma imposta `--spacing` a `0.0025rem`, quindi un passo numerico si
+legge come una dimensione: `p-100` è `100 x 0.0025rem`, un quarto di rem (4px), `gap-400`
+è 1rem. Accanto ai numeri ci sono i passi con un nome, e le misure del testo in `ch`: le
+larghezze che tengono leggibile una riga (`max-w-text` per il testo corrente).
+
+<TokenTable tokens="spacing" cssOnly="spacing" />
+
+## Scala di dimensioni
+
+I passi numerici di cui sono fatti i token di spaziatura, container, bordi e raggi. Non
+hanno una custom property propria: in Tailwind ognuno è un passo di ogni utility di
+spaziatura.
+
+<TokenTable tokens="size" />
+
+## Container
+
+Larghezze per i blocchi di contenuto e per le container query. Nel tema di Magma le
+utility di larghezza leggono la spaziatura con lo stesso nome prima del container:
+`max-w-xs` è `--spacing-xs`, quindi per il container scrivi `max-w-(--container-xs)`. Le
+varianti delle container query (`@md:`) leggono i container.
+
+<TokenTable tokens="container" />
+
+## Breakpoint
+
+Varianti di Tailwind, non utility: `tablet:` vale da quella larghezza in su, `max-tablet:`
+sotto.
+
+<TokenTable tokens="breakpoint" />
+
+## Proporzioni
+
+<TokenTable tokens="aspect" />
+
+<CopyToClipboard />
