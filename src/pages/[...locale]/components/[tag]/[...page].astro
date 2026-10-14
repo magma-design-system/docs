@@ -103,12 +103,11 @@ const headings =
   sections.map((section) => ({ depth: 2, slug: section.id, text: section.label }));
 
 // Table cells stay on one line: mds-table scrolls sideways when it is wider
-// than the page. Descriptions are mds-text paragraphs, which keep the reading
-// measure (TEXT.paragraph) and wrap again (`text-wrap: pretty` on their host).
-// `max-w-[none]`, not `max-w-none`: Magma's Tailwind theme has
-// `--spacing-none: 0px`, so that one is 0.
+// than the page. Descriptions wrap instead, at Magma's reading measure
+// (--spacing-text). `min-w-text`, not `w-text`: on a table cell the width is
+// only the preferred one, and Chrome squeezes the column to its longest word.
 const CELL = 'whitespace-nowrap';
-const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:whitespace-nowrap';
+const DESCRIPTION = 'min-w-phrase';
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
@@ -182,7 +181,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
           {data.props.map((p: any) => (
             <mds-table-row data-copy-scope>
               <mds-table-cell class={CELL} value={p.name}>
-                <Code typography="hack" name copy={p.name}>
+                <Code name copy={p.name}>
                   {p.name}
                 </Code>
                 {p.required && ` (${t('component.required')})`}
@@ -195,7 +194,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
                   </mds-text>
                 ) : (
                   p.attr && (
-                    <Code typography="hack" name copy={p.attr}>
+                    <Code name copy={p.attr}>
                       {p.attr}
                     </Code>
                   )
@@ -209,9 +208,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
                 value={p.default !== undefined ? unquote(p.default) : ''}
               >
                 {p.default !== undefined && (
-                  <Code typography="hack" copy={unquote(p.default)}>
-                    {unquote(p.default)}
-                  </Code>
+                  <Code copy={unquote(p.default)}>{unquote(p.default)}</Code>
                 )}
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={p.docsHtml} />
@@ -236,14 +233,12 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
           {data.events.map((e: any) => (
             <mds-table-row data-copy-scope>
               <mds-table-cell class={CELL}>
-                <Code typography="hack" name copy={e.event}>
+                <Code name copy={e.event}>
                   {e.event}
                 </Code>
               </mds-table-cell>
               <mds-table-cell class={CELL}>
-                <Code typography="hack" copy={e.detail}>
-                  {e.detail}
-                </Code>
+                <Code copy={e.detail}>{e.detail}</Code>
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={e.docsHtml} />
               <CopyStatus />
@@ -267,14 +262,12 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
           {data.methods.map((m: any) => (
             <mds-table-row data-copy-scope>
               <mds-table-cell class={CELL}>
-                <Code typography="hack" name copy={m.name}>
+                <Code name copy={m.name}>
                   {m.name}
                 </Code>
               </mds-table-cell>
               <mds-table-cell class={CELL}>
-                <Code typography="hack" copy={m.signature}>
-                  {m.signature}
-                </Code>
+                <Code copy={m.signature}>{m.signature}</Code>
               </mds-table-cell>
               <mds-table-cell class={DESCRIPTION} lang={contentLang} set:html={m.docsHtml} />
               <CopyStatus />
@@ -314,7 +307,7 @@ const DESCRIPTION = 'whitespace-nowrap [&_mds-text]:max-w-[none] [&_mds-text]:wh
               <mds-table-row data-copy-scope>
                 <mds-table-cell class={CELL}>
                   {/* The default slot has no name to copy. */}
-                  <Code typography="hack" name copy={item.name || undefined}>
+                  <Code name copy={item.name || undefined}>
                     {item.name || t('component.defaultSlot')}
                   </Code>
                 </mds-table-cell>

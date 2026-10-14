@@ -167,9 +167,7 @@ const fields = props
             />
           )}
           <span class="flex min-w-0 items-center gap-200">
-            <Code typography="hack" name>
-              {name}
-            </Code>
+            <Code name>{name}</Code>
             <TypeValue text={control.kind} kind={control.kind} copy={false} />
             {docs && <mds-help>{docs}</mds-help>}
           </span>
