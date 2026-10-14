@@ -196,5 +196,7 @@
   "tokens.figma.sizing": "Spaziature, gap, container, raggi e dimensioni",
   "tokens.figma.kb": "{{size}} kB",
   "tokens.figma.from": "Copiati così come sono da",
-  "tokens.tailwind.more": "e altre {{count}}"
+  "tokens.tailwind.more": "e altre {{count}}",
+  "tokens.preview.na": "N/A",
+  "tokens.preview.none": "Nessuna anteprima per questo token"
 }

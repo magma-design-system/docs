@@ -26,7 +26,7 @@ const rows = KINDS.flatMap((kind) => {
     cells: families.map((family) => tokenNamed(`palette.${kind}.${family}.${role}`) as Token),
   }));
 });
-const CELL = 'whitespace-nowrap';
+const CELL = 'whitespace-nowrap align-middle';
 ---
 
 <mds-table>

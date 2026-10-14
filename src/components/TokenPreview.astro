@@ -1,7 +1,8 @@
 ---
 // A token applied to a small sample (previewOf in src/lib/tokens.mjs): a
-// swatch, a box with the shadow or the radius, a bar as long as the space, the
-// curve of an easing. Painted with the custom property itself wherever the
+// swatch, a box with the shadow, the radius, the outline or the opacity, a
+// bar as long as the space, the curve of an easing; "N/A" in the space of a
+// swatch for what cannot be drawn (a duration, a layer, a blur). Painted with the custom property itself wherever the
 // page has it, so it follows the mode, the theme and the corner shape the
 // page is in; the colors whose custom property is not plain rgb channels,
 // and the sizing steps, which have none, show their value instead.
@@ -19,6 +20,7 @@ interface Props {
 }
 
 const { token } = Astro.props;
+const { t } = Astro.locals;
 const kind = previewOf(token);
 const css = token.css;
 // The value as a fallback: a token whose stylesheet the page does not load
@@ -93,4 +95,23 @@ const shape = token.name.startsWith('radius.squircle')
     class="block h-800 rounded-sm bg-accent-surface shadow-outline-weak"
     style={`aspect-ratio: ${value}`}
   ></span>
+)}
+{kind === 'outline' && (
+  <span
+    class="m-100 block size-600 rounded-sm bg-surface-raised"
+    style={`outline: ${value}`}
+  ></span>
+)}
+{kind === 'opacity' && (
+  <span class="block size-800 rounded-md bg-fg-default" style={`opacity: ${value}`}></span>
+)}
+{!kind && (
+  <span
+    class="flex size-800 items-center justify-center rounded-md bg-wash-soft"
+    title={t('tokens.preview.none')}
+  >
+    <mds-text typography="caption" tag="span" class="my-0 whitespace-nowrap text-fg-subtle">
+      {t('tokens.preview.na')}
+    </mds-text>
+  </span>
 )}

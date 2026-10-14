@@ -493,7 +493,7 @@ export function shadowedClasses() {
 // --- Previews ------------------------------------------------------------
 
 /**
- * @typedef {'color' | 'shadow' | 'font' | 'ease' | 'space' | 'radius' | 'border' | 'aspect'} PreviewKind
+ * @typedef {'color' | 'shadow' | 'font' | 'ease' | 'space' | 'radius' | 'border' | 'aspect' | 'outline' | 'opacity'} PreviewKind
  */
 
 /**
@@ -512,7 +512,10 @@ export function previewOf(token) {
       return 'font';
     case 'cubicBezier':
       return 'ease';
+    case 'border':
+      return 'outline';
   }
+  if (token.type === 'number' && token.css?.endsWith('opacity')) return 'opacity';
   if (token.type !== 'dimension' && token.type !== 'number') return undefined;
   if (token.group === 'size') return 'space';
   if (!token.css) return undefined;

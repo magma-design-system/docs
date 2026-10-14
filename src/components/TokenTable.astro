@@ -60,7 +60,7 @@ const hasDark = rows.some((row) => row.dark);
 const hasTailwind = rows.some((row) => row.tailwind);
 const hasDescription = rows.some((row) => row.token.description);
 const hasPreview = !noPreview && rows.some((row) => previewOf(row.token));
-const CELL = 'whitespace-nowrap';
+const CELL = 'whitespace-nowrap align-middle';
 ---
 
 <mds-table interactive>
@@ -122,7 +122,7 @@ const CELL = 'whitespace-nowrap';
           </mds-table-cell>
         )}
         {hasDescription && (
-          <mds-table-cell class="min-w-phrase">
+          <mds-table-cell class="min-w-phrase align-middle">
             <mds-text typography="detail" tag="span">
               {token.description}
             </mds-text>

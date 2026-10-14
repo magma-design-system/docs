@@ -196,5 +196,7 @@
   "tokens.figma.sizing": "Spacing, gaps, containers, radii and sizes",
   "tokens.figma.kb": "{{size}} kB",
   "tokens.figma.from": "Copied as they are from",
-  "tokens.tailwind.more": "and {{count}} more"
+  "tokens.tailwind.more": "and {{count}} more",
+  "tokens.preview.na": "N/A",
+  "tokens.preview.none": "No preview for this token"
 }
