@@ -47,8 +47,10 @@ shadows are drawn with the darkest neutral and change in dark mode.
 
 ## Elevation and depth
 
-The elevations the components use, multiplied by `--depth`. A flat theme
-(`data-theme-depth="flat"` on `<html>`) sets the depth to 0 and takes the shadows away.
+Two elevation shadows whose offsets, blur and opacity are multiplied by `--depth`. They
+come from `styles/dist/css/theme.css`, which the documented setup does not import, and no
+component reads them yet: they exist only in a project that imports that file. There,
+`data-theme-depth="flat"` on `<html>` sets the depth to 0 and takes the shadows away.
 
 <TokenTable tokens={['mds.elevation', 'depth']} />
 

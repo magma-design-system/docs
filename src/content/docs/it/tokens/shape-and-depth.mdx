@@ -48,8 +48,10 @@ cambiano in modalità scura.
 
 ## Elevazione e profondità
 
-Le elevazioni usate dai componenti, moltiplicate per `--depth`. Un tema piatto
-(`data-theme-depth="flat"` su `<html>`) porta la profondità a 0 e toglie le ombre.
+Due ombre di elevazione con spostamenti, sfocatura e opacità moltiplicati per `--depth`.
+Vengono da `styles/dist/css/theme.css`, che la configurazione documentata non importa, e
+nessun componente le legge ancora: esistono solo in un progetto che importa quel file. Lì
+`data-theme-depth="flat"` su `<html>` porta la profondità a 0 e toglie le ombre.
 
 <TokenTable tokens={['mds.elevation', 'depth']} />
 
