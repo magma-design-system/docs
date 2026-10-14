@@ -1,0 +1,113 @@
+---
+// The pages of the Brand assets section, one per folder of the dist/ of
+// @maggioli-design-system/identity (src/lib/identity.mjs): the families of
+// artworks of the folder, each under its heading. A folder with more than one
+// owner (the folder below it) shows its first owner, and every other owner
+// has a page of its own (src/lib/brand-pages.ts), listed in the "Brands"
+// column of the frame. Intros in the UI dictionaries, brand.page.<page>.*.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Code from '../../../../components/Code.astro';
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import Heading from '../../../../components/Heading.astro';
+import IdentityFamily from '../../../../components/IdentityFamily.astro';
+import UiText from '../../../../components/UiText.astro';
+import { brandOwners } from '../../../../lib/brand-pages';
+import { localePrefix } from '../../../../lib/frame';
+import { localeParams } from '../../../../lib/i18n.mjs';
+import {
+  IDENTITY_GROUPS,
+  IDENTITY_PACKAGE,
+  identityGroup,
+  unknownIdentityGroups,
+  webpIsPng,
+} from '../../../../lib/identity.mjs';
+import { magmaVersion } from '../../../../lib/magma.mjs';
+import { TEXT } from '../../../../lib/markdown-text.mjs';
+
+export function getStaticPaths() {
+  const unknown = unknownIdentityGroups();
+  if (unknown.length) {
+    throw new Error(
+      `identity has folders with no page: ${unknown.join(', ')}. Add them to IDENTITY_GROUPS in src/lib/identity.mjs.`,
+    );
+  }
+  return localeParams.flatMap((locale) =>
+    IDENTITY_GROUPS.flatMap(({ id, page }) => {
+      const [first, ...others] = brandOwners(id);
+      return [first, ...others].map((owner) => ({
+        params: { locale, group: page, owner: owner && owner !== first ? owner.id : undefined },
+        props: { group: id, page, owner: owner?.id },
+      }));
+    }),
+  );
+}
+
+interface Props {
+  group: string;
+  page: string;
+  /** The owner the page shows, when the group has more than one. */
+  owner: string | undefined;
+}
+
+const { group, page, owner } = Astro.props;
+const { t } = Astro.locals;
+// Starlight's route data does not exist yet outside StarlightPage.
+const { locale } = Astro.params;
+const owners = identityGroup(group);
+const shown = owner ? owners.filter((o) => o.id === owner) : owners;
+const families = shown.flatMap((o) => o.families);
+const title = t(`brand.page.${page}.title` as never);
+const ownerName = owner && shown[0]?.name;
+
+// A page of an owner with more than one family names the owner in a heading
+// above them: the right column lists the owners, not the families. An owner
+// with one family (a company on Logos) is that family's heading.
+const ownerHeading =
+  owner && ownerName && families.length > 1 ? { id: owner, text: ownerName } : undefined;
+const headings = [
+  ...(ownerHeading ? [{ depth: 2, slug: ownerHeading.id, text: ownerHeading.text }] : []),
+  ...families.map((family) => ({
+    depth: ownerHeading ? 3 : 2,
+    slug: family.id,
+    text: family.name,
+  })),
+];
+---
+
+<StarlightPage
+  frontmatter={{
+    title,
+    description: t(`brand.page.${page}.description` as never),
+    // Each owner gets a <title> of its own.
+    head: ownerName ? [{ tag: 'title', content: `${ownerName} - ${title} | Magma` }] : [],
+  }}
+  headings={headings}
+>
+  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+    <UiText text={t(`brand.page.${page}.intro` as never)} />
+  </mds-text>
+  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+    <UiText text={t('brand.howTo')} />{' '}
+    <a href={`${localePrefix(locale)}/brand/identity-package/`}>{t('brand.howTo.link')}</a>
+    {t('brand.howTo.after')}
+  </mds-text>
+  {webpIsPng() && (
+    <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <UiText text={t('brand.webpIsPng')} />
+    </mds-text>
+  )}
+
+  {ownerHeading && <Heading id={ownerHeading.id} text={ownerHeading.text} />}
+  {families.map((family) => (
+    <IdentityFamily family={family} id={family.id} level={ownerHeading ? 3 : 2} />
+  ))}
+
+  <mds-text typography="caption" tag="p" class="mt-400 text-fg-muted">
+    {t('brand.from')}{' '}
+    <Code>
+      {IDENTITY_PACKAGE}@{magmaVersion('identity')}
+    </Code>
+    <Code>dist/{shown[0]?.id ? `${group}/${shown[0].id}` : group}/</Code>.
+  </mds-text>
+  <CopyToClipboard />
+</StarlightPage>

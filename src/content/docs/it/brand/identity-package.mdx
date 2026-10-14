@@ -1,0 +1,116 @@
+---
+title: Pacchetto identity
+description: Installa @maggioli-design-system/identity con npm e usa i suoi loghi in un progetto, con Vite, React, Angular o una copia all'installazione.
+---
+
+`@maggioli-design-system/identity` contiene gli artwork di questa sezione come file, senza
+codice e senza dipendenze. Installarlo tiene i loghi di un progetto allineati al brand
+tramite npm, invece di file copiati a mano che nessuno aggiorna.
+
+## Installazione
+
+```bash
+npm install @maggioli-design-system/identity
+```
+
+Il pacchetto non ha una mappa `exports`: qualsiasi file della sua cartella `dist/` si importa
+con il suo percorso.
+
+## File
+
+Ogni artwork è un file SVG, con gli altri formati accanto, nella stessa cartella e con lo
+stesso nome:
+
+| File                                                        | Cos'è                                 |
+| ----------------------------------------------------------- | ------------------------------------- |
+| `<nome>.svg`                                                | L'artwork, vettoriale                 |
+| `<nome>.pdf`                                                | Lo stesso artwork su una pagina PDF   |
+| `<nome>-256w.png`, `<nome>-512w.png`, `<nome>-1024w.png`    | Versioni PNG, per larghezza in pixel  |
+| `<nome>-256w.webp`, `<nome>-512w.webp`, `<nome>-1024w.webp` | Versioni WebP, per larghezza in pixel |
+
+Il nome indica la variante. Nessun suffisso è la versione a colori; `-black` e `-white` sono
+quelle a un colore, e alcuni brand interni hanno `-blue`, `-gold` o `-dark-gold`. `-no-text`
+e `-icon` indicano il simbolo, il logo senza il nome, e `-bordered` il logo del Gruppo con un
+bordo intorno. `dist/directory-tree.json` elenca tutti i file del pacchetto.
+
+Nelle pagine di questa sezione, un clic sul nome del file di una card copia il suo percorso
+nel pacchetto, pronto da importare:
+`@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg`.
+
+## Con Vite
+
+In un progetto Vite, vanilla o React, importa il file: Vite lo copia nella build e restituisce
+il suo URL.
+
+```js title="src/main.js"
+import logo from '@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg';
+
+document.querySelector('#logo').src = logo;
+```
+
+```jsx title="src/Logo.jsx"
+import logo from '@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg';
+
+export function Logo() {
+  return <img src={logo} alt="Gruppo Maggioli" height="48" />;
+}
+```
+
+In TypeScript, i tipi `vite/client` di un progetto Vite dichiarano questi import. Vite scrive
+i file sotto i 4 kB nel bundle, come data URL, invece di copiarli.
+
+## Con Angular
+
+Angular copia file da `node_modules` nella build con l'opzione `assets` di `angular.json`; i
+template puntano poi alla copia:
+
+```json title="angular.json"
+"assets": [
+  { "glob": "**/*", "input": "public" },
+  {
+    "glob": "**/*.svg",
+    "input": "node_modules/@maggioli-design-system/identity/dist/brand/gruppo-maggioli",
+    "output": "identity"
+  }
+]
+```
+
+```html
+<img src="identity/logo-gruppo-maggioli.svg" alt="Gruppo Maggioli" height="48" />
+```
+
+## Qualsiasi altro progetto
+
+Copia i file che servono al progetto al momento dell'installazione, con uno script che parte
+dopo `npm install`. Lo script trova il pacchetto ovunque npm lo metta:
+
+```js title="scripts/copy-identity.mjs"
+import { cpSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const dist = fileURLToPath(import.meta.resolve('@maggioli-design-system/identity/dist/'));
+
+cpSync(`${dist}brand/gruppo-maggioli`, 'public/identity', {
+  recursive: true,
+  filter: (file) => !/\.(pdf|webp)$/.test(file),
+});
+```
+
+```json title="package.json"
+"scripts": {
+  "postinstall": "node scripts/copy-identity.mjs"
+}
+```
+
+## Testo alternativo
+
+Un logo da solo, come il link alla home page, ha il nome del brand come testo alternativo:
+`alt="Gruppo Maggioli"`. Un logo accanto al nome scritto come testo lo ripete, ed è
+decorazione: `alt=""`.
+
+## Non ancora nel pacchetto
+
+- [magma#901](https://github.com/magma-design-system/magma/issues/901): nomi, descrizioni e regole d'uso. I nomi e le descrizioni di questa sezione sono
+  valori di default di questo sito.
+- [magma#900](https://github.com/magma-design-system/magma/issues/900): i file WebP della versione attuale contengono dati PNG, le stesse immagini dei file
+  PNG, senza risparmio di peso.

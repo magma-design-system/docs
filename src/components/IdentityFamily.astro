@@ -1,0 +1,155 @@
+---
+// A family of brand assets (src/lib/identity.mjs): its heading, a description
+// and one mds-card per artwork, with the artwork on the background it is
+// drawn for (white on dark, anything else on white, whatever the mode of the
+// page) as a checkerboard, since the files are transparent, the download
+// links of each format and the file name, which copies the path of the SVG
+// in the package (CopyToClipboard.astro, once per page).
+// The descriptions are this site's defaults until identity publishes its own.
+// The cards are surface-overlay: mds-card's parts paint --mds-card-background,
+// not the background of the card, so both are set.
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+import { TEXT } from '../lib/markdown-text.mjs';
+import { IDENTITY_PACKAGE, type IdentityFamily, type IdentityFile } from '../lib/identity.mjs';
+
+interface Props {
+  family: IdentityFamily;
+  /** Id of the family's heading. */
+  id: string;
+  /** The family's heading: 3 under the heading of its owner. */
+  level?: 2 | 3;
+}
+
+const { family, id, level = 2 } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const raw = { interpolation: { escapeValue: false } };
+
+const kind =
+  family.kind === 'logo' && family.group === 'products'
+    ? 'product'
+    : family.kind === 'logo' && family.group === 'internal'
+      ? 'internal'
+      : family.kind;
+const description = [
+  t(`brand.description.${kind}` as never, { name: family.name, owner: family.owner, ...raw }),
+  ...family.forms
+    .filter((form) => form !== 'logo')
+    .map((form) => t(`brand.description.${form}` as never)),
+].join(' ');
+
+const size = (bytes: number) =>
+  t('brand.kb', { size: Math.max(1, Math.round(bytes / 1024)).toLocaleString(lang) });
+const link = (file: IdentityFile, text: string) => ({
+  text,
+  href: `${base}downloads/identity/${file.path}`,
+  file: file.file,
+  label: t('brand.download', { file: file.file, size: size(file.bytes), ...raw }),
+});
+
+const tiles = family.assets.map((asset) => {
+  const color: string = t(`brand.color.${asset.color}` as never);
+  const label =
+    family.forms.length > 1
+      ? t('brand.variant', {
+          form: t(`brand.form.${asset.form}` as never),
+          color: color.toLocaleLowerCase(lang),
+          ...raw,
+        })
+      : color;
+  return {
+    asset,
+    label,
+    // mds-img names the picture after its file when `alt` is empty.
+    alt: family.assets.length > 1 ? `${family.name}, ${label}` : family.name,
+    dark: asset.color === 'white',
+    src: `${base}downloads/identity/${asset.svg.path}`,
+    rows: [
+      {
+        format: 'SVG',
+        links: [link(asset.svg, size(asset.svg.bytes))],
+      },
+      ...(asset.pdf ? [{ format: 'PDF', links: [link(asset.pdf, size(asset.pdf.bytes))] }] : []),
+      { format: 'PNG', links: asset.png.map((file) => link(file, `${file.width}`)) },
+      { format: 'WebP', links: asset.webp.map((file) => link(file, `${file.width}`)) },
+    ].filter((row) => row.links.length),
+  };
+});
+---
+
+<Heading id={id} text={family.name} level={level} />
+<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+  {description}
+</mds-text>
+
+<!-- auto-fit: a family with one artwork gets a card as wide as the column,
+     which mds-card lays out with the media beside the content. -->
+<div class="not-content mt-400 mb-800 grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-400">
+  {tiles.map(({ asset, label, alt, dark, src, rows }) => (
+    <mds-card
+      data-copy-scope
+      class="bg-surface-overlay [--mds-card-background:rgb(var(--magma-surface-overlay))]"
+    >
+      <mds-card-media>
+        <div
+          class:list={[
+            'flex h-3200 items-center justify-center p-600',
+            // The classic checkerboard, to show that the files are transparent.
+            'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
+            dark
+              ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
+              : 'bg-white [--checker:var(--color-neutral-100)]',
+          ]}
+        >
+          <mds-img src={src} alt={alt} class="block h-full w-full" />
+        </div>
+      </mds-card-media>
+      {tiles.length > 1 && (
+        <mds-card-header>
+          <mds-text typography="h6" tag={`h${level + 1}`}>
+            {label}
+          </mds-text>
+        </mds-card-header>
+      )}
+      <mds-card-content class="flex flex-col gap-300 pt-0">
+        <dl
+          data-pagefind-ignore
+          class="m-0 grid grid-cols-[auto_1fr] items-baseline gap-x-400 gap-y-100"
+        >
+          {rows.map(({ format, links }) => (
+            <>
+              <dt>
+                <mds-text typography="caption" tag="span" class="text-fg-muted">
+                  {format}
+                </mds-text>
+              </dt>
+              <dd class="m-0 flex flex-wrap gap-x-300">
+                {links.map((item) => (
+                  <mds-text typography="caption" tag="span">
+                    <a href={item.href} download={item.file} aria-label={item.label}>
+                      {item.text}
+                    </a>
+                  </mds-text>
+                ))}
+              </dd>
+            </>
+          ))}
+        </dl>
+        <span class="flex flex-wrap items-baseline gap-x-200 wrap-anywhere">
+          <Code copy={`${IDENTITY_PACKAGE}/dist/${asset.svg.path}`}>{asset.svg.file}</Code>
+          <mds-text
+            typography="caption"
+            tag="span"
+            class="hidden my-0 text-fg-muted"
+            aria-hidden="true"
+            data-copy-status
+            data-copied={t('copy.copied')}
+            data-failed={t('copy.notCopied')}
+          ></mds-text>
+        </span>
+      </mds-card-content>
+    </mds-card>
+  ))}
+</div>
