@@ -203,4 +203,12 @@
   mds-header-bar {
     @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
+
+  mds-progress {
+    corner-shape: round;
+  }
+}
+
+figcaption {
+  max-width: 100%;
 }

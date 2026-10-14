@@ -20,11 +20,11 @@ interface Props {
   tone?: ToneMinimalVariantType;
 }
 
-const { name, kind, icon, href, action, variant, tone } = Astro.props;
+const { name, kind, icon, href, action, variant, tone = 'weak' } = Astro.props;
 ---
 
 <mds-card>
-  <mds-card-header>
+  <mds-card-header class="items-start">
     <mds-entity icon={icon} variant={variant} tone={tone}>
       <mds-text typography="h6" tag="h3">
         {name}
@@ -42,10 +42,13 @@ const { name, kind, icon, href, action, variant, tone } = Astro.props;
       icon="mi/baseline/open-in-new"
       icon-position="right"
       variant="primary"
-      tone="outline"
+      size="lg"
+      tone="text"
     ></mds-button>
   </mds-card-header>
   <mds-card-content class="pt-0">
-    <slot />
+    <mds-text>
+      <slot />
+    </mds-text>
   </mds-card-content>
 </mds-card>
