@@ -61,17 +61,17 @@ const { t } = Astro.locals;
           {count}
         </mds-text>
       </div>
-        <mds-badge
-          class="hidden my-0 text-fg-muted"
-          aria-live="polite"
-          aria-hidden="true"
-          data-copy-status
-          variant="light"
-          tone="strong"
-          data-copied={t('copy.copied')}
-          data-failed={t('copy.notCopied')}
-        >
-          {t('icons.hint')}
+      <mds-badge
+        class="hidden my-0 text-fg-muted"
+        aria-live="polite"
+        aria-hidden="true"
+        data-copy-status
+        variant="light"
+        tone="strong"
+        data-copied={t('copy.copied')}
+        data-failed={t('copy.notCopied')}
+      >
+        {t('icons.hint')}
       </mds-badge>
     </div>
     <slot name="controls" />
