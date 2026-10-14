@@ -6,8 +6,7 @@
 // (src/pages/icons/[set].json.ts), which the page loads once it shows.
 // Material Icons add a tab for each style, which changes every slug; the
 // style picked last stays from page to page.
-import CopyExample from './CopyExample.astro';
-import CopyToClipboard from './CopyToClipboard.astro';
+import IconTiles from './IconTiles.astro';
 import { iconSet, slugOf, type IconSetId } from '../lib/icons.mjs';
 
 interface Props {
@@ -39,8 +38,14 @@ const heading = current && (current.label ?? t(`icons.set.category.${current.id}
 const formats = ['slug', 'mdsIcon', 'font'];
 ---
 
-<div
-  class="not-content my-600 flex flex-col gap-600"
+<IconTiles
+  formats={formats}
+  example={slugOf(set, example.name)}
+  placeholder={template('icons.set.search', {
+    count: icons.length.toLocaleString(starlightRoute.lang),
+  })}
+  count={t('icons.set.loading')}
+  lazy
   data-icon-set={set}
   data-src={src}
   data-styles={styles.join(' ')}
@@ -50,48 +55,23 @@ const formats = ['slug', 'mdsIcon', 'font'];
   data-empty={template('icons.set.empty', { query: '{query}' })}
   data-deprecated={t('icons.set.deprecated')}
 >
-  <div class="grid flex-wrap items-center gap-x-400 gap-y-200">
-    <mds-input-field label={t('icons.copies')}>
-      <mds-input-select
-        accessible-name={t('icons.copyAs')}
-        data-icon-format
-        class="mt-0 w-auto min-w-[14rem]"
-      >
-        {formats.map((format) => (
-          <option value={format}>{t(`icons.format.${format}` as never)}</option>
-        ))}
-      </mds-input-select>
-    </mds-input-field>
-    <CopyExample text={slugOf(set, example.name)}>
-      <span data-icon-example data-name={example.name}>
-        {slugOf(set, example.name)}
-      </span>
-    </CopyExample>
-  </div>
-
+  <span slot="example" data-icon-example data-name={example.name}>
+    {slugOf(set, example.name)}
+  </span>
   {/*
-    Search, styles and category stay in sight above the tiles: right below
-    the mobile header (--frame-sticky-top is where it ends), at the top of
-    the window on desktop. While they stick, a blurred background and a
-    shadow part them from the tiles under them (markStuck). The styles
-    change the slugs of the tiles in place, wherever the page is scrolled to.
+    The styles change the slugs of the tiles in place, wherever the page is
+    scrolled to. The tabs let the blurred bar show through: in place of
+    wash-soft, the text color as thin as it takes to give wash-soft on the
+    bar (237 on 248 in light mode, 62 on 48 in dark mode), and no inner ring,
+    which would draw that color twice along the edge.
   */}
-  <div
-    class="sticky top-(--frame-sticky-top) desktop:top-0 z-10 -mx-200 flex flex-col gap-300 rounded-xl bg-surface-raised/80 px-200 py-300 backdrop-blur-md transition-cosmetic data-stuck:shadow-(--shadow-md-sharp)"
-    data-icon-bar
-  >
-    <mds-input
-      type="search"
-      icon="mi/baseline/search"
-      accessible-name={t('icons.search')}
-      placeholder={template('icons.set.search', {
-        count: icons.length.toLocaleString(starlightRoute.lang),
-      })}
-      data-icon-search
-      class="mt-0"
-    />
-    {styles.length > 0 && (
-      <mds-tab size="sm" data-icon-styles class="mt-0">
+  {styles.length > 0 && (
+    <Fragment slot="controls">
+      <mds-tab
+        size="sm"
+        data-icon-styles
+        class="mt-0 [--mds-tab-tabs-background:rgb(var(--magma-text-default)/0.045)] [--mds-tab-tabs-wrapper-shadow:none] dark:[--mds-tab-tabs-background:rgb(var(--magma-text-default)/0.07)]"
+      >
         {styles.map((style, index) => (
           <mds-tab-item
             type="button"
@@ -102,49 +82,16 @@ const formats = ['slug', 'mdsIcon', 'font'];
           />
         ))}
       </mds-tab>
-    )}
-    <div class="flex flex-wrap items-center justify-between gap-300">
-      {heading && (
-        <mds-text typography="h5" tag="h2" class="my-0" data-icon-heading>
-          {heading}
-        </mds-text>
-      )}
-      <span class="flex items-center gap-200" aria-live="polite">
-        <mds-text typography="caption" tag="span" class="my-0 text-fg-muted" data-icon-count>
-          {t('icons.set.loading')}
-        </mds-text>
-        <mds-text
-          typography="caption"
-          tag="span"
-          class="hidden my-0 text-fg-muted"
-          aria-hidden="true"
-          data-copy-status
-          data-copied={t('copy.copied')}
-          data-failed={t('copy.notCopied')}
-        >
-          {t('icons.hint')}
-        </mds-text>
-      </span>
-    </div>
-  </div>
-
-  {/* Columns of at least 8rem: 5 in the content column of a desktop, 2 on phones. */}
-  <div
-    class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(3200),1fr))] gap-200"
-    data-icon-grid
-  ></div>
-  {/* Coming into sight, it brings the next block of tiles. */}
-  <div class="h-px" data-icon-more></div>
-
-  <mds-text
-    typography="detail"
-    tag="p"
-    class="hidden my-0 text-fg-muted"
-    data-icon-empty
-  ></mds-text>
-
-  <CopyToClipboard />
-</div>
+    </Fragment>
+  )}
+  {heading && (
+    <Fragment slot="label">
+      <mds-text typography="h5" tag="h2" class="my-0" data-icon-heading>
+        {heading}
+      </mds-text>
+    </Fragment>
+  )}
+</IconTiles>
 
 <script>
   import {

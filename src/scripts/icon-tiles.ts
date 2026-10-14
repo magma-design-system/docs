@@ -4,7 +4,7 @@
 
 /** The classes of a tile: a column with the icon and its name, tinted while copied. */
 export const TILE =
-  'flex flex-col items-center gap-300 rounded-xl px-200 pt-500 pb-400 text-center text-fg-default transition-cosmetic hover:bg-surface-muted data-copied:bg-success-surface data-copied:text-success-fg';
+  'flex flex-col items-center gap-300 rounded-xl px-200 pt-500 pb-400 text-center text-fg-default transition-cosmetic hover:bg-surface-overlay hover:shadow-outline-weak data-copied:bg-success-surface data-copied:text-success-fg';
 
 /** What a click on a tile of a set copies, by format; the first one is the default. */
 export const SLUG_FORMATS: Record<string, (slug: string) => string> = {

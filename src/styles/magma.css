@@ -79,6 +79,16 @@
 @custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
 
 /*
+  Tokens of the site, with their utilities: `shadow-sticky` is the shadow of
+  a sticky bar while it sticks (`data-stuck`, markStuck in
+  src/scripts/icon-tiles.ts): a soft line under its bottom edge, short of
+  its corners, and nothing above it.
+*/
+@theme {
+  --shadow-sticky: 0px 13px 4px -14px rgba(0, 0, 0, 0.16), 0px 12px 6px -14px rgba(0, 0, 0, 0.1);
+}
+
+/*
   The frame (src/components/frame/) styles its markup with utilities. What is
   left here is markup the site does not render itself: <html>, <body>, the
   content of the pages and Starlight's elements. In the `components` layer:

@@ -5,8 +5,7 @@
 // a filter by the set of the slug and a choice of what a click copies (the
 // class, the markup, ...) sit above the tiles. 717 tiles: all of them are on
 // the page from the start.
-import CopyExample from './CopyExample.astro';
-import CopyToClipboard from './CopyToClipboard.astro';
+import IconTiles from './IconTiles.astro';
 import UiText from './UiText.astro';
 import { ICON_SETS, legacyIcons } from '../lib/icons.mjs';
 import { localePrefix } from '../lib/frame';
@@ -32,149 +31,89 @@ const formats = ['class', 'legacyFont', 'member', 'name'];
 const example = icons.find(({ name }) => name === 'action-copy')!;
 ---
 
-<div
-  class="not-content my-600 flex flex-col gap-600"
+<IconTiles
+  formats={formats}
+  example={example.className}
+  placeholder={t('icons.search')}
+  count={template('icons.legacy.count', { total: String(icons.length) })}
   data-legacy-icons
-  data-copy-scope
   data-count-all={template('icons.legacy.count', { total: '{total}' })}
   data-count-some={template('icons.legacy.countSome', { shown: '{shown}', total: '{total}' })}
   data-empty={template('icons.set.empty', { query: '{query}' })}
 >
-  <mds-banner
-    variant="warning"
-    icon="mi/baseline/warning-amber"
-    headline={t('icons.legacy.title')}
-    class="mt-0"
-  >
-    <mds-text typography="detail" class={TEXT.block}>
-      <UiText text={t('icons.legacy.intro')} />
-    </mds-text>
-    <mds-button
-      slot="action"
-      href={`${guide}#${t('icons.legacy.anchor')}`}
-      role="link"
+  <Fragment slot="intro">
+    <mds-banner
       variant="warning"
-      tone="strong"
-    >
-      {t('icons.legacy.guide')}
-    </mds-button>
-  </mds-banner>
-
-  <div class="grid items-center gap-x-400 gap-y-200">
-    <mds-input-field label={t('icons.copies')}>
-      <mds-input-select
-        accessible-name={t('icons.copyAs')}
-        data-icon-format
-        class="mt-0 w-auto min-w-[14rem]"
-      >
-        {formats.map((format) => (
-          <option value={format}>{t(`icons.format.${format}` as never)}</option>
-        ))}
-      </mds-input-select>
-    </mds-input-field>
-    <CopyExample text={example.className}>
-      <span
-        data-icon-example
-        data-name={example.name}
-        data-class={example.className}
-        data-member={example.member}
-      >
-        {example.className}
-      </span>
-    </CopyExample>
-  </div>
-
-  {/*
-    Search and sets stay in sight above the tiles: right below the mobile
-    header (--frame-sticky-top is where it ends), at the top of the window on
-    desktop. While they stick, a blurred background and a shadow part them
-    from the tiles under them (markStuck).
-  */}
-  <div
-    class="sticky top-(--frame-sticky-top) desktop:top-0 z-10 -mx-200 flex flex-col gap-300 rounded-xl bg-surface-raised/80 px-200 py-300 backdrop-blur-md transition-cosmetic data-stuck:shadow-(--shadow-md-sharp)"
-    data-icon-bar
-  >
-    <mds-input
-      type="search"
-      icon="mi/baseline/search"
-      accessible-name={t('icons.search')}
-      placeholder={t('icons.search')}
-      data-icon-search
+      icon="mi/baseline/warning-amber"
+      headline={t('icons.legacy.title')}
       class="mt-0"
-    />
-    <div class="flex flex-wrap items-center justify-between gap-300">
-      <mds-filter data-icon-sets class="mt-0">
-        {ICON_SETS.map((set) => (
-          <mds-filter-item
-            value={set}
-            label={t(`icons.setName.${set}` as never)}
-            count={String(counts[set])}
-            class="mt-0"
-          />
-        ))}
-      </mds-filter>
-      <span class="flex items-center gap-200" aria-live="polite">
-        <mds-text typography="caption" tag="span" class="my-0 text-fg-muted" data-icon-count>
-          {template('icons.legacy.count', { total: String(icons.length) })}
-        </mds-text>
-        <mds-text
-          typography="caption"
-          tag="span"
-          class="hidden my-0 text-fg-muted"
-          aria-hidden="true"
-          data-copy-status
-          data-copied={t('copy.copied')}
-          data-failed={t('copy.notCopied')}
-        >
-          {t('icons.hint')}
-        </mds-text>
-      </span>
-    </div>
-  </div>
+    >
+      <mds-text typography="detail" class={TEXT.block}>
+        <UiText text={t('icons.legacy.intro')} />
+      </mds-text>
+      <mds-button
+        slot="action"
+        href={`${guide}#${t('icons.legacy.anchor')}`}
+        role="link"
+        variant="warning"
+        tone="strong"
+      >
+        {t('icons.legacy.guide')}
+      </mds-button>
+    </mds-banner>
+  </Fragment>
 
-  {/* Columns of at least 8rem: 5 in the content column of a desktop, 2 on phones. */}
-  <div
-    class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(3200),1fr))] gap-200"
-    data-icon-grid
+  <span
+    slot="example"
+    data-icon-example
+    data-name={example.name}
+    data-class={example.className}
+    data-member={example.member}
   >
-    {icons.map(({ name, className, member, slug, set }) => {
-      const slash = slug.lastIndexOf('/');
-      return (
-        <div
-          class={`${TILE} data-out:hidden`}
-          data-icon-tile
-          data-set={set}
-          data-search={`${name} ${slug}`}
-          data-slug={slug}
-          data-name={name}
-          data-class={className}
-          data-member={member}
-          data-copy={className}
-          data-copy-label={name}
-        >
-          <mds-icon name={slug} class="w-800 fill-current" />
-          <mds-text typography="hack" tag="span" class="block w-full break-words">
-            <span class="block">{name}</span>
-            <span class="mt-100 block text-fg-muted">
-              {slug.slice(0, slash + 1)}
-              <br />
-              {slug.slice(slash + 1)}
-            </span>
-          </mds-text>
-        </div>
-      );
-    })}
-  </div>
+    {example.className}
+  </span>
 
-  <mds-text
-    typography="detail"
-    tag="p"
-    class="hidden my-0 text-fg-muted"
-    data-icon-empty
-  ></mds-text>
+  <Fragment slot="label">
+    <mds-filter data-icon-sets class="mt-0">
+      {ICON_SETS.map((set) => (
+        <mds-filter-item
+          value={set}
+          label={t(`icons.setName.${set}` as never)}
+          count={String(counts[set])}
+          class="mt-0"
+        />
+      ))}
+    </mds-filter>
+  </Fragment>
 
-  <CopyToClipboard />
-</div>
+  {icons.map(({ name, className, member, slug, set }) => {
+    const slash = slug.lastIndexOf('/');
+    return (
+      <div
+        class={`${TILE} data-out:hidden`}
+        data-icon-tile
+        data-set={set}
+        data-search={`${name} ${slug}`}
+        data-slug={slug}
+        data-name={name}
+        data-class={className}
+        data-member={member}
+        data-copy={className}
+        data-copy-label={name}
+      >
+        <mds-icon name={slug} class="w-800 fill-current" />
+        <mds-text typography="hack" tag="span" class="block w-full break-words">
+          <span class="block">{name}</span>
+          <span class="mt-100 block text-fg-muted">
+            {slug.slice(0, slash + 1)}
+            <br />
+            {slug.slice(slash + 1)}
+          </span>
+        </mds-text>
+      </div>
+    );
+  })}
+</IconTiles>
 
 <script>
   import { fill, formatKey, markStuck, showCopies, storage } from '../scripts/icon-tiles';
