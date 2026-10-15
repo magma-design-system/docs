@@ -1,0 +1,36 @@
+---
+// The live preview of a pattern: its plain HTML version running in an iframe
+// (src/pages/example/pattern/[id].astro) on the stage of the component
+// previews (Playground.astro), whose handle narrows it down to a phone, and a
+// button that opens it alone in a new tab, as the page of an application.
+import Playground from './Playground.astro';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/. */
+  id: string;
+}
+
+const { id } = Astro.props;
+const { t } = Astro.locals;
+const src = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/pattern/${id}/`;
+---
+
+<Playground
+  tag={`pattern-${id}`}
+  props={[]}
+  example=""
+  src={src}
+  intro={t('pattern.preview.intro')}
+  title={t('pattern.preview.title')}
+>
+  <mds-button
+    slot="actions"
+    href={src}
+    target="blank"
+    label={t('pattern.preview.open')}
+    icon="mi/baseline/open-in-new"
+    variant="dark"
+    tone="text"
+    size="sm"
+  ></mds-button>
+</Playground>

@@ -1,0 +1,70 @@
+---
+// Previews of the pages of a section, for its landing page: one mds-card per
+// page, with an icon, the title and the description of the page (from its
+// frontmatter, in the language of the current page, else in English) and a
+// button that opens it. Two columns when the content column has room.
+import { getEntry } from 'astro:content';
+import { localePrefix } from '../lib/frame';
+
+interface Props {
+  /** `slug` of the page without the locale; `icon` is an mds-icon slug, collected by iconsauce. */
+  pages: { slug: string; icon: string }[];
+}
+
+const { pages } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+
+const cards = await Promise.all(
+  pages.map(async ({ slug, icon }) => {
+    const entry =
+      (locale ? await getEntry('docs', `${locale}/${slug}`) : undefined) ??
+      (await getEntry('docs', slug));
+    if (!entry) throw new Error(`PageCards: no page ${slug}`);
+    return {
+      icon,
+      title: entry.data.title,
+      description: entry.data.description,
+      href: `${localePrefix(locale)}/${slug}/`,
+    };
+  }),
+);
+---
+
+{/* `not-content`: Starlight would put 1rem above every card but the first. */}
+<div class="not-content @container my-600">
+  <div class="grid gap-600 @xl:grid-cols-2">
+    {cards.map(({ icon, title, description, href }) => (
+      <mds-card class="bg-surface-overlay">
+        <mds-card-header class="items-start bg-surface-overlay">
+          <mds-entity
+            icon={icon}
+            variant="primary"
+            tone="weak"
+            class="shadow-none p-0 bg-transparent"
+          >
+            <mds-text typography="h6" tag="h3">
+              {title}
+            </mds-text>
+          </mds-entity>
+        </mds-card-header>
+        <mds-card-content class="pt-0 bg-surface-overlay">
+          <mds-text typography="detail">{description}</mds-text>
+        </mds-card-content>
+        <mds-card-footer class="bg-surface-overlay">
+          <mds-button
+            href={href}
+            role="link"
+            type="a"
+            label={t('cards.open')}
+            aria-label={`${t('cards.open')}: ${title}`}
+            icon="mi/baseline/arrow-forward"
+            icon-position="right"
+            variant="primary"
+            tone="text"
+          />
+        </mds-card-footer>
+      </mds-card>
+    ))}
+  </div>
+</div>

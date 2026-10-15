@@ -1,0 +1,109 @@
+---
+title: Color
+description: What color means in Magma - neutrals for the interface, an accent for actions and one for AI, four states, labels and brands for data - and the contrast ladder under all of them.
+---
+
+import Usages from '../../../components/Usages.astro';
+
+In Maggioli's products color is information before it is decoration: it says what can be
+pressed, what went wrong, what belongs together. This page says which color to use for what;
+the tokens, their values and the pairs they are measured in are in
+[Tokens: Color](../../tokens/color/).
+
+## Every color has one meaning
+
+Each family of colors has a job, and keeps it everywhere: once red means danger, it cannot
+also be the accent of a banner in the same product. That is why Magma names colors by what
+they do (a surface, a text, the accent, danger) and not by their hue: the name says the
+meaning, and the value can change with the brand, the mode and the contrast preference.
+
+## The interface is neutral
+
+Surfaces, text and borders are greys: the neutral of the default theme, or one of the two
+tinted ones, cool and warm, that a product can pick as its theme. Most of a screen is
+neutral, so that the few colored elements stand out, and mean something.
+
+## One accent for actions
+
+The accent is the action color of the brand: the primary button, the link, the selected
+item, the focus. A view has one primary action; when everything is in the accent, nothing
+stands out.
+
+## A second accent for AI
+
+The features driven by artificial intelligence have their own accent, so that users can tell
+at a glance what an AI proposes from what the product does. It goes with `mds-policy-ai`,
+which marks the content an AI produced and links to the policy that governs it.
+
+## Four states
+
+- **Info**: something useful to know, with nothing to do. For example, a new version of the
+  product, the last login.
+- **Success**: something went as expected. For example, a document saved, a payment
+  registered.
+- **Warning**: something that will become a problem if it is ignored. For example, a license
+  about to expire, a maintenance window.
+- **Danger**: something went wrong, or is about to happen and cannot be undone. For example,
+  a field that is not valid, deleting a record.
+
+The states do not change with the theme or the brand: a warning looks like a warning in every
+product of the group.
+
+<Usages>
+<mds-usage variant="do">
+
+The button that deletes a record is in the danger color, and asks for a confirmation.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A promotional banner is painted red to catch the eye: users read it as an error.
+
+</mds-usage>
+</Usages>
+
+## Labels and brands are data
+
+Label colors are for the categories users create or recognize: tags, folders, the subject
+areas of an editorial product. Brand colors identify a company or a product of the group, in
+its logo and in its editorial pages. Neither is used to paint the interface, nor to tell a
+state.
+
+<Usages>
+<mds-usage variant="do">
+
+The tags a user gives to the files of a case take the label colors, one per tag.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The categories of a list take the success and warning colors: users read them as states.
+
+</mds-usage>
+</Usages>
+
+## A ladder of contrast
+
+Every palette has ten steps, from `01`, the most contrasted with the page, to `10`, the
+closest to it. The steps are generated from contrast targets rather than from lightness, with
+Adobe's Leonardo. So palettes of the same kind are interchangeable: the same step of info and
+of success has the same contrast, and swapping one for the other does not change what can be
+read. Dark mode is the same ladder on a dark page.
+
+## Never color alone
+
+A state or a category is never told by color only: it also has a text, an icon or a shape.
+More in [Accessibility](../accessibility/#never-color-alone).
+
+## One product at a time
+
+Many products of the group have colors of their own, older than Magma. They do not have to
+replace them in one go: they paint the new screens with the color roles, and move the others
+when they get to them. Consistency between the products grows one release at a time.
+
+## Sources
+
+- [Leonardo](https://leonardocolor.io/), Adobe
+- Nate Baldwin,
+  [Creating contrast-based themes with Leonardo](https://medium.com/user-experience-design-1/creating-contrast-based-themes-with-leonardo-32b6219a090f),
+  Medium, 2020

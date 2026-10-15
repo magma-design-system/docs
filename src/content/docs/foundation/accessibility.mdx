@@ -1,0 +1,131 @@
+---
+title: Accessibility
+description: The accessibility target of Magma, what the components take care of and what is left to the product, and the decisions on contrast, keyboard, focus, preferences and text.
+---
+
+import Usages from '../../../components/Usages.astro';
+
+In Italy, the software of the public administration has to be accessible by law: Law 4/2004
+and the AgID guidelines require it to meet EN 301 549, the European standard that includes
+WCAG. Since June 2025 the European Accessibility Act extends similar requirements to many
+products and services sold to the public. For Magma it comes before the law: it is the first
+of its [principles](../principles/).
+
+## The target
+
+Magma is designed for WCAG 2.x, level AA. It is a design target, not a certification: the
+stories of every component run automated accessibility checks, and there is no independent
+audit yet. A product built with Magma is accessible when it is tested as a whole, not
+because its parts are.
+
+## Who does what
+
+The components take care of what is the same everywhere: the roles and states that assistive
+technologies read, the keyboard, the visible focus, color pairs measured for contrast, and
+their own built-in texts in Italian, English, Spanish and Greek.
+
+The product takes care of what only it knows: the order of the headings, the labels of fields
+and of buttons with only an icon, the alternative text of its images, the order of the focus
+across the page, the error messages, the flow of each task.
+
+## Contrast
+
+Text and icons that carry meaning meet the AA contrast ratios. Paint them with the color
+roles, in the [pairs they are measured in](../../tokens/color/#pairing-rules): any other pair
+is not measured. Users who need more contrast ask for it with the contrast preference, and
+the roles [follow it](../../tokens/themes-and-preferences/).
+
+## Never color alone
+
+A state, a category or a choice is never told by color only: it also has a text, an icon or a
+shape. Many people do not tell red from green, and a screen reader does not read colors.
+
+<Usages>
+<mds-usage variant="do">
+
+The invalid field has a red border, an error icon and a message: "Enter a date after 1
+January 2024".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The invalid field only turns red.
+
+</mds-usage>
+</Usages>
+
+## Keyboard
+
+- Everything that works with a pointer works with the keyboard, in an order that follows the
+  reading of the page.
+- The focus is always visible.
+- Standard controls answer to standard keys: Enter and Space press a button, Esc closes a
+  dialog, the arrows move within a group. A new kind of interaction needs a standard
+  alternative, and instructions.
+
+## The focus follows the user
+
+The focus moves only when the user does something that asks for it. Moving it otherwise
+makes people lose their place, and screen reader users lose it without seeing where it went.
+
+<Usages>
+<mds-usage variant="do">
+
+Opening a dialog moves the focus into it; closing it brings the focus back to the button that
+opened it.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A notification that arrives while the user is typing takes the focus.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Submitting a form with errors moves the focus to the first of them.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+An autosave moves the focus to its confirmation message.
+
+</mds-usage>
+</Usages>
+
+The only exception is a task that cannot go on: then the product stops the user, and says
+why.
+
+## Preferences
+
+Users set their preferences in the system or in the product, with `mds-pref`: light or dark
+mode, more contrast, less motion, lower energy consumption. The components follow them, and
+so does the code of the product when it paints with the tokens. Nothing essential happens
+only through motion: with less motion, transitions get shorter or stop, and the content stays
+the same.
+
+## Text and zoom
+
+- Pages work at 200% zoom and with larger text: no fixed heights on text, no text inside
+  images.
+- An image that carries information says it in its alternative text; a decorative image has
+  an empty one.
+- Every page declares its language, so screen readers pronounce it correctly and the
+  components pick their own texts.
+
+## Testing
+
+Automated checks find only part of the problems. Before a release, go through the main tasks:
+
+- with the keyboard only;
+- with a screen reader: NVDA or JAWS on Windows, VoiceOver on macOS and iOS, TalkBack on
+  Android;
+- at 200% zoom, in dark mode and with more contrast.
+
+## Sources
+
+- [Law 4/2004](https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004-01-09;4),
+  Normattiva
+- [European Accessibility Act, Directive (EU) 2019/882](https://eur-lex.europa.eu/eli/dir/2019/882/oj),
+  EUR-Lex
+- [Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/), W3C
+- [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/), W3C

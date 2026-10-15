@@ -1,0 +1,60 @@
+---
+// A level of adoption of Magma, inside Levels.astro: a card with its number
+// and title, the packages it installs and what it gives; under the card, as
+// its caption, when it fits a product. Card and caption take two rows of the
+// grid of Levels.astro (subgrid): the cards of a row are as tall as the
+// tallest, the captions start on one line. The number is an icon: mds-entity colors `initials` by their letters, not by
+// `variant`.
+import Code from '../Code.astro';
+
+interface Props {
+  level: number;
+  title: string;
+  /** npm package names, without the scope. */
+  packages: string[];
+  text: string;
+  fits: string;
+}
+
+/** The numbers 1 to 4 as mds-icon slugs, collected by iconsauce. */
+const NUMBERS = [
+  'mi/outline/looks-one',
+  'mi/outline/looks-two',
+  'mi/outline/looks-3',
+  'mi/outline/looks-4',
+];
+
+const { level, title, packages, text, fits } = Astro.props;
+const { t } = Astro.locals;
+---
+
+<li class="row-span-2 grid grid-rows-subgrid gap-400">
+  <mds-card class="bg-surface-overlay">
+    <mds-card-header class="items-start bg-surface-overlay">
+      <mds-entity
+        icon={NUMBERS[level - 1]}
+        variant="primary"
+        tone="weak"
+        class="shadow-none p-0 bg-transparent"
+      >
+        <mds-text typography="h5" tag="h3">
+          {title}
+        </mds-text>
+      </mds-entity>
+    </mds-card-header>
+    <mds-card-content class="flex grow flex-col gap-400 pt-0 bg-surface-overlay">
+      <div class="flex flex-wrap gap-200">
+        {packages.map((name) => (
+          <Code>{name}</Code>
+        ))}
+      </div>
+      <mds-text typography="detail" tag="p" class="block">
+        {text}
+      </mds-text>
+    </mds-card-content>
+  </mds-card>
+  <mds-text typography="caption" tag="p" class="block px-400 text-center text-fg-muted">
+    <strong class="block">{t('home.levels.fits')}</strong>
+    {fits}
+  </mds-text>
+</li>

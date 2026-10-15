@@ -60,6 +60,21 @@ export function componentTags() {
     .sort();
 }
 
+/**
+ * How many components there are, how many properties they have, and how many
+ * of those are also HTML attributes (a string, a number or a boolean): the
+ * others, such as arrays and functions, can only be set from JavaScript.
+ */
+export function apiCounts() {
+  const { components } = loadComponentDocs();
+  const props = components.flatMap((/** @type {{ props: { attr?: string }[] }} */ c) => c.props);
+  return {
+    components: components.length,
+    properties: props.length,
+    attributes: props.filter((prop) => prop.attr).length,
+  };
+}
+
 /** An icon slug: `mi/<variant>/<name>`, `mdi/<name>` or `mgg/<name>`. */
 export const ICON_SLUG =
   /\b(?:mi\/(?:baseline|outline|round|sharp|two-tone)\/[a-z0-9-]+|mdi\/[a-z0-9-]+|mgg\/[a-z0-9-]+)/g;

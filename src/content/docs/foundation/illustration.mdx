@@ -1,0 +1,69 @@
+---
+title: Illustration
+description: When an illustration helps and when it gets in the way, where it goes in a product, and the rules for drawing or choosing one.
+---
+
+import Usages from '../../../components/Usages.astro';
+
+An illustration costs attention, and weight on the page: it has to give something back. In
+Maggioli's products it explains, welcomes or marks a moment; it does not decorate the screens
+where people work.
+
+Magma has no library of interface illustrations yet: the artworks of the group, its logos
+and the marks of its products, are in [Brand assets](../../brand/). Until there is one,
+these decisions guide whoever draws or chooses an illustration for a product.
+
+## When to use one
+
+- To explain what words alone make hard: how a procedure goes, how a service works.
+- To fill a space that would otherwise be empty, and say what to do next.
+- To welcome: the first access, a guided tour, a new feature.
+
+Not on the screens where people work, such as lists, forms and tables: there, the space
+belongs to the data. And not to soften an error: a serious problem needs a clear message,
+not a drawing.
+
+<Usages>
+<mds-usage variant="do">
+
+A case without files shows, in `mds-zero`, an illustration, the message "No files in this
+case yet" and one action: "Upload a file".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+An illustration sits above a table of invoices, pushing the data below the fold.
+
+</mds-usage>
+</Usages>
+
+## Where they go
+
+- **Empty states**, with `mds-zero`: the illustration, a short message and one action.
+- **Guided tours and announcements**: one illustration per step or per news item, all from
+  the same family.
+- **Editorial pages**: the pages that present a product or a publication, where the brand
+  steps forward.
+
+## How they are drawn
+
+- **One idea each.** If an illustration needs a caption to be understood, it says too much.
+- **One family per product.** The same line, palette and perspective in every illustration
+  of a product: a mix of styles makes a product look patched together.
+- **Few colors, from Magma's palettes**, less saturated than the actions, so that an
+  illustration never competes with a button.
+- **No text inside.** Text in an image cannot be translated, read by a screen reader or
+  enlarged: it goes in the page, next to the image.
+- **Light.** SVG whenever possible, and nothing a product cannot do without when the user asks
+  for lower consumption.
+- **Both modes.** No white background baked in: an illustration is checked in dark mode too.
+- **People as they are.** When an illustration shows people, it shows the variety of those
+  who use the products: ages, genders, origins, disabilities.
+
+## Accessibility
+
+- Most illustrations are decorative: their alternative text is empty, and the message is in
+  the text next to them.
+- An illustration that carries information says it in its alternative text.
+- An animated illustration stops when the user asks for less motion, and never loops without
+  a way to stop it.

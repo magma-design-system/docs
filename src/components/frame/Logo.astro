@@ -1,11 +1,14 @@
 ---
 // The Magma mark from @maggioli-design-system/identity, in its blue and white
-// versions: the white one is shown on the dark scheme.
+// versions: the white one is shown on the dark scheme. `class`: its size,
+// `size-1000` by default.
 import logo from '@maggioli-design-system/identity/dist/internal/magma-design-system/logo-magma.svg?url';
 import logoWhite from '@maggioli-design-system/identity/dist/internal/magma-design-system/logo-magma-white.svg?url';
+
+const { class: size = 'size-1000' } = Astro.props;
 ---
 
-<span class="inline-flex size-1000 shrink-0" aria-hidden="true">
+<span class:list={['inline-flex shrink-0', size]} aria-hidden="true">
   <mds-img
     class="size-full [--mds-img-background:transparent] dark:hidden"
     src={logo}

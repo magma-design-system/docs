@@ -5,6 +5,9 @@
 // the mobile header (Header.astro) with everything else in its menu, the right
 // column down to 48rem.
 //
+// Under the card, on the page background like the rail: the footer of the
+// site (SiteFooter.astro).
+//
 // Pages change in place (Astro's ClientRouter, Head.astro). The columns marked
 // `transition:persist` stay mounted from page to page while their links are
 // the same (script below): their Magma components do not hydrate again, the
@@ -15,8 +18,11 @@
 // paint over them otherwise), under what floats from the content.
 import Search from '@astrojs/starlight/components/Search.astro';
 import Rail from './Rail.astro';
+import SiteFooter from './SiteFooter.astro';
 
-const { hasSidebar } = Astro.locals.starlightRoute;
+const { hasSidebar, entry } = Astro.locals.starlightRoute;
+// A page with a hero: the card is a container, for the hero to reach its edges (Hero.astro).
+const hasHero = Boolean(entry.data.hero);
 ---
 
 <div
@@ -33,26 +39,30 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   >
     <Rail />
   </div>
-  <div
-    class:list={[
-      'desktop:my-400 desktop:me-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
-      hasSidebar
-        ? 'desktop:grid-cols-[1fr_minmax(0,4fr)] desktop:gap-x-800'
-        : 'desktop:grid-cols-[minmax(0,1fr)]',
-    ]}
-  >
-    {hasSidebar && (
-      <div
-        data-frame-section
-        transition:persist="frame-section"
-        class="hidden desktop:sticky desktop:top-(--frame-sticky-top) desktop:block desktop:max-h-[calc(100vh-var(--frame-sticky-top))] desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
-      >
-        <slot name="sidebar" />
+  <div class="min-w-0 desktop:me-400">
+    <div
+      class:list={[
+        'desktop:mt-400 desktop:grid desktop:rounded-2xl desktop:border desktop:border-border-muted desktop:bg-surface-raised',
+        hasHero && '@container',
+        hasSidebar
+          ? 'desktop:grid-cols-[1fr_minmax(0,4fr)] desktop:gap-x-800'
+          : 'desktop:grid-cols-[minmax(0,1fr)]',
+      ]}
+    >
+      {hasSidebar && (
+        <div
+          data-frame-section
+          transition:persist="frame-section"
+          class="hidden desktop:sticky desktop:top-(--frame-sticky-top) desktop:block desktop:max-h-[calc(100vh-var(--frame-sticky-top))] desktop:self-start desktop:overflow-y-auto desktop:py-800 desktop:ps-800 [scrollbar-width:thin] print:hidden"
+        >
+          <slot name="sidebar" />
+        </div>
+      )}
+      <div class:list={[!hasSidebar && 'desktop:px-800']}>
+        <slot />
       </div>
-    )}
-    <div class:list={[!hasSidebar && 'desktop:ps-800']}>
-      <slot />
     </div>
+    <SiteFooter />
   </div>
 </div>
 

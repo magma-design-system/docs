@@ -1,0 +1,113 @@
+---
+title: Colore
+description: Cosa significa il colore in Magma - i neutri per l'interfaccia, un accento per le azioni e uno per l'IA, quattro stati, etichette e marchi per i dati - e la scala di contrasto sotto tutti.
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+Nei prodotti Maggioli il colore è un'informazione prima che una decorazione: dice cosa si può
+premere, cosa è andato storto, cosa sta insieme. Questa pagina dice quale colore usare per
+cosa; i token, i loro valori e le coppie in cui sono misurati sono in
+[Token: Colore](../../tokens/color/).
+
+## Ogni colore ha un significato
+
+Ogni famiglia di colori ha un compito, e lo mantiene ovunque: se il rosso significa pericolo,
+non può essere anche l'accento di un banner nello stesso prodotto. Per questo Magma chiama i
+colori per quello che fanno (una superficie, un testo, l'accento, il pericolo) e non per la
+loro tinta: il nome dice il significato, e il valore può cambiare con il marchio, la modalità
+e la preferenza di contrasto.
+
+## L'interfaccia è neutra
+
+Superfici, testi e bordi sono grigi: il neutro del tema predefinito, oppure uno dei due
+colorati, freddo e caldo, che un prodotto può scegliere come tema. La maggior parte di una
+schermata è neutra, perché i pochi elementi colorati risaltino, e significhino qualcosa.
+
+## Un accento per le azioni
+
+L'accento è il colore d'azione del marchio: il pulsante principale, il link, l'elemento
+selezionato, il focus. Una vista ha un'azione principale; quando tutto è nell'accento, niente
+risalta.
+
+## Un secondo accento per l'IA
+
+Le funzioni basate sull'intelligenza artificiale hanno un accento proprio, perché si capisca
+a colpo d'occhio cosa propone un'IA e cosa fa il prodotto. Va insieme a `mds-policy-ai`, che
+segnala i contenuti prodotti da un'IA e rimanda alla policy che ne regola l'uso.
+
+## Quattro stati
+
+- **Info**: qualcosa di utile da sapere, senza niente da fare. Per esempio, una nuova
+  versione del prodotto, l'ultimo accesso.
+- **Successo**: qualcosa è andato come previsto. Per esempio, un documento salvato, un
+  pagamento registrato.
+- **Attenzione**: qualcosa che diventerà un problema se lo si ignora. Per esempio, una
+  licenza in scadenza, una finestra di manutenzione.
+- **Pericolo**: qualcosa è andato storto, o sta per succedere e non si annulla. Per esempio,
+  un campo non valido, l'eliminazione di un record.
+
+Gli stati non cambiano con il tema o con il marchio: un avviso ha l'aspetto di un avviso in
+ogni prodotto del gruppo.
+
+<Usages>
+<mds-usage variant="do">
+
+Il pulsante che elimina un record è nel colore del pericolo, e chiede una conferma.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un banner promozionale è dipinto di rosso per attirare l'attenzione: chi lo vede lo legge come
+un errore.
+
+</mds-usage>
+</Usages>
+
+## Etichette e marchi sono dati
+
+I colori delle etichette servono per le categorie che le persone creano o riconoscono: tag,
+cartelle, le aree tematiche di un prodotto editoriale. I colori dei marchi identificano
+un'azienda o un prodotto del gruppo, nel suo logo e nelle sue pagine editoriali. Né gli uni
+né gli altri dipingono l'interfaccia, o comunicano uno stato.
+
+<Usages>
+<mds-usage variant="do">
+
+I tag che una persona dà ai file di una pratica prendono i colori delle etichette, uno per
+tag.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Le categorie di un elenco prendono i colori di successo e di attenzione: chi le vede le legge
+come stati.
+
+</mds-usage>
+</Usages>
+
+## Una scala di contrasto
+
+Ogni palette ha dieci passi, da `01`, il più contrastato rispetto alla pagina, a `10`, il più
+vicino. I passi sono generati da obiettivi di contrasto e non di luminosità, con Leonardo di
+Adobe. Così le palette dello stesso tipo sono intercambiabili: lo stesso passo di info e di
+successo ha lo stesso contrasto, e scambiarli non cambia ciò che si riesce a leggere. La
+modalità scura è la stessa scala su una pagina scura.
+
+## Mai solo il colore
+
+Uno stato o una categoria non si comunicano mai solo con il colore: hanno anche un testo,
+un'icona o una forma. Approfondisci in [Accessibilità](../accessibility/#mai-solo-il-colore).
+
+## Un prodotto alla volta
+
+Molti prodotti del gruppo hanno colori propri, più vecchi di Magma. Non devono sostituirli
+tutti insieme: dipingono le nuove schermate con i ruoli di colore, e spostano le altre quando
+ci arrivano. La coerenza tra i prodotti cresce un rilascio alla volta.
+
+## Fonti
+
+- [Leonardo](https://leonardocolor.io/), Adobe
+- Nate Baldwin,
+  [Creating contrast-based themes with Leonardo](https://medium.com/user-experience-design-1/creating-contrast-based-themes-with-leonardo-32b6219a090f),
+  Medium, 2020

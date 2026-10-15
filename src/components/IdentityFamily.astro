@@ -13,7 +13,7 @@
 // not the background of the card, so both are set.
 import CopyExample from './CopyExample.astro';
 import Heading from './Heading.astro';
-import { TEXT } from '../lib/markdown-text.mjs';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
 import { IDENTITY_PACKAGE, type IdentityFamily, type IdentityFile } from '../lib/identity.mjs';
 
 interface Props {
@@ -85,7 +85,7 @@ const tiles = family.assets.map((asset) => {
 ---
 
 <Heading id={id} text={family.name} level={level} />
-<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+<mds-text {...READING} tag="p" class={TEXT.paragraph}>
   {description}
 </mds-text>
 

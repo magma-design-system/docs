@@ -60,9 +60,10 @@ if (path) {
     <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
       {heading}
     </mds-text>
+    {/* Labels lined up with the heading, as in SectionEntries.astro. */}
     <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
       {links.map((link) => (
-        <li class="flex max-w-full">
+        <li class="-ml-300 flex max-w-[calc(100%_+_--spacing(300))]">
           <mds-button
             class="max-w-full"
             href={link.href}

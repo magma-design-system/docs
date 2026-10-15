@@ -1,0 +1,66 @@
+---
+title: Typography
+description: Why Magma sets text in four families, when to use each style of the scale, and the fonts to download for design tools and to serve in products.
+---
+
+import FontFamilies from '../../../components/FontFamilies.astro';
+
+Magma sets text in four families, each with a job, and a short scale of styles within them.
+This page says why, and which style to use when; the sizes, the classes and the tokens of
+every style are in [Tokens: Typography](../../tokens/typography/).
+
+## Four families, four jobs
+
+- **Title**, Roboto: headings and actions. A sans serif that stays plain and institutional at
+  large sizes and heavy weights.
+- **Info**, Karla: the text of the interface, the one people work with: forms, tables, menus,
+  messages. It is legible at small sizes, and its lowercase g recalls the one of the Maggioli
+  logo.
+- **Read**, Merriweather: long reading, such as articles, commentaries and the texts of the
+  law. A serif drawn for screens, with sturdy shapes that hold up at length.
+- **Code**, Roboto Mono: strings where every character counts, such as tax codes, IBANs,
+  protocol numbers, and code.
+
+## Information and knowledge
+
+Maggioli writes software and publishes books, journals and legal databases. Info and Read
+keep the two apart: the interface where people do their work speaks in Karla, the content
+they read and study speaks in Merriweather. At a glance, users know whether they are working
+or reading.
+
+## Picking a style
+
+- `h1`: the title of the page, once per page.
+- `h2` and `h3`: the sections of a page, and the titles of articles in a list.
+- `h4` to `h6`: subsections, the titles of cards and panels, previews in dense lists.
+- `action`: the text of buttons and other actions.
+- `paragraph`: text that takes time to read, such as descriptions, guides and, with `read`,
+  articles.
+- `detail`: the body text of the interface, such as messages, descriptions and table cells.
+- `caption`: secondary information, such as dates, authors, notes and footers.
+- `label` and `tip`: short and small text, such as field labels, badges and tooltips.
+- `option`: the smallest text, in bold, for overlines and tiny labels of one or two words.
+- `snippet` and `hack`: codes and code, `snippet` on a line of its own, `hack` inside a
+  sentence.
+
+Three rules hold for all of them:
+
+- **The tag says the structure, the style says the look.** A section of the page is an
+  `h2` even when it sits in a card and looks like an `h5`: `mds-text` takes the two apart,
+  with `tag` and `typography`. Never skip a heading level to get a smaller size.
+- **Bold sparingly.** A paragraph full of bold has no emphasis left.
+- **Text follows the reader.** The sizes are in `rem`, so they grow with the text size the
+  user sets; reading text keeps a line short enough to follow, about 60 to 80 characters.
+
+## Fonts
+
+All four fonts have open licenses, and the products serve them themselves, from their own
+files: never from Google's servers. A font loaded from a third party's server hands the
+address of every user to that party, which a product of the public administration cannot
+do. Download the fonts from Google Fonts to work in design tools; in a product, install the
+Fontsource packages and load the weights of the scale, as the
+[installation guide](../../development/installation/#fonts) shows.
+
+<FontFamilies />
+
+A font outside these four needs a license the company holds, for every use it is put to.

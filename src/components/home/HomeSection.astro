@@ -1,0 +1,62 @@
+---
+// A band of the home page: a centered heading with its lead, then the slot,
+// then, when given, a button to the page that tells more (`href`, labelled
+// `action`, relative to the page). With an `aside` slot, the heading and the
+// lead sit on its left, aligned to the start, once the band is wide enough
+// for both (centered above it before). `not-content`: the band sets its own
+// space, Starlight would add 1rem.
+interface Props {
+  /** Id of the heading, for links to the band. */
+  id: string;
+  title: string;
+  lead?: string;
+  href?: string;
+  action?: string;
+}
+
+const { id, title, lead, href, action } = Astro.props;
+const aside = Astro.slots.has('aside');
+---
+
+<section class:list={['not-content mt-2400', aside && '@container']} aria-labelledby={id}>
+  <div
+    class:list={[
+      aside && 'mb-1000 grid items-center gap-1000 @5xl:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]',
+    ]}
+  >
+    <div
+      class:list={[
+        'flex flex-col gap-300',
+        aside
+          ? 'mx-auto max-w-(--container-3xl) items-center text-center @5xl:mx-0 @5xl:items-start @5xl:text-start'
+          : 'mx-auto mb-1000 max-w-(--container-3xl) items-center text-center',
+      ]}
+    >
+      <mds-text id={id} typography="h2" tag="h2" class="block scroll-mt-600">
+        {title}
+      </mds-text>
+      {lead && (
+        <mds-text typography="paragraph" variant="read" tag="p" class="block text-fg-muted">
+          {lead}
+        </mds-text>
+      )}
+    </div>
+    <slot name="aside" />
+  </div>
+  <slot />
+  {href && (
+    <div class="mt-800 flex justify-center">
+      <mds-button
+        href={href}
+        role="link"
+        type="a"
+        label={action}
+        icon="mi/baseline/arrow-forward"
+        icon-position="right"
+        variant="primary"
+        tone="weak"
+        size="lg"
+      />
+    </div>
+  )}
+</section>

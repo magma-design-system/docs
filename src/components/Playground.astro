@@ -10,10 +10,12 @@
 // sets the prop on the element of the example; when the component changes a
 // prop itself (an accordion item opened by a click), its control follows.
 // Reset loads the example again at full width. Controls wait, disabled, until
-// the preview is ready.
+// the preview is ready. A pattern (src/components/PatternPreview.astro) runs
+// its own page on the same stage, with its own texts and without controls;
+// the buttons of the `actions` slot go next to Reset.
 import { plainText, propControl, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
-import { TEXT } from '../lib/markdown-text.mjs';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
 import TypeValue from './TypeValue.astro';
@@ -23,11 +25,17 @@ interface Props {
   props: any[];
   /** The markup the preview runs. */
   example: string;
+  /** The page the preview runs, when it is not the component's example. */
+  src?: string;
+  /** The text above the stage, when it is not the component's one. */
+  intro?: string;
+  /** The title of the frame, when it is not the component's one. */
+  title?: string;
 }
 
-const { tag, props, example } = Astro.props;
+const { tag, props, example, intro, title } = Astro.props;
 const { t } = Astro.locals;
-const src = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${tag}/`;
+const src = Astro.props.src ?? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${tag}/`;
 
 // Grouped by kind, so the switches share their rows and the fields theirs;
 // by name within a group. Props with no control (functions, arrays, files)
@@ -54,8 +62,8 @@ const fields = props
   );
 ---
 
-<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-  {t('component.preview.intro')}
+<mds-text {...READING} tag="p" class={TEXT.paragraph}>
+  {intro ?? t('component.preview.intro')}
   {fields.length > 0 && ` ${t('component.preview.controls')}`}
 </mds-text>
 {/*
@@ -70,11 +78,14 @@ const fields = props
   >
     <iframe
       src={src}
-      title={t('component.preview.title', {
-        tag: `<${tag}>`,
-        // Astro escapes the attribute: i18next does not need to.
-        interpolation: { escapeValue: false },
-      })}
+      title={
+        title ??
+        t('component.preview.title', {
+          tag: `<${tag}>`,
+          // Astro escapes the attribute: i18next does not need to.
+          interpolation: { escapeValue: false },
+        })
+      }
       class="block h-5000 min-w-0 flex-1 border-0"
       data-playground-frame={tag}
     ></iframe>
@@ -91,7 +102,8 @@ const fields = props
     </div>
   </div>
 </div>
-<div class="flex justify-end">
+<div class="flex justify-end gap-200">
+  <slot name="actions" />
   <mds-button
     label={t('component.preview.reset')}
     icon="mi/baseline/refresh"
@@ -327,6 +339,8 @@ const fields = props
       changes?.disconnect();
     };
 
+    // No controls (a pattern): nothing to set on an element.
+    if (!playground.controls) return;
     const element = doc.querySelector<MagmaElement>(tag);
     if (!element) return;
     await win.customElements.whenDefined(tag);

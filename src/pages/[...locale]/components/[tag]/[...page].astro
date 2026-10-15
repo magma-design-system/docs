@@ -11,7 +11,7 @@ import UiText from '../../../../components/UiText.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
 import { propControl } from '../../../../lib/controls';
 import { localeParams } from '../../../../lib/i18n.mjs';
-import { TEXT } from '../../../../lib/markdown-text.mjs';
+import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
 import { componentName } from '../../../../lib/nav.mjs';
 import { typeSortValue, unquote } from '../../../../lib/types';
 
@@ -124,26 +124,26 @@ const DESCRIPTION = 'min-w-phrase';
         <>
           <Heading id="dependencies" typography="h3" text={label('dependencies') ?? ''} />
           {data.dependencies.length > 0 && (
-            <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+            <mds-text {...READING} tag="p" class={TEXT.paragraph}>
               {t('component.uses')}:{' '}
               {data.dependencies.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
                   <a href={link(tag)}>
-                    <Code>{tag}</Code>
+                    <Code reading>{tag}</Code>
                   </a>
                 </>
               ))}
             </mds-text>
           )}
           {data.dependents.length > 0 && (
-            <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+            <mds-text {...READING} tag="p" class={TEXT.paragraph}>
               {t('component.usedBy')}:{' '}
               {data.dependents.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
                   <a href={link(tag)}>
-                    <Code>{tag}</Code>
+                    <Code reading>{tag}</Code>
                   </a>
                 </>
               ))}
@@ -157,16 +157,16 @@ const DESCRIPTION = 'min-w-phrase';
   {guide && <div lang={contentLang} set:html={guide.html} />}
 
   {page.id === 'api' && (
-    <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-      <UiText text={t('component.api.intro')} />
+    <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+      <UiText reading text={t('component.api.intro')} />
     </mds-text>
   )}
 
   {page.id === 'api' && data.props.length > 0 && (
     <>
       <Heading id="props" typography="h3" text={label('props') ?? ''} />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-        <UiText text={t('component.api.props')} />
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+        <UiText reading text={t('component.api.props')} />
       </mds-text>
       <mds-table interactive>
         <mds-table-header>
@@ -293,8 +293,8 @@ const DESCRIPTION = 'min-w-phrase';
       <>
         <Heading id={section.id} typography="h3" text={label(section.id) ?? ''} />
         {section.id === 'slots' && (
-          <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-            <UiText text={slotsIntro.join(' ')} />
+          <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+            <UiText reading text={slotsIntro.join(' ')} />
           </mds-text>
         )}
         <mds-table interactive>

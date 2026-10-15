@@ -107,6 +107,55 @@
 }
 
 /*
+  A slow float, up and down with a slight sway, for the figures of the home
+  page (src/components/home/HomeStats.astro gives each a later
+  `animation-delay`, so they move as a wave). The shadow goes from Magma's
+  near glow, at rest, to its distant one, at the top, and back; while an
+  element waits for its delay, it already has the shadow of the first frame.
+  It follows Magma's animation preference as Magma's components do: `reduce`
+  stops it, `system` and no choice at all follow the operating system,
+  `no-preference` keeps it.
+*/
+@keyframes float-wave {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+    box-shadow: var(--shadow-glow-near-strong);
+  }
+
+  25% {
+    translate: 0 calc(--spacing(150) * -1);
+    rotate: -0.6deg;
+  }
+
+  50% {
+    translate: 0 calc(--spacing(300) * -1);
+    rotate: 0deg;
+    box-shadow: var(--shadow-glow-distant-weak);
+  }
+
+  75% {
+    translate: 0 calc(--spacing(150) * -1);
+    rotate: 0.6deg;
+  }
+}
+
+@utility float-wave {
+  animation: float-wave 8s var(--ease-in-out-sine) infinite both;
+
+  :where(.pref-animation-reduce) & {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(.pref-animation-system, html:not([class*='pref-animation-'])) & {
+      animation: none;
+    }
+  }
+}
+
+/*
   The frame (src/components/frame/) styles its markup with utilities. What is
   left here is markup the site does not render itself: <html>, <body>, the
   content of the pages and Starlight's elements. In the `components` layer:
@@ -152,6 +201,16 @@
 
   body {
     @apply bg-surface-raised text-fg-default desktop:bg-surface-default;
+  }
+
+  /*
+    A page with a hero (the home page) is a site of its own in the card: its
+    bands wider than a page of text, centered. Set on <main>, which the content
+    inherits from: Starlight sets the width on <html>, unlayered.
+  */
+  [data-has-hero] main {
+    --sl-content-width: 76rem;
+    --sl-content-margin-inline: auto;
   }
 
   /* No rule between the page title and the content. */
@@ -209,6 +268,16 @@
   */
   mds-icon {
     @apply fill-current;
+  }
+
+  /*
+    magma 2.2.0: mds-list-item gives its :host the muted text color instead of
+    inheriting its parent's, so a list reads lighter than the paragraphs
+    around it and ignores the color of its container (magma#932). A page
+    style beats :host: inherit until Magma does.
+  */
+  mds-list-item {
+    @apply text-inherit;
   }
 
   /*

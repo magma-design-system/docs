@@ -1,0 +1,50 @@
+---
+// The live preview of a pattern, shown in an iframe on its page
+// (src/components/PatternPreview.astro): the plain HTML version of the pattern
+// (src/patterns/<id>/example.html), alone on a page with Magma's styles and
+// loader, away from the styles of the site, as the page of an application.
+// Its script runs as it is written. Opened on its own, it is the full screen
+// version of the preview.
+import '../../../styles/magma.css';
+import { patternExample, patternIds } from '../../../lib/patterns';
+
+export function getStaticPaths() {
+  return patternIds().map((id) => ({ params: { id }, props: { example: patternExample(id) } }));
+}
+
+interface Props {
+  example: string;
+}
+
+const { example } = Astro.props;
+const { id } = Astro.params;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{id}</title>
+    <script is:inline>
+      // The light or dark mode and the theme of the page around it before the
+      // first paint, as in src/pages/example/[tag].astro.
+      try {
+        const around = parent.document.documentElement;
+        for (const name of around.classList) {
+          if (name.startsWith('pref-mode-')) document.documentElement.classList.add(name);
+        }
+        for (const name of ['data-magma-pref', 'data-theme-name']) {
+          const value = around.getAttribute(name);
+          if (value !== null) document.documentElement.setAttribute(name, value);
+        }
+      } catch {
+        // Opened on its own, or from another site: Magma's default.
+      }
+    </script>
+  </head>
+  <body data-preview class="m-0 bg-surface-default p-600 md:p-800 [&>astro-dev-toolbar]:hidden">
+    <Fragment set:html={example} />
+  </body>
+</html>

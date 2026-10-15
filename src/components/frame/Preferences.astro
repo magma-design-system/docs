@@ -1,9 +1,9 @@
 ---
-// Repository link, light/dark mode, theme and language: at the bottom of the
-// rail and in the mobile menu (the search is at their top, SearchField.astro).
-// Mode, theme and language are Magma's own preference components, in the
-// panel that groups them (mds-pref); src/scripts/magma.ts makes Starlight
-// follow the mode.
+// Repository and Storybook links, light/dark mode, theme and language: at the
+// bottom of the rail and in the mobile menu (the search is at their top,
+// SearchField.astro). Mode, theme and language are Magma's own preference
+// components, in the panel that groups them (mds-pref); src/scripts/magma.ts
+// makes Starlight follow the mode.
 //
 // Rendered once, in the rail, and moved into the menu below Magma's `desktop`
 // breakpoint: one set of controls for both. (Up to magma 2.0.1 a second
@@ -12,7 +12,7 @@
 // button here or from its icon in the collapsed rail; in the menu it is shown
 // as it is, below the links.
 import { locales } from '../../lib/i18n.mjs';
-import { REPOSITORY } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
 
 const { t, starlightRoute } = Astro.locals;
@@ -46,6 +46,17 @@ const themes = [
       type="a"
       icon="mdi/github"
       label={t('frame.repository')}
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+    <mds-button
+      href={STORYBOOK}
+      target="blank"
+      role="link"
+      type="a"
+      icon="mi/baseline/auto-stories"
+      label={t('frame.storybook')}
       variant="dark"
       tone="text"
       size="sm"

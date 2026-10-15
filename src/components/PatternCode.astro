@@ -1,0 +1,29 @@
+---
+// The code of a pattern in each framework, in the tabs of FrameworkTabs: the
+// files of its folder in src/patterns/ as they are (src/lib/patterns.ts), each
+// named after the pattern the way its framework names a file.
+import { Code as CodeBlock } from '@astrojs/starlight/components';
+import { patternCode } from '../lib/patterns';
+import FrameworkTabs from './FrameworkTabs.astro';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/. */
+  id: string;
+}
+
+const { id } = Astro.props;
+const code = patternCode(id);
+const pascal = id.replace(/(?:^|-)([a-z])/g, (_, letter: string) => letter.toUpperCase());
+---
+
+<FrameworkTabs>
+  <Fragment slot="vanilla">
+    <CodeBlock code={code.vanilla.code} lang={code.vanilla.lang} title={`${id}.html`} />
+  </Fragment>
+  <Fragment slot="react">
+    <CodeBlock code={code.react.code} lang={code.react.lang} title={`${pascal}.tsx`} />
+  </Fragment>
+  <Fragment slot="angular">
+    <CodeBlock code={code.angular.code} lang={code.angular.lang} title={`${id}.component.ts`} />
+  </Fragment>
+</FrameworkTabs>

@@ -1,0 +1,24 @@
+---
+// The AI coding agents best known today, as chips with their own logos
+// (LobeHub icons, src/lib/iconsauce-lobe-icons.mjs): in brand colors where
+// the brand has them, in the color of the text where the mark is plain, with
+// no tinted disc behind them, which would muddy the brand colors. Any
+// agent that reads files reads the guides in the packages, these are only the
+// ones people ask about. Names of products, not translated.
+const AGENTS = [
+  { name: 'Claude Code', icon: 'lobe/claudecode-color' },
+  { name: 'Codex', icon: 'lobe/codex-color' },
+  { name: 'GitHub Copilot', icon: 'lobe/githubcopilot' },
+  { name: 'Cursor', icon: 'lobe/cursor' },
+  { name: 'Gemini CLI', icon: 'lobe/geminicli-color' },
+  { name: 'Windsurf', icon: 'lobe/windsurf' },
+];
+---
+
+<ul class="not-content my-600 flex flex-wrap justify-center gap-300">
+  {AGENTS.map(({ name, icon }) => (
+    <li class="flex">
+      <mds-chip label={name} icon={icon} variant="ai" tone="weak" class="bg-surface-overlay [--mds-chip-icon-background:transparent]" />
+    </li>
+  ))}
+</ul>
