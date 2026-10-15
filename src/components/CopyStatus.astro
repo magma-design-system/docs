@@ -42,9 +42,9 @@ const { t } = Astro.locals;
       data-copy-status
       data-copied={t('copy.copied')}
       data-failed={t('copy.notCopied')}
-    >
-      {t('copy.hint')}
-    </mds-text>
+      animation="yugop"
+      text={t('copy.hint')}
+    ></mds-text>
   )}
 </div>
 
@@ -78,6 +78,22 @@ const { t } = Astro.locals;
     frame ||= requestAnimationFrame(place);
   };
 
+  // Magma 2.2.0 (magma#893): mds-text reads the speed of its animation once,
+  // when it loads, and a row that has not drawn its slots yet gives it none,
+  // so the animation never moves past its first frame. Once the components
+  // around a status are ready, it is swapped for a copy of itself, which
+  // loads in the drawn row and reads it. Drop when Magma reads it later.
+  const STATUS = 'mds-text[data-copy-status][animation]';
+  const reload = async (status: HTMLElement) => {
+    const around: Promise<unknown>[] = [];
+    for (let node = status.parentElement; node; node = node.parentElement) {
+      const { componentOnReady } = node as { componentOnReady?: () => Promise<unknown> };
+      if (componentOnReady) around.push(componentOnReady.call(node));
+    }
+    await Promise.all(around);
+    if (status.isConnected) status.replaceWith(status.cloneNode(true));
+  };
+
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       const wrap = entry.target.querySelector<HTMLElement>(WRAP);
@@ -95,6 +111,8 @@ const { t } = Astro.locals;
     for (const wrap of document.querySelectorAll(WRAP)) {
       const row = wrap.closest('[data-copy-scope]');
       if (row) observer.observe(row);
+      const status = wrap.querySelector<HTMLElement>(STATUS);
+      if (status) reload(status);
     }
   };
 
