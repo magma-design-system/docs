@@ -89,6 +89,24 @@
 }
 
 /*
+  The box of a heading's anchor (TEXT.anchorLine in src/lib/markdown-text.mjs),
+  with the heading's typography: an invisible character gives it the height of
+  one line of the heading, trimmed as Magma trims headings, and the anchor is
+  centered on it. In front of the heading, at the top of the row, it lines up
+  with the heading's first line, at any size and on any number of lines.
+*/
+@utility anchor-line {
+  display: flex;
+  flex: none;
+  align-items: center;
+
+  &::before {
+    content: '\200b';
+    @apply text-box-vertical-margin;
+  }
+}
+
+/*
   The frame (src/components/frame/) styles its markup with utilities. What is
   left here is markup the site does not render itself: <html>, <body>, the
   content of the pages and Starlight's elements. In the `components` layer:

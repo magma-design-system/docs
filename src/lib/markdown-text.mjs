@@ -43,8 +43,21 @@ export const TEXT = {
   // heading. `not-content`: Starlight would put 1rem above the heading, since
   // it follows the anchor.
   anchored: {
-    h2: 'not-content flex items-center gap-300 mt-1200 first:mt-0',
-    h3: 'not-content flex items-center gap-300 mt-1000 first:mt-0',
+    h2: 'not-content flex items-start mt-1200 first:mt-0',
+    h3: 'not-content flex items-start mt-1000 first:mt-0',
+  },
+  // The box of the anchor, by the heading's typography: one line of it
+  // (`anchor-line`, see src/styles/magma.css), so the anchor sits on the
+  // middle of the heading's first line at every size. h4 to h6 have the
+  // anchor closer to the text, and h6 one step higher (by eye: 25, the
+  // smallest of Magma's sizes; h5 would want half of it, which has no token).
+  anchorLine: {
+    h1: 'anchor-line text-title-h1 me-300',
+    h2: 'anchor-line text-title-h2 me-300',
+    h3: 'anchor-line text-title-h3 me-300',
+    h4: 'anchor-line text-title-h4 me-150',
+    h5: 'anchor-line text-title-h5 me-150',
+    h6: 'anchor-line text-title-h6 me-150 *:-translate-y-25',
   },
   paragraph: 'block max-w-(--spacing-text)',
   // Inline code, everywhere: mds-text `hack` (0.875rem), without the ring
@@ -63,12 +76,14 @@ const ANCHORED = new Set(['h2', 'h3']);
  * The anchor of a heading: an icon button that links to it (the link icon is
  * collected by iconsauce from this file). Heading.astro writes the same. A
  * click also copies the address of the heading (HeadingAnchors.astro).
+ * Centered in its box (TEXT.anchorLine), whose height its negative block
+ * margins leave to the line: a button taller than the line overflows it.
  */
 export const ANCHOR = {
   'data-heading-anchor': '',
   icon: 'mi/baseline/link',
   variant: 'dark',
-  class: 'mt-0',
+  class: '-my-4000 self-center',
   tone: 'text',
   size: 'md',
 };
@@ -218,17 +233,19 @@ function convertHeading(node, heading, label) {
     );
   }
   return element('div', {}, TEXT.anchored[/** @type {keyof typeof TEXT.anchored} */ (tag)], [
-    element(
-      'mds-button',
-      {
-        href: `#${id}`,
-        role: 'link',
-        ...ANCHOR,
-        'aria-label': label ?? anchorLabel(textOf(node)),
-      },
-      '',
-      [],
-    ),
+    element('span', {}, TEXT.anchorLine[/** @type {keyof typeof TEXT.anchorLine} */ (tag)], [
+      element(
+        'mds-button',
+        {
+          href: `#${id}`,
+          role: 'link',
+          ...ANCHOR,
+          'aria-label': label ?? anchorLabel(textOf(node)),
+        },
+        '',
+        [],
+      ),
+    ]),
     element('mds-text', { ...own(node), id, typography: tag, tag }, TEXT.headingText, children),
   ]);
 }
