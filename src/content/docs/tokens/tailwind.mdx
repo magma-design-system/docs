@@ -41,8 +41,9 @@ in the last column, write its arbitrary value: `max-w-(--container-xs)`.
 
 ## Tokens no utility reads
 
-Tailwind 4 has no namespace for border widths and durations: `border-xs` does not exist
-and `duration-200` is Tailwind's own 200ms. Use the arbitrary value.
+Tailwind 4 has no namespace for border widths: `border-xs` does not exist, use the arbitrary
+value. It reads durations from `--transition-duration-*`, which styles does not publish:
+`duration-200` writes 200ms, the value of `--duration-200`, without reading the variable.
 
 <TailwindMap part="unread" />
 

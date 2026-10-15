@@ -5,6 +5,7 @@
 // node_modules (src/lib/magma.mjs); the two kinds of data share the custom
 // property a token is published as (`$extensions["it.maggioli.magma"].css`).
 import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { resolveMagma } from './magma.mjs';
 
@@ -385,6 +386,24 @@ export function consumption() {
   return consumptionMap;
 }
 
+let themeValues;
+
+/**
+ * Tailwind's own theme variables and their values (`--max-width-prose: 65ch`),
+ * what a class shadowed by one of them writes.
+ * @returns {Map<string, string>}
+ */
+function tailwindTheme() {
+  if (themeValues) return themeValues;
+  const file = createRequire(import.meta.url).resolve('tailwindcss/theme.css');
+  themeValues = new Map(
+    [...readFileSync(file, 'utf8').matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)].map(
+      ([, name, value]) => [name, value.trim()],
+    ),
+  );
+  return themeValues;
+}
+
 /** The text measures of the spacing namespace (`--spacing-prose: 65ch`): widths. */
 const MEASURES = new Set(['phrase', 'prose', 'text', 'title']);
 
@@ -427,6 +446,41 @@ function arbitrary(/** @type {string} */ css) {
 }
 
 /**
+ * The class Tailwind builds from the number alone, where that number is the
+ * value of the token: `duration-75` writes 75ms, the value of
+ * `--duration-75`, the class editors suggest. It writes the value, not the
+ * variable: Tailwind reads `--transition-duration-75`, which styles does not
+ * publish.
+ * @param {string} css
+ */
+function bareValue(css) {
+  const step = /^--duration-(\d+)$/.exec(css)?.[1];
+  if (!step) return undefined;
+  const token = [...tokenSet().values()].find((t) => t.css === css);
+  return token && formatValue(token) === `${step}ms` ? `duration-${step}` : undefined;
+}
+
+/**
+ * The utility of styles named after a token that writes its value:
+ * `transition-cosmetic` sets the properties of `--transition-property-cosmetic`
+ * (with the default duration and easing), without reading the variable.
+ * @param {string} css
+ */
+function magmaUtility(css) {
+  const name = css.replace(/^--transition-property-/, 'transition-');
+  const utility = consumption().utilities[name];
+  if (name === css || !utility) return undefined;
+  const token = cssOnlyTokens('transition-property').find((t) => t.css === css);
+  return token && utility.css.includes(`transition-property: ${formatValue(token)};`)
+    ? name
+    : undefined;
+}
+
+/** The class for a token no namespace reads: the bare value, or the arbitrary one. */
+const unreadUtility = (/** @type {string} */ css) =>
+  bareValue(css) ?? magmaUtility(css) ?? arbitrary(css);
+
+/**
  * The color utility root by what the role paints: text roles are `fg-*` in
  * Tailwind (`text-fg-muted`), borders and the shadow ink have their own.
  * @param {string} key
@@ -455,12 +509,12 @@ export function tailwindOf(token) {
   if (!css) return undefined;
   const entry = consumption().tokens[css];
   if (!entry) {
-    const utility = arbitrary(css);
+    const utility = unreadUtility(css);
     return utility ? { utility } : undefined;
   }
   const { theme, namespace, key, shadowed = {}, property } = entry;
   if (property) return { theme };
-  if (!namespace) return { theme, utility: arbitrary(css) };
+  if (!namespace) return { theme, utility: unreadUtility(css) };
   if (namespace === '--breakpoint') return { theme, utility: `${key}:`, variant: true };
   if (key == null) return { theme };
   const root =
@@ -470,7 +524,14 @@ export function tailwindOf(token) {
         ? 'max-w'
         : ROOT[namespace];
   if (!root) return { theme };
-  if (root in shadowed) return { theme, utility: `${root}-(${css})` };
+  // A class that reads another variable is still the one to use when that
+  // variable has the value of the token: `max-w-prose` writes 65ch, as
+  // `--spacing-prose`.
+  if (root in shadowed) {
+    const reads = shadowed[root];
+    const same = reads && 'value' in token && tailwindTheme().get(reads) === formatValue(token);
+    return { theme, utility: same ? `${root}-${key}` : `${root}-(${css})` };
+  }
   return { theme, utility: `${root}-${key}` };
 }
 
@@ -493,7 +554,7 @@ export function shadowedClasses() {
 // --- Previews ------------------------------------------------------------
 
 /**
- * @typedef {'color' | 'shadow' | 'font' | 'ease' | 'space' | 'radius' | 'border' | 'aspect' | 'outline' | 'opacity'} PreviewKind
+ * @typedef {'color' | 'shadow' | 'font' | 'ease' | 'duration' | 'space' | 'radius' | 'border' | 'aspect' | 'outline' | 'opacity'} PreviewKind
  */
 
 /**
@@ -512,6 +573,8 @@ export function previewOf(token) {
       return 'font';
     case 'cubicBezier':
       return 'ease';
+    case 'duration':
+      return 'duration';
     case 'border':
       return 'outline';
   }
@@ -535,6 +598,25 @@ export function previewOf(token) {
 export function easePath(token) {
   const [x1, y1, x2, y2] = /** @type {number[]} */ (token.value);
   return `M0 1C${num(x1)} ${num(1 - y1)} ${num(x2)} ${num(1 - y2)} 1 0`;
+}
+
+/**
+ * Where a dot that a `cubicBezier` token moves starts and stops, as fractions
+ * of its track: from 0 to 1, or inside them for the curves that overshoot
+ * (the `back` easings), so that the overshoot stays on the track.
+ * @param {Token} token
+ */
+export function easeTrack(token) {
+  const [, y1, , y2] = /** @type {number[]} */ (token.value);
+  let min = 0;
+  let max = 1;
+  for (let i = 1; i < 100; i++) {
+    const t = i / 100;
+    const y = 3 * (1 - t) ** 2 * t * y1 + 3 * (1 - t) * t ** 2 * y2 + t ** 3;
+    min = Math.min(min, y);
+    max = Math.max(max, y);
+  }
+  return { from: num(-min / (max - min)), to: num((1 - min) / (max - min)) };
 }
 
 // --- Figma ---------------------------------------------------------------

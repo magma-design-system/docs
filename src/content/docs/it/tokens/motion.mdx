@@ -8,15 +8,17 @@ import TokenTable from '../../../../components/TokenTable.astro';
 
 ## Durate
 
-Tailwind 4 non ha un namespace per le durate: `duration-200` sono i 200ms di Tailwind, non
-il token. Per usare il token scrivi `duration-(--duration-200)`.
+Le classi di Tailwind scrivono il valore del token: `duration-200` vale 200ms, come
+`--duration-200`, senza leggere la variabile (Tailwind legge `--transition-duration-200`,
+che styles non pubblica). Per seguire la variabile, se un tema la cambia, scrivi
+`duration-(--duration-200)`.
 
 <TokenTable tokens="duration" />
 
 ## Curve
 
-Ogni curva è disegnata dai suoi punti di controllo; le curve `back` superano i loro
-estremi.
+Ogni curva è disegnata dai suoi punti di controllo, sopra un pallino che muove in
+`--duration-1000`; le curve `back` superano i loro estremi.
 
 <TokenTable tokens="ease" />
 

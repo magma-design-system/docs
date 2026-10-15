@@ -1,8 +1,9 @@
 ---
 // A table of global tokens (src/lib/tokens.mjs), by name prefix: the custom
-// property, its value in the stylesheets with no class or attribute (and the
-// token an alias ends on), its value in dark mode where that differs, the
-// Tailwind class that reads it and, once Magma writes them, its description.
+// property, the Tailwind class that uses it (next to the name: the column
+// most readers look for), its value in the stylesheets with no class or
+// attribute (and the token an alias ends on), its value in dark mode where
+// that differs and, once Magma writes them, its description.
 // The preview column paints with the token itself, so it follows the mode,
 // the theme and the preferences the page is in. Values are copied on click
 // (CopyToClipboard.astro, once per page).
@@ -67,9 +68,9 @@ const CELL = 'whitespace-nowrap align-middle';
   <mds-table-header>
     {hasPreview && <mds-table-header-cell label={t('tokens.column.preview')} />}
     <mds-table-header-cell label={t('tokens.column.token')} />
+    {hasTailwind && <mds-table-header-cell label={t('tokens.column.tailwind')} />}
     <mds-table-header-cell label={hasDark ? t('tokens.column.light') : t('tokens.column.value')} />
     {hasDark && <mds-table-header-cell label={t('tokens.column.dark')} />}
-    {hasTailwind && <mds-table-header-cell label={t('tokens.column.tailwind')} />}
     {hasDescription && <mds-table-header-cell label={t('tokens.column.description')} />}
   </mds-table-header>
   <mds-table-body>
@@ -85,6 +86,17 @@ const CELL = 'whitespace-nowrap align-middle';
             {name}
           </Code>
         </mds-table-cell>
+        {hasTailwind && (
+          <mds-table-cell class={CELL}>
+            {tailwind ? (
+              <Code copy={tailwind}>{tailwind}</Code>
+            ) : (
+              <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
+                -
+              </mds-text>
+            )}
+          </mds-table-cell>
+        )}
         <mds-table-cell class={CELL}>
           <span class="flex flex-col items-start gap-100">
             <Code copy={value}>{value}</Code>
@@ -103,17 +115,6 @@ const CELL = 'whitespace-nowrap align-middle';
           <mds-table-cell class={CELL}>
             {dark ? (
               <Code copy={dark}>{dark}</Code>
-            ) : (
-              <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
-                -
-              </mds-text>
-            )}
-          </mds-table-cell>
-        )}
-        {hasTailwind && (
-          <mds-table-cell class={CELL}>
-            {tailwind ? (
-              <Code copy={tailwind}>{tailwind}</Code>
             ) : (
               <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
                 -

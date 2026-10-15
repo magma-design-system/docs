@@ -166,7 +166,6 @@
   "tokens.column.class": "Class",
   "tokens.column.readsInstead": "Reads instead",
   "tokens.column.notToken": "Not the token",
-  "tokens.column.arbitrary": "Arbitrary value",
   "tokens.column.source": "Defined in",
   "tokens.column.tier": "Tier",
   "tokens.column.example": "Example",
