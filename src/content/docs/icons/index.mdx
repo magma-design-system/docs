@@ -1,0 +1,20 @@
+---
+title: Icon sets
+description: The icon sets of Magma, each on a page of its own to search and copy its icons, and the names of the legacy icons package.
+---
+
+import IconSets from '../../../components/IconSets.astro';
+
+Magma names an icon by its slug: the set it comes from, then its name. `mds-icon` and every
+component with an `icon` prop take a slug and load the SVG file of that name;
+[iconsauce](iconsauce/) writes the files, or an icon font with the same names. Three sets
+work this way:
+
+<IconSets />
+
+The page of each set lists all its icons, one category at a time, and its search looks
+through the whole set, also by the tags the set gives its icons. A click on an icon copies
+its slug, or the markup that uses it.
+
+Apps that still use the legacy icons package find its names, each with the slug that
+replaces it, in [icons package (legacy)](icons-package/).

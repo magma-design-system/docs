@@ -32,11 +32,12 @@ const { t } = Astro.locals;
         aria-controls="rail-body"
         aria-expanded="true"
         variant="dark"
+        class="self-center"
         tone="text"
       ></mds-button>
     </div>
     <button
-      class="hidden cursor-pointer rounded-lg border-0 bg-transparent p-0 focus-visible:[outline-offset:var(--magma-outline-focus-offset)] focus-visible:[outline:var(--magma-outline-focus)] rail-collapsed:inline-flex"
+      class="hidden p-200 rounded-lg focus-bounce hover:bg-surface-muted cursor-pointer rounded-lg border-0 bg-transparent p-0 focus-visible:[outline-offset:var(--magma-outline-focus-offset)] focus-visible:[outline:var(--magma-outline-focus)] rail-collapsed:inline-flex"
       type="button"
       data-rail-toggle="expand"
       aria-label={t('frame.rail.expand')}

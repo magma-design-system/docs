@@ -1,0 +1,220 @@
+---
+// The names of the legacy icons package (@maggioli-design-system/icons), for
+// the apps that still use it: one tile per name, sorted by name, with the
+// iconsauce slug that draws the same icon below it, copied on click. A search,
+// a filter by the set of the slug and a choice of what a click copies (the
+// class, the markup, ...) sit above the tiles. 717 tiles: all of them are on
+// the page from the start.
+import IconTiles from './IconTiles.astro';
+import UiText from './UiText.astro';
+import { ICON_SETS, legacyIcons } from '../lib/icons.mjs';
+import { localePrefix } from '../lib/frame';
+import { TEXT } from '../lib/markdown-text.mjs';
+import { TILE } from '../scripts/icon-tiles';
+
+const { t, starlightRoute } = Astro.locals;
+const guide = `${localePrefix(starlightRoute.locale)}/icons/iconsauce/`;
+const icons = [...legacyIcons()].sort((a, b) => a.name.localeCompare(b.name));
+
+/** `{name}` placeholders, filled in by the script below. */
+const template = (key: string, values: Record<string, string>) =>
+  t(key as never, { ...values, interpolation: { escapeValue: false } });
+
+const counts = Object.fromEntries(
+  ICON_SETS.map((set) => [set, icons.filter((icon) => icon.set === set).length]),
+);
+
+/** What a click copies; the first one is the default. */
+const formats = ['class', 'legacyFont', 'member', 'name'];
+
+/** The icon the example of the formats shows. */
+const example = icons.find(({ name }) => name === 'action-copy')!;
+---
+
+<IconTiles
+  formats={formats}
+  example={example.className}
+  placeholder={t('icons.search')}
+  count={template('icons.legacy.count', { total: String(icons.length) })}
+  data-legacy-icons
+  data-count-all={template('icons.legacy.count', { total: '{total}' })}
+  data-count-some={template('icons.legacy.countSome', { shown: '{shown}', total: '{total}' })}
+  data-empty={template('icons.set.empty', { query: '{query}' })}
+>
+  <Fragment slot="intro">
+    <mds-banner
+      variant="warning"
+      icon="mi/baseline/warning-amber"
+      headline={t('icons.legacy.title')}
+      class="mt-0"
+    >
+      <mds-text typography="detail" class={TEXT.block}>
+        <UiText text={t('icons.legacy.intro')} />
+      </mds-text>
+      <mds-button
+        slot="action"
+        href={`${guide}#${t('icons.legacy.anchor')}`}
+        role="link"
+        variant="warning"
+        tone="strong"
+      >
+        {t('icons.legacy.guide')}
+      </mds-button>
+    </mds-banner>
+  </Fragment>
+
+  <span
+    slot="example"
+    data-icon-example
+    data-name={example.name}
+    data-class={example.className}
+    data-member={example.member}
+  >
+    {example.className}
+  </span>
+
+  <Fragment slot="label">
+    <mds-filter data-icon-sets class="mt-0">
+      {ICON_SETS.map((set) => (
+        <mds-filter-item
+          value={set}
+          label={t(`icons.setName.${set}` as never)}
+          count={String(counts[set])}
+          class="mt-0"
+        />
+      ))}
+    </mds-filter>
+  </Fragment>
+
+  {icons.map(({ name, className, member, slug, set }) => {
+    const slash = slug.lastIndexOf('/');
+    return (
+      <div
+        class={`${TILE} data-out:hidden`}
+        data-icon-tile
+        data-set={set}
+        data-search={`${name} ${slug}`}
+        data-slug={slug}
+        data-name={name}
+        data-class={className}
+        data-member={member}
+        data-copy={className}
+        data-copy-label={name}
+      >
+        <mds-icon name={slug} class="w-800 fill-current" />
+        <mds-text typography="hack" tag="span" class="block w-full break-words">
+          <span class="block">{name}</span>
+          <span class="mt-100 block text-fg-muted">
+            {slug.slice(0, slash + 1)}
+            <br />
+            {slug.slice(slash + 1)}
+          </span>
+        </mds-text>
+      </div>
+    );
+  })}
+</IconTiles>
+
+<script>
+  import { fill, formatKey, markStuck, showCopies, storage } from '../scripts/icon-tiles';
+
+  /** What a click on a tile copies, by format. */
+  const FORMATS: Record<string, (tile: DOMStringMap) => string> = {
+    class: ({ class: className }) => className ?? '',
+    legacyFont: ({ class: className }) => `<i class="${className}" aria-hidden="true"></i>`,
+    member: ({ member }) => `MggIcons.${member}`,
+    name: ({ name }) => name ?? '',
+  };
+
+  type Field = HTMLElement & { value?: string };
+
+  function setup(root: HTMLElement) {
+    const tiles = [...root.querySelectorAll<HTMLElement>('[data-icon-tile]')];
+    const search = root.querySelector<Field>('[data-icon-search]')!;
+    const sets = root.querySelector<HTMLElement>('[data-icon-sets]')!;
+    const select = root.querySelector<Field>('[data-icon-format]')!;
+    const count = root.querySelector<HTMLElement>('[data-icon-count]')!;
+    const empty = root.querySelector<HTMLElement>('[data-icon-empty]')!;
+    const example = root.querySelector<HTMLElement>('[data-icon-example]')!;
+
+    const stored = storage.get(formatKey('icons'));
+    const state = {
+      query: new URL(location.href).searchParams.get('q') ?? '',
+      set: '',
+      format: stored && FORMATS[stored] ? stored : 'class',
+    };
+    select.value = state.format;
+    if (state.query) search.value = state.query;
+
+    /** Tiles, counts and copied values after a change of search, set or format. */
+    const update = () => {
+      const words = state.query
+        .toLowerCase()
+        .split(/[\s_]+/)
+        .filter(Boolean);
+      const matches = tiles.filter((tile) => {
+        const text = (tile.dataset.search ?? '').toLowerCase().replaceAll('_', '-');
+        return words.every((word) => text.includes(word));
+      });
+      const shown = new Set(matches.filter((tile) => !state.set || tile.dataset.set === state.set));
+      const format = FORMATS[state.format];
+      for (const tile of tiles) {
+        tile.toggleAttribute('data-out', !shown.has(tile));
+        tile.dataset.copy = format(tile.dataset);
+      }
+      // The sets with how many names of the search each one has.
+      for (const item of sets.querySelectorAll<HTMLElement>('mds-filter-item')) {
+        const set = item.getAttribute('value');
+        item.setAttribute(
+          'count',
+          String(matches.filter((tile) => tile.dataset.set === set).length),
+        );
+      }
+      count.textContent =
+        shown.size === tiles.length
+          ? fill(root.dataset.countAll, { total: tiles.length })
+          : fill(root.dataset.countSome, { shown: shown.size, total: tiles.length });
+      empty.textContent = fill(root.dataset.empty, { query: state.query });
+      empty.classList.toggle('hidden', shown.size > 0);
+      example.textContent = format(example.dataset);
+    };
+
+    search.addEventListener('mdsInputChange', (event) => {
+      state.query = String((event as CustomEvent<{ value?: string }>).detail.value ?? '').trim();
+      const url = new URL(location.href);
+      if (state.query) url.searchParams.set('q', state.query);
+      else url.searchParams.delete('q');
+      history.replaceState(history.state, '', url);
+      update();
+    });
+
+    sets.addEventListener('mdsFilterChange', (event) => {
+      state.set = String((event as CustomEvent<{ value?: string }>).detail.value ?? '');
+      update();
+    });
+
+    select.addEventListener('mdsInputSelectChange', (event) => {
+      const format = String((event as CustomEvent<{ value?: unknown }>).detail.value ?? '');
+      if (!FORMATS[format] || format === state.format) return;
+      state.format = format;
+      storage.set(formatKey('icons'), format);
+      update();
+    });
+
+    const bar = root.querySelector<HTMLElement>('[data-icon-bar]');
+    if (bar) markStuck(bar);
+    showCopies(root);
+    update();
+  }
+
+  // Every page the router shows, the first one included.
+  const init = () => {
+    for (const root of document.querySelectorAll<HTMLElement>('[data-legacy-icons]')) {
+      if (root.dataset.ready !== undefined) continue;
+      root.dataset.ready = '';
+      setup(root);
+    }
+  };
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

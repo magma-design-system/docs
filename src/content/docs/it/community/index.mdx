@@ -1,0 +1,57 @@
+---
+title: Canali
+description: Dove fare domande su Magma, seguire come cambia e provare i suoi componenti.
+---
+
+import Channel from '../../../../components/Channel.astro';
+import Channels from '../../../../components/Channels.astro';
+
+Dove fare domande su Magma, seguire come cambia e provare i suoi componenti:
+
+<Channels>
+<Channel
+  name="Stack Overflow"
+  kind="Domande e risposte"
+  icon="mdi/stack-overflow"
+  variant="orange"
+  href="https://stackoverflowteams.com/c/magma-design-system/questions"
+  action="Apri Stack Overflow"
+>
+
+Le domande e risposte su Magma, in uno spazio Stack Overflow for Teams tutto suo. Chiedi
+come fare qualcosa con Magma, oppure cerca prima: qualcuno potrebbe averlo già chiesto, e
+ogni risposta resta lì per chi arriva dopo. Per leggere e fare domande, unisciti al team con
+un account Stack Overflow.
+
+</Channel>
+<Channel
+  name="GitHub"
+  kind="Pull request"
+  icon="mdi/github"
+  variant="primary"
+  href="https://github.com/magma-design-system/magma/pulls"
+  action="Apri le pull request"
+>
+
+Le modifiche a Magma in lavorazione. Ogni pull request è una modifica proposta, con la sua
+discussione, la sua revisione e i suoi controlli, finché non viene unita e rilasciata.
+Segui quello che sta arrivando, commenta una modifica o proponine una tua.
+
+</Channel>
+<Channel
+  name="Storybook"
+  kind="Componenti dal vivo"
+  icon="mi/baseline/auto-stories"
+  variant="orchid"
+  href="https://magma-design-system.github.io/magma/storybook/?path=/story/common-tests-semantic-surfaces--example-page"
+  action="Apri Storybook"
+>
+
+Il laboratorio di Magma, dove ogni componente mostra le sue varianti e i suoi stati: cambia
+le proprietà dai controlli, guarda gli eventi che invia e verifica l'accessibilità.
+Contiene anche la scala tipografica, le icone e le pagine di test di colori e superfici. Il
+link apre Acme Console, una schermata d'applicazione costruita con Magma seguita
+dall'intera libreria di componenti, in modalità chiara e scura.
+
+</Channel>
+</Channels>

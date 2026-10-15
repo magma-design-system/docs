@@ -79,6 +79,16 @@
 @custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
 
 /*
+  Tokens of the site, with their utilities: `shadow-sticky` is the shadow of
+  a sticky bar while it sticks (`data-stuck`, markStuck in
+  src/scripts/icon-tiles.ts): a soft line under its bottom edge, short of
+  its corners, and nothing above it.
+*/
+@theme {
+  --shadow-sticky: 0px 13px 4px -14px rgba(0, 0, 0, 0.16), 0px 12px 6px -14px rgba(0, 0, 0, 0.1);
+}
+
+/*
   The frame (src/components/frame/) styles its markup with utilities. What is
   left here is markup the site does not render itself: <html>, <body>, the
   content of the pages and Starlight's elements. In the `components` layer:
@@ -94,10 +104,12 @@
 
     /*
       Where the sticky columns stop: where they start, so they do not move when
-      they stick. Below the mobile header; on desktop inside the card, below
-      its margin and border (PageFrame.astro).
+      they stick. Right below the bar of the mobile header, which mds-header
+      spaces from the top by --mds-header-inline-margin-mobile (16px) up to
+      767px and by --mds-header-inline-margin (24px) from 768px; on desktop
+      inside the card, below its margin and border (PageFrame.astro).
     */
-    --frame-sticky-top: calc(var(--frame-header-height) + --spacing(600));
+    --frame-sticky-top: calc(var(--frame-header-height) + --spacing(400));
 
     /*
       Starlight: anchors land below the header, no mobile table of contents,
@@ -107,6 +119,10 @@
     --sl-mobile-toc-height: 0rem;
     --sl-content-margin-inline: 0;
     --sl-content-pad-x: --spacing(600);
+
+    @variant tablet {
+      --frame-sticky-top: calc(var(--frame-header-height) + --spacing(600));
+    }
 
     @variant desktop {
       --frame-header-height: 0rem;
@@ -187,4 +203,12 @@
   mds-header-bar {
     @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
+
+  mds-progress {
+    corner-shape: round;
+  }
+}
+
+figcaption {
+  max-width: 100%;
 }

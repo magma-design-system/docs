@@ -4,8 +4,8 @@
 // docs of the components loader.
 // Headings become mds-text with their typography and tag, paragraphs mds-text
 // `detail` (Magma's body text, 1rem: `paragraph` is 1.25rem, for long
-// reading), inline code mds-text `snippet`, or `hack` (smaller) in table
-// cells (code blocks stay as they are),
+// reading), inline code mds-text `hack` but in headings, where it is plain
+// text (code blocks stay as they are),
 // lists mds-list and mds-list-item, rules mds-hr. Ordered lists stay <ol>:
 // mds-list has no numbered form. Section headings (h2, h3) get an anchor in
 // front of them, an mds-button that links to them (`anchoredHeading`), in
@@ -47,10 +47,9 @@ export const TEXT = {
     h3: 'not-content flex items-center gap-300 mt-1000 first:mt-0',
   },
   paragraph: 'block max-w-(--spacing-text)',
-  // mds-text gives `tag="code"` its own look (background, ring, radius):
-  // kept in running text; where code stays compact, no ring and a lighter
-  // background.
-  code: { snippet: '', hack: 'shadow-none bg-wash-soft' },
+  // Inline code, everywhere: mds-text `hack` (0.875rem), without the ring
+  // and with a lighter background than mds-text gives `tag="code"`.
+  code: 'shadow-none bg-wash-soft',
   // What a table row is about (props, events, ...): bold, no background.
   name: 'bg-transparent p-0 text-fg-default shadow-none',
   listItem: 'mt-0 [&::part(text)]:block',
@@ -62,9 +61,11 @@ const ANCHORED = new Set(['h2', 'h3']);
 
 /**
  * The anchor of a heading: an icon button that links to it (the link icon is
- * collected by iconsauce from this file). Heading.astro writes the same.
+ * collected by iconsauce from this file). Heading.astro writes the same. A
+ * click also copies the address of the heading (HeadingAnchors.astro).
  */
 export const ANCHOR = {
+  'data-heading-anchor': '',
   icon: 'mi/baseline/link',
   variant: 'dark',
   class: 'mt-0',
@@ -107,24 +108,21 @@ const own = (/** @type {any} */ node) => {
 
 /**
  * The tree with its text elements replaced. `heading` gives a heading its id
- * and records it for the table of contents; `compact` is set inside table
- * cells.
+ * and records it for the table of contents.
  * @param {any} node
  * @param {(heading: any) => string | undefined} heading
- * @param {boolean} [compact]
  * @returns {any}
  */
-function convert(node, heading, compact = false) {
+function convert(node, heading) {
   if (node.type !== 'element') {
     return node.children
-      ? { ...node, children: node.children.map((child) => convert(child, heading, compact)) }
+      ? { ...node, children: node.children.map((child) => convert(child, heading)) }
       : node;
   }
   // Code blocks: highlighted by Astro, nothing in Magma replaces them.
   if (node.tagName === 'pre') return node;
 
-  const inCell = compact || node.tagName === 'mds-table-cell';
-  const children = () => (node.children ?? []).map((child) => convert(child, heading, inCell));
+  const children = () => (node.children ?? []).map((child) => convert(child, heading));
   const tag = node.tagName;
 
   // Starlight's heading with its anchor: the heading with ours instead,
@@ -156,8 +154,8 @@ function convert(node, heading, compact = false) {
   if (tag === 'code') {
     return element(
       'mds-text',
-      { ...own(node), typography: compact ? 'hack' : 'snippet', tag: 'code' },
-      compact ? TEXT.code.hack : TEXT.code.snippet,
+      { ...own(node), typography: 'hack', tag: 'code' },
+      TEXT.code,
       node.children ?? [],
     );
   }
@@ -184,6 +182,20 @@ function convert(node, heading, compact = false) {
 }
 
 /**
+ * Inline code of a heading as plain text in the heading's font: a small code
+ * label in a large title breaks its line, and the table of contents, the
+ * anchors' labels and the search show headings as plain text anyway.
+ * @param {any[]} nodes
+ * @returns {any[]}
+ */
+const withoutCode = (nodes) =>
+  nodes.flatMap((node) => {
+    if (node.type !== 'element') return [node];
+    if (node.tagName === 'code') return withoutCode(node.children ?? []);
+    return [{ ...node, children: withoutCode(node.children ?? []) }];
+  });
+
+/**
  * A heading as mds-text, with its typography and tag; h2 and h3 with an anchor
  * in front of them (Heading.astro writes the same). `label`: the anchor's
  * accessible name, Starlight's English one if not given.
@@ -194,7 +206,9 @@ function convert(node, heading, compact = false) {
 function convertHeading(node, heading, label) {
   const tag = node.tagName;
   const id = heading(node);
-  const children = (node.children ?? []).map((/** @type {any} */ child) => convert(child, heading));
+  const children = withoutCode(node.children ?? []).map((/** @type {any} */ child) =>
+    convert(child, heading),
+  );
   if (!id || !ANCHORED.has(tag)) {
     return element(
       'mds-text',

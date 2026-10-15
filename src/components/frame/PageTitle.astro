@@ -26,10 +26,9 @@ const component = path && (await getEntry('components', path.tag));
       {`<${component.data.tag}>`}
     </mds-text>
     <mds-text typography="caption" tag="p" class:list={[TEXT.block, 'mt-400 text-fg-muted']}>
-      {t('component.generatedFrom')}{' '}
-      <Code typography="hack">@maggioli-design-system/magma@{magmaVersion()}</Code>
-      <Code typography="hack">dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
-      <Code typography="hack">{component.data.encapsulation}</Code>.
+      {t('component.generatedFrom')} <Code>@maggioli-design-system/magma@{magmaVersion()}</Code>
+      <Code>dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
+      <Code>{component.data.encapsulation}</Code>.
       {locale && (
         <>
           <br />

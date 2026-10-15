@@ -1,0 +1,101 @@
+---
+// The same step for Vanilla JS, React and Angular, as mds-tab: one panel per
+// framework, filled from the slot named after it (`vanilla`, `react`,
+// `angular`). Every set of tabs shows the framework picked last: the choice is
+// kept in localStorage, and the other sets of the page follow a change
+// (script below).
+import { FRAMEWORKS } from '../lib/frameworks.mjs';
+---
+
+<mds-tab data-framework-tabs class="my-600">
+  {FRAMEWORKS.map(({ id, label, icon }, index) => (
+    <mds-tab-item
+      type="button"
+      value={id}
+      label={label}
+      icon={icon}
+      selected={index === 0 || undefined}
+      class="mt-0"
+    />
+  ))}
+  {FRAMEWORKS.map(({ id }) => (
+    <div slot="content" data-framework={id} class="pt-200">
+      <slot name={id} />
+    </div>
+  ))}
+</mds-tab>
+
+<script>
+  import { FRAMEWORK_KEY } from '../lib/frameworks.mjs';
+
+  type Tab = HTMLElement & { componentOnReady?: () => Promise<unknown> };
+
+  const stored = () => {
+    try {
+      return localStorage.getItem(FRAMEWORK_KEY);
+    } catch {
+      return null;
+    }
+  };
+
+  /** The framework every set of tabs shows. */
+  let current = stored();
+
+  const loaded = (tab: Tab) => tab.hasAttribute('hydrated') || tab.classList.contains('hydrated');
+
+  /**
+   * Shows `framework` in a set of tabs. Before mds-tab loads, `selected` on
+   * the item is enough: mds-tab reads it when it loads. Once loaded, the item
+   * is selected the way a click does it, with the event mds-tab listens to:
+   * mds-tab has no method to select a tab. It then moves the focus to the tab
+   * (and scrolls the page to it), which only makes sense for the set the user
+   * clicked: the focus of the others stays where it is.
+   */
+  async function show(tab: Tab, framework: string) {
+    const items = [...tab.querySelectorAll<HTMLElement>('mds-tab-item')];
+    const item = items.find((candidate) => candidate.getAttribute('value') === framework);
+    if (!item) return;
+    if (!loaded(tab)) {
+      for (const other of items) other.toggleAttribute('selected', other === item);
+    }
+    await customElements.whenDefined('mds-tab');
+    await tab.componentOnReady?.();
+    const panel = tab.querySelector(`[data-framework="${framework}"]`);
+    if (!panel?.hasAttribute('mds-tab-content-hidden')) return;
+    const button = item.shadowRoot?.querySelector<HTMLElement>('mds-button');
+    if (button) button.focus = () => {};
+    item.dispatchEvent(
+      new CustomEvent('mdsTabItemSelect', {
+        bubbles: true,
+        composed: true,
+        detail: { target: item, value: framework },
+      }),
+    );
+    // After mds-tab's own timeout, the one that moves the focus.
+    setTimeout(() => button && Reflect.deleteProperty(button, 'focus'));
+  }
+
+  const showEverywhere = (except?: Element) => {
+    if (!current) return;
+    for (const tab of document.querySelectorAll<Tab>('[data-framework-tabs]')) {
+      if (tab !== except) show(tab, current);
+    }
+  };
+
+  document.addEventListener('mdsTabChange', (event) => {
+    const tab = event.target;
+    if (!(tab instanceof HTMLElement) || !tab.matches('[data-framework-tabs]')) return;
+    const framework = (event as CustomEvent<{ value?: string }>).detail.value;
+    // The sets this script changes report the framework it set.
+    if (!framework || framework === current) return;
+    current = framework;
+    try {
+      localStorage.setItem(FRAMEWORK_KEY, framework);
+    } catch {}
+    showEverywhere(tab);
+  });
+
+  // The first page, then each page the router swaps in, before its components load.
+  showEverywhere();
+  document.addEventListener('astro:after-swap', () => showEverywhere());
+</script>

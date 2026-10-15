@@ -30,7 +30,15 @@ export const sections = [
   {
     id: 'icons',
     icon: 'mi/outline/brush',
-    items: () => [{ slug: 'icons' }],
+    items: () => [
+      { slug: 'icons' },
+      // Pages generated per set and category (src/lib/icon-pages.ts).
+      { ...sidebarLabel('icons.page.mgg.title'), link: '/icons/maggioli/' },
+      { ...sidebarLabel('icons.page.mi.title'), link: '/icons/material-icons/' },
+      { ...sidebarLabel('icons.page.mdi.title'), link: '/icons/material-design-icons/' },
+      { slug: 'icons/iconsauce' },
+      { slug: 'icons/icons-package' },
+    ],
   },
   {
     id: 'components',
@@ -48,12 +56,17 @@ export const sections = [
   {
     id: 'development',
     icon: 'mi/outline/code',
-    items: () => [{ slug: 'development' }],
+    items: () => [
+      { slug: 'development' },
+      { slug: 'development/installation' },
+      { slug: 'development/agentic-development' },
+      { slug: 'development/versions' },
+    ],
   },
   {
     id: 'community',
     icon: 'mi/outline/forum',
-    items: () => [{ slug: 'community' }],
+    items: () => [{ slug: 'community' }, { slug: 'community/code-of-conduct' }],
   },
 ];
 

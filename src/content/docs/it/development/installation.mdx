@@ -1,0 +1,456 @@
+---
+title: Installazione
+description: 'Installare Magma in un progetto Vanilla JS, React o Angular: i pacchetti, gli stili e i font, le icone e i componenti.'
+---
+
+import FrameworkTabs from '../../../../components/FrameworkTabs.astro';
+import MagmaVersions from '../../../../components/MagmaVersions.astro';
+
+Magma distribuisce i suoi componenti come web component, in `@maggioli-design-system/magma`,
+con un wrapper per React (`magma-react`) e uno per Angular (`magma-angular`). Ogni progetto
+ha bisogno delle stesse quattro cose: i pacchetti, gli stili e i font di Magma, i file delle
+icone e i componenti registrati. Dove un passaggio cambia con il framework, scegli il tuo
+nelle schede: la scelta resta in tutte le pagine.
+
+I passaggi sono stati provati il 13 ottobre 2026 con Vite 8.3 (Vanilla JS), React 19.3 con
+Vite e Angular 21.2, in build di produzione: ogni componente visualizzato, ogni icona
+caricata.
+
+## Pacchetti
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```bash
+npm i @maggioli-design-system/magma @maggioli-design-system/styles @maggioli-design-system/design-tokens normalize.css
+npm i @fontsource/karla @fontsource/merriweather @fontsource/roboto @fontsource/roboto-mono
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```bash
+npm i @maggioli-design-system/magma-react @maggioli-design-system/magma @maggioli-design-system/styles @maggioli-design-system/design-tokens normalize.css
+npm i @fontsource/karla @fontsource/merriweather @fontsource/roboto @fontsource/roboto-mono
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```bash
+npm i @maggioli-design-system/magma-angular @maggioli-design-system/magma @maggioli-design-system/styles @maggioli-design-system/design-tokens normalize.css
+npm i @fontsource/karla @fontsource/merriweather @fontsource/roboto @fontsource/roboto-mono
+```
+
+</Fragment>
+</FrameworkTabs>
+
+`styles` contiene il CSS di Magma, `design-tokens` i suoi token, `normalize.css` il reset su
+cui si basano gli stili e i pacchetti `@fontsource` i font. magma dipende già da styles e
+design-tokens: installali comunque, perché il tuo foglio di stile li importa. Le versioni:
+
+<MagmaVersions />
+
+Tieni magma e il suo wrapper sulla stessa versione: il wrapper è generato da quella build di
+magma.
+
+## Stili
+
+Importa gli stili di Magma nel foglio di stile globale dell'app, in questo ordine:
+`src/style.css`, importato da `src/main.js`, in un progetto Vite; `src/index.css` in un'app
+React creata con Vite; `src/styles.css` in Angular. La dichiarazione `@layer` fissa l'ordine
+dei cascade layer: reset, font, token e stili di base di Magma vengono prima, così i tuoi
+stili prevalgono sui loro.
+
+```css title="Foglio di stile globale"
+@layer reset, vendor, theme, base, components, utilities, overrides;
+
+@import 'normalize.css' layer(reset);
+
+@import '@fontsource/karla/400.css' layer(vendor);
+@import '@fontsource/karla/700.css' layer(vendor);
+@import '@fontsource/merriweather/300.css' layer(vendor);
+@import '@fontsource/merriweather/400.css' layer(vendor);
+@import '@fontsource/merriweather/700.css' layer(vendor);
+@import '@fontsource/roboto/500.css' layer(vendor);
+@import '@fontsource/roboto/700.css' layer(vendor);
+@import '@fontsource/roboto/900.css' layer(vendor);
+@import '@fontsource/roboto-mono/400.css' layer(vendor);
+
+@import '@maggioli-design-system/styles/dist/css/colors-rgb.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/typography.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/reset.css' layer(reset);
+@import '@maggioli-design-system/styles/dist/css/hydrated.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/transitions.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/animations.css' layer(base);
+@import '@maggioli-design-system/styles/dist/css/globals.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/semantic.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/themes.css' layer(theme);
+@import '@maggioli-design-system/styles/dist/css/base.css' layer(base);
+```
+
+| File                                | Cosa dà                                                                                                         |
+| ----------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `colors-rgb.css`                    | I token di colore, modalità scura e alto contrasto compresi. Non `colors-hex-*.css`: ignorano la modalità scura |
+| `typography.css`                    | Gli altri token: font, dimensioni del testo, spaziature, raggi e ombre                                          |
+| `reset.css`                         | Il reset di Magma, sopra normalize.css                                                                          |
+| `hydrated.css`                      | Nasconde i componenti finché non sono pronti, così non si vedono mai senza stile                                |
+| `transitions.css`, `animations.css` | Il movimento condiviso                                                                                          |
+| `globals.css`                       | Le decisioni di design globali, le proprietà `--magma-*`                                                        |
+| `semantic.css`                      | I ruoli di colore di superfici, testo e bordi: senza, la pagina non ha colori                                   |
+| `themes.css`                        | I temi con nome, che ricolorano i ruoli: dopo `semantic.css`                                                    |
+| `base.css`                          | Gli stili degli elementi della pagina, come il font del body                                                    |
+
+### Tailwind
+
+Con Tailwind 4, configuralo come dice la sua guida per il tuo framework, poi scrivi il tema
+di Magma nel tuo foglio di stile Tailwind, dopo il tema e le utility di Tailwind, e importa
+quel file in fondo al foglio di stile globale. Non usare `@import 'tailwindcss'`: il suo
+preflight azzererebbe di nuovo la pagina, sopra il reset di Magma.
+
+```css title="tailwind.css"
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import '@maggioli-design-system/styles/dist/tailwind/theme.css';
+@import '@maggioli-design-system/styles/dist/tailwind/typography.css';
+@import '@maggioli-design-system/styles/dist/tailwind/utilities.css';
+```
+
+Il tema di Magma sostituisce i token di Tailwind con i suoi: i colori e i ruoli di colore
+(`bg-surface-raised`, `text-fg-muted`, ...), la scala tipografica (`text-title-*`,
+`text-info-*`, ...) e le spaziature, dove `gap-400` vale 1rem. Tailwind 3 usa invece il
+preset JS del pacchetto styles e i layer in `dist/tailwind3/`.
+
+## Font
+
+Magma non include i suoi font. La scala tipografica usa Roboto per i titoli, Karla per
+l'interfaccia, Merriweather per la lettura e Roboto Mono per il codice, ognuno con un
+fallback di sistema. Il foglio di stile qui sopra importa dai pacchetti `@fontsource` i pesi
+che la scala usa, nel layer `vendor`: aggiungi allo stesso modo altri pesi. I font
+installati con l'app rispettano l'ordine dei layer e funzionano offline, a differenza di un
+link a un servizio di font.
+
+## Icone
+
+`mds-icon`, e ogni componente con una proprietà `icon`, carica ogni icona come file SVG da
+una cartella servita dall'app. Con la cartella `/svg/`, l'icona `mi/baseline/email` viene
+caricata da `/svg/mi/baseline/email.svg`. L'app copia i file in quella cartella e dice a
+mds-icon dove si trova.
+
+### Copiare i file
+
+La prima parte del nome di un'icona è il suo set: `mi/` per Material Icons, `mdi/` per
+Material Design Icons, `mgg/` per le icone Maggioli. Magma pubblica solo `mgg/`, in
+`@maggioli-design-system/svg-icons`; gli altri due vengono dai loro pacchetti, dove i file
+sono organizzati diversamente. iconsauce, lo strumento che usa Magma, legge i tuoi sorgenti
+come Tailwind legge i nomi delle classi e copia solo le icone che usano, nelle cartelle che
+mds-icon si aspetta:
+
+```bash
+npm i -D @iconsauce/core @iconsauce/material-icons @iconsauce/mdi-svg @iconsauce/mgg-icons
+```
+
+Elenca i file in cui l'app scrive i nomi delle icone, poi esegui iconsauce prima di ogni
+avvio e build dell'app:
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```js title="iconsauce.config.mjs"
+import mi from '@iconsauce/material-icons';
+import mdi from '@iconsauce/mdi-svg';
+import mgg from '@iconsauce/mgg-icons';
+
+export default {
+  content: ['./index.html', './src/**/*.js'],
+  plugin: [mi, mdi, mgg],
+};
+```
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-svg ./public/svg",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons",
+  "dev": "vite",
+  "build": "vite build"
+}
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```js title="iconsauce.config.mjs"
+import mi from '@iconsauce/material-icons';
+import mdi from '@iconsauce/mdi-svg';
+import mgg from '@iconsauce/mgg-icons';
+
+export default {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  plugin: [mi, mdi, mgg],
+};
+```
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-svg ./public/svg",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons",
+  "dev": "vite",
+  "build": "vite build"
+}
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```js title="iconsauce.config.mjs"
+import mi from '@iconsauce/material-icons';
+import mdi from '@iconsauce/mdi-svg';
+import mgg from '@iconsauce/mgg-icons';
+
+export default {
+  content: ['./src/**/*.{ts,html}'],
+  plugin: [mi, mdi, mgg],
+};
+```
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-svg ./public/svg",
+  "prestart": "npm run icons",
+  "prebuild": "npm run icons",
+  "start": "ng serve",
+  "build": "ng build"
+}
+```
+
+I progetti creati prima di Angular 18 servono `src/assets/` invece di `public/`: scrivi lì
+le icone e usa `/assets/svg/` come cartella del passaggio successivo.
+
+</Fragment>
+</FrameworkTabs>
+
+`public/` è servita alla radice del sito, quindi le icone finiscono in `/svg/`. Tieni
+`public/svg/` fuori da git: iconsauce la riscrive ogni volta.
+
+Per copiare tutte le icone insieme, per i nomi che l'app riceve a runtime, o per scrivere le
+icone come font di icone, vedi [Usare iconsauce](../../icons/iconsauce/).
+
+Un'app che usa solo icone `mgg/` può fare a meno di iconsauce e copiare la cartella di
+svg-icons, purché i file finiscano in `mgg/` dentro la cartella delle icone. In Angular, con
+una voce negli `assets` di `angular.json`:
+
+```json title="angular.json"
+{
+  "glob": "**/*.svg",
+  "input": "node_modules/@maggioli-design-system/svg-icons/dist/svg",
+  "output": "/svg/mgg"
+}
+```
+
+### Indicare la cartella
+
+Indica a mds-icon l'indirizzo della cartella prima che compaia la prima icona, nel punto di
+ingresso dell'app:
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```js title="src/main.js"
+import './style.css';
+
+sessionStorage.setItem('mdsIconSvgPath', '/svg/');
+
+// Poi registra i componenti (vedi Componenti qui sotto).
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```jsx title="src/main.jsx"
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import './index.css';
+import App from './App.jsx';
+
+sessionStorage.setItem('mdsIconSvgPath', '/svg/');
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+```
+
+Con il rendering lato server, come in Next.js, `sessionStorage` esiste solo nel browser:
+imposta la cartella in un effect di un client component alla radice dell'app, poi invia
+l'evento `mdsIconSvgPathUpdate`, che ricarica le icone già visualizzate. Un effect viene
+eseguito dopo che i componenti sono comparsi: senza l'evento le loro icone restano vuote
+fino alla visita successiva.
+
+```tsx title="magma-icons.tsx"
+'use client';
+import { useEffect } from 'react';
+
+export default function MagmaIcons() {
+  useEffect(() => {
+    sessionStorage.setItem('mdsIconSvgPath', '/svg/');
+    window.dispatchEvent(new CustomEvent('mdsIconSvgPathUpdate'));
+  }, []);
+  return null;
+}
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```ts title="src/main.ts"
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { App } from './app/app';
+
+sessionStorage.setItem('mdsIconSvgPath', '/svg/');
+
+bootstrapApplication(App, appConfig).catch((err) => console.error(err));
+```
+
+</Fragment>
+</FrameworkTabs>
+
+## Componenti
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+Registra i componenti che usi, una volta, nel punto di ingresso dell'app. Ogni funzione
+`defineCustomElement*` registra un componente e quelli che contiene, e il bundler lascia
+fuori il resto della libreria:
+
+```js title="src/main.js"
+import './style.css';
+import {
+  defineCustomElementMdsButton,
+  defineCustomElementMdsIcon,
+  defineCustomElementMdsText,
+} from '@maggioli-design-system/magma/components';
+
+sessionStorage.setItem('mdsIconSvgPath', '/svg/');
+
+defineCustomElementMdsButton();
+defineCustomElementMdsIcon();
+defineCustomElementMdsText();
+```
+
+Poi i componenti sono tag come gli altri:
+
+```html title="index.html"
+<mds-text typography="h3" tag="h1">Hello Magma</mds-text>
+<mds-button icon="mi/baseline/send">Send</mds-button>
+<mds-icon name="mgg/abitazione-principale"></mds-icon>
+```
+
+Il lazy loader, `defineCustomElements()` da `@maggioli-design-system/magma/loader`, registra
+tutti i componenti con una sola chiamata e carica ognuno la prima volta che compare il suo
+tag: è adatto alle app che usano gran parte della libreria. Usa l'uno o l'altro, mai
+entrambi: sono due build degli stessi componenti. In Magma 2.1.0 il loader si rompe nelle
+build di produzione di Vite (vedi Problemi noti).
+
+</Fragment>
+<Fragment slot="react">
+
+Importa i componenti dal wrapper: ognuno registra il suo custom element quando viene
+importato, e il bundler lascia fuori il resto della libreria.
+
+```jsx title="src/App.jsx"
+import { useState } from 'react';
+import { MdsButton, MdsIcon, MdsText } from '@maggioli-design-system/magma-react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return (
+    <>
+      <MdsText typography="h3" tag="h1">
+        Hello Magma
+      </MdsText>
+      <MdsButton icon="mi/baseline/send" onClick={() => setCount(count + 1)}>
+        Sent {count} times
+      </MdsButton>
+      <MdsIcon name="mgg/abitazione-principale" />
+    </>
+  );
+}
+```
+
+Gli eventi di un componente sono proprietà che si chiamano `on` più l'evento, come
+`onMdsInputChange` per `mdsInputChange`.
+
+</Fragment>
+<Fragment slot="angular">
+
+Aggiungi i componenti agli `imports` del componente che li usa: ognuno registra il suo
+custom element.
+
+```ts title="src/app/app.ts"
+import { Component, signal } from '@angular/core';
+import { MdsButton, MdsIcon, MdsText } from '@maggioli-design-system/magma-angular';
+
+@Component({
+  selector: 'app-root',
+  imports: [MdsButton, MdsIcon, MdsText],
+  templateUrl: './app.html',
+})
+export class App {
+  protected readonly count = signal(0);
+}
+```
+
+```html title="src/app/app.html"
+<mds-text typography="h3" tag="h1">Hello Magma</mds-text>
+<mds-button icon="mi/baseline/send" (click)="count.set(count() + 1)">
+  Sent {{ count() }} times
+</mds-button>
+<mds-icon name="mgg/abitazione-principale"></mds-icon>
+```
+
+Gli eventi sono output, come `(mdsInputChange)`. Con i reactive form, importa anche il value
+accessor del campo: `TextValueAccessor` per `mds-input`, `SelectValueAccessor` per
+`mds-input-select`, `NumericValueAccessor` per `mds-input-range`, `BooleanValueAccessor` per
+`mds-input-switch`. `MagmaModule` importa tutti i componenti e gli accessor in una volta;
+`MagmaModule.forRoot()` è deprecato e non fa nulla, toglilo.
+
+`ng build` avvisa che il glob pattern `./**/*.entry.js*` non corrisponde a nessun file:
+l'avviso viene dal runtime di Magma e non ha effetti sull'app.
+
+</Fragment>
+</FrameworkTabs>
+
+## Modalità scura
+
+I colori di Magma seguono una classe su `<html>`: `pref-mode-light`, `pref-mode-dark`,
+oppure `pref-mode-system`, che segue l'impostazione del sistema. I componenti cambiano da
+soli, e così i tuoi stili quando usano i token o le utility di colore di Magma.
+
+```html title="index.html"
+<html lang="it" class="pref-mode-system">
+  <!-- la pagina -->
+</html>
+```
+
+Per far scegliere l'utente, aggiungi `mds-pref-mode`: imposta la classe e ricorda la scelta.
+Lo stesso vale per contrasto, movimento e consumo di dati, con le classi `pref-contrast-*`,
+`pref-animation-*` e `pref-consumption-*` e i componenti `mds-pref-contrast`,
+`mds-pref-animation` e `mds-pref-consumption`; `mds-pref` li raccoglie in un unico pannello.
+
+## Problemi noti
+
+Le issue aperte di Magma che toccano questa configurazione in Magma 2.1.0:
+
+- [magma#817](https://github.com/magma-design-system/magma/issues/817): il lazy loader
+  (`@maggioli-design-system/magma/loader`) si rompe nelle build di produzione di Vite, ogni
+  componente va in errore quando si carica. Registra i componenti uno per uno, da
+  `@maggioli-design-system/magma/components`.
+- [magma#863](https://github.com/magma-design-system/magma/issues/863): le guide di
+  installazione nei pacchetti Magma copiano svg-icons dove mds-icon non la cerca, e lasciano
+  fuori le icone `mi/` e `mdi/`. La configurazione con iconsauce di questa pagina copre tutti
+  e tre i set; la issue contiene anche uno script che copia le icone senza iconsauce.

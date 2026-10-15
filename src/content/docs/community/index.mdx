@@ -1,0 +1,57 @@
+---
+title: Channels
+description: Where to ask about Magma, follow how it changes and try its components.
+---
+
+import Channel from '../../../components/Channel.astro';
+import Channels from '../../../components/Channels.astro';
+
+Where to ask about Magma, follow how it changes and try its components:
+
+<Channels>
+<Channel
+  name="Stack Overflow"
+  kind="Questions and answers"
+  icon="mdi/stack-overflow"
+  variant="orange"
+  href="https://stackoverflowteams.com/c/magma-design-system/questions"
+  action="Open Stack Overflow"
+>
+
+The questions and answers about Magma, in a Stack Overflow for Teams space of its own. Ask
+how to do something with Magma, or search first: someone may have asked already, and every
+answer stays there for whoever comes next. To read and to ask, join the team with a Stack
+Overflow account.
+
+</Channel>
+<Channel
+  name="GitHub"
+  kind="Pull requests"
+  icon="mdi/github"
+  variant="primary"
+  href="https://github.com/magma-design-system/magma/pulls"
+  action="Open the pull requests"
+>
+
+The changes to Magma in the works. Each pull request is a proposed change, with its
+discussion, its review and its checks, until it is merged and released. Follow what is
+coming, comment on a change, or propose your own.
+
+</Channel>
+<Channel
+  name="Storybook"
+  kind="Components in action"
+  icon="mi/baseline/auto-stories"
+  variant="orchid"
+  href="https://magma-design-system.github.io/magma/storybook/?path=/story/common-tests-semantic-surfaces--example-page"
+  action="Open Storybook"
+>
+
+Magma's workshop, where every component shows its variants and states: change its props
+from the controls, see the events it sends and check its accessibility. It also holds the
+type scale, the icons and the test pages of colors and surfaces. The link opens Acme
+Console, an application screen built with Magma followed by the whole component library,
+in light and dark mode.
+
+</Channel>
+</Channels>

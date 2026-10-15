@@ -1,0 +1,106 @@
+---
+// What the icon pages share (IconSet.astro, LegacyIcons.astro): the choice of
+// what a click on a tile copies with its example, the sticky bar with the
+// search and the count, the grid of the tiles and the line a search without
+// icons shows. Each page fills in its own parts through the slots (intro,
+// example, controls, label, the tiles) and drives them with its own script,
+// through the `data-*` attributes of the root. `formats`: the keys of
+// icons.format.* a click can copy, the first one is the default; `example`:
+// the text the example starts with; `count`: what the count reads before the
+// script fills it in; `lazy`: the tiles come in blocks as the page scrolls.
+import CopyExample from './CopyExample.astro';
+import CopyToClipboard from './CopyToClipboard.astro';
+
+interface Props {
+  formats: string[];
+  example: string;
+  placeholder: string;
+  count: string;
+  lazy?: boolean;
+  [attribute: `data-${string}`]: string | boolean | undefined;
+}
+
+const { formats, example, placeholder, count, lazy = false, ...data } = Astro.props;
+const { t } = Astro.locals;
+---
+
+<div class="not-content my-600 flex flex-col gap-600" data-copy-scope {...data}>
+  <slot name="intro" />
+
+  <div class="grid items-center gap-x-400 gap-y-200">
+    <mds-input-field label={t('icons.copies')}>
+      <mds-input-select
+        accessible-name={t('icons.copyAs')}
+        data-icon-format
+        class="mt-0 w-auto min-w-[14rem]"
+      >
+        {formats.map((format) => (
+          <option value={format}>{t(`icons.format.${format}` as never)}</option>
+        ))}
+      </mds-input-select>
+    </mds-input-field>
+    <CopyExample text={example}>
+      <slot name="example" />
+    </CopyExample>
+  </div>
+
+  {/*
+    The search, what the page adds to it and the count stay in sight above
+    the tiles: right below the mobile header (--frame-sticky-top is where it
+    ends), at the top of the window on desktop. While they stick, a blurred
+    background and a shadow part them from the tiles under them (markStuck).
+  */}
+  <div
+    class="sticky top-(--frame-sticky-top) desktop:top-0 z-10 -mx-200 flex flex-col gap-300 bg-surface-raised/80 px-200 py-300 backdrop-blur-md transition-cosmetic data-stuck:shadow-sticky"
+    data-icon-bar
+  >
+    <div class="flex flex-wrap items-end justify-between gap-300">
+      <div>
+        <slot name="label" />
+        <mds-text typography="caption" class="my-0 text-fg-muted mr-100" data-icon-count>
+          {count}
+        </mds-text>
+      </div>
+      <mds-badge
+        class="hidden my-0 text-fg-muted"
+        aria-live="polite"
+        aria-hidden="true"
+        data-copy-status
+        variant="light"
+        tone="strong"
+        data-copied={t('copy.copied')}
+        data-failed={t('copy.notCopied')}
+      >
+        {t('icons.hint')}
+      </mds-badge>
+    </div>
+    <slot name="controls" />
+    <mds-input
+      type="search"
+      icon="mi/baseline/search"
+      accessible-name={t('icons.search')}
+      placeholder={placeholder}
+      data-icon-search
+      class="mt-0"
+    />
+  </div>
+
+  {/* Columns of at least 8rem: 5 in the content column of a desktop, 2 on phones. */}
+  <div
+    class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(3200),1fr))] gap-200"
+    data-icon-grid
+  >
+    <slot />
+  </div>
+  {/* Coming into sight, it brings the next block of tiles. */}
+  {lazy && <div class="h-px" data-icon-more></div>}
+
+  <mds-text
+    typography="detail"
+    tag="p"
+    class="hidden my-0 text-fg-muted"
+    data-icon-empty
+  ></mds-text>
+
+  <CopyToClipboard />
+</div>

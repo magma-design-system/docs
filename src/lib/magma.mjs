@@ -32,6 +32,25 @@ export function magmaVersion(pkg = 'magma') {
 }
 
 /**
+ * What the installed Magma asks of a project, for the install guide: the
+ * versions of magma and its wrappers, the ranges of styles and design-tokens
+ * magma declares, the Angular versions magma-angular supports.
+ */
+export function magmaRequirements() {
+  const manifest = (/** @type {string} */ pkg) => require(resolveMagma(`${pkg}/package.json`));
+  const magma = manifest('magma');
+  const angular = manifest('magma-angular');
+  return {
+    magma: magma.version,
+    react: manifest('magma-react').version,
+    angular: angular.version,
+    angularCore: angular.peerDependencies['@angular/core'],
+    styles: magma.dependencies['@maggioli-design-system/styles'],
+    designTokens: magma.dependencies['@maggioli-design-system/design-tokens'],
+  };
+}
+
+/**
  * Sorted list of component tags, used by the sidebar and the routes.
  * @returns {string[]}
  */

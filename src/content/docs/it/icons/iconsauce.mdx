@@ -1,0 +1,256 @@
+---
+title: Usare iconsauce
+description: 'Le icone con iconsauce, lo strumento che usa Magma: ogni icona come file SVG con il dump, oppure le icone dei tuoi sorgenti come font di icone.'
+---
+
+iconsauce è lo strumento open source che Magma usa per le sue icone. Funziona come Tailwind con
+i nomi delle classi: legge i tuoi sorgenti, trova gli slug delle icone (`mi/baseline/home`,
+`mdi/github`, `mgg/ai-brain`) e scrive quelle icone, come file SVG o come font di icone.
+Qualunque modo di servire i file SVG funziona con Magma; iconsauce è quello che usa Magma
+stesso, e quello che segue questa guida.
+
+Scrive le icone in due forme:
+
+| Output        | Flag                                | Cosa scrive             | A cosa serve                |
+| ------------- | ----------------------------------- | ----------------------- | --------------------------- |
+| File SVG      | `--output-dump-svg`, `--output-svg` | un file per icona       | `mds-icon` e le prop `icon` |
+| Font di icone | `--output-css`                      | un file CSS con il font | le classi del tuo markup    |
+
+I componenti Magma caricano sempre file SVG: un'app che li usa ha bisogno dei file. Il font di
+icone serve per le icone del tuo markup, e un solo lancio di iconsauce può scrivere entrambi.
+
+## Come funziona
+
+Ogni set di icone è un plugin, un pacchetto che sa dove è installato il set e come sono fatti
+i suoi slug:
+
+| Plugin                      | Slug                | Icone     | Set                   |
+| --------------------------- | ------------------- | --------- | --------------------- |
+| `@iconsauce/material-icons` | `mi/<stile>/<nome>` | 4 x 2.191 | Material Icons        |
+| `@iconsauce/mdi-svg`        | `mdi/<nome>`        | 7.447     | Material Design Icons |
+| `@iconsauce/mgg-icons`      | `mgg/<nome>`        | 318       | Maggioli              |
+
+`<stile>` è `baseline`, `outline`, `round` o `sharp`. Ogni plugin legge il suo set dal
+pacchetto da cui dipende: `@material-icons/svg`, `@mdi/svg` e
+`@maggioli-design-system/svg-icons`.
+
+iconsauce cerca gli slug in ogni file elencato nella configurazione, in qualunque tipo di
+testo: un attributo, una classe, una stringa in JavaScript, un valore in JSON. Trova solo gli
+slug interi: un'icona il cui nome l'app compone a runtime (`` `mi/baseline/${name}` ``) o
+riceve da un'API non si trova nei sorgenti. Per quelle, scrivi da qualche parte nei sorgenti
+ogni slug che l'app può usare, oppure copia tutte le icone con il dump.
+
+## Installare
+
+```bash
+npm i -D @iconsauce/core @iconsauce/material-icons @iconsauce/mdi-svg @iconsauce/mgg-icons
+```
+
+La configurazione sta nella radice del progetto ed elenca, in `content`, i file in cui l'app
+scrive gli slug delle icone:
+
+```js title="iconsauce.config.mjs"
+import mi from '@iconsauce/material-icons';
+import mdi from '@iconsauce/mdi-svg';
+import mgg from '@iconsauce/mgg-icons';
+
+export default {
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx,html}'],
+  plugin: [mi, mdi, mgg],
+};
+```
+
+| Chiave         | Default      | Cosa fa                                       |
+| -------------- | ------------ | --------------------------------------------- |
+| `content`      | -            | Obbligatoria: i file da leggere               |
+| `plugin`       | i tre plugin | I set di icone                                |
+| `fontSize`     | `24px`       | La dimensione delle icone del font            |
+| `fontFamily`   | `iconsauce`  | Il nome del font di icone                     |
+| `center`       | `false`      | Centra ogni icona nel suo glifo               |
+| `skipWarnings` | `true`       | Va avanti oltre uno slug che nessun plugin ha |
+| `verbose`      | `false`      | Racconta ogni passo                           |
+
+I glob di `content` sono relativi alla radice del progetto. Togli da `plugin` i set che l'app
+non usa. Uno slug che nessun plugin ha viene segnalato e lasciato fuori; con
+`skipWarnings: false` iconsauce invece si ferma. `center` non è per i set disegnati su una
+griglia di pixel, come Material Icons.
+
+Il comando `iconsauce` arriva con `@iconsauce/core`: lo lanciano gli script npm qui sotto.
+
+## File SVG
+
+`mds-icon` carica ogni icona da una cartella che l'app serve: con la cartella `/svg/`, l'icona
+`mi/baseline/home` arriva da `/svg/mi/baseline/home.svg`. iconsauce scrive i file in questa
+struttura, una cartella per set e per stile:
+
+```text title="public/svg/"
+mdi/
+  github.svg
+mgg/
+  ai-brain.svg
+mi/
+  baseline/
+    content-copy.svg
+    home.svg
+  outline/
+    home.svg
+  round/
+  sharp/
+```
+
+### Tutte le icone, con il dump
+
+`--output-dump-svg` copia nella cartella ogni icona dei plugin della configurazione,
+qualunque cosa usino i sorgenti. Ogni slug funziona subito: quelli dei sorgenti, quelli che
+l'app compone a runtime e quelli che arrivano da un'API o da un CMS.
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-dump-svg ./public/svg",
+  "postinstall": "npm run icons"
+}
+```
+
+Il dump dipende solo dai set di icone installati, non dai sorgenti: basta dopo ogni
+installazione, e `postinstall` lo fa. Con i tre plugin scrive 16.529 file, 6,8 MB di SVG
+(iconsauce 2.0.1, ottobre 2026); i plugin tolti dalla configurazione restano fuori anche dal
+dump. La cartella è generata, quindi tieni `public/svg/` fuori da git. La configurazione ha
+comunque bisogno di `content`, anche quando iconsauce scrive solo il dump.
+
+### Solo le icone che usi
+
+`--output-svg` copia solo le icone che i sorgenti nominano, quindi va lanciato prima di ogni
+avvio e di ogni build dell'app:
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-svg ./public/svg",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons"
+}
+```
+
+Pochi file invece di migliaia, e solo gli slug scritti interi nei sorgenti. La
+[guida all'installazione](../../development/installation/#icone) lo configura per Vanilla JS,
+React e Angular; questo sito funziona allo stesso modo.
+
+### Usarle
+
+Indica a `mds-icon` l'indirizzo della cartella prima che compaia la prima icona, come fa la
+guida all'installazione in [Indicare la cartella](../../development/installation/#indicare-la-cartella),
+poi scrivi gli slug:
+
+```html
+<mds-icon name="mi/baseline/content-copy"></mds-icon>
+<mds-button icon="mdi/github">GitHub</mds-button>
+```
+
+## Font di icone
+
+`--output-css` scrive un file CSS con un font delle icone che usano i sorgenti, incorporato nel
+file, e una classe per ogni slug. Segue i sorgenti, come `--output-svg`, quindi va lanciato
+prima di ogni avvio e di ogni build:
+
+```json title="package.json"
+"scripts": {
+  "icons": "iconsauce --config ./iconsauce.config.mjs --output-css ./src/icons.css",
+  "predev": "npm run icons",
+  "prebuild": "npm run icons"
+}
+```
+
+Importa il file nel foglio di stile globale dell'app, poi scrivi lo slug come classe:
+
+```css title="Foglio di stile globale"
+@import './icons.css';
+```
+
+```html
+<i class="mi/baseline/content-copy" aria-hidden="true"></i>
+```
+
+La classe contiene delle barre, e l'HTML le ammette: iconsauce le fa precedere da un escape nel
+CSS. Quello che scrive è così:
+
+{/* prettier-ignore */}
+```css title="src/icons.css"
+@font-face {
+  font-family: "iconsauce";
+  src: url("data:font/truetype;charset=utf-8;base64,...") format("truetype");
+}
+
+[class^="mi/"], [class*=" mi/"] {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-family: "iconsauce" !important;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.mi\/baseline\/content-copy::before { content: "\ea01" }
+```
+
+Un'icona del font è un carattere: prende il colore del testo intorno. La dimensione invece non
+segue il testo: la classe imposta `font-size` al `fontSize` della configurazione, 24px, quindi
+un'icona di un'altra dimensione ha bisogno di un suo `font-size`. Agli screen reader non dice
+nulla: tieni `aria-hidden="true"` sull'icona e dai al controllo in cui si trova un'etichetta
+sua.
+
+Per avere sia i file per i componenti sia il font per il tuo markup, dai a un solo lancio
+entrambi i flag: `--output-svg ./public/svg --output-css ./src/icons.css`.
+
+## Trovare un'icona
+
+Le pagine dei tre set elencano ogni icona che iconsauce ha, nelle versioni che installa questo
+sito: [Icone SVG Maggioli](../maggioli/), [Material Icons](../material-icons/) e
+[Material Design Icons](../material-design-icons/). Ognuna mostra le sue icone per categoria e
+le cerca per nome e per tag; un clic copia lo slug. Altrove:
+
+- **Material Icons**: il catalogo di Google, in [Google Fonts](https://fonts.google.com/icons?icon.set=Material+Icons),
+  con il set Material Icons selezionato (non Material Symbols). Lo slug prende il nome con i
+  trattini al posto dei trattini bassi e lo stile come lo chiama iconsauce: Filled è
+  `baseline`, Outlined `outline`, Rounded `round`, Sharp `sharp`. `content_copy` nello stile
+  Outlined è `mi/outline/content-copy`. Le icone two-tone non hanno uno slug.
+- **Material Design Icons**: la [libreria di Pictogrammers](https://pictogrammers.com/library/mdi/).
+  Lo slug è il nome così com'è: `mdi/` e `account-circle`.
+- **Tutti gli slug insieme**: `--output-dump-dictionary ./icons.json` scrive gli slug di ogni
+  icona dei plugin come lista JSON, da cercare o per controllare che uno slug esista.
+
+I cataloghi mostrano le loro icone più recenti, mentre le versioni installate decidono quali
+esistono: uno slug che il set installato non ha viene segnalato da iconsauce e lasciato fuori.
+
+## Dal pacchetto icons
+
+`@maggioli-design-system/icons` è deprecato. Contiene le icone del dizionario di Magma con
+nomi che dicono a cosa servono, come `action-copy`: come font di icone (`dist/mgg-icons.css`,
+una classe `mgg-icons-<nome>` per ogni icona), come enum TypeScript (`MggIcons`) e come file
+SVG (`dist/svg/<nome>.svg`). Un'app che lo usa scrive:
+
+```css
+@import '@maggioli-design-system/icons/dist/mgg-icons.css';
+```
+
+```html
+<i class="mgg-icons-action-copy"></i>
+```
+
+Ogni nome del pacchetto ha uno slug iconsauce che disegna la stessa icona:
+[Pacchetto icons (legacy)](../icons-package/) lo mostra sotto ogni nome. Per passare a
+iconsauce:
+
+1. Installa iconsauce e scrivi la sua configurazione, come in [Installare](#installare).
+2. Sostituisci ogni nome con il suo slug: `mgg-icons-action-copy` diventa
+   `mi/baseline/content-copy`, `MggIcons.ActionCopy` la stringa `'mi/baseline/content-copy'`.
+3. Scegli l'output. Per tenere le icone come classi nel tuo markup, genera il
+   [font di icone](#font-di-icone): le sue icone hanno la stessa dimensione predefinita, 24px.
+   Per passarle a `mds-icon`, scrivi i [file SVG](#file-svg).
+4. Togli l'import di `mgg-icons.css` e disinstalla `@maggioli-design-system/icons`.
+
+Google ha ridisegnato alcune Material Icons da quando il pacchetto è stato costruito. Cinque
+nomi tengono il loro vecchio disegno sotto un altro slug, che l'elenco mostra:
+`design-palette` è `mi/baseline/color-lens`, e `avatar-placeholder-user`, `cards-view`,
+`columns-view` e `view-comfy` sono Material Design Icons. `data-analytics` e `data-bar-chart`
+non hanno più un disegno identico: il loro slug, `mi/baseline/bar-chart`, è quello attuale, con
+le barre più spesse.
