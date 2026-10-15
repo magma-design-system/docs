@@ -16,15 +16,18 @@ const { id, text, level = 2 } = Astro.props;
 const tag = `h${level}` as const;
 const { typography = tag } = Astro.props;
 const { t } = Astro.locals;
+const line = TEXT.anchorLine[typography as keyof typeof TEXT.anchorLine] ?? TEXT.anchorLine[tag];
 ---
 
 <div class={TEXT.anchored[tag]}>
-  <mds-button
-    href={`#${id}`}
-    role="link"
-    {...ANCHOR}
-    aria-label={t('heading.anchorLabel', { title: text, interpolation: { escapeValue: false } })}
-  ></mds-button>
+  <span class={line}>
+    <mds-button
+      href={`#${id}`}
+      role="link"
+      {...ANCHOR}
+      aria-label={t('heading.anchorLabel', { title: text, interpolation: { escapeValue: false } })}
+    ></mds-button>
+  </span>
   <mds-text id={id} typography={typography} tag={tag} class={TEXT.headingText}>
     {text}
   </mds-text>

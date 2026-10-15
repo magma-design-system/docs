@@ -5,14 +5,17 @@
 // can change the text (the examples of the icon pages follow the format
 // picked). Its icon turns into a check for a moment, and screen readers hear
 // the copy from the live region of CopyToClipboard.astro, which the page
-// needs. `text`: the text the line starts with, for the button's label.
+// needs. `text`: the text the line starts with, for the button's label;
+// `copy`: what the button copies in place of the text shown (the path of a
+// file whose name the line shows).
 import { TEXT } from '../lib/markdown-text.mjs';
 
 interface Props {
   text: string;
+  copy?: string;
 }
 
-const { text } = Astro.props;
+const { text, copy } = Astro.props;
 const { t } = Astro.locals;
 const label = (value: string) => t('copy.label', { value, interpolation: { escapeValue: false } });
 ---
@@ -20,6 +23,7 @@ const label = (value: string) => t('copy.label', { value, interpolation: { escap
 <div
   class="flex min-w-0 items-center gap-200 rounded-(--radius-3xs) bg-wash-soft p-200 rounded-md"
   data-copy-example
+  data-copy-value={copy}
   data-label={label('{value}')}
 >
   <mds-text
@@ -36,7 +40,7 @@ const label = (value: string) => t('copy.label', { value, interpolation: { escap
     tone="strong"
     size="sm"
     class="mt-0 shrink-0"
-    aria-label={label(text)}
+    aria-label={label(copy ?? text)}
     data-copy-example-button
   ></mds-button>
 </div>
@@ -58,8 +62,8 @@ const label = (value: string) => t('copy.label', { value, interpolation: { escap
       button.remove();
       return;
     }
-    const value = () => text.textContent?.trim() ?? '';
-    // The label names the text the line shows now.
+    const value = () => example.dataset.copyValue ?? text.textContent?.trim() ?? '';
+    // The label names the text the line shows now, or the value copied in its place.
     const relabel = () => button.setAttribute('aria-label', fill(example.dataset.label, value()));
     new MutationObserver(relabel).observe(text, {
       characterData: true,

@@ -1,0 +1,60 @@
+---
+// The pages of the Brand assets section, for its landing page: one per
+// folder of the dist/ of @maggioli-design-system/identity, with what it
+// holds and how many artworks and files, counted from the installed package
+// (src/lib/identity.mjs).
+import Code from './Code.astro';
+import { IDENTITY_GROUPS, identityGroupCount } from '../lib/identity.mjs';
+import { localePrefix } from '../lib/frame';
+
+const { t, starlightRoute } = Astro.locals;
+const { lang, locale } = starlightRoute;
+
+const rows = IDENTITY_GROUPS.map(({ id, page }) => {
+  const { artworks, files } = identityGroupCount(id);
+  return {
+    name: t(`brand.page.${page}.title` as never),
+    href: `${localePrefix(locale)}/brand/${page}/`,
+    content: t(`brand.page.${page}.summary` as never),
+    count: t('brand.groups.files', {
+      artworks: artworks.toLocaleString(lang),
+      files: files.toLocaleString(lang),
+    }),
+    folder: `dist/${id}/`,
+  };
+});
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('brand.groups.page')} />
+    <mds-table-header-cell label={t('brand.groups.content')} />
+    <mds-table-header-cell label={t('brand.groups.artworks')} />
+    <mds-table-header-cell label={t('brand.groups.folder')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ name, href, content, count, folder }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            <a href={href}>{name}</a>
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            {content}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            {count}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{folder}</Code>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

@@ -1,0 +1,115 @@
+---
+title: Identity package
+description: Install @maggioli-design-system/identity with npm and use its logos in a project, with Vite, React, Angular or a copy at install time.
+---
+
+`@maggioli-design-system/identity` holds the artworks of this section as files, with no code
+and no dependencies. Installing it keeps the logos of a project in step with the brand through
+npm, instead of files copied by hand that nobody updates.
+
+## Install
+
+```bash
+npm install @maggioli-design-system/identity
+```
+
+The package has no `exports` map: any file of its `dist/` folder can be imported by its path.
+
+## Files
+
+Each artwork is an SVG file, with its other formats next to it, in the same folder and under
+the same name:
+
+| File                                                        | What it is                          |
+| ----------------------------------------------------------- | ----------------------------------- |
+| `<name>.svg`                                                | The artwork, vector                 |
+| `<name>.pdf`                                                | The same artwork on a PDF page      |
+| `<name>-256w.png`, `<name>-512w.png`, `<name>-1024w.png`    | PNG renderings, by width in pixels  |
+| `<name>-256w.webp`, `<name>-512w.webp`, `<name>-1024w.webp` | WebP renderings, by width in pixels |
+
+The name tells the variant. No suffix is the color version; `-black` and `-white` are the
+one-color ones, and some internal brands have `-blue`, `-gold` or `-dark-gold`. `-no-text`
+and `-icon` mark the symbol, the logo without its name, and `-bordered` the logo of the Group
+with a border around it. `dist/directory-tree.json` lists every file of the package.
+
+On the pages of this section, the Download menu of a card copies the path of its file in
+the package, ready to import:
+`@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg`.
+
+## With Vite
+
+In a Vite project, vanilla or React, import the file: Vite copies it into the build and gives
+back its URL.
+
+```js title="src/main.js"
+import logo from '@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg';
+
+document.querySelector('#logo').src = logo;
+```
+
+```jsx title="src/Logo.jsx"
+import logo from '@maggioli-design-system/identity/dist/brand/gruppo-maggioli/logo-gruppo-maggioli.svg';
+
+export function Logo() {
+  return <img src={logo} alt="Gruppo Maggioli" height="48" />;
+}
+```
+
+In TypeScript, the `vite/client` types of a Vite project declare these imports. Vite writes
+files under 4 kB into the bundle, as data URLs, instead of copying them.
+
+## With Angular
+
+Angular copies files from `node_modules` into the build with the `assets` option of
+`angular.json`; the templates then point at the copy:
+
+```json title="angular.json"
+"assets": [
+  { "glob": "**/*", "input": "public" },
+  {
+    "glob": "**/*.svg",
+    "input": "node_modules/@maggioli-design-system/identity/dist/brand/gruppo-maggioli",
+    "output": "identity"
+  }
+]
+```
+
+```html
+<img src="identity/logo-gruppo-maggioli.svg" alt="Gruppo Maggioli" height="48" />
+```
+
+## Any other project
+
+Copy the files the project needs at install time, with a script that runs after
+`npm install`. The script finds the package wherever npm puts it:
+
+```js title="scripts/copy-identity.mjs"
+import { cpSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+
+const dist = fileURLToPath(import.meta.resolve('@maggioli-design-system/identity/dist/'));
+
+cpSync(`${dist}brand/gruppo-maggioli`, 'public/identity', {
+  recursive: true,
+  filter: (file) => !/\.(pdf|webp)$/.test(file),
+});
+```
+
+```json title="package.json"
+"scripts": {
+  "postinstall": "node scripts/copy-identity.mjs"
+}
+```
+
+## Alternative text
+
+A logo on its own, such as the link to the home page, has the name of the brand as its
+alternative text: `alt="Gruppo Maggioli"`. A logo next to the name written as text repeats
+it, and is decoration: `alt=""`.
+
+## Not in the package yet
+
+- [magma#901](https://github.com/magma-design-system/magma/issues/901): names, descriptions and usage rules. The names and the descriptions in this
+  section are defaults of this site.
+- [magma#900](https://github.com/magma-design-system/magma/issues/900): the WebP files of the current version hold PNG data, the same pictures as the PNG
+  files, with no saving in size.

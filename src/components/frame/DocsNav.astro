@@ -1,10 +1,12 @@
 ---
 // The sub-pages column of the frame: the "Documentation" column of a component
-// page, its sub-pages (src/lib/components.ts), and the "Categories" column of
-// an icon set page, its categories with how many icons each one has
-// (src/lib/icon-pages.ts).
+// page, its sub-pages (src/lib/components.ts), the "Categories" column of an
+// icon set page, its categories with how many icons each one has
+// (src/lib/icon-pages.ts), and the "Brands" column of a Brand assets page, its
+// owners with how many artworks each one has (src/lib/brand-pages.ts).
 import { getEntry } from 'astro:content';
 import { componentHref, pagesOf, parseComponentPath } from '../../lib/components';
+import { brandOwnerHref, parseBrandPath } from '../../lib/brand-pages';
 import { iconCategoryHref, parseIconSetPath } from '../../lib/icon-pages';
 
 interface Props {
@@ -27,6 +29,7 @@ let links: Link[] = [];
 
 const path = parseComponentPath(Astro.url.pathname, locale);
 const icons = parseIconSetPath(Astro.url.pathname, locale);
+const brand = parseBrandPath(Astro.url.pathname, locale);
 if (path) {
   const entry = await getEntry('components', path.tag);
   heading = t('component.documentation');
@@ -42,6 +45,13 @@ if (path) {
     label: `${label ?? t(`icons.set.category.${id}` as never)} (${count})`,
     current: id === icons.category,
   }));
+} else if (brand) {
+  heading = t('brand.owners');
+  links = brand.owners.map(({ id, name, families }) => ({
+    href: brandOwnerHref(locale, brand.page, id),
+    label: `${name} (${families.reduce((sum, family) => sum + family.assets.length, 0)})`,
+    current: id === brand.owner,
+  }));
 }
 ---
 
@@ -52,7 +62,7 @@ if (path) {
     </mds-text>
     <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
       {links.map((link) => (
-        <li class="max-w-full">
+        <li class="flex max-w-full">
           <mds-button
             class="max-w-full"
             href={link.href}

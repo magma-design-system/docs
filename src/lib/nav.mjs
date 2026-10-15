@@ -3,6 +3,7 @@
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here.
 import { componentTags } from './magma.mjs';
+import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
 export const REPOSITORY = 'https://github.com/magma-design-system/magma';
@@ -61,7 +62,15 @@ export const sections = [
   {
     id: 'brand',
     icon: 'mi/outline/design-services',
-    items: () => [{ slug: 'brand' }],
+    items: () => [
+      { slug: 'brand' },
+      // Pages generated per folder of the identity package (src/lib/identity.mjs).
+      ...IDENTITY_GROUPS.map(({ page }) => ({
+        ...sidebarLabel(`brand.page.${page}.title`),
+        link: `/brand/${page}/`,
+      })),
+      { slug: 'brand/identity-package' },
+    ],
   },
   {
     id: 'development',

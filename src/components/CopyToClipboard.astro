@@ -38,6 +38,15 @@ const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
     template?.replaceAll('{value}', value) ?? '';
   const timers = new WeakMap<HTMLElement, ReturnType<typeof setTimeout>>();
 
+  // A status with a `text` (an mds-text animated by `animation`) shows that
+  // instead of its content, and animates when it changes; any other status
+  // shows its content.
+  const said = (status: HTMLElement) => status.getAttribute('text') ?? status.textContent ?? '';
+  const say = (status: HTMLElement, text: string) => {
+    if (status.hasAttribute('text')) status.setAttribute('text', text);
+    else status.textContent = text;
+  };
+
   /** The values of the page as buttons, when there is a clipboard to copy to. */
   const enhance = () => {
     if (!navigator.clipboard) return;
@@ -63,14 +72,14 @@ const template = (key: 'copy.label' | 'copy.done' | 'copy.failed') =>
       .closest('[data-copy-scope]')
       ?.querySelector<HTMLElement>('[data-copy-status]');
     if (!status) return;
-    status.dataset.idle ??= status.textContent ?? '';
-    status.textContent = (copied ? status.dataset.copied : status.dataset.failed) ?? '';
+    status.dataset.idle ??= said(status);
+    say(status, (copied ? status.dataset.copied : status.dataset.failed) ?? '');
     if (copied) status.classList.replace(IDLE, DONE);
     clearTimeout(timers.get(status));
     timers.set(
       status,
       setTimeout(() => {
-        status.textContent = status.dataset.idle ?? '';
+        say(status, status.dataset.idle ?? '');
         status.classList.replace(DONE, IDLE);
       }, SHOWN),
     );

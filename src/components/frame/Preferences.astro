@@ -1,11 +1,16 @@
 ---
-// Search, repository link, light/dark mode and language: at the bottom of the
-// rail and in the mobile menu. Mode and language are Magma's own preference
-// components; src/scripts/magma.ts makes Starlight follow the mode.
+// Repository link, light/dark mode, theme and language: at the bottom of the
+// rail and in the mobile menu (the search is at their top, SearchField.astro).
+// Mode, theme and language are Magma's own preference components, in the
+// panel that groups them (mds-pref); src/scripts/magma.ts makes Starlight
+// follow the mode.
 //
 // Rendered once, in the rail, and moved into the menu below Magma's `desktop`
 // breakpoint: one set of controls for both. (Up to magma 2.0.1 a second
-// mds-pref-mode also undid the choice made in the first one, magma#789.)
+// mds-pref-mode also undid the choice made in the first one, magma#789.) In
+// the rail the panel opens in a dropdown (Rail.astro), from the Preferences
+// button here or from its icon in the collapsed rail; in the menu it is shown
+// as it is, below the links.
 import { locales } from '../../lib/i18n.mjs';
 import { REPOSITORY } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
@@ -18,19 +23,22 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
   lang,
   href: `${localePrefix(key === 'root' ? undefined : key)}${path}`,
 }));
+
+// Magma's named themes (magma/agents/theming.md): `default` is the base theme,
+// the others retint the neutral roles (surfaces, wash, borders, text) with
+// their family. The swatch of an item is the wash of its family; the dots on
+// it (accent and status colors) are the same in every theme. (In magma 2.2.0
+// the swatch is not shown: mds-pref-theme-item puts it in the text-only
+// default slot of an mds-button, magma#910.)
+const themes = [
+  { name: 'default', family: 'neutral', label: t('frame.theme.default') },
+  { name: 'cool', family: 'porcelain', label: t('frame.theme.cool') },
+  { name: 'warm', family: 'bisque', label: t('frame.theme.warm') },
+];
 ---
 
 <div class="grid grid-cols-full gap-400" id="preferences">
-  <div class="flex flex-col gap-100">
-    <mds-button
-      data-search-trigger
-      type="button"
-      icon="mi/baseline/search"
-      label={t('search.label')}
-      variant="dark"
-      tone="text"
-      size="sm"
-    ></mds-button>
+  <div class="flex flex-col gap-200">
     <mds-button
       href={REPOSITORY}
       target="blank"
@@ -42,28 +50,87 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
       tone="text"
       size="sm"
     ></mds-button>
+    <mds-button
+      id="preferences-trigger"
+      class="in-data-[preferences=menu]:hidden"
+      type="button"
+      icon="mi/baseline/settings-accessibility"
+      label={t('frame.preferences')}
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
   </div>
-  <mds-pref-mode class="relative w-full" size="sm"></mds-pref-mode>
-  <mds-pref-language class="relative w-full" size="sm" set={starlightRoute.lang}>
-    {languages.map(({ lang, href }) => (
-      <mds-pref-language-item
-        code={lang}
-        data-href={href}
-        selected={lang === starlightRoute.lang}
-      />
-    ))}
-  </mds-pref-language>
+  <div class="hidden gap-400 in-data-[preferences=menu]:grid" data-preferences="menu-panel">
+    <mds-hr></mds-hr>
+    <mds-pref id="preferences-panel" class="gap-400" size="sm">
+      <mds-pref-language class="relative w-full" size="sm" set={starlightRoute.lang}>
+        {languages.map(({ lang, href }) => (
+          <mds-pref-language-item
+            code={lang}
+            data-href={href}
+            selected={lang === starlightRoute.lang}
+          />
+        ))}
+      </mds-pref-language>
+      <mds-pref-mode class="relative w-full gap-200" size="sm"></mds-pref-mode>
+      <mds-pref-theme class="relative w-full" size="sm">
+        {themes.map(({ name, family, label }) => (
+          <mds-pref-theme-item
+            name={name}
+            label={label}
+            style={`--mds-pref-theme-item-color-background: rgb(var(--tone-${family}-09))`}
+          />
+        ))}
+      </mds-pref-theme>
+    </mds-pref>
+  </div>
 </div>
 
 <script>
   import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
 
-  // Magma's `desktop` breakpoint (1024px), as in the frame: rail above, menu below.
+  // magma 2.2.0: mds-pref takes data-magma-pref off <html> when it leaves the
+  // page, moved too (its disconnectedCallback, a microtask later), and sets it
+  // only when it first loads: moved below, it would leave the styles following
+  // the system's preferences. The panel is always on the page (and
+  // ThemeProvider.astro sets the flag before the first paint): put it back.
+  // Tracked in https://github.com/magma-design-system/magma/issues/922
+  const root = document.documentElement;
+  new MutationObserver(() => {
+    if (!root.hasAttribute('data-magma-pref')) root.setAttribute('data-magma-pref', '');
+  }).observe(root, { attributeFilter: ['data-magma-pref'] });
+
+  // magma 2.2.0: mds-pref-language and mds-pref-theme put their label and tab
+  // in a `.menu` with no layout of its own: the label is inline, in a line as
+  // tall as the page's line height, and the tab follows with no gap. The other
+  // mds-pref-* lay the two out in a grid with a gap (which the panel doubles,
+  // gap-200 on mds-pref-mode): the same grid and gap in the two menus.
+  // Tracked in https://github.com/magma-design-system/magma/issues/927
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+  const menu = new CSSStyleSheet();
+  menu.replaceSync('.menu { display: grid; gap: calc(var(--spacing, 0.0025rem) * 200); }');
+  document
+    .querySelectorAll<MagmaElement>('#preferences-panel :is(mds-pref-language, mds-pref-theme)')
+    .forEach(async (pref) => {
+      await customElements.whenDefined(pref.localName);
+      await pref.componentOnReady?.();
+      const shadow = pref.shadowRoot;
+      if (shadow) shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, menu];
+    });
+
+  /** Moves `element` into the one of the `data-preferences` boxes named `where`. */
+  const move = (element: HTMLElement | null, where: string) => {
+    const box = document.querySelector(`[data-preferences="${where}"]`);
+    if (element && box && element.parentElement !== box) box.append(element);
+  };
+
+  // Magma's `desktop` breakpoint (1024px), as in the frame: rail above, menu
+  // below. The panel: in the dropdown of the rail, below the links in the menu.
   const desktop = matchMedia('(min-width: 1024px)');
   const place = (where = desktop.matches ? 'rail' : 'menu') => {
-    const preferences = document.getElementById('preferences');
-    const target = document.querySelector(`[data-preferences="${where}"]`);
-    if (preferences && target && preferences.parentElement !== target) target.append(preferences);
+    move(document.getElementById('preferences'), where);
+    move(document.getElementById('preferences-panel'), desktop.matches ? 'dropdown' : 'menu-panel');
   };
   place();
   desktop.addEventListener('change', () => place());
@@ -72,25 +139,16 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
   // not. Back to the rail before the change, then where the width wants them.
   // The language links lead to the new page in each language.
   document.addEventListener('astro:before-swap', (event) => {
-    place('rail');
+    move(document.getElementById('preferences'), 'rail');
     const next = (event as TransitionBeforeSwapEvent).newDocument;
-    document.querySelectorAll<HTMLElement>('#preferences [data-href]').forEach((item) => {
+    document.querySelectorAll<HTMLElement>('#preferences-panel [data-href]').forEach((item) => {
       const code = item.getAttribute('code');
-      const href = next.querySelector<HTMLElement>(`#preferences [code="${code}"]`)?.dataset.href;
+      const href = next.querySelector<HTMLElement>(`#preferences-panel [code="${code}"]`)?.dataset
+        .href;
       if (href) item.dataset.href = href;
     });
   });
   document.addEventListener('astro:after-swap', () => place());
-
-  // One search dialog per page (Starlight's, in PageFrame): every trigger opens it.
-  document.addEventListener('click', (event) => {
-    if (!(event.target instanceof Element) || !event.target.closest('[data-search-trigger]'))
-      return;
-    // Once open, the dialog closes on the next click that reaches `window` on
-    // anything with an `href` property: mds-button has one.
-    event.stopPropagation();
-    document.querySelector<HTMLButtonElement>('site-search button[data-open-modal]')?.click();
-  });
 
   // Picking a language opens the same page in that locale.
   document.addEventListener('mdsPrefLanguageChange', (event) => {

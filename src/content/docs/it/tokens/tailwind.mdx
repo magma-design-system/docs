@@ -42,8 +42,9 @@ Per il token dell'ultima colonna scrivi il suo valore arbitrario: `max-w-(--cont
 
 ## Token che nessuna utility legge
 
-Tailwind 4 non ha un namespace per gli spessori dei bordi e per le durate: `border-xs` non
-esiste e `duration-200` sono i 200ms di Tailwind. Usa il valore arbitrario.
+Tailwind 4 non ha un namespace per gli spessori dei bordi: `border-xs` non esiste, usa il
+valore arbitrario. Le durate le legge da `--transition-duration-*`, che styles non pubblica:
+`duration-200` scrive 200ms, il valore di `--duration-200`, senza leggere la variabile.
 
 <TailwindMap part="unread" />
 

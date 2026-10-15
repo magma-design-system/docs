@@ -1,14 +1,17 @@
 ---
 // A token applied to a small sample (previewOf in src/lib/tokens.mjs): a
 // swatch, a box with the shadow, the radius, the outline or the opacity, a
-// bar as long as the space, the curve of an easing; "N/A" in the space of a
-// swatch for what cannot be drawn (a duration, a layer, a blur). Painted with the custom property itself wherever the
+// bar as long as the space, a dot that crosses its box in a duration, the
+// curve of an easing over a dot that moves with it (script below); "N/A" in
+// the space of a swatch for what cannot
+// be drawn (a layer, a blur). Painted with the custom property itself wherever the
 // page has it, so it follows the mode, the theme and the corner shape the
 // page is in; the colors whose custom property is not plain rgb channels,
 // and the sizing steps, which have none, show their value instead.
 import {
   colorOf,
   easePath,
+  easeTrack,
   formatResolved,
   formatValue,
   previewOf,
@@ -51,26 +54,47 @@ const shape = token.name.startsWith('radius.squircle')
   </span>
 )}
 {kind === 'ease' && (
-  <svg
-    class="block size-1000 overflow-visible text-accent-fg"
-    viewBox="-0.1 -0.4 1.2 1.8"
-    aria-hidden="true"
-  >
-    <path
-      d="M0 1H1V0"
-      fill="none"
-      stroke="currentColor"
-      stroke-opacity="0.2"
-      vector-effect="non-scaling-stroke"
-    />
-    <path
-      d={easePath(token)}
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      vector-effect="non-scaling-stroke"
-    />
-  </svg>
+  <span class="flex size-1600 flex-col gap-100 rounded-md bg-wash-soft p-150">
+    <svg
+      class="block min-h-0 w-full flex-1 overflow-visible text-accent-fg"
+      viewBox="-0.1 -0.4 1.2 1.8"
+      aria-hidden="true"
+    >
+      <path
+        d="M0 1H1V0"
+        fill="none"
+        stroke="currentColor"
+        stroke-opacity="0.2"
+        vector-effect="non-scaling-stroke"
+      />
+      <path
+        d={easePath(token)}
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
+    <span class="@container block">
+      <span
+        class="block size-200 rounded-full bg-fg-default"
+        style={`--preview-duration: var(--duration-1000, 1000ms); --preview-ease: ${value}`}
+        data-motion-dot="1000ms"
+        data-ease={formatResolved(token)}
+        data-from={easeTrack(token).from}
+        data-to={easeTrack(token).to}
+      ></span>
+    </span>
+  </span>
+)}
+{kind === 'duration' && (
+  <span class="@container flex size-1000 items-center rounded-md bg-wash-soft p-100">
+    <span
+      class="block size-200 rounded-full bg-fg-default"
+      style={`--preview-duration: ${value}`}
+      data-motion-dot={formatResolved(token)}
+    ></span>
+  </span>
 )}
 {kind === 'space' && (
   <span
@@ -115,3 +139,58 @@ const shape = token.name.startsWith('radius.squircle')
     </mds-text>
   </span>
 )}
+
+<script>
+  // The dot of a duration or an easing preview moves as a transition does:
+  // once, across its track (`@container`), in the duration of
+  // `--preview-duration` with the easing of `--preview-ease` (linear for a
+  // duration; the slowest duration for an easing, to see its curve), from
+  // `data-from` to `data-to`, the overshoot of an easing included. Then it
+  // rests at the end, fades and starts over. Until the page resolves the
+  // custom properties of the tokens, their values (`data-motion-dot`,
+  // `data-ease`). Still when animations are reduced, by the system or by
+  // Magma's preference class.
+  const FADE = 200;
+  const REST = 400;
+  const HOLD = 1000;
+
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = () =>
+    reduce.matches || document.documentElement.classList.contains('pref-animation-reduce');
+  /** A CSS time in milliseconds. */
+  const ms = (time: string) => parseFloat(time) * (/\dms$/.test(time.trim()) ? 1 : 1000);
+  /** A point of the track, as a fraction of it. */
+  const at = (fraction: number) => `calc((100cqw - 100%) * ${fraction}) 0`;
+
+  const start = () => {
+    for (const dot of document.querySelectorAll<HTMLElement>('[data-motion-dot]')) {
+      for (const animation of dot.getAnimations()) animation.cancel();
+      const style = getComputedStyle(dot);
+      const duration =
+        ms(style.getPropertyValue('--preview-duration')) || ms(dot.dataset.motionDot ?? '');
+      if (reduced() || !(duration >= 0)) continue;
+      const easing =
+        style.getPropertyValue('--preview-ease').trim() || dot.dataset.ease || 'linear';
+      const from = at(Number(dot.dataset.from ?? 0));
+      const to = at(Number(dot.dataset.to ?? 1));
+      const total = FADE + REST + duration + HOLD + FADE;
+      const offset = (time: number) => time / total;
+      dot.animate(
+        [
+          { offset: 0, translate: from, opacity: 0 },
+          { offset: offset(FADE), translate: from, opacity: 1 },
+          { offset: offset(FADE + REST), translate: from, opacity: 1, easing },
+          { offset: offset(FADE + REST + duration), translate: to, opacity: 1 },
+          { offset: offset(total - FADE), translate: to, opacity: 1 },
+          { offset: 1, translate: to, opacity: 0 },
+        ],
+        { duration: total, iterations: Infinity },
+      );
+    }
+  };
+
+  // Every page the router shows, the first one included.
+  document.addEventListener('astro:page-load', start);
+  reduce.addEventListener('change', start);
+  start();
+</script>

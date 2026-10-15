@@ -8,7 +8,11 @@
 // Pages change in place (Astro's ClientRouter, Head.astro). The columns marked
 // `transition:persist` stay mounted from page to page while their links are
 // the same (script below): their Magma components do not hydrate again, the
-// section navigation keeps its scroll position.
+// columns keep their scroll position.
+//
+// The rail is sticky, so its own stacking context: on Magma's header layer,
+// its dropdown and tooltips show over the card (whose sticky columns would
+// paint over them otherwise), under what floats from the content.
 import Search from '@astrojs/starlight/components/Search.astro';
 import Rail from './Rail.astro';
 
@@ -25,7 +29,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   <div
     data-frame-rail
     transition:persist="frame-rail"
-    class="hidden desktop:sticky desktop:top-0 desktop:flex desktop:h-screen print:hidden"
+    class="hidden desktop:sticky desktop:top-0 desktop:z-(--magma-header-z-index) desktop:flex desktop:h-screen print:hidden"
   >
     <Rail />
   </div>
@@ -109,28 +113,38 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   ];
   const hrefs = (column: ParentNode) => links(column).map((link) => link.getAttribute('href'));
 
-  let sectionScroll = 0;
+  /** Scroll positions in the kept columns, put back after the swap. */
+  const scrolled = new Map<Element, [top: number, left: number]>();
 
   document.addEventListener('astro:before-swap', (event) => {
     const next = (event as TransitionBeforeSwapEvent).newDocument;
 
     // <html> takes the attributes of the new page: keep the ones set on this
-    // side (mode and theme, ThemeProvider.astro and mds-pref-mode; rail, Rail.astro).
+    // side (mode and theme, ThemeProvider.astro, mds-pref-mode and
+    // mds-pref-theme; rail, Rail.astro).
     const root = document.documentElement;
-    for (const name of ['data-theme', 'data-magma-pref', 'data-rail']) {
+    for (const name of ['data-theme', 'data-theme-name', 'data-magma-pref', 'data-rail']) {
       const value = root.getAttribute(name);
       if (value === null) next.documentElement.removeAttribute(name);
       else next.documentElement.setAttribute(name, value);
     }
     next.documentElement.classList.add(
-      ...[...root.classList].filter((name) => name.startsWith('pref-mode-')),
+      ...[...root.classList].filter((name) => /^pref-(mode|theme)-/.test(name)),
     );
-    const mode = root.style.getPropertyValue('--magma-pref-mode');
-    if (mode) next.documentElement.style.setProperty('--magma-pref-mode', mode);
+    for (const property of [
+      '--magma-pref-mode',
+      '--magma-pref-theme',
+      '--magma-pref-theme-scheme',
+    ]) {
+      const value = root.style.getPropertyValue(property);
+      if (value) next.documentElement.style.setProperty(property, value);
+    }
 
     // A column is kept when the new page has the same links in it, and only
     // which one is current changes. Other links (another section, another
     // component, the table of contents of a page) make a new column.
+    scrolled.clear();
+    const copies: Element[] = [];
     for (const column of next.querySelectorAll(`[${PERSIST}]`)) {
       const kept = document.querySelector(`[${PERSIST}="${column.getAttribute(PERSIST)}"]`);
       if (!kept) continue;
@@ -150,37 +164,63 @@ const { hasSidebar } = Astro.locals.starlightRoute;
           else link.setAttribute(name, value);
         }
       });
+      for (const element of [kept, ...kept.querySelectorAll('*')]) {
+        if (element.scrollTop || element.scrollLeft) {
+          scrolled.set(element, [element.scrollTop, element.scrollLeft]);
+        }
+      }
+      copies.push(column);
     }
 
-    sectionScroll = document.querySelector('[data-frame-section]')?.scrollTop ?? 0;
+    // The router puts the new page in, then the kept columns in place of
+    // their copies: for that moment the copies are on the page, and their
+    // components start loading for nothing. mds-tooltip and mds-dropdown
+    // (magma 2.2.0) then throw, taken off the page before they have loaded
+    // (https://github.com/magma-design-system/magma/issues/527). Emptied once
+    // every listener has read the new page, right before the swap.
+    const swap = (event as TransitionBeforeSwapEvent).swap;
+    (event as TransitionBeforeSwapEvent).swap = () => {
+      for (const copy of copies) copy.replaceChildren();
+      swap();
+    };
   });
 
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
 
-  /** The current page of the section navigation in view, once its links have their height. */
-  const showCurrent = async () => {
-    const column = document.querySelector<HTMLElement>('[data-frame-section]');
-    if (!column || column.getClientRects().length === 0) return;
-    await Promise.all(
-      [...column.querySelectorAll<MagmaElement>('mds-button')].map(async (element) => {
-        await customElements.whenDefined(element.localName);
-        await element.componentOnReady?.();
-      }),
+  /**
+   * The current page of the section navigation and of the right column in
+   * view, once their links have their height.
+   */
+  const showCurrent = () =>
+    Promise.all(
+      [...document.querySelectorAll<HTMLElement>('[data-frame-section], [data-frame-aside]')].map(
+        async (column) => {
+          if (column.getClientRects().length === 0) return;
+          await Promise.all(
+            [...column.querySelectorAll<MagmaElement>('mds-button')].map(async (element) => {
+              await customElements.whenDefined(element.localName);
+              await element.componentOnReady?.();
+            }),
+          );
+          const current = column.querySelector('[aria-current="page"]');
+          if (!current) return;
+          const view = column.getBoundingClientRect();
+          const item = current.getBoundingClientRect();
+          if (item.top < view.top || item.bottom > view.bottom) {
+            column.scrollTop += item.top - view.top - (view.height - item.height) / 2;
+          }
+        },
+      ),
     );
-    const current = column.querySelector('[aria-current="page"]');
-    if (!current) return;
-    const view = column.getBoundingClientRect();
-    const item = current.getBoundingClientRect();
-    if (item.top < view.top || item.bottom > view.bottom) {
-      column.scrollTop += item.top - view.top - (view.height - item.height) / 2;
-    }
-  };
 
   document.addEventListener('astro:after-swap', () => {
-    // A kept column can lose its scroll position on the move (browsers
-    // without `moveBefore`): put it back before the new page is shown.
-    const column = document.querySelector('[data-frame-section]');
-    if (column?.hasAttribute(PERSIST)) column.scrollTop = sectionScroll;
+    // The kept columns lose their scroll position on the move, also with
+    // `moveBefore` (Chromium 152): put it back before the new page is shown.
+    for (const [element, [top, left]] of scrolled) {
+      element.scrollTop = top;
+      element.scrollLeft = left;
+    }
+    scrolled.clear();
     showCurrent();
   });
   showCurrent();

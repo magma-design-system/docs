@@ -69,16 +69,16 @@ const LIST = 'min-w-prose';
             </mds-text>
           </mds-table-cell>
           <mds-table-cell class={LIST}>
-            <span class="flex flex-wrap items-center gap-100">
+            <div class="flex flex-wrap gap-100 items-start justify-start">
               {ns.shown.map((name) => (
-                <Code>{name}</Code>
+                <Code class="my-0">{name}</Code>
               ))}
               {ns.more > 0 && (
-                <mds-text typography="caption" tag="span" class="my-0 text-fg-muted">
+                <mds-text typography="caption" tag="span" class="text-fg-muted inline-flex m-0">
                   {t('tokens.tailwind.more', { count: ns.more })}
                 </mds-text>
               )}
-            </span>
+            </div>
           </mds-table-cell>
         </mds-table-row>
       ))}
@@ -124,7 +124,7 @@ const LIST = 'min-w-prose';
   <mds-table interactive>
     <mds-table-header>
       <mds-table-header-cell label={t('tokens.column.token')} />
-      <mds-table-header-cell label={t('tokens.column.arbitrary')} />
+      <mds-table-header-cell label={t('tokens.column.class')} />
     </mds-table-header>
     <mds-table-body>
       {unread.map((row) => (
@@ -168,7 +168,7 @@ const LIST = 'min-w-prose';
           <mds-table-cell class={LIST}>
             <span class="flex flex-wrap gap-100">
               {row.tokens.length ? (
-                row.tokens.map((token) => <Code>{token}</Code>)
+                row.tokens.map((token) => <Code class="my-0">{token}</Code>)
               ) : (
                 <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
                   -

@@ -1,26 +1,48 @@
 ---
-// The 8 sections of the site, in the rail and in the mobile menu.
+// The 8 sections of the site, in the rail and in the mobile menu. `compact`
+// (the collapsed rail): icons only, each named by the label of its section,
+// which a tooltip shows on hover.
 import { frameNav } from '../../lib/frame';
 
+interface Props {
+  compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
 const { t, starlightRoute } = Astro.locals;
 const { sections } = frameNav(starlightRoute, Astro.url.pathname);
 ---
 
 <nav aria-label={t('frame.sections')}>
+  {/*
+    The items are flex boxes: in a block, the button would sit on a line of
+    text, whose line height adds space below it to the gap.
+  */}
   <ul class="m-0 flex list-none flex-col gap-100 p-0">
     {sections.map((section) => (
-      <li>
+      <li class="flex">
         <mds-button
+          id={compact ? `rail-section-${section.id}` : undefined}
           class="max-w-full"
           href={section.href}
           role="link"
           type="a"
           aria-current={section.current ? 'page' : undefined}
+          aria-label={compact ? section.label : undefined}
           icon={section.icon}
-          label={section.label}
+          label={compact ? undefined : section.label}
           variant="dark"
           tone={section.current ? 'strong' : 'text'}
         />
+        {compact && (
+          <mds-tooltip
+            target={`#rail-section-${section.id}`}
+            placement="right"
+            disable-auto-placement
+          >
+            {section.label}
+          </mds-tooltip>
+        )}
       </li>
     ))}
   </ul>

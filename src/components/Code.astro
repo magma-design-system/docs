@@ -3,18 +3,26 @@
 // have it (src/lib/markdown-text.mjs): `hack`, without the ring, on a light
 // background. `name`: what a table row is about, in bold and without
 // background. `copy`: the text copied when it is clicked
-// (CopyToClipboard.astro).
+// (CopyToClipboard.astro). `class`: overrides, such as `my-0` where the
+// code sits next to other code in a flex row (Starlight's content styles
+// give every sibling after the first a top margin).
 import { TEXT } from '../lib/markdown-text.mjs';
 
 interface Props {
   name?: boolean;
   copy?: string;
+  class?: string;
 }
 
-const { name = false, copy } = Astro.props;
+const { name = false, copy, class: className } = Astro.props;
 ---
 
-<mds-text typography="hack" tag="code" class={name ? TEXT.name : TEXT.code} data-copy={copy}>
+<mds-text
+  typography="hack"
+  tag="code"
+  class:list={[name ? TEXT.name : TEXT.code, className]}
+  data-copy={copy}
+>
   {name ? (
     <strong>
       <slot />

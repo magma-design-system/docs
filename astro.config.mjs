@@ -28,13 +28,28 @@ const frame = Object.fromEntries(
   ].map((name) => [name, `./src/components/frame/${name}.astro`]),
 );
 
+const base = '/docs';
+
+/** The favicons of src/pages/favicons/[file].ts, other than the SVG one (`favicon`). */
+const favicons = [
+  // Before the SVG, as Starlight sorts them: the browsers that have both take the SVG.
+  { rel: 'icon', href: 'favicon.ico', sizes: '16x16 32x32 48x48' },
+  { rel: 'apple-touch-icon', href: 'apple-touch-icon.png' },
+  { rel: 'manifest', href: 'manifest.webmanifest' },
+].map((attrs) => ({
+  tag: /** @type {const} */ ('link'),
+  attrs: { ...attrs, href: `${base}/favicons/${attrs.href}` },
+}));
+
 export default defineConfig({
   site: 'https://magma-design-system.github.io',
-  base: '/docs',
+  base,
   integrations: [
     starlight({
       title: 'Magma',
       description: 'Maggioli Group Design System',
+      favicon: '/favicons/favicon.svg',
+      head: favicons,
       defaultLocale: 'root',
       locales,
       // First entry: it declares the cascade layer order for the whole site.

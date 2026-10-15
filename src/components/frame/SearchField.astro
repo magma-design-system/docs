@@ -1,0 +1,38 @@
+---
+// The search at the top of the rail and of the mobile menu: a button that
+// opens Starlight's search dialog (PageFrame.astro), as its shortcut does
+// (Ctrl+K, or Cmd+K on Apple systems).
+const { t } = Astro.locals;
+---
+
+<mds-button
+  type="button"
+  variant="light"
+  class="shadow-sm-sharp hover:shadow-highlight-strong hover:shadow-variant-primary-03/80 self-auto justify-start"
+  icon="mi/baseline/search"
+  label={t('search.label')}
+  data-search-trigger
+  aria-keyshortcuts="Control+K"
+></mds-button>
+<script is:inline>
+  // As Starlight's own search button: the Command key on Apple systems.
+  (() => {
+    const button = document.currentScript?.previousElementSibling;
+    if (button && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+      button.setAttribute('aria-keyshortcuts', 'Meta+K');
+    }
+  })();
+</script>
+
+<script>
+  // One search dialog per page (Starlight's, in PageFrame): every trigger
+  // opens it, this button and the search icon of the collapsed rail.
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('[data-search-trigger]'))
+      return;
+    // Once open, the dialog closes on the next click that reaches `window` on
+    // anything with an `href` property: mds-button has one.
+    event.stopPropagation();
+    document.querySelector<HTMLButtonElement>('site-search button[data-open-modal]')?.click();
+  });
+</script>

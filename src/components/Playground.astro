@@ -277,13 +277,19 @@ const fields = props
     (element as unknown as Record<string, unknown>)[name] = value;
   };
 
-  /** The light or dark mode of the page, in the preview too. */
+  /** The light or dark mode and the theme of the page, in the preview too. */
   const syncMode = (doc: Document) => {
     const root = doc.documentElement;
     root.classList.remove(...[...root.classList].filter((name) => MODE.test(name)));
     root.classList.add(
       ...[...document.documentElement.classList].filter((name) => MODE.test(name)),
     );
+    // Without data-magma-pref Magma follows the system's mode, whatever the class.
+    for (const name of ['data-magma-pref', 'data-theme-name']) {
+      const value = document.documentElement.getAttribute(name);
+      if (value === null) root.removeAttribute(name);
+      else root.setAttribute(name, value);
+    }
   };
 
   /** A load of the preview: its height, its mode, then the controls on its element. */
@@ -309,7 +315,10 @@ const fields = props
     const resize = new win.ResizeObserver(fit);
     resize.observe(doc.body);
     const mode = new MutationObserver(() => syncMode(doc));
-    mode.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    mode.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme-name'],
+    });
     syncMode(doc);
     let changes: MutationObserver | undefined;
     playground.stop = () => {

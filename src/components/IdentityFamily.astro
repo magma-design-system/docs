@@ -1,0 +1,243 @@
+---
+// A family of brand assets (src/lib/identity.mjs): its heading, a description
+// and one mds-card per artwork, with the artwork on the background it is
+// drawn for (white on dark, anything else on white, whatever the mode of the
+// page) as a checkerboard, since the files are transparent, and a Download
+// split button (mds-button-dropdown): its action downloads the SVG, its menu
+// every format and the file name, whose button copies the path of the SVG in
+// the package (CopyExample.astro; CopyToClipboard.astro once per page). The
+// artwork is a background image, `contain`, so the preview fills
+// mds-card-media whatever the shape of the logo.
+// The descriptions are this site's defaults until identity publishes its own.
+// The cards are surface-overlay: mds-card's parts paint --mds-card-background,
+// not the background of the card, so both are set.
+import CopyExample from './CopyExample.astro';
+import Heading from './Heading.astro';
+import { TEXT } from '../lib/markdown-text.mjs';
+import { IDENTITY_PACKAGE, type IdentityFamily, type IdentityFile } from '../lib/identity.mjs';
+
+interface Props {
+  family: IdentityFamily;
+  /** Id of the family's heading. */
+  id: string;
+  /** The family's heading: 3 under the heading of its owner. */
+  level?: 2 | 3;
+}
+
+const { family, id, level = 2 } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const raw = { interpolation: { escapeValue: false } };
+
+const kind =
+  family.kind === 'logo' && family.group === 'products'
+    ? 'product'
+    : family.kind === 'logo' && family.group === 'internal'
+      ? 'internal'
+      : family.kind;
+const description = [
+  t(`brand.description.${kind}` as never, { name: family.name, owner: family.owner, ...raw }),
+  ...family.forms
+    .filter((form) => form !== 'logo')
+    .map((form) => t(`brand.description.${form}` as never)),
+].join(' ');
+
+const size = (bytes: number) =>
+  t('brand.kb', { size: Math.max(1, Math.round(bytes / 1024)).toLocaleString(lang) });
+const link = (file: IdentityFile, text: string) => ({
+  text,
+  href: `${base}downloads/identity/${file.path}`,
+  file: file.file,
+  label: t('brand.download', { file: file.file, size: size(file.bytes), ...raw }),
+});
+
+const tiles = family.assets.map((asset) => {
+  const color: string = t(`brand.color.${asset.color}` as never);
+  const variant =
+    family.forms.length > 1
+      ? t('brand.variant', {
+          form: t(`brand.form.${asset.form}` as never),
+          color: color.toLocaleLowerCase(lang),
+          ...raw,
+        })
+      : color;
+  return {
+    asset,
+    // The title of the card: its variant, or the name of a family with one artwork.
+    label: family.assets.length > 1 ? variant : family.name,
+    // The accessible name of the preview.
+    alt: family.assets.length > 1 ? `${family.name}, ${variant}` : family.name,
+    dark: asset.color === 'white',
+    src: `${base}downloads/identity/${asset.svg.path}`,
+    rows: [
+      { format: 'SVG', id: 'svg', links: [link(asset.svg, size(asset.svg.bytes))] },
+      ...(asset.pdf
+        ? [{ format: 'PDF', id: 'pdf', links: [link(asset.pdf, size(asset.pdf.bytes))] }]
+        : []),
+      { format: 'PNG', id: 'png', links: asset.png.map((file) => link(file, `${file.width}w`)) },
+      { format: 'WebP', id: 'webp', links: asset.webp.map((file) => link(file, `${file.width}w`)) },
+    ]
+      .filter((row) => row.links.length)
+      .map(({ id, ...row }) => ({ ...row, description: t(`brand.format.${id}` as never) })),
+  };
+});
+---
+
+<Heading id={id} text={family.name} level={level} />
+<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+  {description}
+</mds-text>
+
+<!-- auto-fit: a family with one artwork gets a card as wide as the column,
+     which mds-card lays out with the media beside the content. -->
+<div class="not-content mt-400 mb-800 grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-400">
+  {tiles.map(({ asset, label, alt, dark, src, rows }) => (
+    <mds-card class="bg-surface-overlay [--mds-card-background:rgb(var(--magma-surface-overlay))]">
+      <mds-card-media class="p-200">
+        <div
+          class:list={[
+            'relative size-full min-h-3200 overflow-hidden rounded-md inset-shadow-xs',
+            // The classic checkerboard, to show that the files are transparent.
+            'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
+            dark
+              ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
+              : 'bg-white [--checker:color-mix(in_oklab,var(--color-neutral-100),var(--color-neutral-200))]',
+          ]}
+        >
+          <span
+            role="img"
+            aria-label={alt}
+            class="absolute inset-600 bg-contain bg-center bg-no-repeat"
+            style={`background-image: url('${src}')`}
+          ></span>
+        </div>
+      </mds-card-media>
+      <mds-card-header>
+        <mds-text typography="h6" tag={`h${level + 1}`}>
+          {label}
+        </mds-text>
+      </mds-card-header>
+      <mds-card-content>
+        xxx
+      </mds-card-content>
+      <mds-card-footer>
+        <mds-button-dropdown
+          label={t('brand.download.action')}
+          icon="mi/outline/file-download"
+          variant="primary"
+          tone="strong"
+          data-download={src}
+          data-file={asset.svg.file}
+        >
+          <div
+            role="group"
+            aria-label={t('brand.download.group', { name: alt, ...raw })}
+            data-pagefind-ignore
+            data-download-menu
+            class="flex flex-col gap-400 p-400"
+          >
+            <div class="grid items-center">
+              {rows.map(({ format, description, links }) => (
+                <div class="hover:bg-surface-raised p-200 pl-400 transition-colors rounded-md grid grid-cols-[1fr_auto] items-center gap-600">
+                  <div class="flex flex-col">
+                    <mds-text typography="h6" tag="span">
+                      {format}
+                    </mds-text>
+                    <mds-text typography="caption" tag="span" class="text-fg-muted">
+                      {description}
+                    </mds-text>
+                  </div>
+                  <div class="flex justify-center gap-300">
+                    {links.map((item) => (
+                      <div
+                        class="inline-flex cursor-pointer flex-col items-center justify-center"
+                        data-download={item.href}
+                        data-file={item.file}
+                      >
+                        <mds-button
+                          icon="mi/outline/file-download"
+                          variant="dark"
+                          tone="text"
+                          class="self-center justify-self-center"
+                          aria-label={item.label}
+                          class="hover:bg-surface-overlay hover:shadow-sm"
+                        ></mds-button>
+                        <mds-text typography="tip" tag="span" aria-hidden="true">
+                          {item.text}
+                        </mds-text>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <mds-hr></mds-hr>
+            <CopyExample text={asset.svg.file} copy={`${IDENTITY_PACKAGE}/dist/${asset.svg.path}`}>
+              {asset.svg.file}
+            </CopyExample>
+          </div>
+        </mds-button-dropdown>
+      </mds-card-footer>
+    </mds-card>
+  ))}
+</div>
+
+<script>
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+
+  // mds-button follows its `href` with `location.href` and has no `download`:
+  // a link made for the click downloads the file of `data-download`.
+  const download = (element: Element | null) => {
+    const href = element?.getAttribute('data-download');
+    if (!element || !href) return;
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = element.getAttribute('data-file') ?? '';
+    link.click();
+  };
+
+  // The action of the split button: the SVG.
+  document.addEventListener('mdsButtonDropdownClick', (event) =>
+    download(event.target instanceof Element ? event.target : null),
+  );
+
+  // magma 2.2.0, fixes to the menu of each split button:
+  // - mds-button-dropdown passes no placement to its mds-dropdown, whose
+  //   autoPlacement opens the menu on the side with the most room, beside the
+  //   button most of the time. Below it, aligned to its end, above it when
+  //   there is no room below.
+  // - mds-dropdown tells what is in it with `contains`, which does not see
+  //   what mds-button-dropdown slots into it: any click in the menu closed
+  //   it, the copy before its check showed, and Escape from the menu dropped
+  //   the focus on the page. The clicks stop in the menu, which Escape and a
+  //   click outside still close, and Escape gives the focus back to the arrow.
+  const setup = async () => {
+    await customElements.whenDefined('mds-button-dropdown');
+    for (const split of document.querySelectorAll<MagmaElement>(
+      'mds-button-dropdown[data-download]',
+    )) {
+      if (split.dataset.ready !== undefined) continue;
+      split.dataset.ready = '';
+      await split.componentOnReady?.();
+      const menu = split.shadowRoot?.querySelector('mds-dropdown');
+      if (menu) {
+        Object.assign(menu, { placement: 'bottom-end', disableAutoPlacement: true, flip: true });
+      }
+      const files = split.querySelector('[data-download-menu]');
+      files?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const file =
+          event.target instanceof Element ? event.target.closest('[data-download]') : null;
+        if (file && files.contains(file)) download(file);
+      });
+      files?.addEventListener('keydown', (event) => {
+        if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') return;
+        split.shadowRoot?.querySelector<HTMLElement>('.dropdown-action')?.focus();
+      });
+    }
+  };
+  // Every page the router shows, the first one included.
+  document.addEventListener('astro:page-load', setup);
+  setup();
+</script>

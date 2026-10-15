@@ -8,14 +8,17 @@ import TokenTable from '../../../components/TokenTable.astro';
 
 ## Durations
 
-Tailwind 4 has no namespace for durations: `duration-200` is Tailwind's own 200ms, not the
-token. To use the token write `duration-(--duration-200)`.
+The Tailwind classes write the value of the token: `duration-200` is 200ms, as
+`--duration-200`, without reading the variable (Tailwind reads `--transition-duration-200`,
+which styles does not publish). To follow the variable, should a theme change it, write
+`duration-(--duration-200)`.
 
 <TokenTable tokens="duration" />
 
 ## Easings
 
-Each curve is drawn from its control points; the `back` curves overshoot their ends.
+Each curve is drawn from its control points, over a dot that it moves in
+`--duration-1000`; the `back` curves overshoot their ends.
 
 <TokenTable tokens="ease" />
 
