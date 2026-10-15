@@ -7,6 +7,7 @@ import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
 export const REPOSITORY = 'https://github.com/magma-design-system/magma';
+export const STORYBOOK = 'https://magma-design-system.github.io/magma/storybook/';
 
 /**
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).

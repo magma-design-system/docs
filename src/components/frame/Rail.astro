@@ -1,6 +1,6 @@
 ---
-// Desktop rail: brand, the search (SearchField.astro), the 8
-// sections and the actions (repository, preferences). Collapsed, it narrows to
+// Desktop rail: brand, the search (SearchField.astro), the 8 sections and
+// the actions (repository, Storybook, preferences). Collapsed, it narrows to
 // icons: the button that expands it again, the logo below it, then the search,
 // the sections and the actions, each named by a tooltip (which Magma also
 // makes its description: the same text twice, magma#923). The state is kept
@@ -10,7 +10,7 @@
 // The preferences open in a dropdown next to the button that asks for them,
 // in either form of the rail (Preferences.astro moves them in and out).
 import { localePrefix } from '../../lib/frame';
-import { REPOSITORY } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
 import Brand from './Brand.astro';
 import Logo from './Logo.astro';
 import Preferences from './Preferences.astro';
@@ -33,6 +33,12 @@ const actions = [
     icon: 'mdi/github',
     label: t('frame.repository'),
     attributes: { type: 'a', href: REPOSITORY, target: 'blank', role: 'link' },
+  },
+  {
+    id: 'rail-storybook',
+    icon: 'mi/baseline/auto-stories',
+    label: t('frame.storybook'),
+    attributes: { type: 'a', href: STORYBOOK, target: 'blank', role: 'link' },
   },
   {
     id: 'rail-preferences',

@@ -17,6 +17,7 @@
   "frame.theme.cool": "Cool",
   "frame.theme.warm": "Warm",
   "frame.repository": "Magma on GitHub",
+  "frame.storybook": "Magma Storybook",
   "frame.preferences": "Preferences",
   "frame.footer.modified": "Modified {{date}}",
   "frame.footer.created": "Created {{date}}",
