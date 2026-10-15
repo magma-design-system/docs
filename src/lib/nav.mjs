@@ -1,7 +1,8 @@
-// The 9 sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
+// The sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here.
+import { existsSync, readFileSync } from 'node:fs';
 import { componentTags } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
@@ -13,6 +14,8 @@ export const STORYBOOK = 'https://magma-design-system.github.io/magma/storybook/
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).
  * `items` are Starlight sidebar items: the first one is where the rail item links.
  * A landing page titled like its section is labelled Overview in the section navigation.
+ * `soon`: a section still being written, whose landing page says what is coming
+ * (its pages are drafts, see `published`).
  */
 export const sections = [
   {
@@ -83,16 +86,24 @@ export const sections = [
     ],
   },
   {
+    id: 'blocks',
+    icon: 'mi/outline/extension',
+    soon: true,
+    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
+  },
+  {
     id: 'patterns',
     icon: 'mi/outline/view-quilt',
+    soon: true,
     // The groups of the landing page, in its order.
-    items: () => [
-      { slug: 'patterns', ...sidebarLabel('nav.overview') },
-      {
-        ...sidebarLabel('nav.patterns.data'),
-        items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
-      },
-    ],
+    items: () =>
+      published([
+        { slug: 'patterns', ...sidebarLabel('nav.overview') },
+        {
+          ...sidebarLabel('nav.patterns.data'),
+          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
+        },
+      ]),
   },
   {
     id: 'brand',
@@ -128,6 +139,39 @@ export const sections = [
     ],
   },
 ];
+
+/**
+ * Whether the page of a sidebar slug is a draft (`draft: true` in its front
+ * matter). Read on use, from astro.config.mjs: once bundled, `import.meta.url`
+ * no longer points at src/ (as in i18n.mjs).
+ * @param {string} slug
+ */
+function isDraft(slug) {
+  for (const extension of ['mdx', 'md']) {
+    const file = new URL(`../content/docs/${slug}.${extension}`, import.meta.url);
+    if (!existsSync(file)) continue;
+    const frontMatter = readFileSync(file, 'utf8').split(/^---$/m)[1] ?? '';
+    return /^draft:\s*true\s*$/m.test(frontMatter);
+  }
+  return false;
+}
+
+/**
+ * Sidebar items without the draft pages in a production build, where Starlight
+ * leaves them out (a slug to a page that is not built is an error), and without
+ * the groups left empty. In dev the drafts stay, to be written and reviewed.
+ * @param {any[]} items
+ * @returns {any[]}
+ */
+function published(items) {
+  if (process.env.NODE_ENV !== 'production') return items;
+  return items.flatMap((item) => {
+    if (item.slug) return isDraft(item.slug) ? [] : [item];
+    if (!item.items) return [item];
+    const kept = published(item.items);
+    return kept.length > 0 ? [{ ...item, items: kept }] : [];
+  });
+}
 
 /** Starlight's `sidebar` config: one group per section, labelled from the UI dictionaries. */
 export function sidebar() {

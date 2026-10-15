@@ -87,9 +87,26 @@ First release: `valid-attribute-values`, `no-false-boolean`, `accessible-name`,
 `no-raw-palette-classes`, `no-raw-color`, `no-color-scheme-override`.
 `no-internal-tokens` waits for choice 1.
 
+## Building blocks section
+
+A rail item between Components and Patterns, coming soon like Patterns (landing page only).
+A building block is a group of components that screens reuse in the same arrangement (page
+header, filter bar, results summary, form section, action bar, empty or error state,
+confirmation dialog): no data and no business logic, its rules are about structure and
+layout. A pattern is a whole screen or task: blocks plus behavior over time (state, what
+follows an action, loading, errors, focus). Blocks are not designed in advance: a part of a
+screen becomes a block when it comes back in two or three patterns. Candidates from list
+with filters: page header, filter bar, results summary, empty and error states.
+
 ## Patterns section
 
 A ninth rail item, after Components. Section navigation mirrors the landing groups.
+
+Coming soon (2026-10-15): the section is public only as its landing page, which says what is
+coming (`soon: true` in `src/lib/nav.mjs`, `ComingSoon.astro`, a badge on the home card). The
+pattern pages are drafts (`draft: true`): in dev they are in the section navigation, a
+production build leaves them out, with their live previews (`published` in `nav.mjs`).
+Remove `draft` from a page when it is ready, and `soon` from the section with the first one.
 
 - **Overview**: what a pattern is here (a whole screen or task, not one component), how
   to read a page.
