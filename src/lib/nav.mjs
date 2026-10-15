@@ -1,4 +1,4 @@
-// The 8 sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
+// The 9 sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here.
@@ -79,6 +79,18 @@ export const sections = [
     items: () => [
       { ...sidebarLabel('nav.components.overview'), link: '/components/' },
       ...componentTags().map((tag) => ({ label: componentName(tag), link: `/components/${tag}/` })),
+    ],
+  },
+  {
+    id: 'patterns',
+    icon: 'mi/outline/view-quilt',
+    // The groups of the landing page, in its order.
+    items: () => [
+      { slug: 'patterns', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.patterns.data'),
+        items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
+      },
     ],
   },
   {

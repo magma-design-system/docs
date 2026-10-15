@@ -1,0 +1,174 @@
+---
+title: List with filters
+description: A list of records to search, narrow down, sort and page through, with its loading, empty and error states and the query kept in the address.
+---
+
+import PatternCode from '../../../components/PatternCode.astro';
+import PatternComponents from '../../../components/PatternComponents.astro';
+import PatternPreview from '../../../components/PatternPreview.astro';
+import Usages from '../../../components/Usages.astro';
+
+The screen people open most in a management application: the list of the records they work on -
+requests, documents, payments, files - where they find the ones they need. They search it,
+narrow it down by status or by office, sort it and move through its pages, and they come back
+to it after opening a record, expecting to find it as they left it.
+
+<PatternPreview id="list-with-filters" />
+
+## When to use it
+
+Use it when people look for records in a set too large to read through: dozens of records or
+more, with a few properties worth filtering on. Something else fits better:
+
+- With a handful of records, show them all: filters and pages only get in the way.
+- When the records are visual, such as images or documents to preview, show them as cards in a
+  grid; the search, the filters and the pages stay the same.
+- When people pick one record to go on with a task, such as a recipient in a form, a search
+  field with suggestions is quicker than a whole list.
+
+## Anatomy
+
+1. **Title and description**: what the list holds, as the heading of the page.
+2. **Search and filters**: a form with the role of a search, with a field that searches the
+   number and the subject, a select for each property with a few values, and the order.
+3. **Status filter**: the statuses as an `mds-filter`, one at a time, each with the number of
+   records it would show.
+4. **Summary**: which records are on screen out of how many, and the button that clears the
+   filters when there are any.
+5. **Results**: one row per record, its number linking to its page.
+6. **Pages**: the paginator, only when there is more than one page.
+
+Three states replace or join the results: **loading** (a spinner in the search field, while
+the results already there stay), **no results** (a message with a way out), **error** (a
+banner with a way to try again).
+
+## Components
+
+<PatternComponents id="list-with-filters" />
+
+## Behavior
+
+- **The back end does the work.** It searches, counts, sorts and pages the records, and the
+  page receives one page of results. Filtering in the browser works only while the whole set
+  fits in the page, and sets grow.
+- **The query is in the address.** Search, status, office, order and page are parameters of the
+  address, so a reload, a bookmark or a link sent to a colleague shows the same results, and
+  Back from a record returns to the list as it was. Values left to their default stay out, to
+  keep the address short.
+- **A new filter starts from the first page.** Any change but the page goes back to page 1:
+  page 4 of a smaller set may not exist. An address that asks for a page past the end gets the
+  last one.
+- **One query at a time.** The search waits for a pause in the typing (300 ms) instead of
+  asking at every key, and a new query cancels the one still running, so an older, slower
+  answer never replaces a newer one.
+- **The results stay while the next ones load.** The spinner in the search field, and
+  `aria-busy` on the table, tell that new results are coming; the page does not flash empty.
+- **Counts follow the other filters.** Each status shows how many records it would show with
+  the search and the office chosen, so an empty status is visible before it is picked.
+- **No results is not an error.** When nothing matches, the page says so and offers to clear
+  the filters. When the request fails, it says the results could not be loaded and offers to
+  try again, instead of showing an empty list.
+
+## Accessibility
+
+- The filters are a form with `role="search"`, a landmark screen reader users can jump to.
+  Every control has a visible label, given by `mds-input-field`: the placeholder is an example,
+  not the label.
+- The summary has `role="status"`: after each change, screen readers read out which records
+  are shown out of how many, while the focus stays on the control just used, so people can go
+  on refining.
+- The status of each record is the text of its badge, not only its color.
+- The number of each record is the link to its page, and the name of the link. A button that
+  says "Open" on every row would sound the same on every row.
+- The table keeps its column headers, and on a narrow screen it scrolls sideways instead of
+  squeezing the columns: its cells stay on one line.
+
+## Content
+
+- Name the list after what it holds, in the plural: "Requests", not "Request list" or
+  "Search".
+- The label of the search field says what it is; the placeholder says what it searches:
+  "Number or subject".
+- Name the statuses as the page of a record names them, and list them in the order of the
+  process.
+- Count the results, and use the singular for one: "1 request", "11-20 of 46 requests".
+- When nothing matches, say so and say how to get out of it: "No requests match", with
+  "Clear filters" - not "No data".
+- Write dates in the format of the language of the page.
+
+## Mistakes to avoid
+
+<Usages>
+<mds-usage variant="dont">
+
+The page loads every record and filters them in the browser.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The back end searches, counts, sorts and pages; the page receives one page.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The columns of a list with pages are sortable with `sortable` on `mds-table-header-cell`: it
+sorts only the rows on screen.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The order is part of the query: the back end sorts the whole set, then pages it.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The status changes and the list stays on page 4, which no longer exists.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Every change of the filters goes back to page 1.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The filters live only in the page: a reload, or Back from a record, loses them.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The query is in the address, and the page reads it when it opens.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A query for every key pressed, and the answer that arrives last wins, even when it is the
+answer to an older query.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A query when the typing pauses, and each new query cancels the one still running.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A failed request shows "No requests match".
+
+</mds-usage>
+<mds-usage variant="do">
+
+A failed request shows an error with a way to try again; the empty state is only for an empty
+set.
+
+</mds-usage>
+</Usages>
+
+## Code
+
+<PatternCode id="list-with-filters" />
+
+The plain HTML version is the one running in the preview above. In all three, `fetchRequests`
+stands in for the back end and works on demo data: replace it with the call to your API. The
+Angular component reads and writes the query through the router, so it must be the component
+of a route.

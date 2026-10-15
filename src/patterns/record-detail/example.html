@@ -1,0 +1,512 @@
+<!--
+  Record detail: one request of the list, with its status, the actions its
+  status allows, its data, its documents and its history. Plain HTML with
+  Magma's components, styles and Tailwind theme (see Development >
+  Installation). The record and the open tab live in the address.
+-->
+<main class="flex min-w-0 flex-col gap-600">
+  <mds-button
+    id="back"
+    class="self-start"
+    href="../list-with-filters/"
+    icon="mi/baseline/arrow-back"
+    label="Requests"
+    variant="dark"
+    tone="text"
+    size="sm"
+  ></mds-button>
+
+  <mds-spinner id="loading" class="self-center" running></mds-spinner>
+
+  <mds-banner
+    id="error"
+    hidden
+    variant="error"
+    icon="mi/baseline/error"
+    headline="The request could not be loaded"
+  >
+    <mds-text typography="detail">Check the connection, then try again.</mds-text>
+    <mds-button
+      slot="action"
+      id="retry"
+      type="button"
+      label="Try again"
+      variant="error"
+    ></mds-button>
+  </mds-banner>
+
+  <mds-zero id="not-found" hidden>
+    <mds-text typography="h5" tag="h1" slot="content">This request does not exist</mds-text>
+    <mds-text typography="detail" tag="p" slot="content">
+      It may have been deleted, or the address may be wrong.
+    </mds-text>
+    <mds-button slot="action" href="../list-with-filters/" label="See all requests"></mds-button>
+  </mds-zero>
+
+  <article id="record" hidden class="flex flex-col gap-600" aria-labelledby="title">
+    <header class="flex flex-col gap-400 lg:flex-row lg:items-start lg:justify-between">
+      <div class="flex min-w-0 flex-col gap-200">
+        <mds-text id="number" typography="caption" tag="p" class="text-fg-muted"></mds-text>
+        <div class="flex flex-wrap items-center gap-300">
+          <!-- Focused after an action, when the button that ran it is gone. -->
+          <mds-text
+            id="title"
+            typography="h3"
+            tag="h1"
+            tabindex="-1"
+            class="outline-none"
+          ></mds-text>
+          <mds-badge id="status"></mds-badge>
+        </div>
+        <mds-text id="summary" typography="detail" tag="p" class="text-fg-muted"></mds-text>
+      </div>
+      <!-- The actions the status allows, the main one last. -->
+      <div id="actions" class="flex flex-wrap gap-200"></div>
+    </header>
+
+    <mds-tab id="tabs">
+      <mds-tab-item label="Details" value="details"></mds-tab-item>
+      <mds-tab-item label="Documents" value="documents"></mds-tab-item>
+      <mds-tab-item label="History" value="history"></mds-tab-item>
+      <section slot="content" class="pt-600">
+        <!-- Magma has no description list: native dl, dt and dd. -->
+        <dl id="facts" class="m-0 grid gap-x-800 gap-y-500 md:grid-cols-2"></dl>
+      </section>
+      <section slot="content" class="pt-600">
+        <div id="documents" class="grid gap-400 md:grid-cols-2"></div>
+      </section>
+      <section slot="content" class="pt-600">
+        <ol id="history" class="m-0 flex list-none flex-col gap-500 p-0"></ol>
+      </section>
+    </mds-tab>
+  </article>
+
+  <mds-modal id="dialog">
+    <form id="dialog-form" class="flex flex-col gap-500 p-600" novalidate>
+      <mds-text id="dialog-title" typography="h5" tag="h2"></mds-text>
+      <mds-text id="dialog-text" typography="detail" tag="p"></mds-text>
+      <mds-input-field id="dialog-field">
+        <mds-input id="dialog-input" type="textarea" name="note" required></mds-input>
+      </mds-input-field>
+      <div class="flex flex-wrap justify-end gap-200">
+        <mds-button
+          id="dialog-cancel"
+          type="button"
+          label="Cancel"
+          variant="dark"
+          tone="weak"
+        ></mds-button>
+        <mds-button id="dialog-confirm" type="submit"></mds-button>
+      </div>
+    </form>
+  </mds-modal>
+
+  <!-- Read out by screen readers after an action: mds-toast is not, yet. -->
+  <mds-text id="announcer" role="status" class="sr-only"></mds-text>
+</main>
+
+<template id="fact">
+  <div class="flex flex-col gap-100">
+    <dt><mds-text typography="caption" class="text-fg-muted"></mds-text></dt>
+    <dd class="m-0"><mds-text typography="detail"></mds-text></dd>
+  </div>
+</template>
+
+<template id="event">
+  <li>
+    <mds-author>
+      <mds-avatar slot="avatar"></mds-avatar>
+      <mds-text data-field="what" typography="detail"></mds-text>
+      <mds-text data-field="when" typography="caption" class="text-fg-muted"></mds-text>
+      <mds-text data-field="note" typography="detail" hidden></mds-text>
+    </mds-author>
+  </li>
+</template>
+
+<script type="module">
+  const TABS = ['details', 'documents', 'history'];
+  const STATUSES = {
+    new: { label: 'New', variant: 'info' },
+    'in-progress': { label: 'In progress', variant: 'violet' },
+    waiting: { label: 'Waiting for documents', variant: 'warning' },
+    closed: { label: 'Closed', variant: 'success' },
+  };
+  /**
+   * What each status allows, the main action last. An action with a
+   * `dialog` asks for a note before it runs.
+   */
+  const ACTIONS = {
+    new: [{ id: 'take', label: 'Take charge', done: 'You took charge of the request.' }],
+    'in-progress': [
+      {
+        id: 'documents',
+        label: 'Request documents',
+        done: 'The documents were requested.',
+        dialog: {
+          title: 'Request documents',
+          text: 'The applicant receives this message by email, and the request waits for the documents.',
+          field: 'What is missing',
+          error: 'Write what the applicant has to send.',
+          confirm: 'Send the request',
+        },
+      },
+      {
+        id: 'close',
+        label: 'Close request',
+        done: 'The request was closed.',
+        dialog: {
+          title: 'Close the request',
+          text: 'The applicant receives the outcome by email. A closed request can be reopened.',
+          field: 'Outcome',
+          error: 'Write the outcome of the request.',
+          confirm: 'Close the request',
+        },
+      },
+    ],
+    waiting: [
+      {
+        id: 'received',
+        label: 'Documents received',
+        done: 'The documents were marked as received.',
+      },
+    ],
+    closed: [{ id: 'reopen', label: 'Reopen', done: 'The request was reopened.' }],
+  };
+  const dateFormat = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+    dateStyle: 'medium',
+  });
+  const formatDate = (iso) => dateFormat.format(new Date(iso));
+
+  const $ = (id) => document.getElementById(id);
+  const [back, loading, error, notFound, record, title, actions, tabs, dialog, form] = [
+    'back',
+    'loading',
+    'error',
+    'not-found',
+    'record',
+    'title',
+    'actions',
+    'tabs',
+    'dialog',
+    'dialog-form',
+  ].map($);
+
+  /** The record and the tab from the address. */
+  const params = new URLSearchParams(location.search);
+  // In an application the id comes from the route, as in /requests/512.
+  const id = Number(params.get('id') ?? 512);
+  let tab = TABS.includes(params.get('tab')) ? params.get('tab') : TABS[0];
+  let current;
+
+  // The tab of the address, selected before mds-tab loads.
+  tabs.querySelector(`mds-tab-item[value="${tab}"]`).setAttribute('selected', '');
+  tabs.addEventListener('mdsTabChange', (event) => {
+    tab = event.detail.value ?? TABS[0];
+    const url = new URL(location.href);
+    url.searchParams.set('tab', tab);
+    history.replaceState(null, '', url);
+  });
+
+  // Back to the list as it was: when the list opened this page, going back
+  // in the history keeps its search and filters.
+  back.addEventListener('click', (event) => {
+    const list = new URL(back.href, location.href).pathname;
+    if (document.referrer && new URL(document.referrer).pathname === list) {
+      event.preventDefault();
+      history.back();
+    }
+  });
+
+  async function load() {
+    loading.hidden = false;
+    error.hidden = true;
+    try {
+      current = await fetchRecord(id);
+      notFound.hidden = current !== null;
+      record.hidden = current === null;
+      if (current) render();
+    } catch (reason) {
+      console.error(reason);
+      error.hidden = false;
+    } finally {
+      loading.hidden = true;
+    }
+  }
+
+  function render() {
+    const { number, subject, office, status, received } = current;
+    document.title = `${number} - ${subject}`;
+    $('number').textContent = number;
+    title.textContent = subject;
+    $('status').label = STATUSES[status].label;
+    $('status').variant = STATUSES[status].variant;
+    $('summary').textContent = `${office}, received on ${formatDate(received)}`;
+
+    actions.replaceChildren(
+      ...ACTIONS[status].map((action, index, all) => {
+        const button = document.createElement('mds-button');
+        button.type = 'button';
+        button.label = action.label;
+        button.tone = index === all.length - 1 ? 'strong' : 'weak';
+        button.addEventListener('click', () =>
+          action.dialog ? openDialog(action) : run(action, button),
+        );
+        return button;
+      }),
+    );
+
+    const facts = [
+      ['Applicant', current.applicant],
+      ['Email', current.email],
+      ['Office', office],
+      ['Assigned to', current.assignee ?? 'Nobody yet'],
+      ['Received', `${formatDate(received)} via ${current.channel}`],
+      ['Due by', formatDate(current.due)],
+    ];
+    $('facts').replaceChildren(
+      ...facts.map(([term, value]) => {
+        const fact = $('fact').content.firstElementChild.cloneNode(true);
+        const [dt, dd] = fact.querySelectorAll('mds-text');
+        dt.textContent = term;
+        dd.textContent = value;
+        return fact;
+      }),
+    );
+
+    $('documents').replaceChildren(
+      ...current.documents.map((filename) => {
+        const file = document.createElement('mds-file');
+        file.filename = filename;
+        downloadable(file);
+        return file;
+      }),
+    );
+
+    // The newest event first.
+    $('history').replaceChildren(
+      ...current.history.toReversed().map((event) => {
+        const item = $('event').content.firstElementChild.cloneNode(true);
+        const field = (name) => item.querySelector(`[data-field="${name}"]`);
+        item.querySelector('mds-avatar').initials = initials(event.who);
+        field('what').textContent = `${event.who} ${event.what}`;
+        field('when').textContent = formatDate(event.when);
+        field('note').textContent = event.note ?? '';
+        field('note').hidden = !event.note;
+        return item;
+      }),
+    );
+  }
+
+  /**
+   * mds-file emits mdsFileDownload on a click only, and has no role: a role
+   * and the keyboard of a button, until Magma gives them
+   * (https://github.com/magma-design-system/magma/issues/820).
+   */
+  function downloadable(file) {
+    file.setAttribute('role', 'button');
+    file.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      file.click();
+    });
+    file.addEventListener('mdsFileDownload', (event) => {
+      // In an application: the address of the file, opened to download it.
+      show(`Demo: ${event.detail.filename} is not a real file.`, 'info');
+    });
+  }
+
+  /** Runs an action, then shows the record as it is now. True when it ran. */
+  async function run(action, button, note) {
+    button.await = true;
+    try {
+      current = await runAction(id, action.id, note);
+      render();
+      // The button is gone with the old status: the focus goes to the title,
+      // once the dialog, if there is one, has closed.
+      if (dialog.opened) focusTitle = true;
+      else title.focus();
+      show(action.done, 'success');
+      return true;
+    } catch (reason) {
+      console.error(reason);
+      show('The action could not be completed. Try again.', 'error');
+      return false;
+    } finally {
+      button.await = false;
+    }
+  }
+
+  /**
+   * The feedback of an action: on screen, and read out by screen readers.
+   * One toast per message: mds-toast shows a text only when it has one as it
+   * loads.
+   */
+  function show(message, variant) {
+    const toast = document.createElement('mds-toast');
+    toast.variant = variant;
+    toast.textContent = message;
+    toast.visible = true;
+    toast.addEventListener('mdsToastClose', () => toast.remove(), { once: true });
+    document.body.append(toast);
+    $('announcer').textContent = message;
+  }
+
+  // The dialog of an action that asks for a note.
+  let pending;
+  let focusTitle = false;
+  const input = $('dialog-input');
+  const field = $('dialog-field');
+
+  function openDialog(action) {
+    pending = action;
+    $('dialog-title').textContent = action.dialog.title;
+    $('dialog-text').textContent = action.dialog.text;
+    dialog.setAttribute('aria-label', action.dialog.title);
+    field.label = action.dialog.field;
+    field.message = undefined;
+    field.variant = undefined;
+    input.value = '';
+    $('dialog-confirm').label = action.dialog.confirm;
+    dialog.opened = true;
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const note = input.value.trim();
+    if (!note) {
+      field.variant = 'error';
+      field.message = pending.dialog.error;
+      input.setFocus();
+      return;
+    }
+    // On failure the dialog stays open, with what was written.
+    if (await run(pending, $('dialog-confirm'), note)) dialog.close();
+  });
+  $('dialog-cancel').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('mdsModalClose', () => (dialog.opened = undefined));
+  // Once the dialog is gone, its own focus handling included.
+  dialog.addEventListener('mdsModalHide', () => {
+    if (!focusTitle) return;
+    focusTitle = false;
+    title.focus();
+  });
+  $('retry').addEventListener('click', load);
+
+  const initials = (name) =>
+    name
+      .split(' ')
+      .map((word) => word[0])
+      .join('')
+      .slice(0, 2);
+
+  /*
+   * Demo only: stands in for the back end. Replace these functions with the
+   * calls to your API: one reads a record, null when there is none; the other
+   * runs an action and returns the record as it is after it.
+   */
+  const pause = () => new Promise((resolve) => setTimeout(resolve, 300));
+
+  async function fetchRecord(id) {
+    await pause();
+    return REQUESTS.find((request) => request.id === id) ?? null;
+  }
+
+  async function runAction(id, action, note) {
+    await pause();
+    const request = REQUESTS.find((candidate) => candidate.id === id);
+    const status = {
+      take: 'in-progress',
+      documents: 'waiting',
+      received: 'in-progress',
+      close: 'closed',
+      reopen: 'in-progress',
+    }[action];
+    const what = {
+      take: 'took charge of the request',
+      documents: 'requested documents',
+      received: 'marked the documents as received',
+      close: 'closed the request',
+      reopen: 'reopened the request',
+    }[action];
+    request.status = status;
+    request.assignee ??= USER;
+    request.history.push({ who: USER, what, when: new Date().toISOString(), note });
+    return structuredClone(request);
+  }
+
+  /** Demo only: the user signed in. */
+  const USER = 'Anna Neri';
+
+  /** Demo only: the 46 requests of the list with filters, with their details. */
+  const REQUESTS = (() => {
+    const offices = {
+      registry: 'Registry office',
+      tax: 'Tax office',
+      planning: 'Town planning',
+      mobility: 'Mobility',
+      education: 'Education',
+    };
+    const subjects = [
+      ['Change of residence', 'registry'],
+      ['Identity card renewal', 'registry'],
+      ['Waste tax refund', 'tax'],
+      ['Property tax payment plan', 'tax'],
+      ['Building permit', 'planning'],
+      ['Scaffolding on public land', 'planning'],
+      ['Disabled parking permit', 'mobility'],
+      ['Resident parking permit', 'mobility'],
+      ['School canteen enrolment', 'education'],
+      ['School bus service', 'education'],
+    ];
+    const applicants = [
+      'Mario Rossi',
+      'Giulia Bianchi',
+      'Luca Ferrari',
+      'Sara Esposito',
+      'Marco Romano',
+    ];
+    const channels = ['online form', 'front office', 'certified email'];
+    const day = 86_400_000;
+    const statuses = Object.keys(STATUSES);
+    return Array.from({ length: 46 }, (_, index) => {
+      const [subject, officeId] = subjects[(index * 7) % subjects.length];
+      const number = 512 - index;
+      const status = statuses[(index * 3 + Math.floor(index / 4)) % statuses.length];
+      const received = Date.UTC(2026, 9, 14) - index * 1.7 * day;
+      const applicant = applicants[index % applicants.length];
+      const assignee = status === 'new' ? null : ['Anna Neri', 'Paolo Gallo'][index % 2];
+      const at = (days) => new Date(received + days * day).toISOString();
+      const history = [{ who: applicant, what: 'sent the request', when: at(0) }];
+      if (assignee)
+        history.push({ who: assignee, what: 'took charge of the request', when: at(1) });
+      if (status === 'waiting') {
+        history.push({
+          who: assignee,
+          what: 'requested documents',
+          when: at(2),
+          note: 'A copy of the identity document of the applicant.',
+        });
+      }
+      if (status === 'closed') {
+        history.push({ who: assignee, what: 'closed the request', when: at(3), note: 'Approved.' });
+      }
+      return {
+        id: number,
+        number: `REQ-2026-${String(number).padStart(4, '0')}`,
+        subject,
+        office: offices[officeId],
+        status,
+        received: at(0),
+        due: at(30),
+        applicant,
+        email: `${applicant.toLowerCase().replace(' ', '.')}@example.com`,
+        channel: channels[index % channels.length],
+        assignee,
+        documents: [`request-${number}.pdf`, 'identity-document.jpg'],
+        history,
+      };
+    });
+  })();
+
+  load();
+</script>
