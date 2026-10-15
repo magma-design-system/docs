@@ -1,0 +1,84 @@
+---
+title: Tokens
+description: The global tokens of Magma by tier, which one to use, where their data comes from and how to get them in your editor.
+---
+
+import TokenTiers from '../../../components/TokenTiers.astro';
+
+Magma's look is made of tokens: custom properties for every color, size, type style,
+radius, shadow and easing. The components read them, and so should your own UI: a value
+taken from a token follows the mode, the named theme and the user's preferences along with
+the rest of the page.
+
+## Tiers
+
+Every token belongs to one tier. The counts come from the packages this site is built with:
+
+<TokenTiers />
+
+- **Primitives** are the raw values of `@maggioli-design-system/design-tokens`: color
+  ramps from `01` to `10`, the type scale, the spacing and radius steps, shadows,
+  durations and easings.
+- **Semantic** tokens (`--magma-*`) name a role, such as the raised surface or the muted
+  text, and point at a primitive. Which primitive depends on the mode, the named theme
+  and the contrast preference: this is the tier to paint your UI with.
+- **Internal** tokens (`--magma-tint-*`) are the pointers a theme moves to retint the
+  roles at once. They are listed for completeness only.
+- **Component** tokens (`--mds-*`) belong to one component each and are listed on its CSS
+  page.
+
+## Which token to use
+
+1. **Color of the UI**: a semantic role, `bg-surface-raised` or
+   `rgb(var(--magma-surface-raised))`. Never a palette step for a role, and never
+   Tailwind's own palette (`bg-white`, `text-gray-700`): neither follows the theme nor the
+   contrast preference.
+2. **A color that is data**: a category, a tag, a color the user picked, a brand. Here a
+   palette step is right: `label-*`, `brand-*`.
+3. **Size, space, type, radius, shadow, motion**: the scales, through their Tailwind
+   classes or their custom properties. In your own CSS take radii from `--magma-radius-*`,
+   which follows the corner shape of the page.
+4. **One component**: its `--mds-*` tokens, set in the `overrides` cascade layer.
+5. **A global decision**, such as the opacity of disabled elements or the focus outline:
+   the `--magma-*` global, set in the `overrides` layer.
+
+No `dark:` variants and no dark-mode media queries: the semantic roles already flip.
+
+## Reading the tables
+
+The tables of this section are generated from the token data of the installed packages.
+
+- **Preview** paints with the token itself, so it follows this site: switch it to dark
+  mode and the previews follow.
+- **Value** is what the stylesheets give with no class or attribute on the page: light
+  mode, default theme. Colors are written in hex, while the CSS publishes them as rgb
+  channels, to read as `rgb(var(--tone-neutral-08))`. "Alias of" names the primitive a
+  token points at.
+- **Dark** is the value in dark mode, where it is a different one.
+- **Tailwind** is a class that reads the token. Every class and variant is in
+  [Tailwind](tailwind/).
+- A click on a value copies it.
+
+## Token data
+
+Two packages describe their tokens as data, for tools that read tokens rather than paint
+with them: a documentation site like this one, a design tool, another platform.
+
+| File                                    | Content                                                                                                                                                                            |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `design-tokens/dist/dtcg/`              | Every primitive and semantic role in the [DTCG 2025.10 format](https://www.designtokens.org/TR/2025.10/), plus what dark mode, the named themes and the contrast preference change |
+| `styles/dist/dtcg/`                     | The globals of styles (`--magma-*` of `globals.css`, the corner and depth axes), and the resolver that merges every set for one condition                                          |
+| `styles/dist/tailwind/consumption.json` | How Tailwind 4 reads each token: the `@theme` variable, the classes and the variants                                                                                               |
+
+The three share one key, the custom property a token is published as. To style a page,
+import the stylesheets: the data describes them, it does not replace them.
+
+The data holds descriptions for a handful of tokens only; Magma is adding the rest
+([magma-design-system/magma#876](https://github.com/magma-design-system/magma/issues/876)).
+The tables show them as soon as they are published.
+
+## Autocomplete in the editor
+
+`@maggioli-design-system/styles` ships `dist/css/tokens.editor.css`, one file with every
+public token exactly once, the component tokens included, for an editor to complete them.
+Never import it in a page: it holds the light values only and would freeze the theming.

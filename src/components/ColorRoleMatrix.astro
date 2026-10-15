@@ -1,0 +1,60 @@
+---
+// The role primitives of design-tokens (`--surface-<family>-*`,
+// `--border-<family>-*`, `--text-<family>-*`): one row per role, one column
+// per family, the neutral families first. They follow the mode only; the
+// semantic roles point at them and a named theme or the contrast preference
+// repoints the roles. Swatches paint with the custom property and copy its
+// name on click (CopyToClipboard.astro, once per page).
+import Code from './Code.astro';
+import { formatValue, tokenNamed, tokensIn, type Token } from '../lib/tokens.mjs';
+
+const KINDS = ['surface', 'border', 'text'] as const;
+const FIRST = ['neutral', 'porcelain', 'bisque'];
+
+const families = [
+  ...new Set((tokensIn('palette.surface') as Token[]).map((t) => t.name.split('.')[2])),
+].sort((a, b) => {
+  const rank = (f: string) => (FIRST.includes(f) ? FIRST.indexOf(f) : FIRST.length);
+  return rank(a) - rank(b);
+});
+const rows = KINDS.flatMap((kind) => {
+  const roles = [
+    ...new Set((tokensIn(`palette.${kind}.${families[0]}`) as Token[]).map((t) => t.key)),
+  ];
+  return roles.map((role) => ({
+    pattern: `--${kind}-<family>-${role}`,
+    cells: families.map((family) => tokenNamed(`palette.${kind}.${family}.${role}`) as Token),
+  }));
+});
+const CELL = 'whitespace-nowrap align-middle';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label="" />
+    {families.map((family) => (
+      <mds-table-header-cell label={family} />
+    ))}
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ pattern, cells }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <Code name>{pattern}</Code>
+        </mds-table-cell>
+        {cells.map((token) => (
+          <mds-table-cell class={CELL}>
+            {token?.css && (
+              <span
+                class="block h-800 w-1600 rounded-md shadow-outline-weak"
+                style={`background: rgb(var(${token.css}))`}
+                title={`${token.css} ${formatValue(token)}`}
+                data-copy={token.css}
+              ></span>
+            )}
+          </mds-table-cell>
+        ))}
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

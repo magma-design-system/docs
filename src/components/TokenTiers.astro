@@ -1,0 +1,60 @@
+---
+// The tiers of Magma's tokens, counted from the installed packages: the
+// primitives, the semantic roles and the internal pointers of the DTCG data
+// (`tier` in `$extensions["it.maggioli.magma"]`), and the component tokens of
+// documentation.json, which the DTCG data leaves to each component.
+import Code from './Code.astro';
+import { loadComponentDocs } from '../lib/magma.mjs';
+import { tokenSet, type Token } from '../lib/tokens.mjs';
+
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+
+const counts: Record<string, number> = {};
+for (const token of tokenSet().values() as Iterable<Token>) {
+  if (token.css) counts[token.tier] = (counts[token.tier] ?? 0) + 1;
+}
+const components = loadComponentDocs().components as { styles: unknown[] }[];
+counts.component = components.reduce((sum, c) => sum + c.styles.length, 0);
+
+const TIERS = [
+  { tier: 'primitive', example: '--tone-neutral-08' },
+  { tier: 'semantic', example: '--magma-surface-raised' },
+  { tier: 'internal', example: '--magma-tint-default' },
+  { tier: 'component', example: '--mds-button-background' },
+] as const;
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('tokens.column.tier')} />
+    <mds-table-header-cell label={t('tokens.column.tokens')} />
+    <mds-table-header-cell label={t('tokens.column.example')} />
+    <mds-table-header-cell label={t('tokens.column.use')} />
+  </mds-table-header>
+  <mds-table-body>
+    {TIERS.map(({ tier, example }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            <strong>{t(`tokens.tier.${tier}` as never)}</strong>
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {(counts[tier] ?? 0).toLocaleString(lang)}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{example}</Code>
+        </mds-table-cell>
+        <mds-table-cell class="min-w-phrase">
+          <mds-text typography="detail" tag="span">
+            {t(`tokens.tier.${tier}.use` as never)}
+          </mds-text>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

@@ -1,0 +1,63 @@
+---
+title: Themes and preferences
+description: What dark mode, the named themes, the contrast preference, the corner shape and the depth axis change in the tokens of Magma.
+---
+
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenConditions from '../../../components/TokenConditions.astro';
+
+The same token can hold different values: the condition of the page picks one. Each
+condition is a class or an attribute on `<html>`, written by the `mds-pref-*` components,
+which also remember the user's choice; `mds-pref` groups them in one panel. Your code
+changes nothing: it paints with the roles, and the roles move.
+
+| Condition    | On `<html>`                                             | Component           |
+| ------------ | ------------------------------------------------------- | ------------------- |
+| Mode         | `pref-mode-light`, `pref-mode-dark`, `pref-mode-system` | `mds-pref-mode`     |
+| Named theme  | `data-theme-name="cool"` or `"warm"`                    | `mds-pref-theme`    |
+| Contrast     | `pref-contrast-more`                                    | `mds-pref-contrast` |
+| Corner shape | `data-corner-shape="round"` or `"squircle"`             | `mds-pref-theme`    |
+| Depth        | `data-theme-depth="flat"`                               |                     |
+
+The tables below are computed from the token data, one condition per column, and list
+only the tokens that change; so their swatches are fixed colors, not the ones of this
+page.
+
+## Dark mode
+
+The palette flips and the roles with it: the dark value of every role is in its table in
+[Color](../color/). Never write `dark:` variants or dark-mode media queries for them.
+Tailwind's `dark:` follows the system only, not the `pref-mode-*` classes.
+
+## Named themes and contrast
+
+A named theme retints the neutral roles at once: surfaces, washes, borders, text, the
+inverse chip, on the `porcelain` family for `cool` and the `bisque` one for `warm`. The
+status roles never change with the theme. The contrast preference promotes text and
+borders, and turns the page into the paper of the mode. Under a named theme the
+promotions are restated in the theme's family, so the two go together.
+
+### In light mode
+
+<TokenConditions modifier="theme" />
+
+### In dark mode
+
+<TokenConditions modifier="theme" mode="dark" />
+
+## Corner shape
+
+The shape and the radius scale tuned for it move together. `--magma-radius-full`, the
+pill, is the same under every shape.
+
+<TokenConditions modifier="corner-shape" />
+
+## Depth
+
+A flat theme sets the depth to 0, which takes the shadows of the elevations away. The
+depth axis is in `styles/dist/css/theme.css`, outside the documented setup: it works only
+where a project imports that file.
+
+<TokenConditions modifier="theme-depth" />
+
+<CopyToClipboard />

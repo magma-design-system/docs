@@ -1,0 +1,176 @@
+---
+title: Color
+description: The semantic color roles of Magma, how to pair them, and every palette they point at.
+---
+
+import ColorRamps from '../../../components/ColorRamps.astro';
+import ColorRoleMatrix from '../../../components/ColorRoleMatrix.astro';
+import CopyToClipboard from '../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../components/TokenTable.astro';
+
+Name the role, not the color. A semantic role (`--magma-*`) says what an element is, a
+raised card, muted text, the primary action, and resolves to a color for the mode, the
+named theme and the contrast preference of the page. A palette step only flips with the
+mode: it stays grey under a tinted theme and gains no contrast when the user asks for
+more.
+
+## Two ways to write a role
+
+Every role is a custom property holding rgb channels, and a Tailwind color.
+
+```css
+.panel {
+  background: rgb(var(--magma-surface-raised));
+  color: rgb(var(--magma-text-default));
+  border: 1px solid rgb(var(--magma-border-muted));
+}
+```
+
+```html
+<section class="bg-surface-raised text-fg-default border border-border-muted">
+  <p class="text-fg-muted">Secondary text</p>
+</section>
+```
+
+In Tailwind the text roles are `fg-*`, so that no class reads `text-text-*`:
+`--magma-text-muted` is `text-fg-muted`. Every other role keeps its name. The roles come
+from `styles/dist/css/semantic.css`, their Tailwind colors from
+`styles/dist/tailwind/theme.css`; an opacity modifier works as usual
+(`bg-surface-raised/80`).
+
+## Neutral roles
+
+The backgrounds, text and borders of everything that is neither an action nor a state. A
+named theme retints all of them at once.
+
+### Surfaces
+
+Five levels, chosen by where the element sits, not by the shade: `default` is the page,
+`sunken` is recessed into it (wells, code blocks, tracks), `muted` groups on the page plane
+(zebra rows), `raised` is lifted off it (cards, panels, sticky bars), `overlay` floats
+above everything (modals, dropdowns, popovers). In light mode the levels above the page are
+close, so give `raised` and `overlay` a shadow too, as the components do.
+
+<TokenTable tokens="magma.surface" />
+
+### Wash
+
+A neutral pill, chip or hover, by how marked it is. `wash-soft` carries the whole text
+ladder, `wash-base` only `text-default`, `wash-strong` only icons.
+
+<TokenTable tokens="magma.wash" />
+
+### Text
+
+`text-muted` is for secondary text that is still essential, `text-subtle` only for what
+the user can skip. Every text role is legible on all five surfaces in both modes.
+
+<TokenTable tokens="magma.text" />
+
+### Borders
+
+`border-muted` is decorative (dividers, table grids), `border-default` outlines what
+works (inputs, cards), `border-strong` conveys a state, `border-focus` follows the accent.
+
+<TokenTable tokens="magma.border" />
+
+### Other neutral roles
+
+The inverse chip and its ink, the ink on the modal scrim, the selection, and the color
+of a projected shadow, to compose with your own geometry and alpha.
+`--magma-neutral-emphasis` and `--magma-neutral-on-emphasis` are deprecated aliases of
+`--magma-surface-inverse` and `--magma-on-inverse`.
+
+<TokenTable tokens={['magma.neutral', 'magma.on', 'magma.selection', 'magma.shadow']} />
+
+## Accents
+
+Two accents with the same nine roles: `accent`, the action color of the brand, and
+`accent-ai`, for features driven by AI. `-fg` is ink on a neutral surface, `-on-emphasis`
+is ink on the solid fill: swapping them is the quickest way to break contrast.
+
+### Accent
+
+<TokenTable tokens="magma.accent" />
+
+### AI accent
+
+<TokenTable tokens="magma.accent-ai" />
+
+## Status
+
+Info, success, warning and danger publish the same vocabulary: washes with their text,
+borders, a solid fill with its ink, and three shortcuts at the default prominence
+(`-surface`, `-fg`, `-border`). The danger role uses the `status-error` palette. A named
+theme never retints a status; the contrast preference promotes its text.
+
+### Info
+
+<TokenTable tokens="magma.info" />
+
+### Success
+
+<TokenTable tokens="magma.success" />
+
+### Warning
+
+<TokenTable tokens="magma.warning" />
+
+### Danger
+
+<TokenTable tokens="magma.danger" />
+
+## Pairing rules
+
+- **`-fg` on a neutral surface, `-on-emphasis` on the fill.**
+- **Text on a wash is bounded**: `wash-soft` takes the whole text ladder, `wash-base` only
+  `text-default`, `wash-strong` icons only. The same holds for every status.
+- **Hierarchy without losing contrast**: use weight, size and spacing, and soften the
+  chrome (`border-muted`, zebra on `surface-muted`) rather than the text.
+- **Elevation is a role**: page `surface-default`, card `surface-raised`, floating layer
+  `surface-overlay`, well `surface-sunken`. A grey that has to look marked in both modes is
+  a wash, not a surface.
+
+These are the pairs Magma measures for contrast; any other combination is not measured.
+
+## Palettes
+
+The primitives the roles point at, from `01` to `10`. Paint with them only when the color
+is data: a category, a tag, a color the user picked (`label-*`), a brand (`brand-*`). The
+strips follow the mode of this page; a click on a swatch copies its custom property.
+
+### Tones
+
+The neutral families. `neutral` is the grey of the default theme; `porcelain` and `bisque`
+back the `cool` and `warm` themes: switch those on with `data-theme-name`, do not paint
+with them by hand. `seed` is the paper of the mode, white in light and black in dark.
+
+<ColorRamps group="palette.tone" />
+
+### Status colors
+
+<ColorRamps group="palette.status" />
+
+### Labels
+
+<ColorRamps group="palette.label" />
+
+### Brands
+
+<ColorRamps group="palette.brand" />
+
+### Variants
+
+Aliases of the families they name, kept for the `variant` prop of the components. They
+have no role of their own: the accents are `accent` and `accent-ai`.
+
+<ColorRamps group="palette.variant" />
+
+### Role primitives
+
+The steps behind the neutral and status roles, one set per family. They follow the mode
+but not the named theme nor the contrast preference: paint with the `--magma-*` roles.
+
+<ColorRoleMatrix />
+
+<CopyToClipboard />

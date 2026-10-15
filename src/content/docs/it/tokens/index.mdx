@@ -1,0 +1,89 @@
+---
+title: Token
+description: I token globali di Magma per livello, quale usare, da dove vengono i loro dati e come averli nell'editor.
+---
+
+import TokenTiers from '../../../../components/TokenTiers.astro';
+
+L'aspetto di Magma è fatto di token: custom property per ogni colore, dimensione, stile di
+testo, raggio, ombra e curva di animazione. I componenti li leggono, e così dovrebbe fare
+la tua interfaccia: un valore preso da un token segue la modalità, il tema e le preferenze
+dell'utente insieme al resto della pagina.
+
+## Livelli
+
+Ogni token appartiene a un livello. I numeri vengono dai pacchetti con cui è costruito
+questo sito:
+
+<TokenTiers />
+
+- I **primitivi** sono i valori grezzi di `@maggioli-design-system/design-tokens`: le
+  rampe di colore da `01` a `10`, la scala tipografica, i passi di spaziatura e di raggio,
+  le ombre, le durate e le curve.
+- I token **semantici** (`--magma-*`) danno un nome a un ruolo, come la superficie
+  rialzata o il testo attenuato, e puntano a un primitivo. Quale primitivo dipende dalla
+  modalità, dal tema e dalla preferenza di contrasto: è il livello con cui dipingere
+  l'interfaccia.
+- I token **interni** (`--magma-tint-*`) sono i puntatori che un tema sposta per ricolorare
+  i ruoli tutti insieme. Sono elencati solo per completezza.
+- I token dei **componenti** (`--mds-*`) appartengono ciascuno a un componente e sono
+  elencati nella sua pagina CSS.
+
+## Quale token usare
+
+1. **Colore dell'interfaccia**: un ruolo semantico, `bg-surface-raised` o
+   `rgb(var(--magma-surface-raised))`. Mai un passo della palette al posto di un ruolo, e
+   mai la palette di Tailwind (`bg-white`, `text-gray-700`): nessuna delle due segue il
+   tema né la preferenza di contrasto.
+2. **Un colore che è un dato**: una categoria, un'etichetta, un colore scelto
+   dall'utente, un brand. Qui un passo della palette è giusto: `label-*`, `brand-*`.
+3. **Dimensioni, spazi, testo, raggi, ombre, animazioni**: le scale, con le loro classi
+   Tailwind o le loro custom property. Nel tuo CSS prendi i raggi da `--magma-radius-*`,
+   che segue la forma degli angoli della pagina.
+4. **Un componente**: i suoi token `--mds-*`, impostati nel cascade layer `overrides`.
+5. **Una decisione globale**, come l'opacità degli elementi disabilitati o il contorno
+   del focus: la variabile globale `--magma-*`, impostata nel layer `overrides`.
+
+Niente varianti `dark:` e niente media query per la modalità scura: i ruoli semantici
+cambiano già da soli.
+
+## Leggere le tabelle
+
+Le tabelle di questa sezione sono generate dai dati dei token dei pacchetti installati.
+
+- **Anteprima** dipinge con il token stesso, quindi segue questo sito: passa alla
+  modalità scura e le anteprime la seguono.
+- **Valore** è quello che danno i fogli di stile senza classi né attributi sulla pagina:
+  modalità chiara, tema predefinito. I colori sono scritti in esadecimale, mentre il CSS li
+  pubblica come canali rgb, da leggere come `rgb(var(--tone-neutral-08))`. "Alias di"
+  indica il primitivo a cui punta il token.
+- **Scuro** è il valore in modalità scura, quando è diverso.
+- **Tailwind** è una classe che legge il token. Tutte le classi e le varianti sono in
+  [Tailwind](tailwind/).
+- Un clic su un valore lo copia.
+
+## Dati dei token
+
+Due pacchetti descrivono i loro token come dati, per gli strumenti che leggono i token
+invece di dipingere con essi: un sito di documentazione come questo, uno strumento di
+design, un'altra piattaforma.
+
+| File                                    | Contenuto                                                                                                                                                                                  |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `design-tokens/dist/dtcg/`              | Tutti i primitivi e i ruoli semantici nel [formato DTCG 2025.10](https://www.designtokens.org/TR/2025.10/), più quello che cambiano la modalità scura, i temi e la preferenza di contrasto |
+| `styles/dist/dtcg/`                     | Le variabili globali di styles (`--magma-*` di `globals.css`, gli assi della forma degli angoli e della profondità) e il resolver che unisce tutti gli insiemi per una condizione          |
+| `styles/dist/tailwind/consumption.json` | Come Tailwind 4 legge ogni token: la variabile di `@theme`, le classi e le varianti                                                                                                        |
+
+I tre condividono una chiave, la custom property con cui un token è pubblicato. Per dare
+stile a una pagina importa i fogli di stile: i dati li descrivono, non li sostituiscono.
+
+I dati contengono la descrizione di pochi token; Magma sta aggiungendo le altre
+([magma-design-system/magma#876](https://github.com/magma-design-system/magma/issues/876)).
+Le tabelle le mostrano appena vengono pubblicate.
+
+## Completamento nell'editor
+
+`@maggioli-design-system/styles` pubblica `dist/css/tokens.editor.css`, un file con ogni
+token pubblico una volta sola, compresi quelli dei componenti, perché un editor possa
+completarli. Non importarlo mai in una pagina: contiene solo i valori chiari e
+bloccherebbe i temi.

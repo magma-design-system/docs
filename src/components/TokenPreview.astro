@@ -1,0 +1,117 @@
+---
+// A token applied to a small sample (previewOf in src/lib/tokens.mjs): a
+// swatch, a box with the shadow, the radius, the outline or the opacity, a
+// bar as long as the space, the curve of an easing; "N/A" in the space of a
+// swatch for what cannot be drawn (a duration, a layer, a blur). Painted with the custom property itself wherever the
+// page has it, so it follows the mode, the theme and the corner shape the
+// page is in; the colors whose custom property is not plain rgb channels,
+// and the sizing steps, which have none, show their value instead.
+import {
+  colorOf,
+  easePath,
+  formatResolved,
+  formatValue,
+  previewOf,
+  type Token,
+} from '../lib/tokens.mjs';
+
+interface Props {
+  token: Token;
+}
+
+const { token } = Astro.props;
+const { t } = Astro.locals;
+const kind = previewOf(token);
+const css = token.css;
+// The value as a fallback: a token whose stylesheet the page does not load
+// (the elevations of styles' theme.css) still shows what it draws.
+const value = css ? `var(${css}, ${formatResolved(token)})` : formatValue(token);
+
+// The squircle radius steps are tuned for that shape; the Magma radius scale
+// takes the shape of the page's corner axis.
+const shape = token.name.startsWith('radius.squircle')
+  ? 'squircle'
+  : token.group === 'magma.radius'
+    ? 'var(--magma-corner-shape)'
+    : 'round';
+---
+
+{kind === 'color' && (
+  <span
+    class="block size-800 rounded-md shadow-outline-weak"
+    style={`background: ${token.live ? `rgb(var(${css}))` : colorOf(token)}`}
+  ></span>
+)}
+{kind === 'shadow' && (
+  <span class="flex size-1000 rounded-md bg-surface-overlay" style={`box-shadow: ${value}`}></span>
+)}
+{kind === 'font' && (
+  <span class="block text-[1.5rem] leading-none text-fg-default" style={`font-family: ${value}`}>
+    Aa
+  </span>
+)}
+{kind === 'ease' && (
+  <svg
+    class="block size-1000 overflow-visible text-accent-fg"
+    viewBox="-0.1 -0.4 1.2 1.8"
+    aria-hidden="true"
+  >
+    <path
+      d="M0 1H1V0"
+      fill="none"
+      stroke="currentColor"
+      stroke-opacity="0.2"
+      vector-effect="non-scaling-stroke"
+    />
+    <path
+      d={easePath(token)}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      vector-effect="non-scaling-stroke"
+    />
+  </svg>
+)}
+{kind === 'space' && (
+  <span
+    class="block h-200 max-w-2000 rounded-full bg-accent-emphasis"
+    style={`width: ${value}`}
+  ></span>
+)}
+{kind === 'radius' && (
+  <span
+    class="flex size-1000 border-2 border-solid border-current bg-surface-overlay"
+    style={`border-radius: ${value}; corner-shape: ${shape}`}
+  ></span>
+)}
+{kind === 'border' && (
+  <span
+    class="block w-1000 text-fg-default"
+    style={`border-top: ${value} solid currentColor`}
+  ></span>
+)}
+{kind === 'aspect' && (
+  <span
+    class="block h-800 rounded-sm bg-accent-surface shadow-outline-weak"
+    style={`aspect-ratio: ${value}`}
+  ></span>
+)}
+{kind === 'outline' && (
+  <span
+    class="m-100 block size-600 rounded-sm bg-surface-raised"
+    style={`outline: ${value}`}
+  ></span>
+)}
+{kind === 'opacity' && (
+  <span class="block size-800 rounded-md bg-fg-default" style={`opacity: ${value}`}></span>
+)}
+{!kind && (
+  <span
+    class="flex size-800 items-center justify-center rounded-md bg-wash-soft"
+    title={t('tokens.preview.none')}
+  >
+    <mds-text typography="caption" tag="span" class="my-0 whitespace-nowrap text-fg-subtle">
+      {t('tokens.preview.na')}
+    </mds-text>
+  </span>
+)}

@@ -1,0 +1,135 @@
+---
+// A table of global tokens (src/lib/tokens.mjs), by name prefix: the custom
+// property, its value in the stylesheets with no class or attribute (and the
+// token an alias ends on), its value in dark mode where that differs, the
+// Tailwind class that reads it and, once Magma writes them, its description.
+// The preview column paints with the token itself, so it follows the mode,
+// the theme and the preferences the page is in. Values are copied on click
+// (CopyToClipboard.astro, once per page).
+import Code from './Code.astro';
+import CopyStatus from './CopyStatus.astro';
+import TokenPreview from './TokenPreview.astro';
+import UiText from './UiText.astro';
+import {
+  cssOnlyTokens,
+  formatValue,
+  previewOf,
+  tailwindOf,
+  tokenSet,
+  tokensIn,
+  type Token,
+} from '../lib/tokens.mjs';
+
+interface Props {
+  /** Name prefixes: `magma.surface`, `radius`, `palette.status.info`. */
+  tokens?: string | string[];
+  /** Name prefixes to leave out. */
+  exclude?: string[];
+  /** Leave out the preview column. */
+  noPreview?: boolean;
+  /** Also the `cssOnly` values of this group (`spacing`, `transition-property`). */
+  cssOnly?: string;
+}
+
+const { tokens: prefixes = [], exclude = [], noPreview = false, cssOnly } = Astro.props;
+const { t } = Astro.locals;
+
+const excluded = (token: Token) =>
+  exclude.some((prefix) => token.name === prefix || token.name.startsWith(`${prefix}.`));
+const dark = tokenSet({ mode: 'dark' });
+
+const rows = [
+  ...(tokensIn(prefixes) as Token[]),
+  ...(cssOnly ? (cssOnlyTokens(cssOnly) as Token[]) : []),
+]
+  .filter((token) => !excluded(token))
+  .map((token) => {
+    const value = formatValue(token);
+    const darkToken = dark.get(token.path);
+    const darkValue = darkToken && formatValue(darkToken);
+    return {
+      token,
+      name: token.css ?? token.name,
+      value,
+      dark: darkValue !== value ? darkValue : undefined,
+      tailwind: tailwindOf(token)?.utility,
+    };
+  });
+
+const hasDark = rows.some((row) => row.dark);
+const hasTailwind = rows.some((row) => row.tailwind);
+const hasDescription = rows.some((row) => row.token.description);
+const hasPreview = !noPreview && rows.some((row) => previewOf(row.token));
+const CELL = 'whitespace-nowrap align-middle';
+---
+
+<mds-table interactive>
+  <mds-table-header>
+    {hasPreview && <mds-table-header-cell label={t('tokens.column.preview')} />}
+    <mds-table-header-cell label={t('tokens.column.token')} />
+    <mds-table-header-cell label={hasDark ? t('tokens.column.light') : t('tokens.column.value')} />
+    {hasDark && <mds-table-header-cell label={t('tokens.column.dark')} />}
+    {hasTailwind && <mds-table-header-cell label={t('tokens.column.tailwind')} />}
+    {hasDescription && <mds-table-header-cell label={t('tokens.column.description')} />}
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map(({ token, name, value, dark, tailwind }) => (
+      <mds-table-row data-copy-scope>
+        {hasPreview && (
+          <mds-table-cell class={CELL}>
+            <TokenPreview token={token} />
+          </mds-table-cell>
+        )}
+        <mds-table-cell class={CELL}>
+          <Code name copy={token.css}>
+            {name}
+          </Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <span class="flex flex-col items-start gap-100">
+            <Code copy={value}>{value}</Code>
+            {token.target && (
+              <mds-text
+                typography="caption"
+                tag="span"
+                class="my-0 whitespace-nowrap text-fg-muted"
+              >
+                <UiText text={t('tokens.aliasOf', { target: token.target })} />
+              </mds-text>
+            )}
+          </span>
+        </mds-table-cell>
+        {hasDark && (
+          <mds-table-cell class={CELL}>
+            {dark ? (
+              <Code copy={dark}>{dark}</Code>
+            ) : (
+              <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
+                -
+              </mds-text>
+            )}
+          </mds-table-cell>
+        )}
+        {hasTailwind && (
+          <mds-table-cell class={CELL}>
+            {tailwind ? (
+              <Code copy={tailwind}>{tailwind}</Code>
+            ) : (
+              <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
+                -
+              </mds-text>
+            )}
+          </mds-table-cell>
+        )}
+        {hasDescription && (
+          <mds-table-cell class="min-w-phrase align-middle">
+            <mds-text typography="detail" tag="span">
+              {token.description}
+            </mds-text>
+          </mds-table-cell>
+        )}
+        <CopyStatus />
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

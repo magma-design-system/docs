@@ -1,0 +1,69 @@
+---
+// The Figma files of design-tokens to download (src/pages/downloads/[file].ts):
+// what each one holds, how many variables, its size. Links with `download`:
+// mds-button[href] has no way to ask for a download.
+import Code from './Code.astro';
+import { FIGMA_FILES, figmaFileInfo } from '../lib/tokens.mjs';
+import { magmaVersion } from '../lib/magma.mjs';
+
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const version = magmaVersion('design-tokens');
+
+const rows = FIGMA_FILES.map(({ file, content }) => {
+  const { variables, bytes } = figmaFileInfo(file);
+  return {
+    file,
+    href: `${base}downloads/${file}`,
+    content: t(`tokens.figma.${content}` as never),
+    variables: variables.toLocaleString(lang),
+    size: t('tokens.figma.kb', {
+      size: (bytes / 1024).toLocaleString(lang, { maximumFractionDigits: 0 }),
+    }),
+  };
+});
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('tokens.figma.column.file')} />
+    <mds-table-header-cell label={t('tokens.figma.column.content')} />
+    <mds-table-header-cell label={t('tokens.figma.column.variables')} />
+    <mds-table-header-cell label={t('tokens.figma.column.size')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map((row) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            <a href={row.href} download={row.file}>
+              {row.file}
+            </a>
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {row.content}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {row.variables}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {row.size}
+          </mds-text>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>
+
+<mds-text typography="caption" tag="p" class="mt-400 text-fg-muted">
+  {t('tokens.figma.from')} <Code>@maggioli-design-system/design-tokens@{version}</Code>
+  <Code>dist/json/</Code>.
+</mds-text>

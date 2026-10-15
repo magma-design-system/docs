@@ -1,0 +1,63 @@
+---
+title: Temi e preferenze
+description: Cosa cambiano nei token di Magma la modalità scura, i temi, la preferenza di contrasto, la forma degli angoli e l'asse della profondità.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenConditions from '../../../../components/TokenConditions.astro';
+
+Lo stesso token può avere valori diversi: la condizione della pagina ne sceglie uno. Ogni
+condizione è una classe o un attributo su `<html>`, scritto dai componenti `mds-pref-*`,
+che ricordano anche la scelta dell'utente; `mds-pref` li raccoglie in un solo pannello. Il
+tuo codice non cambia: dipinge con i ruoli, e sono i ruoli a muoversi.
+
+| Condizione         | Su `<html>`                                             | Componente          |
+| ------------------ | ------------------------------------------------------- | ------------------- |
+| Modalità           | `pref-mode-light`, `pref-mode-dark`, `pref-mode-system` | `mds-pref-mode`     |
+| Tema               | `data-theme-name="cool"` o `"warm"`                     | `mds-pref-theme`    |
+| Contrasto          | `pref-contrast-more`                                    | `mds-pref-contrast` |
+| Forma degli angoli | `data-corner-shape="round"` o `"squircle"`              | `mds-pref-theme`    |
+| Profondità         | `data-theme-depth="flat"`                               |                     |
+
+Le tabelle qui sotto sono calcolate dai dati dei token, una condizione per colonna, ed
+elencano solo i token che cambiano; per questo i loro campioni sono colori fissi, non
+quelli di questa pagina.
+
+## Modalità scura
+
+La palette si inverte e i ruoli con lei: il valore scuro di ogni ruolo è nella sua tabella
+in [Colore](../color/). Non scrivere mai varianti `dark:` o media query per la modalità
+scura. Il `dark:` di Tailwind segue solo il sistema, non le classi `pref-mode-*`.
+
+## Temi e contrasto
+
+Un tema ricolora i ruoli neutri tutti insieme: superfici, wash, bordi, testo, il chip
+invertito, sulla famiglia `porcelain` per `cool` e su `bisque` per `warm`. I ruoli di stato
+non cambiano mai con il tema. La preferenza di contrasto rafforza testo e bordi, e fa della
+pagina la carta della modalità. Sotto un tema i rafforzamenti sono ripetuti nella famiglia
+del tema, per questo i due vanno insieme.
+
+### In modalità chiara
+
+<TokenConditions modifier="theme" />
+
+### In modalità scura
+
+<TokenConditions modifier="theme" mode="dark" />
+
+## Forma degli angoli
+
+La forma e la scala dei raggi calibrata per lei si muovono insieme. `--magma-radius-full`,
+la pillola, è uguale con ogni forma.
+
+<TokenConditions modifier="corner-shape" />
+
+## Profondità
+
+Un tema piatto porta la profondità a 0, e questo toglie le ombre delle elevazioni. L'asse
+della profondità è in `styles/dist/css/theme.css`, fuori dalla configurazione documentata:
+funziona solo dove un progetto importa quel file.
+
+<TokenConditions modifier="theme-depth" />
+
+<CopyToClipboard />

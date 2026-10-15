@@ -1,0 +1,34 @@
+---
+title: Figma
+description: The palette and the sizing of Magma as Figma variables, to download and import.
+---
+
+import FigmaDownloads from '../../../components/FigmaDownloads.astro';
+
+`@maggioli-design-system/design-tokens` publishes the palette and the sizing of Magma as
+files Figma can import as variables, generated with every release from the same sources
+as the stylesheets. The files below come from the version this site is built with.
+
+## Files
+
+<FigmaDownloads />
+
+## Palette
+
+The two color files hold the same variables, one file per mode, in the Design Tokens
+format (an earlier draft than the one of the [token data](../#token-data), with colors as
+hex strings). In Figma, create a variable collection with two modes, Light and Dark, and
+import each file into its own mode. Each family keeps its steps as `1` to `10`, and its
+own color as `seed`.
+
+## Sizing
+
+`figma-magma-tokens.json` holds spacing, gaps, containers, radii, screen widths and the
+primitive sizes, in pixels, as one collection in the format of the Import/Export Variables
+plugin: import it with that plugin.
+
+## Not in the files yet
+
+The files cover the palette and the sizing only. The semantic roles, the type styles, the
+shadows and the motion tokens are not in them, and of the neutral families only `neutral`
+is: [Color](../color/) lists the step each role points at, in light and in dark mode.

@@ -1,0 +1,101 @@
+---
+// The type scale: one row per style of the `typography` tokens, set with
+// mds-text in that style, then the Tailwind utility and the plain CSS class
+// that apply it, and the tokens it is made of (size, line height, weight,
+// letter spacing, font family). Values are copied on click
+// (CopyToClipboard.astro, once per page).
+import Code from './Code.astro';
+import CopyStatus from './CopyStatus.astro';
+import {
+  aliased,
+  consumption,
+  formatValue,
+  tokenNamed,
+  tokensIn,
+  type Token,
+} from '../lib/tokens.mjs';
+
+const { t } = Astro.locals;
+
+// The mds-text typography of each style; `read` styles take variant="read".
+const TYPOGRAPHY: Record<string, string> = {
+  paragraph: 'paragraph',
+  detail: 'detail',
+  caption: 'caption',
+};
+const typographyOf = (family: string, style: string) =>
+  family === 'title' && /^h\d$/.test(style) ? style : (TYPOGRAPHY[style] ?? style);
+
+const utilities = consumption().utilities as Record<string, unknown>;
+const rows = (tokensIn('typography') as Token[]).map((token) => {
+  const [, family, style] = token.name.split('.');
+  const size = tokenNamed(`text-size.${family}.${style}`) as Token;
+  const part = (name: string) =>
+    tokenNamed(`text-size.${family}.${style}.${name}`) as Token | undefined;
+  const raw = token.raw as { fontFamily?: string };
+  const utility = `text-${family}-${style}`;
+  return {
+    family,
+    style,
+    typography: typographyOf(family, style),
+    utility: utility in utilities ? utility : undefined,
+    cssClass: `typography-${family}-${style}`,
+    size,
+    lineHeight: part('line-height'),
+    weight: part('font-weight'),
+    letterSpacing: part('letter-spacing'),
+    font: aliased(raw.fontFamily),
+  };
+});
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table interactive>
+  <mds-table-header>
+    <mds-table-header-cell label={t('tokens.column.style')} />
+    <mds-table-header-cell label={t('tokens.column.tailwind')} />
+    <mds-table-header-cell label={t('tokens.column.cssClass')} />
+    <mds-table-header-cell label={t('tokens.column.size')} />
+    <mds-table-header-cell label={t('tokens.column.lineHeight')} />
+    <mds-table-header-cell label={t('tokens.column.weight')} />
+    <mds-table-header-cell label={t('tokens.column.letterSpacing')} />
+    <mds-table-header-cell label={t('tokens.column.font')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map((row) => (
+      <mds-table-row data-copy-scope>
+        <mds-table-cell class={CELL}>
+          <mds-text
+            typography={row.typography}
+            variant={row.family === 'read' ? 'read' : undefined}
+            tag="span"
+            class="my-0 whitespace-nowrap"
+          >
+            {`${row.family} ${row.style}`}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          {row.utility ? <Code copy={row.utility}>{row.utility}</Code> : '-'}
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code copy={row.cssClass}>{row.cssClass}</Code>
+        </mds-table-cell>
+        {[row.size, row.lineHeight, row.weight, row.letterSpacing].map((token) => (
+          <mds-table-cell class={CELL}>
+            {token ? (
+              <Code copy={token.css}>{formatValue(token)}</Code>
+            ) : (
+              <mds-text typography="detail" tag="span" class="whitespace-nowrap text-fg-muted">
+                -
+              </mds-text>
+            )}
+          </mds-table-cell>
+        ))}
+        <mds-table-cell class={CELL}>
+          {row.font?.css ? <Code copy={row.font.css}>{row.font.css}</Code> : '-'}
+        </mds-table-cell>
+        <CopyStatus />
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

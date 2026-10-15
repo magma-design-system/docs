@@ -1,0 +1,181 @@
+---
+title: Colore
+description: I ruoli semantici di colore di Magma, come abbinarli e tutte le palette a cui puntano.
+---
+
+import ColorRamps from '../../../../components/ColorRamps.astro';
+import ColorRoleMatrix from '../../../../components/ColorRoleMatrix.astro';
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../../components/TokenTable.astro';
+
+Dai un nome al ruolo, non al colore. Un ruolo semantico (`--magma-*`) dice cos'è un
+elemento, una card rialzata, un testo attenuato, l'azione principale, e diventa un colore
+secondo la modalità, il tema e la preferenza di contrasto della pagina. Un passo della
+palette cambia solo con la modalità: resta grigio sotto un tema colorato e non guadagna
+contrasto quando l'utente ne chiede di più.
+
+## Due modi di scrivere un ruolo
+
+Ogni ruolo è una custom property che contiene canali rgb, e un colore di Tailwind.
+
+```css
+.panel {
+  background: rgb(var(--magma-surface-raised));
+  color: rgb(var(--magma-text-default));
+  border: 1px solid rgb(var(--magma-border-muted));
+}
+```
+
+```html
+<section class="bg-surface-raised text-fg-default border border-border-muted">
+  <p class="text-fg-muted">Testo secondario</p>
+</section>
+```
+
+In Tailwind i ruoli del testo sono `fg-*`, perché nessuna classe si legga `text-text-*`:
+`--magma-text-muted` è `text-fg-muted`. Tutti gli altri ruoli tengono il loro nome. I
+ruoli vengono da `styles/dist/css/semantic.css`, i loro colori Tailwind da
+`styles/dist/tailwind/theme.css`; il modificatore di opacità funziona come sempre
+(`bg-surface-raised/80`).
+
+## Ruoli neutri
+
+Gli sfondi, i testi e i bordi di tutto ciò che non è né un'azione né uno stato. Un tema
+li ricolora tutti insieme.
+
+### Superfici
+
+Cinque livelli, da scegliere secondo dove sta l'elemento, non secondo la tinta: `default`
+è la pagina, `sunken` è incassato nella pagina (pozzetti, blocchi di codice, binari),
+`muted` raggruppa sul piano della pagina (righe alternate), `raised` è sollevato (card,
+pannelli, barre fisse), `overlay` galleggia sopra tutto (modali, menu a tendina,
+popover). In modalità chiara i livelli sopra la pagina sono vicini, quindi dai a `raised`
+e `overlay` anche un'ombra, come fanno i componenti.
+
+<TokenTable tokens="magma.surface" />
+
+### Wash
+
+Una pillola, un chip o un hover neutro, secondo quanto deve risaltare. `wash-soft` regge
+tutta la scala del testo, `wash-base` solo `text-default`, `wash-strong` solo icone.
+
+<TokenTable tokens="magma.wash" />
+
+### Testo
+
+`text-muted` è per il testo secondario ma essenziale, `text-subtle` solo per quello che
+l'utente può saltare. Ogni ruolo del testo è leggibile su tutte e cinque le superfici in
+entrambe le modalità.
+
+<TokenTable tokens="magma.text" />
+
+### Bordi
+
+`border-muted` è decorativo (divisori, griglie delle tabelle), `border-default` contorna
+ciò che funziona (campi, card), `border-strong` comunica uno stato, `border-focus` segue
+l'accento.
+
+<TokenTable tokens="magma.border" />
+
+### Altri ruoli neutri
+
+Il chip invertito e il suo inchiostro, l'inchiostro sul velo delle modali, la selezione e
+il colore di un'ombra proiettata, da comporre con la tua geometria e la tua opacità.
+`--magma-neutral-emphasis` e `--magma-neutral-on-emphasis` sono alias deprecati di
+`--magma-surface-inverse` e `--magma-on-inverse`.
+
+<TokenTable tokens={['magma.neutral', 'magma.on', 'magma.selection', 'magma.shadow']} />
+
+## Accenti
+
+Due accenti con gli stessi nove ruoli: `accent`, il colore delle azioni del brand, e
+`accent-ai`, per le funzioni guidate dall'AI. `-fg` è inchiostro su una superficie neutra,
+`-on-emphasis` è inchiostro sul riempimento pieno: scambiarli è il modo più rapido per
+rompere il contrasto.
+
+### Accento
+
+<TokenTable tokens="magma.accent" />
+
+### Accento AI
+
+<TokenTable tokens="magma.accent-ai" />
+
+## Stati
+
+Info, success, warning e danger pubblicano lo stesso vocabolario: wash con il loro testo,
+bordi, un riempimento pieno con il suo inchiostro, e tre scorciatoie alla prominenza
+predefinita (`-surface`, `-fg`, `-border`). Il ruolo danger usa la palette `status-error`.
+Un tema non ricolora mai uno stato; la preferenza di contrasto ne rafforza il testo.
+
+### Info
+
+<TokenTable tokens="magma.info" />
+
+### Success
+
+<TokenTable tokens="magma.success" />
+
+### Warning
+
+<TokenTable tokens="magma.warning" />
+
+### Danger
+
+<TokenTable tokens="magma.danger" />
+
+## Regole di abbinamento
+
+- **`-fg` su una superficie neutra, `-on-emphasis` sul riempimento.**
+- **Il testo su un wash ha dei limiti**: `wash-soft` regge tutta la scala del testo,
+  `wash-base` solo `text-default`, `wash-strong` solo icone. Vale lo stesso per ogni stato.
+- **Gerarchia senza perdere contrasto**: usa peso, dimensione e spazi, e attenua la
+  cornice (`border-muted`, righe alternate su `surface-muted`) invece del testo.
+- **L'elevazione è un ruolo**: pagina `surface-default`, card `surface-raised`, livello
+  galleggiante `surface-overlay`, pozzetto `surface-sunken`. Un grigio che deve risaltare
+  in entrambe le modalità è un wash, non una superficie.
+
+Sono le coppie di cui Magma misura il contrasto; nessun'altra combinazione è misurata.
+
+## Palette
+
+I primitivi a cui puntano i ruoli, da `01` a `10`. Dipingi con essi solo quando il colore
+è un dato: una categoria, un'etichetta, un colore scelto dall'utente (`label-*`), un brand
+(`brand-*`). Le strisce seguono la modalità di questa pagina; un clic su un campione ne
+copia la custom property.
+
+### Toni
+
+Le famiglie neutre. `neutral` è il grigio del tema predefinito; `porcelain` e `bisque`
+stanno dietro ai temi `cool` e `warm`: attivali con `data-theme-name`, non dipingere con
+essi a mano. `seed` è la carta della modalità, bianca in chiaro e nera in scuro.
+
+<ColorRamps group="palette.tone" />
+
+### Colori di stato
+
+<ColorRamps group="palette.status" />
+
+### Etichette
+
+<ColorRamps group="palette.label" />
+
+### Brand
+
+<ColorRamps group="palette.brand" />
+
+### Varianti
+
+Alias delle famiglie che nominano, mantenuti per la prop `variant` dei componenti. Non
+hanno un ruolo proprio: gli accenti sono `accent` e `accent-ai`.
+
+<ColorRamps group="palette.variant" />
+
+### Primitivi dei ruoli
+
+I passi dietro ai ruoli neutri e di stato, un insieme per famiglia. Seguono la modalità ma
+non il tema né la preferenza di contrasto: dipingi con i ruoli `--magma-*`.
+
+<ColorRoleMatrix />
+
+<CopyToClipboard />

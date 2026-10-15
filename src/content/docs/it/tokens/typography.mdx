@@ -1,0 +1,50 @@
+---
+title: Tipografia
+description: La scala tipografica di Magma, le classi che applicano ogni stile, le famiglie di font e le interlinee.
+---
+
+import CopyToClipboard from '../../../../components/CopyToClipboard.astro';
+import TokenTable from '../../../../components/TokenTable.astro';
+import TypeScale from '../../../../components/TypeScale.astro';
+
+Magma compone il testo in quattro famiglie di stili: `title` per titoli e azioni, `info`
+per il testo dell'interfaccia, `read` per la lettura lunga, `code` per il codice. Applica
+uno stile per intero, con una classe o una prop, invece di comporre font, dimensione e
+peso: lo stile li tiene insieme, con la sua interlinea e la sua spaziatura.
+
+## Scala tipografica
+
+Ogni stile qui sotto è composto con `mds-text`, nella `typography` del componente; la
+prima colonna mostra com'è lo stile in questa pagina.
+
+<TypeScale />
+
+Tre modi di applicare uno stile:
+
+```html
+<mds-text typography="h3">Fatture</mds-text>
+<h2 class="text-title-h3">Fatture</h2>
+<p class="typography-read-paragraph">CSS puro, senza Tailwind.</p>
+```
+
+- **`mds-text`** prende lo stile nella prop `typography`; `variant="read"` porta
+  `paragraph`, `detail` e `caption` dalla famiglia `info` alla famiglia `read`.
+- **Tailwind**: le utility `text-<famiglia>-<stile>` di `styles/dist/tailwind/typography.css`.
+- **CSS puro**: le classi `typography-<famiglia>-<stile>` di
+  `styles/dist/css/utility-typography.css`, importate nel layer `utilities`.
+
+## Famiglie di font
+
+<TokenTable tokens="font" />
+
+Magma non include i font. Carica i pesi della scala, per esempio con Fontsource: Roboto
+500, 700 e 900 (titoli e azioni), Karla 400 e 700 (testo dell'interfaccia), Merriweather
+300, 400 e 700 (testo da leggere), Roboto Mono 400 (codice).
+
+## Interlinee
+
+La scala da cui gli stili prendono l'interlinea, anche per il testo composto a mano.
+
+<TokenTable tokens="leading" />
+
+<CopyToClipboard />

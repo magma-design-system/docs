@@ -1,0 +1,35 @@
+---
+title: Figma
+description: La palette e le dimensioni di Magma come variabili di Figma, da scaricare e importare.
+---
+
+import FigmaDownloads from '../../../../components/FigmaDownloads.astro';
+
+`@maggioli-design-system/design-tokens` pubblica la palette e le dimensioni di Magma in
+file che Figma può importare come variabili, generati a ogni rilascio dalle stesse
+sorgenti dei fogli di stile. I file qui sotto vengono dalla versione con cui è costruito
+questo sito.
+
+## File
+
+<FigmaDownloads />
+
+## Palette
+
+I due file dei colori contengono le stesse variabili, un file per modalità, nel formato
+Design Tokens (una bozza precedente a quella dei [dati dei token](../#dati-dei-token), con i
+colori come stringhe esadecimali). In Figma crea una collezione di variabili con due
+modalità, Light e Dark, e importa ogni file nella sua modalità. Ogni famiglia tiene i suoi
+passi come `1`-`10` e il suo colore come `seed`.
+
+## Dimensioni
+
+`figma-magma-tokens.json` contiene spaziature, gap, container, raggi, larghezze degli
+schermi e le dimensioni primitive, in pixel, come una sola collezione nel formato del
+plugin Import/Export Variables: importalo con quel plugin.
+
+## Cosa non c'è ancora
+
+I file coprono solo la palette e le dimensioni. I ruoli semantici, gli stili di testo, le
+ombre e i token delle animazioni non ci sono, e delle famiglie neutre c'è solo `neutral`:
+[Colore](../color/) indica il passo a cui punta ogni ruolo, in modalità chiara e scura.
