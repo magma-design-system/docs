@@ -107,6 +107,55 @@
 }
 
 /*
+  A slow float, up and down with a slight sway, for the figures of the home
+  page (src/components/home/HomeStats.astro gives each a later
+  `animation-delay`, so they move as a wave). The shadow goes from Magma's
+  near glow, at rest, to its distant one, at the top, and back; while an
+  element waits for its delay, it already has the shadow of the first frame.
+  It follows Magma's animation preference as Magma's components do: `reduce`
+  stops it, `system` and no choice at all follow the operating system,
+  `no-preference` keeps it.
+*/
+@keyframes float-wave {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+    box-shadow: var(--shadow-glow-near-strong);
+  }
+
+  25% {
+    translate: 0 calc(--spacing(150) * -1);
+    rotate: -0.6deg;
+  }
+
+  50% {
+    translate: 0 calc(--spacing(300) * -1);
+    rotate: 0deg;
+    box-shadow: var(--shadow-glow-distant-weak);
+  }
+
+  75% {
+    translate: 0 calc(--spacing(150) * -1);
+    rotate: 0.6deg;
+  }
+}
+
+@utility float-wave {
+  animation: float-wave 8s var(--ease-in-out-sine) infinite both;
+
+  :where(.pref-animation-reduce) & {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(.pref-animation-system, html:not([class*='pref-animation-'])) & {
+      animation: none;
+    }
+  }
+}
+
+/*
   The frame (src/components/frame/) styles its markup with utilities. What is
   left here is markup the site does not render itself: <html>, <body>, the
   content of the pages and Starlight's elements. In the `components` layer:
@@ -152,6 +201,16 @@
 
   body {
     @apply bg-surface-raised text-fg-default desktop:bg-surface-default;
+  }
+
+  /*
+    A page with a hero (the home page) is a site of its own in the card: its
+    bands wider than a page of text, centered. Set on <main>, which the content
+    inherits from: Starlight sets the width on <html>, unlayered.
+  */
+  [data-has-hero] main {
+    --sl-content-width: 76rem;
+    --sl-content-margin-inline: auto;
   }
 
   /* No rule between the page title and the content. */
@@ -227,72 +286,20 @@
   }
 
   /*
-    styles 17.1.0: the default radius scale is the one tuned for the squircle
-    (--radius-squircle-*), with no fallback for browsers without corner-shape
-    (Firefox): drawn round, those radii are much larger than Magma's round
-    ones. Where the squircle cannot be drawn, use the scale that
-    data-corner-shape="round" uses (magma#913).
+    magma 2.3.0: every neutral ground of mds-banner is surface-raised, the
+    color of the page card it sits on, so only its shadow draws it. Its base
+    styles say surface-overlay: give it to every banner but the dark ones and
+    the status ones that keep their wash (strong and box tones).
+    Tracked in https://github.com/magma-design-system/magma/issues/955
   */
-  @supports not (corner-shape: squircle) {
-    :root,
-    [data-corner-shape='squircle'] {
-      --magma-corner-shape: round;
-      --magma-radius-3xs: var(--radius-3xs);
-      --magma-radius-2xs: var(--radius-2xs);
-      --magma-radius-xs: var(--radius-xs);
-      --magma-radius-sm: var(--radius-sm);
-      --magma-radius-md: var(--radius-md);
-      --magma-radius-lg: var(--radius-lg);
-      --magma-radius-xl: var(--radius-xl);
-      --magma-radius-2xl: var(--radius-2xl);
-      --magma-radius-3xl: var(--radius-3xl);
-      --magma-radius-4xl: var(--radius-4xl);
-      --magma-radius-5xl: var(--radius-5xl);
-    }
-
-    /*
-      A radius is cut to half the height of the box: mds-button's always is
-      (2xl, md for sm), so the round scale still draws a pill, where Chromium
-      draws a squircle cut to half the height. The round corner that looks like
-      it is 0.6 of it, the ratio of the two scales: 30% of the button's height.
-    */
-    mds-button {
-      --mds-button-radius: calc(--spacing(900) * 0.3);
-    }
-
-    mds-button[size='sm'] {
-      --mds-button-radius: calc(--spacing(700) * 0.3);
-    }
-
-    mds-button[size='lg'] {
-      --mds-button-radius: calc(--spacing(1200) * 0.3);
-    }
-
-    mds-button[size='xl'] {
-      --mds-button-radius: calc(--spacing(1300) * 0.3);
-    }
-
-    /*
-      mds-tab takes 2xl as well, and gives its items its radius minus its
-      padding: the items' corner (the buttons' above) plus the padding. The
-      preference components draw an mds-tab of their size inside them, which
-      only the inherited --magma-radius-2xl reaches.
-    */
-    mds-tab {
-      --mds-tab-tabs-radius: calc(--spacing(900) * 0.3 + --spacing(200));
-    }
-
-    mds-tab[size='sm'] {
-      --mds-tab-tabs-radius: calc(--spacing(700) * 0.3 + --spacing(200));
-    }
-
-    :is(mds-pref-mode, mds-pref-language, mds-pref-theme) {
-      --magma-radius-2xl: calc(--spacing(900) * 0.3 + --spacing(200));
-    }
-
-    :is(mds-pref-mode, mds-pref-language, mds-pref-theme)[size='sm'] {
-      --magma-radius-2xl: calc(--spacing(700) * 0.3 + --spacing(200));
-    }
+  mds-banner:not(
+    [variant='dark'],
+    :is([variant='error'], [variant='warning'], [variant='info'], [variant='success']):is(
+      [tone='strong'],
+      [tone='box']
+    )
+  ) {
+    --mds-banner-background: rgb(var(--magma-surface-overlay));
   }
 }
 

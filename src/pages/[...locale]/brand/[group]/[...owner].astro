@@ -19,10 +19,9 @@ import {
   IDENTITY_PACKAGE,
   identityGroup,
   unknownIdentityGroups,
-  webpIsPng,
 } from '../../../../lib/identity.mjs';
 import { magmaVersion } from '../../../../lib/magma.mjs';
-import { TEXT } from '../../../../lib/markdown-text.mjs';
+import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
 
 export function getStaticPaths() {
   const unknown = unknownIdentityGroups();
@@ -83,19 +82,14 @@ const headings = [
   }}
   headings={headings}
 >
-  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-    <UiText text={t(`brand.page.${page}.intro` as never)} />
+  <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+    <UiText reading text={t(`brand.page.${page}.intro` as never)} />
   </mds-text>
-  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-    <UiText text={t('brand.howTo')} />{' '}
+  <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+    <UiText reading text={t('brand.howTo')} />{' '}
     <a href={`${localePrefix(locale)}/brand/identity-package/`}>{t('brand.howTo.link')}</a>
     {t('brand.howTo.after')}
   </mds-text>
-  {webpIsPng() && (
-    <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-      <UiText text={t('brand.webpIsPng')} />
-    </mds-text>
-  )}
 
   {ownerHeading && <Heading id={ownerHeading.id} text={ownerHeading.text} />}
   {families.map((family) => (

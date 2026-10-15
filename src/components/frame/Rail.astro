@@ -1,16 +1,16 @@
 ---
-// Desktop rail: brand, the search (SearchField.astro), the 8
-// sections and the actions (repository, preferences). Collapsed, it narrows to
+// Desktop rail: brand, the search (SearchField.astro), the sections and
+// the actions (repository, Storybook, preferences). Collapsed, it narrows to
 // icons: the button that expands it again, the logo below it, then the search,
-// the sections and the actions, each named by a tooltip (which Magma also
-// makes its description: the same text twice, magma#923). The state is kept
-// in localStorage and restored before the first paint (inline script below);
-// the `rail-collapsed` variant (src/styles/magma.css) follows it.
+// the sections and the actions, each named by its tooltip (relation="label").
+// The state is kept in localStorage and restored before the first paint
+// (inline script below); the `rail-collapsed` variant (src/styles/magma.css)
+// follows it.
 //
 // The preferences open in a dropdown next to the button that asks for them,
 // in either form of the rail (Preferences.astro moves them in and out).
 import { localePrefix } from '../../lib/frame';
-import { REPOSITORY } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
 import Brand from './Brand.astro';
 import Logo from './Logo.astro';
 import Preferences from './Preferences.astro';
@@ -33,6 +33,12 @@ const actions = [
     icon: 'mdi/github',
     label: t('frame.repository'),
     attributes: { type: 'a', href: REPOSITORY, target: 'blank', role: 'link' },
+  },
+  {
+    id: 'rail-storybook',
+    icon: 'mi/baseline/auto-stories',
+    label: t('frame.storybook'),
+    attributes: { type: 'a', href: STORYBOOK, target: 'blank', role: 'link' },
   },
   {
     id: 'rail-preferences',
@@ -64,14 +70,18 @@ const actions = [
         data-rail-toggle="collapse"
         type="button"
         icon="mgg/action-hide-sidebar-left"
-        aria-label={t('frame.rail.collapse')}
         aria-controls="rail"
         aria-expanded="true"
         variant="dark"
         tone="text"
         class="self-center"
       ></mds-button>
-      <mds-tooltip target="#rail-collapse" placement="right" disable-auto-placement>
+      <mds-tooltip
+        target="#rail-collapse"
+        relation="label"
+        placement="right"
+        disable-auto-placement
+      >
         {t('frame.rail.collapse')}
       </mds-tooltip>
     </div>
@@ -94,13 +104,12 @@ const actions = [
         class="justify-self-center self-center"
         type="button"
         icon="mgg/action-show-sidebar-left"
-        aria-label={t('frame.rail.expand')}
         aria-controls="rail"
         aria-expanded="false"
         variant="dark"
         tone="text"
       ></mds-button>
-      <mds-tooltip target="#rail-expand" placement="right" disable-auto-placement>
+      <mds-tooltip target="#rail-expand" relation="label" placement="right" disable-auto-placement>
         {t('frame.rail.expand')}
       </mds-tooltip>
       <a
@@ -116,12 +125,16 @@ const actions = [
         <mds-button
           id={search.id}
           icon={search.icon}
-          aria-label={search.label}
           variant="dark"
           tone="text"
           {...search.attributes}
         />
-        <mds-tooltip target={`#${search.id}`} placement="right" disable-auto-placement>
+        <mds-tooltip
+          target={`#${search.id}`}
+          relation="label"
+          placement="right"
+          disable-auto-placement
+        >
           {search.label}
         </mds-tooltip>
         <SectionLinks compact />
@@ -129,15 +142,13 @@ const actions = [
       <div class="flex flex-col items-center gap-200">
         {actions.map(({ id, icon, label, attributes }) => (
           <>
-            <mds-button
-              id={id}
-              icon={icon}
-              aria-label={label}
-              variant="dark"
-              tone="text"
-              {...attributes}
-            />
-            <mds-tooltip target={`#${id}`} placement="right" disable-auto-placement>
+            <mds-button id={id} icon={icon} variant="dark" tone="text" {...attributes} />
+            <mds-tooltip
+              target={`#${id}`}
+              relation="label"
+              placement="right"
+              disable-auto-placement
+            >
               {label}
             </mds-tooltip>
           </>

@@ -1,0 +1,61 @@
+---
+// A strength of Magma on the home page, as mds-card: the icon on a tint of
+// its label color, the title and the text, then, when given, a figure that
+// proves it (`stat`, with what it counts in `statLabel`) and a link to the
+// page that explains it. Inside Features.astro.
+import type { ThemeFullVariantAvatarType } from '@maggioli-design-system/magma';
+
+interface Props {
+  /** An mds-icon slug, collected by iconsauce from the page that uses it. */
+  icon: string;
+  variant: ThemeFullVariantAvatarType;
+  title: string;
+  text: string;
+  stat?: string;
+  statLabel?: string;
+  href?: string;
+  action?: string;
+}
+
+const { icon, variant, title, text, stat, statLabel, href, action } = Astro.props;
+---
+
+<mds-card class="h-full bg-surface-overlay">
+  <mds-card-header class="items-start bg-surface-overlay">
+    <mds-entity icon={icon} variant={variant} tone="weak" class="shadow-none p-0 bg-transparent">
+      <mds-text typography="h5" tag="h3">
+        {title}
+      </mds-text>
+    </mds-entity>
+  </mds-card-header>
+  <mds-card-content class="flex grow flex-col gap-400 pt-0 bg-surface-overlay">
+    <mds-text typography="detail" tag="p" class="block">
+      {text}
+    </mds-text>
+    {stat && (
+      <div class="mt-auto flex items-baseline gap-200">
+        <mds-text typography="h3" tag="span" class="whitespace-nowrap">
+          {stat}
+        </mds-text>
+        <mds-text typography="caption" tag="span" class="text-fg-muted">
+          {statLabel}
+        </mds-text>
+      </div>
+    )}
+  </mds-card-content>
+  {href && (
+    <mds-card-footer class="bg-surface-overlay">
+      <mds-button
+        href={href}
+        role="link"
+        type="a"
+        label={action}
+        aria-label={`${action}: ${title}`}
+        icon="mi/baseline/arrow-forward"
+        icon-position="right"
+        variant="primary"
+        tone="text"
+      />
+    </mds-card-footer>
+  )}
+</mds-card>

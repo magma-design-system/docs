@@ -17,29 +17,6 @@ const ICONS_DIR = 'svg/';
 
 const ICONSAUCE_CONFIG = 'iconsauce.config.mjs';
 
-const LOADER = '@maggioli-design-system/magma/loader';
-
-/**
- * magma 2.1.0 still declares `"sideEffects": ["**\/*.css"]`, so production builds
- * drop the top of loader/index.js: the shim that lets the ES5 build (the one
- * `./loader` points to) extend HTMLElement. Without it every component throws
- * "Failed to construct 'HTMLElement'" on upgrade. Dev is not affected, the
- * dependency optimizer ignores `sideEffects`. Keep that one module whole.
- * Tracked in https://github.com/magma-design-system/magma/issues/817
- * @returns {import('vite').Plugin}
- */
-function keepLoaderSideEffects() {
-  return {
-    name: 'magma:loader-side-effects',
-    enforce: 'pre',
-    async resolveId(source, importer, options) {
-      if (source !== LOADER) return null;
-      const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
-      return resolved && { ...resolved, moduleSideEffects: true };
-    },
-  };
-}
-
 /** Where the dump records what it copied, to skip the next copy of the same icons. */
 const STAMP = '.iconsauce-dump.json';
 
@@ -93,9 +70,8 @@ export default function magma() {
   return {
     name: 'magma',
     hooks: {
-      'astro:config:setup': async ({ config, injectScript, updateConfig, logger }) => {
+      'astro:config:setup': async ({ config, injectScript, logger }) => {
         const outDir = new URL(ICONS_DIR, config.publicDir);
-        updateConfig({ vite: { plugins: [keepLoaderSideEffects()] } });
         injectScript('page', `import '/src/scripts/magma.ts';`);
         // Markdown as Magma components, on Astro's Markdown processor (Satteri):
         // `markdown.rehypePlugins` would need the unified processor instead.

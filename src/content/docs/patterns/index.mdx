@@ -1,0 +1,35 @@
+---
+title: Patterns
+description: Whole screens built with Magma components - lists, details, forms - with their behavior, their accessibility and the code for HTML, React and Angular.
+---
+
+import ComingSoon from '../../../components/ComingSoon.astro';
+
+<ComingSoon text="The first patterns are being written. They will appear here once they are complete enough to copy into a product." />
+
+A component solves one part of a screen; a product is made of screens. A pattern is a screen,
+or a task, that the products of Maggioli Group build again and again - a list to search, the
+detail of a record, a form to fill in - put together from Magma components, with the
+decisions the components cannot take on their own: what the page shows when nothing matches,
+what goes into the address, what a screen reader hears.
+
+Between the two sit the [building blocks](../blocks/): the parts of a screen that come back in
+many patterns, such as the header of a page or a bar of filters.
+
+## What a pattern page holds
+
+Every pattern will have the same parts: the pattern running, when to use it, its anatomy, the
+components it is made of, its behavior, its accessibility, its texts, the mistakes to avoid and,
+last, its code in plain HTML, React and Angular. The code will be complete: copy it into a
+project where Magma is installed, replace the demo data with your back end, and it runs.
+
+## The first ones
+
+- **List with filters**: records to search, narrow down, sort and page through.
+- **Record detail**: one record, what can be done with it and its history.
+- **Form and validation**: data to fill in, checked as people type and when they send it.
+- **Empty and error states**: what a screen shows when there is nothing yet, or something
+  went wrong.
+
+The Pattern and Antipattern pages of each [component](../components/) already show how to use
+that component on its own. This section will show how the components work together.

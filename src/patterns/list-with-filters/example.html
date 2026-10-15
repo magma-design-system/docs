@@ -1,0 +1,372 @@
+<!--
+  List with filters: a list of requests to search, narrow down by status and
+  office, sort and page through. Plain HTML with Magma's components, styles and
+  Tailwind theme (see Development > Installation). The query lives in the
+  address, so a filtered list can be reloaded, bookmarked and shared.
+-->
+<main class="flex min-w-0 flex-col gap-600">
+  <header class="flex flex-col gap-200">
+    <mds-text typography="h3" tag="h1">Requests</mds-text>
+    <mds-text typography="detail" tag="p" class="text-fg-muted">
+      The requests citizens send to the offices of the municipality.
+    </mds-text>
+  </header>
+
+  <form id="filters" role="search" class="grid gap-400 md:grid-cols-4">
+    <mds-input-field label="Search" class="md:col-span-2">
+      <mds-input id="search" type="search" name="q" placeholder="Number or subject"></mds-input>
+    </mds-input-field>
+    <mds-input-field label="Office">
+      <mds-input-select id="office" name="office">
+        <option value="">All offices</option>
+        <option value="registry">Registry office</option>
+        <option value="tax">Tax office</option>
+        <option value="planning">Town planning</option>
+        <option value="mobility">Mobility</option>
+        <option value="education">Education</option>
+      </mds-input-select>
+    </mds-input-field>
+    <mds-input-field label="Sort by">
+      <mds-input-select id="sort" name="sort">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+        <option value="number">Number</option>
+      </mds-input-select>
+    </mds-input-field>
+  </form>
+
+  <!-- One status at a time; the counts follow the search and the office. -->
+  <mds-filter id="status" label="Status">
+    <mds-filter-item label="All" value="all" selected></mds-filter-item>
+    <mds-filter-item label="New" value="new"></mds-filter-item>
+    <mds-filter-item label="In progress" value="in-progress"></mds-filter-item>
+    <mds-filter-item label="Waiting for documents" value="waiting"></mds-filter-item>
+    <mds-filter-item label="Closed" value="closed"></mds-filter-item>
+  </mds-filter>
+
+  <div class="flex min-h-1000 flex-wrap items-center justify-between gap-400">
+    <!-- Read out by screen readers whenever the results change. -->
+    <mds-text id="summary" typography="detail" role="status"></mds-text>
+    <mds-button
+      id="clear"
+      hidden
+      type="button"
+      label="Clear filters"
+      icon="mi/baseline/filter-alt-off"
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+  </div>
+
+  <mds-banner
+    id="error"
+    hidden
+    variant="error"
+    icon="mi/baseline/error"
+    headline="The requests could not be loaded"
+  >
+    <mds-text typography="detail">Check the connection, then try again.</mds-text>
+    <mds-button
+      slot="action"
+      id="retry"
+      type="button"
+      label="Try again"
+      variant="error"
+    ></mds-button>
+  </mds-banner>
+
+  <mds-table
+    id="results"
+    interactive
+    class="w-full [&_mds-table-cell]:text-nowrap [&_mds-text]:text-nowrap"
+  >
+    <mds-table-header>
+      <mds-table-header-cell label="Number"></mds-table-header-cell>
+      <mds-table-header-cell label="Subject"></mds-table-header-cell>
+      <mds-table-header-cell label="Office"></mds-table-header-cell>
+      <mds-table-header-cell label="Status"></mds-table-header-cell>
+      <mds-table-header-cell label="Received"></mds-table-header-cell>
+    </mds-table-header>
+    <mds-table-body id="rows"></mds-table-body>
+  </mds-table>
+
+  <mds-zero id="empty" hidden>
+    <mds-text typography="h5" tag="h2" slot="content">No requests match</mds-text>
+    <mds-text typography="detail" tag="p" slot="content">
+      Try other words, or clear the filters to see every request.
+    </mds-text>
+    <mds-button slot="action" id="clear-empty" type="button" label="Clear filters"></mds-button>
+  </mds-zero>
+
+  <mds-paginator id="pager" class="self-center" hidden></mds-paginator>
+</main>
+
+<!-- One row of the table, filled by render() for each request. -->
+<template id="row">
+  <mds-table-row>
+    <mds-table-cell>
+      <mds-button data-field="number" variant="primary" tone="text" size="sm"></mds-button>
+    </mds-table-cell>
+    <mds-table-cell><mds-text data-field="subject" typography="detail"></mds-text></mds-table-cell>
+    <mds-table-cell><mds-text data-field="office" typography="detail"></mds-text></mds-table-cell>
+    <mds-table-cell><mds-badge data-field="status"></mds-badge></mds-table-cell>
+    <mds-table-cell><mds-text data-field="received" typography="detail"></mds-text></mds-table-cell>
+  </mds-table-row>
+</template>
+
+<script type="module">
+  const PAGE_SIZE = 10;
+  const DEFAULTS = { q: '', status: 'all', office: '', sort: 'newest', page: 1 };
+  const STATUSES = {
+    new: { label: 'New', variant: 'info' },
+    'in-progress': { label: 'In progress', variant: 'violet' },
+    waiting: { label: 'Waiting for documents', variant: 'warning' },
+    closed: { label: 'Closed', variant: 'success' },
+  };
+  const dateFormat = new Intl.DateTimeFormat(document.documentElement.lang || undefined, {
+    dateStyle: 'medium',
+  });
+
+  const $ = (id) => document.getElementById(id);
+  const [search, office, sort, status, summary, clear, error, results, rows, empty, pager] = [
+    'search',
+    'office',
+    'sort',
+    'status',
+    'summary',
+    'clear',
+    'error',
+    'results',
+    'rows',
+    'empty',
+    'pager',
+  ].map($);
+
+  /** The query from the address, else the defaults. */
+  function readQuery() {
+    const params = new URLSearchParams(location.search);
+    return {
+      q: params.get('q') ?? DEFAULTS.q,
+      status: params.get('status') in STATUSES ? params.get('status') : DEFAULTS.status,
+      office: params.get('office') ?? DEFAULTS.office,
+      sort: params.get('sort') ?? DEFAULTS.sort,
+      page: Math.max(1, Number.parseInt(params.get('page'), 10) || DEFAULTS.page),
+    };
+  }
+
+  /** The query into the address, without the values that are the defaults. */
+  function writeQuery() {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== DEFAULTS[key]) params.set(key, value);
+    }
+    history.replaceState(null, '', params.size ? `?${params}` : location.pathname);
+  }
+
+  const filtered = () =>
+    query.q !== DEFAULTS.q || query.status !== DEFAULTS.status || query.office !== DEFAULTS.office;
+
+  /** Selects the status item of `value`, as a click on it would. */
+  function selectStatus(value) {
+    for (const item of status.querySelectorAll('mds-filter-item')) {
+      item.selected = item.value === value;
+    }
+  }
+
+  let query = readQuery();
+  /** Cancels the request in flight: only the answer to the last query counts. */
+  let inFlight;
+
+  async function load() {
+    inFlight?.abort();
+    const request = new AbortController();
+    inFlight = request;
+    writeQuery();
+    search.await = true;
+    results.setAttribute('aria-busy', 'true');
+    try {
+      render(await fetchRequests({ ...query, size: PAGE_SIZE }, request.signal));
+      error.hidden = true;
+    } catch (reason) {
+      if (request.signal.aborted) return;
+      console.error(reason);
+      error.hidden = false;
+    } finally {
+      if (inFlight === request) {
+        search.await = false;
+        results.removeAttribute('aria-busy');
+      }
+    }
+  }
+
+  /** A new query: the filters changed, so back to the first page. */
+  function update(change) {
+    query = { ...query, page: 1, ...change };
+    load();
+  }
+
+  function render({ items, total, all, counts, page }) {
+    query.page = page;
+    writeQuery();
+
+    for (const item of status.querySelectorAll('mds-filter-item')) {
+      item.count = String(item.value === 'all' ? all : counts[item.value]);
+    }
+
+    const row = $('row').content.firstElementChild;
+    rows.replaceChildren(
+      ...items.map((request) => {
+        const element = row.cloneNode(true);
+        const field = (name) => element.querySelector(`[data-field="${name}"]`);
+        element.value = request.id;
+        // In an application: the address of the detail page of the request,
+        // as /requests/512. Here, the page of the record detail pattern.
+        field('number').href = `../record-detail/?id=${request.id}`;
+        field('number').label = request.number;
+        field('subject').textContent = request.subject;
+        field('office').textContent = request.office;
+        field('status').label = STATUSES[request.status].label;
+        field('status').variant = STATUSES[request.status].variant;
+        field('received').textContent = dateFormat.format(new Date(request.received));
+        return element;
+      }),
+    );
+
+    const pages = Math.ceil(total / PAGE_SIZE);
+    const first = (page - 1) * PAGE_SIZE + 1;
+    const last = Math.min(page * PAGE_SIZE, total);
+    summary.textContent =
+      total === 0
+        ? 'No requests match.'
+        : `${first}\u2013${last} of ${total} ${total === 1 ? 'request' : 'requests'}`;
+    results.hidden = total === 0;
+    empty.hidden = total > 0;
+    clear.hidden = !filtered();
+    pager.hidden = pages < 2;
+    pager.pages = pages;
+    pager.currentPage = page;
+  }
+
+  function clearFilters() {
+    search.value = DEFAULTS.q;
+    office.value = DEFAULTS.office;
+    selectStatus(DEFAULTS.status);
+    update({ q: DEFAULTS.q, status: DEFAULTS.status, office: DEFAULTS.office });
+  }
+
+  // The controls show the query of the address.
+  search.value = query.q;
+  office.value = query.office;
+  sort.value = query.sort;
+  selectStatus(query.status);
+
+  let typing;
+  search.addEventListener('mdsInputChange', (event) => {
+    const q = event.detail.value ?? '';
+    clearTimeout(typing);
+    // A query when the typing pauses, not one per key.
+    if (q !== query.q) typing = setTimeout(() => update({ q }), 300);
+  });
+  office.addEventListener('mdsInputSelectChange', (event) => {
+    if (event.detail.value !== query.office) update({ office: event.detail.value ?? '' });
+  });
+  sort.addEventListener('mdsInputSelectChange', (event) => {
+    if (event.detail.value !== query.sort) update({ sort: event.detail.value });
+  });
+  status.addEventListener('mdsFilterChange', (event) => {
+    // Picking the selected status again leaves none selected: that is All.
+    const value = event.detail.value || 'all';
+    if (!event.detail.value) selectStatus(value);
+    update({ status: value });
+  });
+  pager.addEventListener('mdsPaginatorChange', (event) => {
+    // It also reports the page it is given.
+    if (event.detail.page !== query.page) update({ page: event.detail.page });
+  });
+  $('filters').addEventListener('submit', (event) => event.preventDefault());
+  clear.addEventListener('click', clearFilters);
+  $('clear-empty').addEventListener('click', clearFilters);
+  $('retry').addEventListener('click', load);
+
+  /*
+   * Demo only: stands in for the back end. Replace it with the call to your
+   * API, which searches, counts, sorts and pages the requests on the server:
+   * the list never loads more than one page.
+   */
+  async function fetchRequests({ q, status, office, sort, page, size }, signal) {
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, 250);
+      signal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        reject(signal.reason);
+      });
+    });
+    const text = q.trim().toLowerCase();
+    const matching = REQUESTS.filter(
+      (request) =>
+        (!text || `${request.number} ${request.subject}`.toLowerCase().includes(text)) &&
+        (!office || request.officeId === office),
+    );
+    const counts = Object.fromEntries(
+      Object.keys(STATUSES).map((id) => [id, matching.filter((r) => r.status === id).length]),
+    );
+    const found = status === 'all' ? matching : matching.filter((r) => r.status === status);
+    const order =
+      {
+        newest: (a, b) => b.received.localeCompare(a.received),
+        oldest: (a, b) => a.received.localeCompare(b.received),
+        number: (a, b) => a.number.localeCompare(b.number),
+      }[sort] ?? (() => 0);
+    const last = Math.max(1, Math.ceil(found.length / size));
+    const current = Math.min(page, last);
+    return {
+      items: found.toSorted(order).slice((current - 1) * size, current * size),
+      total: found.length,
+      all: matching.length,
+      counts,
+      page: current,
+    };
+  }
+
+  /** Demo only: 46 requests, the same on every load. */
+  const REQUESTS = (() => {
+    const offices = {
+      registry: 'Registry office',
+      tax: 'Tax office',
+      planning: 'Town planning',
+      mobility: 'Mobility',
+      education: 'Education',
+    };
+    const subjects = [
+      ['Change of residence', 'registry'],
+      ['Identity card renewal', 'registry'],
+      ['Waste tax refund', 'tax'],
+      ['Property tax payment plan', 'tax'],
+      ['Building permit', 'planning'],
+      ['Scaffolding on public land', 'planning'],
+      ['Disabled parking permit', 'mobility'],
+      ['Resident parking permit', 'mobility'],
+      ['School canteen enrolment', 'education'],
+      ['School bus service', 'education'],
+    ];
+    const statuses = Object.keys(STATUSES);
+    return Array.from({ length: 46 }, (_, index) => {
+      const [subject, officeId] = subjects[(index * 7) % subjects.length];
+      const number = 512 - index;
+      return {
+        id: number,
+        number: `REQ-2026-${String(number).padStart(4, '0')}`,
+        subject,
+        officeId,
+        office: offices[officeId],
+        status: statuses[(index * 3 + Math.floor(index / 4)) % statuses.length],
+        received: new Date(Date.UTC(2026, 9, 14) - index * 1.7 * 86_400_000)
+          .toISOString()
+          .slice(0, 10),
+      };
+    });
+  })();
+
+  load();
+</script>

@@ -1,0 +1,174 @@
+---
+title: Dettaglio di un record
+description: Un record di una lista - cos'è, a che punto è, cosa ci si può fare adesso, i suoi dati, documenti e cronologia - e la strada per tornare alla lista.
+draft: true
+---
+
+import PatternCode from '../../../../components/PatternCode.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+import Usages from '../../../../components/Usages.astro';
+
+La pagina di un record: l'istanza, il documento, il pagamento che qualcuno ha aperto da una
+[lista](../list-with-filters/). Ci si arriva per capire a che punto è il record e per farlo
+avanzare: se ne legge lo stato, se ne controllano dati e documenti, si esegue l'azione che lo
+stato consente, e si torna alla lista.
+
+<PatternPreview id="record-detail" />
+
+## Quando usarlo
+
+Usalo per i record su cui si lavora nel tempo, con uno stato, poche azioni e una cronologia.
+Altrimenti c'è di meglio:
+
+- Un record con pochi campi e niente da farci: mostralo nella sua riga della lista, o in un
+  pannello accanto alla lista, senza una pagina sua.
+- Un record da modificare campo per campo: un form, in cui i campi si cambiano, si controllano e
+  si salvano insieme.
+- Record da confrontare: la lista, con i valori affiancati nelle sue colonne.
+
+## Anatomia
+
+1. **Torna alla lista**: un link che riporta alla lista com'era.
+2. **Identità**: il numero del record, il suo oggetto come titolo della pagina, lo stato come
+   badge, e una riga che dice a chi appartiene e quando è arrivato.
+3. **Azioni**: quelle che lo stato consente, la principale per ultima e nel tono forte.
+4. **Schede**: i dati, i documenti e la cronologia, uno alla volta.
+5. **Dati**: etichette e valori, su due colonne quando c'è spazio.
+6. **Documenti**: un `mds-file` per ogni file.
+7. **Cronologia**: chi ha fatto cosa, e quando, dal più recente, con la nota scritta insieme
+   all'azione.
+
+Intorno: **caricamento** (uno spinner), **non trovato** (un messaggio con un link alla lista),
+**errore** (un banner con la possibilità di riprovare), e il **riscontro** di ogni azione (un
+toast, letto anche dai lettori di schermo).
+
+## Componenti
+
+<PatternComponents id="record-detail" />
+
+## Comportamento
+
+- **Lo stato decide le azioni.** Ogni stato mostra solo le azioni che si possono eseguire in
+  quello stato: niente pulsanti disabilitati su cui tirare a indovinare. L'azione principale
+  viene per ultima, nel tono forte; le altre sono più leggere.
+- **Un'azione che ha bisogno di parole le chiede prima.** Richiedere documenti o chiudere
+  l'istanza apre un dialogo con un campo obbligatorio: se resta vuoto, il campo riceve un
+  messaggio d'errore e il focus. Le azioni che non chiedono nulla partono subito.
+- **La pagina mostra il record che restituisce il back end.** Dopo un'azione, stato, azioni e
+  cronologia arrivano dalla risposta del back end, non da una supposizione della pagina: quello
+  che è a schermo è quello che è stato salvato.
+- **Un'azione fallita non cambia nulla.** Il record resta com'era, il dialogo resta aperto con
+  quello che c'era scritto, e un messaggio dice di riprovare.
+- **L'indirizzo contiene il record e la scheda.** Un link alla cronologia di un'istanza si apre
+  sulla sua cronologia.
+- **Indietro riporta alla lista com'era.** Quando è stata la lista ad aprire il record, il link
+  per tornare va indietro nella cronologia del browser, e la lista torna con la sua ricerca, i
+  suoi filtri e la sua pagina.
+- **Non trovato non è un errore.** Un record che non esiste lo dice e porta alla lista; una
+  richiesta che fallisce propone di riprovare.
+
+## Accessibilità
+
+- L'oggetto è il titolo della pagina; il numero sopra e la riga sotto sono testo.
+- Dopo un'azione il pulsante che l'ha eseguita può sparire, perché le azioni seguono lo stato: il
+  focus passa al titolo, che ha `tabindex="-1"`, invece di ricadere in cima alla pagina.
+- L'esito di un'azione viene letto attraverso una regione `role="status"`, oltre a comparire in un
+  toast.
+- Il dialogo ha un nome, il suo titolo, e prende il focus quando si apre; il campo obbligatorio
+  dice a parole cosa manca.
+- I dati sono un elenco descrittivo (`dl`, `dt`, `dd`), così ogni valore viene letto con la sua
+  etichetta. Magma non ha ancora un componente per questo: il codice usa gli elementi nativi, con
+  `mds-text` dentro.
+- I documenti si aprono dalla tastiera e vengono annunciati come pulsanti: il codice aggiunge il
+  ruolo e i tasti che `mds-file` non dà ancora.
+
+## Contenuti
+
+- Il titolo è ciò di cui tratta il record, "Cambio di residenza"; il numero va sopra, più piccolo.
+  Le persone riconoscono un oggetto, e copiano un numero.
+- Chiama le azioni con quello che fanno al record, con un verbo: "Richiedi documenti", "Chiudi
+  istanza", mai "OK" o "Procedi".
+- Il pulsante di conferma di un dialogo ripete l'azione, "Chiudi l'istanza", invece di
+  "Conferma".
+- Il testo di un dialogo dice cosa succede dopo: chi riceve cosa, e se si può tornare indietro.
+- Una riga della cronologia dice chi ha fatto cosa, e quando; la nota resta come è stata scritta.
+- Conferma un'azione al passato: "L'istanza è stata chiusa."
+
+## Errori da evitare
+
+<Usages>
+<mds-usage variant="dont">
+
+Tutte le azioni sono sempre a schermo, e quelle che non si possono eseguire sono disabilitate.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A schermo ci sono solo le azioni che lo stato consente.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Dopo un'azione, la pagina cambia lo stato da sola, e spera che il back end sia d'accordo.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Dopo un'azione, la pagina mostra il record che restituisce il back end.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un dialogo chiede "Sei sicuro?" con OK e Annulla.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il dialogo dice cosa succederà, e il suo pulsante ripete l'azione: "Chiudi l'istanza".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il pulsante dell'azione sparisce con il vecchio stato, e il focus ricade in cima alla pagina.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il focus passa al titolo della pagina, e l'esito viene letto.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il link per tornare apre la lista da capo, senza la ricerca e i filtri.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Indietro riporta alla lista com'era.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un record che non esiste mostra un errore e "Riprova".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Dice che il record non esiste, e porta alla lista.
+
+</mds-usage>
+</Usages>
+
+## Codice
+
+<PatternCode id="record-detail" />
+
+La versione in HTML è quella in funzione nell'anteprima qui sopra: si apre dai numeri della
+[lista con filtri](../list-with-filters/), e il suo link riporta lì. In tutte e tre,
+`fetchRecord` e `runAction` fanno le veci del back end e lavorano su dati di esempio:
+sostituiscile con le chiamate alla tua API. Il componente React riceve l'id del record dal
+componente padre; il componente Angular lo legge dalla sua rotta, `/requests/:id`.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella lingua
+del prodotto.

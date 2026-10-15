@@ -8,8 +8,8 @@ import { sidebar } from './src/lib/nav.mjs';
 
 /**
  * Starlight components replaced by the frame built with Magma components (the
- * page title and the draft and untranslated notices included), and the <head>
- * that adds Astro's ClientRouter to it.
+ * page title, the hero and the draft and untranslated notices included), and
+ * the <head> that adds Astro's ClientRouter to it.
  */
 const frame = Object.fromEntries(
   [
@@ -18,6 +18,7 @@ const frame = Object.fromEntries(
     'Footer',
     'Head',
     'Header',
+    'Hero',
     'PageFrame',
     'PageSidebar',
     'PageTitle',

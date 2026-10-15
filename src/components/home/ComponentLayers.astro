@@ -1,0 +1,402 @@
+---
+// A card of live Magma components on the home page, taken apart by how deep
+// each component nests: the card at the back, then its regions, what they
+// hold and what that holds, one plane per level, in 3D. Flags name some of
+// the components, each on the plane of its component, with a line to it.
+//
+// The planes are the same card drawn four times, so they line up exactly: on
+// each one only the components of its level show. `visibility` does it, since
+// a child can turn it back on under a hidden parent; inline, because Stencil's
+// `[hydrated] { visibility: inherit }` is not in a layer and would win over a
+// utility. The outlines are set on every component of a plane: only the
+// visible ones draw theirs.
+//
+// The pose lives in custom properties on the stage: `--explode` (0, a flat
+// card facing the reader; 1, turned and open), `--tilt-x` and `--tilt-y`
+// (added to the turn). The script below keeps the card flat until most of it
+// is on screen, then turns it and opens it, and tilts it with the scroll and
+// the pointer: the planes, at different depths, slide past each other. It
+// also puts the flags on their components, once they are laid out. Without
+// it the card stays flat, as the components need it to show anyway; with
+// reduced motion it is open and still, from the start.
+// The components follow the preferences of the page (mode, contrast, theme)
+// like everything else. A picture: one name for screen readers, inert, left
+// out of the search.
+import Logo from '../frame/Logo.astro';
+
+const { t } = Astro.locals;
+
+/** The planes, back to front: the label color of their outlines and of their flags. */
+const PLANES = [
+  { ring: '--color-label-blue-06', flag: 'bg-label-blue-10 text-label-blue-03' },
+  { ring: '--color-label-violet-06', flag: 'bg-label-violet-10 text-label-violet-03' },
+  { ring: '--color-label-orchid-06', flag: 'bg-label-orchid-10 text-label-orchid-03' },
+  { ring: '--color-label-orange-06', flag: 'bg-label-orange-10 text-label-orange-03' },
+];
+
+/**
+ * The flags: the tag of a component of the card (`target`, its
+ * `data-flag-target`), on the plane of the component, on a side of the card
+ * (the line ends on that edge of it), at the middle of its height or at `y`,
+ * a share of it. The long tags on the left, the short ones on the right, with
+ * room for them beside the card; placed so that no two meet, at any tilt.
+ */
+const FLAGS = [
+  { tag: 'mds-card', target: 'card', plane: 0, side: 'start', y: 0.48 },
+  { tag: 'mds-card-header', target: 'header', plane: 1, side: 'start' },
+  { tag: 'mds-card-content', target: 'content', plane: 1, side: 'start' },
+  { tag: 'mds-card-footer', target: 'footer', plane: 1, side: 'start' },
+  { tag: 'mds-author', target: 'author', plane: 2, side: 'end' },
+  { tag: 'mds-text', target: 'title', plane: 2, side: 'end' },
+  { tag: 'mds-text', target: 'text', plane: 2, side: 'end' },
+  { tag: 'mds-button', target: 'read', plane: 2, side: 'end' },
+  { tag: 'mds-img', target: 'logo', plane: 3, side: 'start' },
+];
+
+/** The pose before the script runs (flat), the turn when open, the distance between two planes. */
+const STAGE =
+  '--explode: 0; --tilt-x: 0deg; --tilt-y: 0deg; --rest-x: 8deg; --rest-y: 24deg; --gap: 4rem;';
+
+/**
+ * Turned around the middle plane: pushed back by half the depth of the
+ * stack, then rotated. Flat and facing the reader at `--explode: 0`.
+ */
+const SCENE = [
+  'transform:',
+  'rotateX(calc((var(--rest-x) + var(--tilt-x)) * var(--explode)))',
+  'rotateY(calc((var(--rest-y) + var(--tilt-y)) * var(--explode)))',
+  `translateZ(calc(var(--gap) * var(--explode) * ${-(PLANES.length - 1) / 2}))`,
+].join(' ');
+
+/**
+ * A plane, `--plane` gaps in front of the card, its outlines and its shadow
+ * coming in as it opens.
+ */
+const plane = (index: number) =>
+  [
+    `--plane: ${index};`,
+    `--ring: color-mix(in oklab, var(${PLANES[index].ring}) calc(var(--explode) * 70%), transparent);`,
+    'translate: 0 0 calc(var(--plane) * var(--gap) * var(--explode));',
+    index > 0 && 'filter: drop-shadow(0 0.75rem 1rem rgb(0 0 0 / calc(var(--explode) * 0.12)));',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+/** The attributes of a component `depth` levels inside the card, on the plane `index`. */
+const at = (index: number, depth: number) => ({
+  'data-depth': depth,
+  style: `visibility: ${index === depth ? 'visible' : 'hidden'}`,
+});
+---
+
+<div data-pagefind-ignore role="img" aria-label={t('home.layers.label')} class="@container">
+  <div
+    data-layers
+    class="flex justify-center perspective-distant py-1000 @xl:pr-3200 @xl:pl-4400"
+    style={STAGE}
+  >
+    <div
+      data-layers-scene
+      inert
+      class="grid w-4/5 max-w-(--container-sm) transform-3d @xl:w-full"
+      style={SCENE}
+    >
+      {PLANES.map(({ flag }, index) => (
+        <div
+          class="relative [grid-area:1/1] transform-3d [&_[data-depth]]:outline-1 [&_[data-depth]]:outline-offset-2 [&_[data-depth]]:outline-(color:--ring) [&_[data-depth]]:outline-dashed"
+          style={plane(index)}
+        >
+          {FLAGS.filter((item) => item.plane === index).map(({ tag, target, side, y }) => (
+            <span
+              data-flag={target}
+              data-side={side}
+              data-y={y}
+              class:list={[
+                'absolute top-(--flag-y) hidden -translate-y-1/2 items-center opacity-[calc(var(--explode)*var(--flags,0))] @xl:flex',
+                side === 'start'
+                  ? 'right-[calc(100%-var(--flag-x))] -left-4400'
+                  : '-right-3200 left-(--flag-x) flex-row-reverse',
+              ]}
+            >
+              <mds-text
+                typography="hack"
+                tag="code"
+                class:list={[
+                  'shrink-0 rounded-[4px] px-200 py-50 whitespace-nowrap shadow-none',
+                  flag,
+                ]}
+              >
+                {tag}
+              </mds-text>
+              <span class="h-px min-w-200 grow bg-(--ring)"></span>
+              <span class="size-150 shrink-0 rounded-full bg-(--ring)"></span>
+            </span>
+          ))}
+          <mds-card {...at(index, 0)} data-flag-target="card" class="bg-surface-overlay">
+            <mds-card-header {...at(index, 1)} data-flag-target="header" class="bg-surface-overlay">
+              <mds-author {...at(index, 2)} data-flag-target="author">
+                <mds-avatar
+                  slot="avatar"
+                  {...at(index, 3)}
+                  initials="ac"
+                  variant="blue"
+                  tone="weak"
+                />
+                <mds-text {...at(index, 3)} typography="h6" tag="p">
+                  {t('home.layers.name')}
+                </mds-text>
+                <mds-text {...at(index, 3)} typography="caption" tag="p" class="text-fg-muted">
+                  {t('home.layers.role')}
+                </mds-text>
+              </mds-author>
+            </mds-card-header>
+            <mds-card-media {...at(index, 1)} class="bg-surface-overlay">
+              <div
+                {...at(index, 2)}
+                class="grid h-4000 place-items-center bg-linear-135 from-label-blue-10 via-label-violet-10 to-label-orchid-10"
+              >
+                <span {...at(index, 3)} data-flag-target="logo" class="inline-flex">
+                  <Logo class="size-1600" />
+                </span>
+              </div>
+            </mds-card-media>
+            <mds-card-content
+              {...at(index, 1)}
+              data-flag-target="content"
+              class="flex flex-col gap-200 bg-surface-overlay"
+            >
+              <mds-text {...at(index, 2)} data-flag-target="title" typography="h5" tag="p">
+                {t('home.layers.title')}
+              </mds-text>
+              <mds-text
+                {...at(index, 2)}
+                data-flag-target="text"
+                typography="detail"
+                tag="p"
+                class="text-fg-muted"
+              >
+                {t('home.layers.text')}
+              </mds-text>
+            </mds-card-content>
+            <mds-card-footer
+              {...at(index, 1)}
+              data-flag-target="footer"
+              class="flex justify-end gap-300 bg-surface-overlay"
+            >
+              <mds-button
+                {...at(index, 2)}
+                label={t('home.layers.save')}
+                icon="mi/baseline/bookmark-border"
+                variant="primary"
+                tone="weak"
+              />
+              <mds-button
+                {...at(index, 2)}
+                data-flag-target="read"
+                label={t('home.layers.read')}
+                icon="mi/baseline/arrow-forward"
+                icon-position="right"
+                variant="primary"
+              />
+            </mds-card-footer>
+          </mds-card>
+        </div>
+      ))}
+    </div>
+  </div>
+</div>
+
+<script>
+  // The motion of the card of ComponentLayers.astro, on every page the router
+  // shows. For each stage (`data-layers`): the card stays flat until SHOWN of
+  // the stage is on screen, then turns and opens, in OPENING ms; it closes
+  // again once the stage has left the screen, to open again the next time. It
+  // tilts with the scroll and the pointer, easing toward them, only on the
+  // frames after a scroll or a move of the pointer. With reduced motion (the
+  // system's or Magma's `pref-animation-reduce`) it leaves the pose of the
+  // markup: open, still. The flags are placed on their components (place()).
+  const root = document.documentElement;
+  const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = () => systemReduce.matches || root.classList.contains('pref-animation-reduce');
+
+  const clamp = (value: number, min = -1, max = 1) => Math.min(max, Math.max(min, value));
+  const easeInOut = (share: number) =>
+    share < 0.5 ? 4 * share ** 3 : 1 - (-2 * share + 2) ** 3 / 2;
+
+  /** The share of the stage on screen that opens the card (or of the viewport, if taller). */
+  const SHOWN = 0.6;
+  /** How long the card takes to turn and open, or to close, in ms. */
+  const OPENING = 1200;
+  /** How fast the tilt catches up: the time it takes to cover 63% of the distance, in ms. */
+  const EASE = 120;
+  /** The largest tilt, in degrees: from the scroll (around X), from the pointer (X and Y). */
+  const TILT = { scroll: 6, pointerX: 6, pointerY: 12 };
+  /** The pose with reduced motion: open, still. */
+  const REST = { explode: 1, x: 0, y: 0 };
+
+  const write = (stage: HTMLElement, pose: typeof REST) => {
+    stage.style.setProperty('--explode', pose.explode.toFixed(4));
+    stage.style.setProperty('--tilt-x', `${pose.x.toFixed(3)}deg`);
+    stage.style.setProperty('--tilt-y', `${pose.y.toFixed(3)}deg`);
+  };
+
+  /**
+   * Puts each flag (`data-flag`) of a stage on the component it names
+   * (`data-flag-target`, on the same plane): the end of its line on the edge
+   * of the component on the flag's side (`data-side`), at the middle of its
+   * height or at the share `data-y` of it. Measured on the card laid flat for
+   * a moment, within the frame: the planes are moved by transforms only, so
+   * the measures hold at any pose. Then the flags show (`--flags`).
+   */
+  function place(stage: HTMLElement) {
+    const scene = stage.querySelector<HTMLElement>('[data-layers-scene]');
+    if (!scene) return;
+    const planes = [...scene.children] as HTMLElement[];
+    const saved = [scene, ...planes].map((element) => element.style.cssText);
+    scene.style.transform = 'none';
+    for (const plane of planes) plane.style.translate = 'none';
+    for (const plane of planes) {
+      const box = plane.getBoundingClientRect();
+      for (const flag of plane.querySelectorAll<HTMLElement>('[data-flag]')) {
+        const target = plane.querySelector(`[data-flag-target="${flag.dataset.flag}"]`);
+        if (!target) continue;
+        const edge = target.getBoundingClientRect();
+        const x = (flag.dataset.side === 'end' ? edge.right : edge.left) - box.left;
+        const y = edge.top - box.top + edge.height * Number(flag.dataset.y || 0.5);
+        flag.style.setProperty('--flag-x', `${x}px`);
+        flag.style.setProperty('--flag-y', `${y}px`);
+      }
+    }
+    [scene, ...planes].forEach((element, index) => (element.style.cssText = saved[index]));
+    stage.style.setProperty('--flags', '1');
+  }
+
+  function animate(stage: HTMLElement, signal: AbortSignal) {
+    const pose = { ...REST, explode: 0 };
+    let pointer = { x: 0, y: 0 };
+    let onScreen = false;
+    let frame = 0;
+    /** The time of the previous frame, while the tilt moves. */
+    let last: number | undefined;
+    /** The next frame puts the tilt on its goal: the first one, the first after reduced motion. */
+    let jump = true;
+    /** Whether the card is open or opening, and the turn under way: from where, since when. */
+    let open = false;
+    let turn: { from: number; start?: number } | undefined;
+
+    /** Whether enough of the stage is on screen to open the card. */
+    const shown = (box: DOMRect) => {
+      const visible = Math.min(box.bottom, innerHeight) - Math.max(box.top, 0);
+      return visible >= SHOWN * Math.min(box.height, innerHeight);
+    };
+
+    const tick = (time: number) => {
+      frame = 0;
+      if (reduced()) {
+        Object.assign(pose, REST);
+        open = true;
+        turn = undefined;
+        write(stage, pose);
+        jump = true;
+        return;
+      }
+      const box = stage.getBoundingClientRect();
+      if (!open && shown(box)) {
+        open = true;
+        turn = { from: pose.explode };
+      }
+      // From 1 to -1 as its middle crosses the viewport, bottom to top.
+      const scroll = clamp((box.top + box.height / 2 - innerHeight / 2) / (innerHeight / 2));
+      const tilt = {
+        x: scroll * TILT.scroll - pointer.y * TILT.pointerX,
+        y: pointer.x * TILT.pointerY,
+      };
+      let moving = false;
+      // The share of the distance covered since the previous frame, whatever
+      // the frame rate; after a still pose, as if one frame had passed.
+      const step = jump ? 1 : 1 - Math.exp(-(time - (last ?? time - 1000 / 60)) / EASE);
+      jump = false;
+      for (const key of ['x', 'y'] as const) {
+        pose[key] += (tilt[key] - pose[key]) * step;
+        if (Math.abs(tilt[key] - pose[key]) > 0.001) moving = true;
+        else pose[key] = tilt[key];
+      }
+      if (turn) {
+        turn.start ??= time;
+        const share = Math.min(1, (time - turn.start) / OPENING);
+        pose.explode = turn.from + ((open ? 1 : 0) - turn.from) * easeInOut(share);
+        if (share < 1) moving = true;
+        else turn = undefined;
+      }
+      write(stage, pose);
+      last = moving ? time : undefined;
+      if (moving) wake();
+    };
+
+    const wake = () => {
+      if (onScreen && !frame) frame = requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      // Off screen: flat again at once, without a turn nobody sees.
+      if (!onScreen && open && !reduced()) {
+        open = false;
+        turn = undefined;
+        pose.explode = 0;
+        write(stage, pose);
+      }
+      wake();
+    });
+    observer.observe(stage);
+
+    // The flags follow the layout of the card: the components loading, the
+    // fonts, the width of the column.
+    let placing = 0;
+    const replace = () => {
+      if (!placing) placing = requestAnimationFrame(() => ((placing = 0), place(stage)));
+    };
+    const resizes = new ResizeObserver(replace);
+    const plane = stage.querySelector('[data-layers-scene] > *');
+    for (const target of plane?.querySelectorAll('[data-flag-target]') ?? []) {
+      resizes.observe(target);
+    }
+    document.fonts.ready.then(replace);
+
+    signal.addEventListener('abort', () => {
+      observer.disconnect();
+      resizes.disconnect();
+      cancelAnimationFrame(frame);
+      cancelAnimationFrame(placing);
+    });
+
+    // Where the pointer is, from the middle of the stage, over the viewport:
+    // the card turns toward it from anywhere on the page. Not for touch.
+    document.addEventListener(
+      'pointermove',
+      (event) => {
+        if (event.pointerType === 'touch') return;
+        const box = stage.getBoundingClientRect();
+        pointer = {
+          x: clamp((event.clientX - (box.left + box.width / 2)) / (innerWidth / 2)),
+          y: clamp((event.clientY - (box.top + box.height / 2)) / (innerHeight / 2)),
+        };
+        wake();
+      },
+      { signal, passive: true },
+    );
+    // The scrolls of the page and of any box around the stage.
+    document.addEventListener('scroll', wake, { signal, passive: true, capture: true });
+    addEventListener('resize', wake, { signal, passive: true });
+    systemReduce.addEventListener('change', wake, { signal });
+  }
+
+  let pages: AbortController | undefined;
+  document.addEventListener('astro:page-load', () => {
+    pages?.abort();
+    pages = new AbortController();
+    for (const stage of document.querySelectorAll<HTMLElement>('[data-layers]')) {
+      animate(stage, pages.signal);
+    }
+  });
+</script>

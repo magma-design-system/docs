@@ -1,0 +1,179 @@
+---
+title: Lista con filtri
+description: Una lista di record in cui cercare, da restringere, ordinare e scorrere per pagine, con gli stati di caricamento, di nessun risultato e di errore e la ricerca conservata nell'indirizzo.
+draft: true
+---
+
+import PatternCode from '../../../../components/PatternCode.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+import Usages from '../../../../components/Usages.astro';
+
+La schermata che si apre più spesso in un gestionale: la lista dei record su cui si lavora -
+istanze, documenti, pagamenti, pratiche - in cui trovare quelli che servono. Ci si cerca, la si
+restringe per stato o per ufficio, la si ordina e la si scorre per pagine, e ci si torna dopo
+aver aperto un record, aspettandosi di ritrovarla com'era.
+
+<PatternPreview id="list-with-filters" />
+
+## Quando usarla
+
+Usala quando si cercano record in un insieme troppo grande da leggere tutto: da qualche decina
+di record in su, con poche proprietà per cui valga la pena filtrare. Altrimenti c'è di meglio:
+
+- Con una manciata di record, mostrali tutti: filtri e pagine sono solo d'intralcio.
+- Quando i record sono visivi, come immagini o documenti da vedere in anteprima, mostrali come
+  card in una griglia; ricerca, filtri e pagine restano gli stessi.
+- Quando si sceglie un record per proseguire un compito, come un destinatario in un form, un
+  campo di ricerca con suggerimenti è più rapido di una lista intera.
+
+## Anatomia
+
+1. **Titolo e descrizione**: cosa contiene la lista, come titolo della pagina.
+2. **Ricerca e filtri**: un form con il ruolo di ricerca, con un campo che cerca nel numero e
+   nell'oggetto, una select per ogni proprietà con pochi valori, e l'ordinamento.
+3. **Filtro per stato**: gli stati come `mds-filter`, uno alla volta, ciascuno con il numero di
+   record che mostrerebbe.
+4. **Riepilogo**: quali record sono a schermo e su quanti, e il pulsante che azzera i filtri
+   quando ce ne sono.
+5. **Risultati**: una riga per record, con il numero che porta alla sua pagina.
+6. **Pagine**: il paginatore, solo quando c'è più di una pagina.
+
+Tre stati sostituiscono i risultati o si aggiungono a loro: **caricamento** (uno spinner nel
+campo di ricerca, mentre i risultati già presenti restano), **nessun risultato** (un messaggio
+con una via d'uscita), **errore** (un banner con la possibilità di riprovare).
+
+## Componenti
+
+<PatternComponents id="list-with-filters" />
+
+## Comportamento
+
+- **Il lavoro lo fa il back end.** Cerca, conta, ordina e divide in pagine i record, e la
+  pagina riceve una pagina di risultati. Filtrare nel browser funziona solo finché tutto
+  l'insieme sta nella pagina, e gli insiemi crescono.
+- **La ricerca sta nell'indirizzo.** Testo cercato, stato, ufficio, ordinamento e pagina sono
+  parametri dell'indirizzo: un ricaricamento, un segnalibro o un link mandato a un collega
+  mostrano gli stessi risultati, e Indietro da un record riporta alla lista com'era. I valori
+  lasciati al loro predefinito restano fuori, per tenere corto l'indirizzo.
+- **Un nuovo filtro riparte dalla prima pagina.** Ogni cambiamento tranne la pagina riporta a
+  pagina 1: la pagina 4 di un insieme più piccolo può non esistere. Un indirizzo che chiede una
+  pagina oltre la fine riceve l'ultima.
+- **Una ricerca alla volta.** La ricerca aspetta una pausa nella digitazione (300 ms) invece di
+  partire a ogni tasto, e una nuova ricerca annulla quella ancora in corso: una risposta più
+  vecchia e più lenta non sostituisce mai una più recente.
+- **I risultati restano mentre arrivano i nuovi.** Lo spinner nel campo di ricerca, e
+  `aria-busy` sulla tabella, dicono che stanno arrivando nuovi risultati; la pagina non si
+  svuota per un istante.
+- **I conteggi seguono gli altri filtri.** Ogni stato mostra quanti record mostrerebbe con il
+  testo e l'ufficio scelti, così uno stato vuoto si vede prima di sceglierlo.
+- **Nessun risultato non è un errore.** Quando nulla corrisponde, la pagina lo dice e propone
+  di azzerare i filtri. Quando la richiesta fallisce, dice che i risultati non si sono potuti
+  caricare e propone di riprovare, invece di mostrare una lista vuota.
+
+## Accessibilità
+
+- I filtri sono un form con `role="search"`, un landmark a cui chi usa un lettore di schermo
+  può saltare. Ogni controllo ha un'etichetta visibile, data da `mds-input-field`: il
+  placeholder è un esempio, non l'etichetta.
+- Il riepilogo ha `role="status"`: dopo ogni cambiamento, i lettori di schermo leggono quali
+  record sono mostrati e su quanti, mentre il focus resta sul controllo appena usato, così si
+  può continuare a restringere.
+- Lo stato di ogni record è il testo del suo badge, non solo il suo colore.
+- Il numero di ogni record è il link alla sua pagina, e il nome del link. Un pulsante "Apri" su
+  ogni riga suonerebbe uguale su ogni riga.
+- La tabella tiene le intestazioni delle colonne, e su uno schermo stretto scorre di lato
+  invece di schiacciare le colonne: le sue celle restano su una riga.
+
+## Contenuti
+
+- Chiama la lista con ciò che contiene, al plurale: "Istanze", non "Elenco istanze" o
+  "Ricerca".
+- L'etichetta del campo di ricerca dice cos'è; il placeholder dice dove cerca: "Numero o
+  oggetto".
+- Chiama gli stati come li chiama la pagina del record, ed elencali nell'ordine del processo.
+- Conta i risultati, e usa il singolare per uno: "1 istanza", "11-20 di 46 istanze".
+- Quando nulla corrisponde, dillo e di' come uscirne: "Nessuna istanza corrisponde", con
+  "Azzera i filtri" - non "Nessun dato".
+- Scrivi le date nel formato della lingua della pagina.
+
+## Errori da evitare
+
+<Usages>
+<mds-usage variant="dont">
+
+La pagina carica tutti i record e li filtra nel browser.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il back end cerca, conta, ordina e divide in pagine; la pagina riceve una pagina.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Le colonne di una lista a pagine si ordinano con `sortable` su `mds-table-header-cell`: ordina
+solo le righe a schermo.
+
+</mds-usage>
+<mds-usage variant="do">
+
+L'ordinamento fa parte della ricerca: il back end ordina tutto l'insieme, poi lo divide in
+pagine.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Lo stato cambia e la lista resta a pagina 4, che non esiste più.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Ogni cambiamento dei filtri riporta a pagina 1.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+I filtri vivono solo nella pagina: un ricaricamento, o Indietro da un record, li perde.
+
+</mds-usage>
+<mds-usage variant="do">
+
+La ricerca sta nell'indirizzo, e la pagina la legge quando si apre.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una ricerca a ogni tasto, e vince la risposta che arriva per ultima, anche quando risponde a una
+ricerca più vecchia.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Una ricerca quando la digitazione si ferma, e ogni nuova ricerca annulla quella ancora in corso.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una richiesta fallita mostra "Nessuna istanza corrisponde".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Una richiesta fallita mostra un errore con la possibilità di riprovare; lo stato vuoto è solo
+per un insieme vuoto.
+
+</mds-usage>
+</Usages>
+
+## Codice
+
+<PatternCode id="list-with-filters" />
+
+La versione in HTML è quella in funzione nell'anteprima qui sopra. In tutte e tre,
+`fetchRequests` fa le veci del back end e lavora su dati di esempio: sostituiscila con la
+chiamata alla tua API. Il componente Angular legge e scrive la ricerca attraverso il router,
+quindi deve essere il componente di una rotta.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella
+lingua del prodotto.

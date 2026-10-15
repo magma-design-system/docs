@@ -1,0 +1,93 @@
+---
+// The footer of the site, under the card on every page: the links people look
+// for outside the documentation, in four columns (resources, community, help
+// and this site), then the logo and the Magma version the site documents.
+// The issue links open the templates of the Magma repository
+// (.github/ISSUE_TEMPLATE); the problems of this site go to its own issues.
+import { localePrefix } from '../../lib/frame';
+import { magmaVersion } from '../../lib/magma.mjs';
+import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import Brand from './Brand.astro';
+
+const { t, starlightRoute } = Astro.locals;
+const local = (path: string) => `${localePrefix(starlightRoute.locale)}/${path}`;
+const issue = (template: string) => `${REPOSITORY}/issues/new?template=${template}.yml`;
+const SITE_REPOSITORY = 'https://github.com/magma-design-system/docs';
+
+const columns = [
+  {
+    id: 'resources',
+    links: [
+      { key: 'storybook', href: STORYBOOK },
+      { key: 'github', href: REPOSITORY },
+      { key: 'npm', href: 'https://www.npmjs.com/org/maggioli-design-system' },
+      { key: 'figma', href: local('tokens/figma/') },
+      { key: 'brand', href: local('brand/identity-package/') },
+    ],
+  },
+  {
+    id: 'community',
+    links: [
+      { key: 'channels', href: local('community/') },
+      {
+        key: 'stackOverflow',
+        href: 'https://stackoverflowteams.com/c/magma-design-system/questions',
+      },
+      { key: 'contributing', href: local('community/contributing/') },
+      { key: 'codeOfConduct', href: local('community/code-of-conduct/') },
+      { key: 'wiki', href: `${REPOSITORY}/wiki` },
+    ],
+  },
+  {
+    id: 'help',
+    links: [
+      { key: 'bug', href: issue('1-bug-report') },
+      { key: 'feature', href: issue('2-feature-request') },
+      { key: 'contribution', href: issue('3-contribution-proposal') },
+      { key: 'training', href: issue('5-training-request') },
+      { key: 'security', href: `${REPOSITORY}/security/advisories/new` },
+    ],
+  },
+  {
+    id: 'site',
+    links: [
+      { key: 'about', href: local('community/about/') },
+      { key: 'siteIssue', href: `${SITE_REPOSITORY}/issues` },
+      { key: 'siteSource', href: SITE_REPOSITORY },
+    ],
+  },
+];
+---
+
+<footer class="px-600 py-1200 pb-600 desktop:px-800 print:hidden">
+  <div class="grid gap-1000 tablet:grid-cols-2 wide:grid-cols-4">
+    {columns.map(({ id, links }) => (
+      <div>
+        <mds-text id={`site-footer-${id}`} typography="h6" tag="h2" class="mb-400 block">
+          {t(`frame.siteFooter.${id}` as never)}
+        </mds-text>
+        <ul aria-labelledby={`site-footer-${id}`} class="m-0 flex list-none flex-col gap-300 p-0">
+          {links.map(({ key, href }) => (
+            <li class="flex">
+              <a
+                href={href}
+                class="rounded-sm text-fg-muted no-underline focus-zoom hover:text-fg-default hover:underline"
+              >
+                <mds-text typography="detail">
+                  {t(`frame.siteFooter.${id}.${key}` as never)}
+                </mds-text>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </div>
+  <mds-hr class="my-1000" />
+  <div class="flex flex-wrap items-center justify-between gap-400">
+    <Brand />
+    <mds-text typography="caption" class="text-fg-muted">
+      {t('frame.siteFooter.version', { version: magmaVersion() })}
+    </mds-text>
+  </div>
+</footer>

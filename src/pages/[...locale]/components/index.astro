@@ -10,7 +10,7 @@ import Heading from '../../../components/Heading.astro';
 import UiText from '../../../components/UiText.astro';
 import { componentHref } from '../../../lib/components';
 import { localePrefix } from '../../../lib/frame';
-import { TEXT } from '../../../lib/markdown-text.mjs';
+import { READING, TEXT } from '../../../lib/markdown-text.mjs';
 import { localeParams } from '../../../lib/i18n.mjs';
 import { componentName } from '../../../lib/nav.mjs';
 
@@ -67,58 +67,58 @@ const headings = [
   frontmatter={{ title: t('components.title'), description: t('components.description') }}
   headings={headings}
 >
-  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+  <mds-text {...READING} tag="p" class={TEXT.paragraph}>
     {t('components.intro')}
   </mds-text>
 
   <Heading id="quick-start" text={t('components.quickStart')} />
-  <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+  <mds-text {...READING} tag="p" class={TEXT.paragraph}>
     {t('components.quickStart.intro')}
   </mds-text>
 
   <FrameworkTabs>
     <Fragment slot="vanilla">
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.install')}
       </mds-text>
       <CodeBlock code="npm i @maggioli-design-system/magma" lang="bash" />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-        <UiText text={t('components.quickStart.vanilla.register')} />
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+        <UiText reading text={t('components.quickStart.vanilla.register')} />
       </mds-text>
       <CodeBlock code={VANILLA_REGISTER} lang="js" title="src/main.js" />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.vanilla.use')}
       </mds-text>
       <CodeBlock code={MARKUP} lang="html" title="index.html" />
     </Fragment>
 
     <Fragment slot="react">
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.installWrapper')}
       </mds-text>
       <CodeBlock
         code="npm i @maggioli-design-system/magma-react @maggioli-design-system/magma"
         lang="bash"
       />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.react.use')}
       </mds-text>
       <CodeBlock code={REACT_APP} lang="jsx" title="src/App.jsx" />
     </Fragment>
 
     <Fragment slot="angular">
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.installWrapper')}
       </mds-text>
       <CodeBlock
         code="npm i @maggioli-design-system/magma-angular @maggioli-design-system/magma"
         lang="bash"
       />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
-        <UiText text={t('components.quickStart.angular.register')} />
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+        <UiText reading text={t('components.quickStart.angular.register')} />
       </mds-text>
       <CodeBlock code={ANGULAR_COMPONENT} lang="ts" title="src/app/app.ts" />
-      <mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph}>
         {t('components.quickStart.angular.use')}
       </mds-text>
       <CodeBlock code={MARKUP} lang="html" title="src/app/app.html" />

@@ -1,0 +1,96 @@
+---
+// The four font families of Magma, one mds-card each: the name set in the
+// font itself, the family key, the weights the type scale uses (from the
+// `text-size` tokens) and the license of the font (from its installed
+// @fontsource package), with links to download it from Google Fonts, for
+// design tools, and to its Fontsource package, for products.
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import Code from './Code.astro';
+import { tokenNamed, tokensIn, type Token } from '../lib/tokens.mjs';
+
+const { t } = Astro.locals;
+
+const FAMILIES = ['title', 'info', 'read', 'code'];
+// Bold in long reading text is 700, which no style of the scale sets: the
+// installation guide loads it too (development/installation.mdx).
+const BOLD: Record<string, number[]> = { read: [700] };
+const LICENSES: Record<string, string> = { 'Apache-2.0': 'Apache 2.0', 'OFL-1.1': 'SIL OFL 1.1' };
+
+const weightTokens = (tokensIn('text-size') as Token[]).filter((token) =>
+  token.name.endsWith('.font-weight'),
+);
+
+const fonts = FAMILIES.map((family) => {
+  const [name] = (tokenNamed(`font.${family}`) as Token).value as string[];
+  const id = name.toLowerCase().replaceAll(' ', '-');
+  const pkg = JSON.parse(
+    readFileSync(
+      path.join(process.cwd(), 'node_modules', '@fontsource', id, 'package.json'),
+      'utf8',
+    ),
+  ) as { license: string };
+  const weights = [
+    ...new Set([
+      ...weightTokens
+        .filter((token) => token.name.startsWith(`text-size.${family}.`))
+        .map((token) => Number(token.value)),
+      ...(BOLD[family] ?? []),
+    ]),
+  ].sort((a, b) => a - b);
+  return {
+    family,
+    name,
+    weights: weights.join(', '),
+    license: LICENSES[pkg.license] ?? pkg.license,
+    googleFonts: `https://fonts.google.com/specimen/${name.replaceAll(' ', '+')}`,
+    fontsource: `https://fontsource.org/fonts/${id}`,
+  };
+});
+---
+
+{/* `not-content`: Starlight would put 1rem above every card but the first. */}
+<div class="not-content @container my-600">
+  <div class="grid gap-600 @xl:grid-cols-2">
+    {fonts.map(({ family, name, weights, license, googleFonts, fontsource }) => (
+      <mds-card class="bg-surface-overlay">
+        <mds-card-header class="flex-col items-start gap-100 bg-surface-overlay">
+          <mds-text typography="h3" tag="h3" style={`font-family: var(--font-${family})`}>
+            {name}
+          </mds-text>
+          <Code>{family}</Code>
+        </mds-card-header>
+        <mds-card-content class="pt-0 bg-surface-overlay">
+          <mds-text typography="detail">
+            {t('fonts.weights')}: {weights}
+            <br />
+            {t('fonts.license')}: {license}
+          </mds-text>
+        </mds-card-content>
+        <mds-card-footer class="flex flex-wrap gap-200 bg-surface-overlay">
+          <mds-button
+            href={googleFonts}
+            target="blank"
+            role="link"
+            label={t('fonts.download')}
+            aria-label={`${t('fonts.download')}: ${name}`}
+            icon="mi/baseline/download"
+            variant="primary"
+            tone="weak"
+          />
+          <mds-button
+            href={fontsource}
+            target="blank"
+            role="link"
+            label="Fontsource"
+            aria-label={`Fontsource: ${name}`}
+            icon="mi/baseline/open-in-new"
+            icon-position="right"
+            variant="primary"
+            tone="text"
+          />
+        </mds-card-footer>
+      </mds-card>
+    ))}
+  </div>
+</div>

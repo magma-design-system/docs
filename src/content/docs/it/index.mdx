@@ -1,11 +1,247 @@
 ---
 title: Magma
-description: Documentazione di Magma, il Design System del Gruppo Maggioli.
-sidebar:
-  label: Cos'è Magma
+description: Il design system del Gruppo Maggioli - web component standard per ogni framework, design token, icone e guide per gli agenti AI.
+template: splash
+hero:
+  tagline: Il design system del Gruppo Maggioli. Web component standard che funzionano in ogni framework, decisioni di design raccolte nei token e guide che gli agenti AI leggono direttamente dal pacchetto.
+  actions:
+    - text: Inizia
+      link: development/installation/
+      variant: primary
+    - text: Sfoglia i componenti
+      link: components/
+      variant: secondary
 ---
 
-Web component, design token e icone del Design System del Gruppo Maggioli.
+import FrameworkTabs from '../../../components/FrameworkTabs.astro';
+import AgentNames from '../../../components/home/AgentNames.astro';
+import ComponentLayers from '../../../components/home/ComponentLayers.astro';
+import Feature from '../../../components/home/Feature.astro';
+import Features from '../../../components/home/Features.astro';
+import HomeSection from '../../../components/home/HomeSection.astro';
+import HomeStats from '../../../components/home/HomeStats.astro';
+import Level from '../../../components/home/Level.astro';
+import Levels from '../../../components/home/Levels.astro';
+import SectionCards from '../../../components/home/SectionCards.astro';
+import { apiCounts } from '../../../lib/magma.mjs';
 
-- [Componenti](components/): tutti i componenti di Magma, generati dal pacchetto installato.
-- [Informazioni sul sito](about/): come è costruita questa documentazione e a cosa serve.
+export const api = apiCounts();
+
+<HomeStats />
+
+<HomeSection
+  id="built-to-scale"
+  title="Fatto per crescere"
+  lead="Un solo sistema per prodotti costruiti in modi diversi, da team diversi, a velocità diverse."
+>
+  <Features>
+    <Feature
+      icon="mi/outline/layers"
+      variant="blue"
+      title="Una libreria, ogni framework"
+      text="I componenti sono custom element standard, compilati una volta sola. Funzionano così come sono in JavaScript e in qualunque template; i wrapper per React e Angular, generati dallo stesso sorgente e rilasciati insieme, aggiungono tipi, eventi e form nel modo che ogni framework si aspetta."
+      href="development/installation/"
+      action="Installa Magma"
+    />
+    <Feature
+      icon="mi/outline/integration-instructions"
+      variant="violet"
+      title="Solo standard web"
+      text="Le opzioni sono attributi HTML che prendono stringhe, numeri e booleani, non array, oggetti o callback che solo un framework sa passare. I contenuti vanno negli slot e nei componenti figli, gli eventi sono eventi DOM: quello che funziona in un file HTML funziona ovunque."
+      stat={`${api.attributes} / ${api.properties}`}
+      statLabel="proprietà sono attributi semplici"
+      href="development/"
+      action="Leggi le regole"
+    />
+    <Feature
+      icon="mi/outline/stairs"
+      variant="green"
+      title="Un livello alla volta"
+      text="Si parte dai token, si aggiungono gli stili, poi i componenti e i wrapper. Ogni livello funziona da solo: un prodotto prende quello che il suo stack, le sue scadenze e i suoi utenti permettono, e sale quando può."
+      href="#adoption"
+      action="Vedi i livelli"
+    />
+    <Feature
+      icon="mi/outline/auto-awesome"
+      variant="orchid"
+      title="Pronto per gli agenti AI"
+      text="I pacchetti dei componenti contengono un AGENTS.md e guide scritte per gli agenti di sviluppo: come installare, l'API di ogni componente, i modi giusti e quelli sbagliati di usarlo. L'agente lavora con la versione che hai installato, non con quello che ricorda."
+      href="development/agentic-development/"
+      action="Lavora con gli agenti"
+    />
+    <Feature
+      icon="mi/outline/accessibility-new"
+      variant="sky"
+      title="Accessibile e adattivo"
+      text="Progettato per WCAG 2.x AA, con modalità chiara e scura, contrasto più alto, movimento ridotto, basso consumo e temi già inclusi: le preferenze si impostano una volta sulla pagina e ogni componente le segue."
+      href="foundation/accessibility/"
+      action="Accessibilità"
+    />
+    <Feature
+      icon="mi/outline/palette"
+      variant="orange"
+      title="Una sola fonte per le decisioni di design"
+      text="Colori, tipografia, spazi e movimento vivono nei design token, pubblicati per CSS, Tailwind, SCSS, JavaScript e DTCG, per Figma come variabili e per iOS, Android e Flutter. Una decisione cambiata una volta arriva a ogni prodotto con il suo prossimo aggiornamento."
+      href="tokens/"
+      action="Scopri i token"
+    />
+  </Features>
+</HomeSection>
+
+<HomeSection
+  id="every-framework"
+  title="Gli stessi componenti, ovunque sviluppi"
+  lead="Scritti come HTML, usati così come sono in React e Angular: gli stessi nomi, gli stessi attributi, gli stessi eventi. Sono componenti veri: cambia la modalità o il tema dalle preferenze e si adattano."
+>
+<ComponentLayers slot="aside" />
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```html
+<mds-input-field label="Email">
+  <mds-input name="email" type="email" placeholder="name@example.com"></mds-input>
+</mds-input-field>
+<mds-button label="Send" icon="mi/baseline/send" variant="primary"></mds-button>
+
+<script type="module">
+  document.querySelector('mds-input').addEventListener('mdsInputChange', (event) => {
+    console.log(event.detail.value);
+  });
+</script>
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```tsx
+import { MdsButton, MdsInput, MdsInputField } from '@maggioli-design-system/magma-react';
+
+export function Subscribe() {
+  return (
+    <>
+      <MdsInputField label="Email">
+        <MdsInput
+          name="email"
+          type="email"
+          placeholder="name@example.com"
+          onMdsInputChange={(event) => console.log(event.detail.value)}
+        />
+      </MdsInputField>
+      <MdsButton label="Send" icon="mi/baseline/send" variant="primary" />
+    </>
+  );
+}
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```ts
+import { Component } from '@angular/core';
+import { MdsButton, MdsInput, MdsInputField } from '@maggioli-design-system/magma-angular';
+
+@Component({
+  selector: 'app-subscribe',
+  imports: [MdsButton, MdsInput, MdsInputField],
+  template: `
+    <mds-input-field label="Email">
+      <mds-input
+        name="email"
+        type="email"
+        placeholder="name@example.com"
+        (mdsInputChange)="onChange($event)"
+      ></mds-input>
+    </mds-input-field>
+    <mds-button label="Send" icon="mi/baseline/send" variant="primary"></mds-button>
+  `,
+})
+export class SubscribeComponent {
+  onChange(event: CustomEvent) {
+    console.log(event.detail.value);
+  }
+}
+```
+
+</Fragment>
+</FrameworkTabs>
+</HomeSection>
+
+<HomeSection
+  id="adoption"
+  title="Adottalo al tuo ritmo"
+  lead="Quattro livelli, ognuno costruito sul precedente. Fermati dove dicono i tuoi vincoli, sali quando cambiano."
+>
+  <Levels>
+    <Level
+      level={1}
+      title="Design token"
+      packages={['design-tokens']}
+      text="Le decisioni di design come valori: custom property CSS, SCSS, JavaScript, JSON e DTCG, variabili Figma e i formati di iOS, Android e Flutter."
+      fits="Il prodotto ha un suo stack di interfaccia, o non è sul web."
+    />
+    <Level
+      level={2}
+      title="Stili"
+      packages={['styles']}
+      text="I token come tema e utility di Tailwind 4, con gli stili di base, i font, la modalità scura, il contrasto e i temi."
+      fits="Scrivi il tuo markup e vuoi che abbia l'aspetto e il comportamento di Magma."
+    />
+    <Level
+      level={3}
+      title="Web component"
+      packages={['magma', 'svg-icons']}
+      text={`${api.components} componenti come custom element: caricali tutti, o importa solo quelli che una pagina usa. Icone per nome.`}
+      fits="HTML semplice, template generati dal server, un CMS, micro-frontend: qualunque pagina in un browser."
+    />
+    <Level
+      level={4}
+      title="Wrapper per i framework"
+      packages={['magma-react', 'magma-angular']}
+      text="Gli stessi componenti come componenti React e componenti standalone Angular, con tipi, eventi e collegamento ai form, e il rendering lato server per React."
+      fits="Il prodotto è un'app React o Angular."
+    />
+  </Levels>
+</HomeSection>
+
+<HomeSection
+  id="agents"
+  title="Fatto per lavorare con gli agenti AI"
+  lead="Gli agenti sviluppano con Magma come fa il tuo team: dalle guide della versione che hai installato. Installa il pacchetto, poi chiedi."
+  href="development/agentic-development/"
+  action="Sviluppo agentico"
+>
+<AgentNames />
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma-react/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma-angular/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+</FrameworkTabs>
+</HomeSection>
+
+<HomeSection
+  id="explore"
+  title="Esplora la documentazione"
+  lead="Dalle decisioni alla base di Magma al codice di ogni componente."
+>
+  <SectionCards />
+</HomeSection>

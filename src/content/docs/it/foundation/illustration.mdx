@@ -1,0 +1,73 @@
+---
+title: Illustrazione
+description: Quando un'illustrazione aiuta e quando è d'intralcio, dove va in un prodotto, e le regole per disegnarne o sceglierne una.
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+Un'illustrazione costa attenzione, e peso alla pagina: deve restituire qualcosa. Nei prodotti
+Maggioli spiega, accoglie o segna un momento; non decora le schermate in cui le persone
+lavorano.
+
+Magma non ha ancora una libreria di illustrazioni per l'interfaccia: gli artwork del gruppo,
+i suoi loghi e i marchi dei suoi prodotti, sono in [Asset del brand](../../brand/). Finché non
+ce ne sarà una, queste decisioni guidano chi disegna o sceglie un'illustrazione per un
+prodotto.
+
+## Quando usarne una
+
+- Per spiegare ciò che le sole parole rendono difficile: come va una procedura, come funziona
+  un servizio.
+- Per riempire uno spazio che altrimenti sarebbe vuoto, e dire cosa fare dopo.
+- Per accogliere: il primo accesso, una visita guidata, una nuova funzione.
+
+Non nelle schermate in cui si lavora, come elenchi, moduli e tabelle: lì lo spazio è dei dati.
+E non per addolcire un errore: un problema serio ha bisogno di un messaggio chiaro, non di un
+disegno.
+
+<Usages>
+<mds-usage variant="do">
+
+Una pratica senza file mostra, in `mds-zero`, un'illustrazione, il messaggio "Questa pratica
+non ha ancora file" e una sola azione: "Carica un file".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un'illustrazione sopra una tabella di fatture spinge i dati fuori dallo schermo.
+
+</mds-usage>
+</Usages>
+
+## Dove vanno
+
+- **Stati vuoti**, con `mds-zero`: l'illustrazione, un messaggio breve e una sola azione.
+- **Visite guidate e annunci**: un'illustrazione per passo o per novità, tutte della stessa
+  famiglia.
+- **Pagine editoriali**: le pagine che presentano un prodotto o una pubblicazione, dove il
+  marchio si fa avanti.
+
+## Come si disegnano
+
+- **Un'idea ciascuna.** Se un'illustrazione ha bisogno di una didascalia per essere capita,
+  dice troppo.
+- **Una famiglia per prodotto.** Lo stesso tratto, la stessa palette e la stessa prospettiva
+  in ogni illustrazione di un prodotto: un misto di stili fa sembrare un prodotto rattoppato.
+- **Pochi colori, dalle palette di Magma**, meno saturi delle azioni, perché un'illustrazione
+  non faccia mai concorrenza a un pulsante.
+- **Niente testo dentro.** Il testo in un'immagine non si può tradurre, leggere con un lettore
+  di schermo o ingrandire: va nella pagina, accanto all'immagine.
+- **Leggere.** SVG ogni volta che si può, e niente di cui un prodotto non possa fare a meno
+  quando la persona chiede consumi ridotti.
+- **Entrambe le modalità.** Niente sfondo bianco incorporato: un'illustrazione si verifica
+  anche in modalità scura.
+- **Le persone come sono.** Quando un'illustrazione mostra delle persone, mostra la varietà di
+  chi usa i prodotti: età, generi, origini, disabilità.
+
+## Accessibilità
+
+- La maggior parte delle illustrazioni è decorativa: il loro testo alternativo è vuoto, e il
+  messaggio è nel testo accanto.
+- Un'illustrazione che porta informazioni le dice nel suo testo alternativo.
+- Un'illustrazione animata si ferma quando la persona chiede meno movimento, e non va mai in
+  loop senza un modo per fermarla.

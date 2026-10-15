@@ -1,0 +1,25 @@
+---
+// The Magma components a pattern is made of, read from the tags of its plain
+// HTML version (src/lib/patterns.ts), each linking to its page: the list of
+// the components page, in columns of at least 10rem.
+import { componentHref } from '../lib/components';
+import { TEXT } from '../lib/markdown-text.mjs';
+import { componentName } from '../lib/nav.mjs';
+import { patternComponents } from '../lib/patterns';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/. */
+  id: string;
+}
+
+const { id } = Astro.props;
+const { locale } = Astro.locals.starlightRoute;
+---
+
+<mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(4000),1fr))]">
+  {patternComponents(id).map((tag) => (
+    <mds-list-item typography="detail" class={TEXT.listItem}>
+      <a href={componentHref(locale, tag)}>{componentName(tag)}</a>
+    </mds-list-item>
+  ))}
+</mds-list>
