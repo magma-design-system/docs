@@ -103,7 +103,11 @@ export const sections = [
   {
     id: 'community',
     icon: 'mi/outline/forum',
-    items: () => [{ slug: 'community' }, { slug: 'community/code-of-conduct' }],
+    items: () => [
+      { slug: 'community' },
+      { slug: 'community/contributing' },
+      { slug: 'community/code-of-conduct' },
+    ],
   },
 ];
 
