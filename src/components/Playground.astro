@@ -13,7 +13,7 @@
 // the preview is ready.
 import { plainText, propControl, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
-import { TEXT } from '../lib/markdown-text.mjs';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
 import TypeValue from './TypeValue.astro';
@@ -54,7 +54,7 @@ const fields = props
   );
 ---
 
-<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+<mds-text {...READING} tag="p" class={TEXT.paragraph}>
   {t('component.preview.intro')}
   {fields.length > 0 && ` ${t('component.preview.controls')}`}
 </mds-text>

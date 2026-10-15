@@ -3,9 +3,8 @@
 // the tables (markdown-tables.mjs), so it runs on the pages and on the Magma
 // docs of the components loader.
 // Headings become mds-text with their typography and tag, paragraphs mds-text
-// `detail` (Magma's body text, 1rem: `paragraph` is 1.25rem, for long
-// reading), inline code mds-text `hack` but in headings, where it is plain
-// text (code blocks stay as they are),
+// and inline code mds-text in the typography of their kind of text (KIND),
+// but code in headings, where it is plain text (code blocks stay as they are),
 // lists mds-list and mds-list-item, rules mds-hr. Ordered lists stay <ol>:
 // mds-list has no numbered form. Section headings (h2, h3) get an anchor in
 // front of them, an mds-button that links to them (`anchoredHeading`), in
@@ -17,6 +16,49 @@
 // a block again, so they flow inline (inside mds-list-item, through its `text`
 // part).
 import { satteriHeadingIdsPlugin } from '@astrojs/markdown-satteri';
+
+/**
+ * The kinds of text of a page: the typography of their paragraphs and list
+ * items (`text`), of their inline code (`code`, one step below the text) and
+ * of their numbered lists (`ordered`: <ol> has no Magma component, so the
+ * same typography as a Tailwind utility, `text-{variant}-{typography}`, to
+ * keep in step with `text`).
+ * - `reading`: the text to read, the pages from Markdown or written by hand
+ *   (`<mds-text {...READING} tag="p">`, `<Code reading>`). `paragraph` +
+ *   `read`: Merriweather, light, 1.25rem on 2rem; it was `detail` + `info`
+ *   (Karla, 1rem on 1.5rem, Magma's body text) with `hack` code.
+ * - `example`: the interface text that the do and don't blocks (mds-usage)
+ *   show, in the reading font but at the size of the interface.
+ * - `table`: the cells of the Markdown tables, interface text like the
+ *   other tables, cards, banners and tiles of the site, which keep `detail`.
+ */
+export const KIND = {
+  reading: {
+    text: { typography: 'paragraph', variant: 'read' },
+    code: 'snippet',
+    ordered: 'text-read-paragraph',
+  },
+  example: {
+    text: { typography: 'detail', variant: 'read' },
+    code: 'hack',
+    ordered: 'text-read-detail',
+  },
+  table: {
+    text: { typography: 'detail', variant: 'info' },
+    code: 'hack',
+    ordered: 'text-info-detail',
+  },
+};
+
+/** The typography of the text to read, for the paragraphs written by hand. */
+export const READING = KIND.reading.text;
+
+/**
+ * The frontmatter field that names the kind of a whole Markdown text (a key
+ * of KIND, `reading` when missing), for a text rendered on its own that goes
+ * somewhere else: the descriptions in the API tables (src/loaders/components.ts).
+ */
+export const KIND_FIELD = 'magmaText';
 
 /**
  * Utilities of the elements, also used by the pages that write the same
@@ -60,8 +102,9 @@ export const TEXT = {
     h6: 'anchor-line text-title-h6 me-150 *:-translate-y-25',
   },
   paragraph: 'block max-w-(--spacing-text)',
-  // Inline code, everywhere: mds-text `hack` (0.875rem), without the ring
-  // and with a lighter background than mds-text gives `tag="code"`.
+  // Inline code, everywhere: mds-text in the code typography of its kind of
+  // text (KIND), without the ring and with a lighter background than
+  // mds-text gives `tag="code"`.
   code: 'shadow-none bg-wash-soft',
   // What a table row is about (props, events, ...): bold, no background.
   name: 'bg-transparent p-0 text-fg-default shadow-none',
@@ -122,22 +165,42 @@ const own = (/** @type {any} */ node) => {
 };
 
 /**
+ * The kind of text inside an element: the do and don't blocks (JSX in MDX,
+ * HTML in Markdown) hold examples, the tables (made by markdown-tables.mjs)
+ * interface text.
+ * @param {any} node
+ * @param {typeof KIND[keyof typeof KIND]} kind
+ */
+const kindIn = (node, kind) => {
+  const name = node.tagName ?? node.name;
+  if (name === 'mds-usage') return KIND.example;
+  if (name === 'mds-table') return KIND.table;
+  return kind;
+};
+
+/**
  * The tree with its text elements replaced. `heading` gives a heading its id
- * and records it for the table of contents.
+ * and records it for the table of contents; `kind`: the kind of text the node
+ * is in.
  * @param {any} node
  * @param {(heading: any) => string | undefined} heading
+ * @param {typeof KIND[keyof typeof KIND]} [kind]
  * @returns {any}
  */
-function convert(node, heading) {
+function convert(node, heading, kind = KIND.reading) {
+  kind = kindIn(node, kind);
   if (node.type !== 'element') {
     return node.children
-      ? { ...node, children: node.children.map((child) => convert(child, heading)) }
+      ? {
+          ...node,
+          children: node.children.map((/** @type {any} */ child) => convert(child, heading, kind)),
+        }
       : node;
   }
   // Code blocks: highlighted by Astro, nothing in Magma replaces them.
   if (node.tagName === 'pre') return node;
 
-  const children = () => (node.children ?? []).map((child) => convert(child, heading));
+  const children = () => (node.children ?? []).map((child) => convert(child, heading, kind));
   const tag = node.tagName;
 
   // Starlight's heading with its anchor: the heading with ours instead,
@@ -161,7 +224,7 @@ function convert(node, heading) {
   if (tag === 'p') {
     return element(
       'mds-text',
-      { ...own(node), typography: 'detail', tag: 'p' },
+      { ...own(node), ...kind.text, tag: 'p' },
       TEXT.paragraph,
       children(),
     );
@@ -169,7 +232,7 @@ function convert(node, heading) {
   if (tag === 'code') {
     return element(
       'mds-text',
-      { ...own(node), typography: 'hack', tag: 'code' },
+      { ...own(node), typography: kind.code, tag: 'code' },
       TEXT.code,
       node.children ?? [],
     );
@@ -185,12 +248,16 @@ function convert(node, heading) {
       items.map((/** @type {any} */ item) =>
         element(
           'mds-list-item',
-          { ...own(item), typography: 'detail' },
+          { ...own(item), ...kind.text },
           TEXT.listItem,
-          (item.children ?? []).map((/** @type {any} */ child) => convert(child, heading)),
+          (item.children ?? []).map((/** @type {any} */ child) => convert(child, heading, kind)),
         ),
       ),
     );
+  }
+  if (tag === 'ol') {
+    const classes = [...classesOf(node), kind.ordered].join(' ');
+    return element('ol', own(node), classes, children());
   }
   if (tag === 'hr') return element('mds-hr', own(node), '', []);
   return { ...node, children: children() };
@@ -270,7 +337,10 @@ export function magmaText() {
           ids.element.visit(node, ctx);
           return node.properties?.id ?? ctx.data.astro?.headings?.at(-1)?.slug;
         };
-        ctx.replaceNode(root, convert(root, heading));
+        const kind =
+          KIND[/** @type {keyof typeof KIND} */ (ctx.data.astro?.frontmatter?.[KIND_FIELD])] ??
+          KIND.reading;
+        ctx.replaceNode(root, convert(root, heading, kind));
       },
     };
   };
