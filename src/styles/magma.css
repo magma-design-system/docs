@@ -284,6 +284,23 @@
   mds-progress {
     corner-shape: round;
   }
+
+  /*
+    magma 2.3.0: every neutral ground of mds-banner is surface-raised, the
+    color of the page card it sits on, so only its shadow draws it. Its base
+    styles say surface-overlay: give it to every banner but the dark ones and
+    the status ones that keep their wash (strong and box tones).
+    Tracked in https://github.com/magma-design-system/magma/issues/955
+  */
+  mds-banner:not(
+    [variant='dark'],
+    :is([variant='error'], [variant='warning'], [variant='info'], [variant='success']):is(
+      [tone='strong'],
+      [tone='box']
+    )
+  ) {
+    --mds-banner-background: rgb(var(--magma-surface-overlay));
+  }
 }
 
 figcaption {
