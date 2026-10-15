@@ -353,8 +353,7 @@ Poi i componenti sono tag come gli altri:
 Il lazy loader, `defineCustomElements()` da `@maggioli-design-system/magma/loader`, registra
 tutti i componenti con una sola chiamata e carica ognuno la prima volta che compare il suo
 tag: è adatto alle app che usano gran parte della libreria. Usa l'uno o l'altro, mai
-entrambi: sono due build degli stessi componenti. In Magma 2.1.0 il loader si rompe nelle
-build di produzione di Vite (vedi Problemi noti).
+entrambi: sono due build degli stessi componenti.
 
 </Fragment>
 <Fragment slot="react">
@@ -441,16 +440,3 @@ Per far scegliere l'utente, aggiungi `mds-pref-mode`: imposta la classe e ricord
 Lo stesso vale per contrasto, movimento e consumo di dati, con le classi `pref-contrast-*`,
 `pref-animation-*` e `pref-consumption-*` e i componenti `mds-pref-contrast`,
 `mds-pref-animation` e `mds-pref-consumption`; `mds-pref` li raccoglie in un unico pannello.
-
-## Problemi noti
-
-Le issue aperte di Magma che toccano questa configurazione in Magma 2.1.0:
-
-- [magma#817](https://github.com/magma-design-system/magma/issues/817): il lazy loader
-  (`@maggioli-design-system/magma/loader`) si rompe nelle build di produzione di Vite, ogni
-  componente va in errore quando si carica. Registra i componenti uno per uno, da
-  `@maggioli-design-system/magma/components`.
-- [magma#863](https://github.com/magma-design-system/magma/issues/863): le guide di
-  installazione nei pacchetti Magma copiano svg-icons dove mds-icon non la cerca, e lasciano
-  fuori le icone `mi/` e `mdi/`. La configurazione con iconsauce di questa pagina copre tutti
-  e tre i set; la issue contiene anche uno script che copia le icone senza iconsauce.

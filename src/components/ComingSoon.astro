@@ -1,0 +1,32 @@
+---
+// The notice at the top of the landing page of a section still being written
+// (`soon` in src/lib/nav.mjs), as mds-banner: what is coming (`text`, a
+// sentence with inline code between backticks, as UiText), and the way to
+// take part, the Contributing page.
+import UiText from './UiText.astro';
+import { localePrefix } from '../lib/frame';
+import { TEXT } from '../lib/markdown-text.mjs';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+---
+
+<mds-banner variant="info" icon="mi/baseline/construction" headline={t('soon.title')}>
+  <mds-text typography="detail" class={TEXT.block}>
+    <UiText text={text} />
+  </mds-text>
+  <mds-button
+    slot="action"
+    href={`${localePrefix(starlightRoute.locale)}/community/contributing/`}
+    role="link"
+    type="a"
+    variant="info"
+    tone="strong"
+  >
+    {t('soon.contribute')}
+  </mds-button>
+</mds-banner>

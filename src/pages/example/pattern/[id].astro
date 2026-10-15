@@ -5,11 +5,21 @@
 // loader, away from the styles of the site, as the page of an application.
 // Its script runs as it is written. Opened on its own, it is the full screen
 // version of the preview.
+import { getCollection } from 'astro:content';
 import '../../../styles/magma.css';
 import { patternExample, patternIds } from '../../../lib/patterns';
 
-export function getStaticPaths() {
-  return patternIds().map((id) => ({ params: { id }, props: { example: patternExample(id) } }));
+export async function getStaticPaths() {
+  // A pattern whose page is a draft has no preview in a production build
+  // either, as its page.
+  const drafts = await getCollection(
+    'docs',
+    ({ id, data }) => import.meta.env.PROD && data.draft && id.startsWith('patterns/'),
+  );
+  const unpublished = new Set(drafts.map(({ id }) => id.slice('patterns/'.length)));
+  return patternIds()
+    .filter((id) => !unpublished.has(id))
+    .map((id) => ({ params: { id }, props: { example: patternExample(id) } }));
 }
 
 interface Props {

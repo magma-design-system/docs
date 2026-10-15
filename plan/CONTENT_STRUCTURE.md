@@ -4,7 +4,7 @@ Decision record for the information architecture of the site. Source: the intern
 "Magma Design System - Introduzione" (50 slides), reworked for a public documentation site.
 Decided on 2026-10-08.
 
-## Navigation (9 rail items)
+## Navigation (10 rail items)
 
 | Rail                | Pages                                                                                                           | Source                              |
 | ------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
@@ -13,6 +13,7 @@ Decided on 2026-10-08.
 | Tokens              | Colors, typography, motion, spacing, editor autocomplete setup                                                  | `design-tokens`, `styles`           |
 | Icons               | Library, semantic dictionary                                                                                    | `svg-icons`, `icons`                |
 | Components          | One page per component                                                                                          | `magma/dist/documentation.json`     |
+| Building blocks     | Parts of a screen made of components (page header, filter bar, ...): structure and layout, no data              | written here, see `DIRECTION.md`    |
 | Patterns            | Whole screens (list with filters, ...) with code in HTML, React and Angular                                     | written here, see `DIRECTION.md`    |
 | Brands / Assets     | Logos, illustrations, avatars                                                                                   | `identity`                          |
 | Development         | Install (Vanilla / React / Angular), integrating existing vs new products, versioning and migrations, AI agents | deck + `AGENTS.md`                  |

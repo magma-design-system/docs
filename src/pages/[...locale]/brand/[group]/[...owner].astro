@@ -19,7 +19,6 @@ import {
   IDENTITY_PACKAGE,
   identityGroup,
   unknownIdentityGroups,
-  webpIsPng,
 } from '../../../../lib/identity.mjs';
 import { magmaVersion } from '../../../../lib/magma.mjs';
 import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
@@ -91,11 +90,6 @@ const headings = [
     <a href={`${localePrefix(locale)}/brand/identity-package/`}>{t('brand.howTo.link')}</a>
     {t('brand.howTo.after')}
   </mds-text>
-  {webpIsPng() && (
-    <mds-text {...READING} tag="p" class={TEXT.paragraph}>
-      <UiText reading text={t('brand.webpIsPng')} />
-    </mds-text>
-  )}
 
   {ownerHeading && <Heading id={ownerHeading.id} text={ownerHeading.text} />}
   {families.map((family) => (

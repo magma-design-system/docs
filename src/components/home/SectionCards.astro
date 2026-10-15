@@ -2,7 +2,8 @@
 // The sections of the site on the home page, as cards that open them: the
 // icon of the section (src/lib/nav.mjs) in a label color of its own, its
 // name, and the description of its landing page in the language of the page
-// (the components landing is generated: its description is a UI string).
+// (the components landing is generated: its description is a UI string),
+// with a badge on the sections still being written (`soon`).
 // The home section itself is left out; Storybook closes the grid, opening in
 // a new tab.
 import type { ThemeFullVariantAvatarType } from '@maggioli-design-system/magma';
@@ -16,6 +17,7 @@ const VARIANTS: Record<string, ThemeFullVariantAvatarType> = {
   tokens: 'violet',
   icons: 'orange',
   components: 'blue',
+  blocks: 'lime',
   patterns: 'aqua',
   brand: 'green',
   development: 'sky',
@@ -28,7 +30,7 @@ const { locale } = starlightRoute;
 const pages = await Promise.all(
   sections
     .filter(({ id }) => id !== 'home')
-    .map(async ({ id, icon }) => {
+    .map(async ({ id, icon, soon }) => {
       const entry =
         id === 'components'
           ? undefined
@@ -41,6 +43,7 @@ const pages = await Promise.all(
         description: entry?.data.description ?? t('components.description'),
         href: `${localePrefix(locale)}/${id}/`,
         external: false,
+        soon: soon ?? false,
       };
     }),
 );
@@ -54,13 +57,14 @@ const cards = [
     description: t('home.storybook.description'),
     href: STORYBOOK,
     external: true,
+    soon: false,
   },
 ];
 ---
 
 <div class="not-content @container">
   <div class="grid gap-600 @2xl:grid-cols-2 @5xl:grid-cols-4">
-    {cards.map(({ icon, variant, title, description, href, external }) => {
+    {cards.map(({ icon, variant, title, description, href, external, soon }) => {
       const action = external ? t('home.storybook.open') : t('cards.open');
       return (
         <mds-card class="bg-surface-overlay">
@@ -75,6 +79,11 @@ const cards = [
                 {title}
               </mds-text>
             </mds-entity>
+            {soon && (
+              <mds-badge variant="info" tone="weak" class="ml-auto shrink-0">
+                {t('soon.title')}
+              </mds-badge>
+            )}
           </mds-card-header>
           <mds-card-content class="grow pt-0 bg-surface-overlay">
             <mds-text typography="detail">{description}</mds-text>

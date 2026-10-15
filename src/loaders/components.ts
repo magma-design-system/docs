@@ -56,8 +56,8 @@ function nestHeadings(markdown: string, level: number): string {
 /**
  * Usage files of a component, by name: "1. Description" -> "description".
  * They are the whole hand-written documentation of a component, as in Magma's
- * per-component agent docs. The readme is not used: beyond a generic intro it
- * is outdated or repeats them (magma#842).
+ * per-component agent docs. The readme is not used: it holds a generic intro
+ * only.
  */
 const USAGE = ['description', 'pattern', 'antipattern'] as const;
 type Usage = (typeof USAGE)[number];

@@ -3,7 +3,9 @@ title: Pattern
 description: Schermate intere costruite con i componenti Magma - liste, dettagli, form - con il loro comportamento, la loro accessibilità e il codice per HTML, React e Angular.
 ---
 
-import PageCards from '../../../../components/PageCards.astro';
+import ComingSoon from '../../../../components/ComingSoon.astro';
+
+<ComingSoon text="I primi pattern sono in scrittura. Compariranno qui quando saranno abbastanza completi da copiarli in un prodotto." />
 
 Un componente risolve una parte di una schermata; un prodotto è fatto di schermate. Un pattern è
 una schermata, o un compito, che i prodotti del Gruppo Maggioli costruiscono di continuo - una
@@ -11,19 +13,24 @@ lista in cui cercare, il dettaglio di un record, un form da compilare - montata 
 Magma, insieme alle decisioni che i componenti da soli non possono prendere: cosa mostra la
 pagina quando non trova nulla, cosa va nell'indirizzo, cosa sente chi usa un lettore di schermo.
 
-Ogni pattern ha le stesse parti: il pattern in funzione, quando usarlo, la sua anatomia, i
+Nel mezzo ci sono i [building block](../blocks/): le parti di una schermata che tornano in molti
+pattern, come l'intestazione di una pagina o una barra di filtri.
+
+## Cosa contiene la pagina di un pattern
+
+Ogni pattern avrà le stesse parti: il pattern in funzione, quando usarlo, la sua anatomia, i
 componenti di cui è fatto, il comportamento, l'accessibilità, i testi, gli errori da evitare e,
-per ultimo, il suo codice in HTML, React e Angular. Il codice è completo: copialo in un progetto
-in cui Magma è installato, sostituisci i dati di esempio con il tuo back end, e funziona.
+per ultimo, il suo codice in HTML, React e Angular. Il codice sarà completo: copialo in un
+progetto in cui Magma è installato, sostituisci i dati di esempio con il tuo back end, e
+funziona.
 
-Le pagine Pattern e Antipattern di ogni [componente](../components/) mostrano come usare quel
-componente da solo. Questa sezione mostra come i componenti lavorano insieme.
+## I primi
 
-## Dati
+- **Lista con filtri**: record da cercare, restringere, ordinare e sfogliare per pagine.
+- **Dettaglio di un record**: un record, cosa si può fare con lui e la sua storia.
+- **Form e validazione**: dati da compilare, controllati mentre si scrive e all'invio.
+- **Stati vuoti e di errore**: cosa mostra una schermata quando non c'è ancora nulla, o quando
+  qualcosa è andato storto.
 
-<PageCards
-  pages={[
-    { slug: 'patterns/list-with-filters', icon: 'mi/outline/view-list' },
-    { slug: 'patterns/record-detail', icon: 'mi/outline/article' },
-  ]}
-/>
+Le pagine Pattern e Antipattern di ogni [componente](../components/) mostrano già come usare quel
+componente da solo. Questa sezione mostrerà come i componenti lavorano insieme.

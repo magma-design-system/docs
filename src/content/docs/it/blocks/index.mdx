@@ -1,0 +1,34 @@
+---
+title: Building block
+description: Le parti di una schermata che tornano di continuo - l'intestazione di una pagina, una barra di filtri, uno stato vuoto - fatte di componenti Magma, con la loro struttura e il loro layout.
+---
+
+import ComingSoon from '../../../../components/ComingSoon.astro';
+
+<ComingSoon text="I building block sono in scrittura, insieme ai primi pattern da cui nascono." />
+
+Tra un componente e una schermata intera c'è una misura di mezzo. Un building block è un gruppo
+di componenti Magma che le schermate usano di continuo, sempre nella stessa disposizione:
+l'intestazione di una pagina con il titolo e le azioni, una barra di filtri, il riepilogo dei
+risultati, una sezione di un form, una barra di azioni, uno stato vuoto o di errore, una finestra
+che chiede conferma.
+
+Un building block non contiene dati né logica di business. Le sue regole riguardano struttura e
+layout: quali parti ha e quali sono facoltative, in che ordine vengono, come si adatta alla
+larghezza dello schermo.
+
+## Componenti, building block, pattern
+
+- Un **componente** è un elemento Magma, come un pulsante o un campo: Magma lo fornisce pronto.
+- Un **building block** mette insieme dei componenti in una parte di una schermata.
+- Un **pattern** è una schermata o un compito intero: building block, più quello che succede nel
+  tempo - dove vive lo stato, cosa segue un'azione, il caricamento, gli errori, il focus.
+
+## Da dove nascono
+
+I building block non si progettano a tavolino: nascono dai [pattern](../patterns/). Una parte di
+una schermata diventa un building block quando torna in due o tre pattern, così si scrive una
+volta e ogni schermata che ne ha bisogno la costruisce allo stesso modo.
+
+Ogni building block avrà la sua pagina: le parti, le regole che valgono sempre, gli stati, i
+componenti di cui è fatto e il suo codice.
