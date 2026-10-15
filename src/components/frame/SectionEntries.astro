@@ -12,12 +12,14 @@ const { entries, currentHref } = Astro.props;
 
 {/*
   The link items are flex boxes: in a block, the button would sit on a line of
-  text, whose line height adds space below it to the gap.
+  text, whose line height adds space below it to the gap. They are pulled left
+  by the padding of the button, so that its label lines up with the headings
+  and the background of the selected or hovered one stands out of the column.
 */}
 <ul class="m-0 flex list-none flex-col gap-100 p-0">
   {entries.map((entry) =>
     entry.type === 'link' ? (
-      <li class="flex">
+      <li class="-ml-300 flex">
         <mds-button
           class="max-w-full"
           href={entry.href}
