@@ -1,7 +1,7 @@
 ---
-// Search, repository link, light/dark mode and language: at the bottom of the
-// rail and in the mobile menu. Mode and language are Magma's own preference
-// components; src/scripts/magma.ts makes Starlight follow the mode.
+// Search, repository link, light/dark mode, theme and language: at the bottom
+// of the rail and in the mobile menu. Mode, theme and language are Magma's own
+// preference components; src/scripts/magma.ts makes Starlight follow the mode.
 //
 // Rendered once, in the rail, and moved into the menu below Magma's `desktop`
 // breakpoint: one set of controls for both. (Up to magma 2.0.1 a second
@@ -18,6 +18,18 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
   lang,
   href: `${localePrefix(key === 'root' ? undefined : key)}${path}`,
 }));
+
+// Magma's named themes (magma/agents/theming.md): `default` is the base theme,
+// the others retint the neutral roles (surfaces, wash, borders, text) with
+// their family. The swatch of an item is the wash of its family; the dots on
+// it (accent and status colors) are the same in every theme. (In magma 2.2.0
+// the swatch is not shown: mds-pref-theme-item puts it in the text-only
+// default slot of an mds-button, magma#910.)
+const themes = [
+  { name: 'default', family: 'neutral', label: t('frame.theme.default') },
+  { name: 'cool', family: 'porcelain', label: t('frame.theme.cool') },
+  { name: 'warm', family: 'bisque', label: t('frame.theme.warm') },
+];
 ---
 
 <div class="grid grid-cols-full gap-400" id="preferences">
@@ -53,6 +65,15 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
       />
     ))}
   </mds-pref-language>
+  <mds-pref-theme class="relative w-full" size="sm">
+    {themes.map(({ name, family, label }) => (
+      <mds-pref-theme-item
+        name={name}
+        label={label}
+        style={`--mds-pref-theme-item-color-background: rgb(var(--tone-${family}-09))`}
+      />
+    ))}
+  </mds-pref-theme>
 </div>
 
 <script>

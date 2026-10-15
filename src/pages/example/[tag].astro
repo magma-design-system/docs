@@ -33,12 +33,19 @@ const { tag, example } = Astro.props.entry.data;
     <meta name="robots" content="noindex" />
     <title>{`<${tag}>`}</title>
     <script is:inline>
-      // The light or dark mode of the page around it before the first paint:
-      // Magma's tokens follow the pref-mode-* class of <html>. Playground.astro
-      // keeps it in sync afterwards.
+      // The light or dark mode and the theme of the page around it before the
+      // first paint: Magma's tokens follow the pref-mode-* class and the
+      // data-theme-name attribute of <html>, and the system's mode while
+      // data-magma-pref is missing. Playground.astro keeps them in sync
+      // afterwards.
       try {
-        for (const name of parent.document.documentElement.classList) {
+        const around = parent.document.documentElement;
+        for (const name of around.classList) {
           if (name.startsWith('pref-mode-')) document.documentElement.classList.add(name);
+        }
+        for (const name of ['data-magma-pref', 'data-theme-name']) {
+          const value = around.getAttribute(name);
+          if (value !== null) document.documentElement.setAttribute(name, value);
         }
       } catch {
         // Opened on its own, or from another site: Magma's default.

@@ -116,18 +116,25 @@ const { hasSidebar } = Astro.locals.starlightRoute;
     const next = (event as TransitionBeforeSwapEvent).newDocument;
 
     // <html> takes the attributes of the new page: keep the ones set on this
-    // side (mode and theme, ThemeProvider.astro and mds-pref-mode; rail, Rail.astro).
+    // side (mode and theme, ThemeProvider.astro, mds-pref-mode and
+    // mds-pref-theme; rail, Rail.astro).
     const root = document.documentElement;
-    for (const name of ['data-theme', 'data-magma-pref', 'data-rail']) {
+    for (const name of ['data-theme', 'data-theme-name', 'data-magma-pref', 'data-rail']) {
       const value = root.getAttribute(name);
       if (value === null) next.documentElement.removeAttribute(name);
       else next.documentElement.setAttribute(name, value);
     }
     next.documentElement.classList.add(
-      ...[...root.classList].filter((name) => name.startsWith('pref-mode-')),
+      ...[...root.classList].filter((name) => /^pref-(mode|theme)-/.test(name)),
     );
-    const mode = root.style.getPropertyValue('--magma-pref-mode');
-    if (mode) next.documentElement.style.setProperty('--magma-pref-mode', mode);
+    for (const property of [
+      '--magma-pref-mode',
+      '--magma-pref-theme',
+      '--magma-pref-theme-scheme',
+    ]) {
+      const value = root.style.getPropertyValue(property);
+      if (value) next.documentElement.style.setProperty(property, value);
+    }
 
     // A column is kept when the new page has the same links in it, and only
     // which one is current changes. Other links (another section, another
