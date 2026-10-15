@@ -349,8 +349,7 @@ Then the components are tags like any other:
 The lazy loader, `defineCustomElements()` from `@maggioli-design-system/magma/loader`,
 registers every component in one call and loads each one the first time its tag shows up:
 it suits apps that use most of the library. Use one or the other, never both: they are two
-builds of the same components. In Magma 2.1.0 the loader breaks in Vite production builds
-(see Known issues).
+builds of the same components.
 
 </Fragment>
 <Fragment slot="react">
@@ -438,16 +437,3 @@ same holds for contrast, motion and data consumption, with the `pref-contrast-*`
 `pref-animation-*` and `pref-consumption-*` classes and the `mds-pref-contrast`,
 `mds-pref-animation` and `mds-pref-consumption` components; `mds-pref` groups them in one
 panel.
-
-## Known issues
-
-Open Magma issues that affect this setup in Magma 2.1.0:
-
-- [magma#817](https://github.com/magma-design-system/magma/issues/817): the lazy loader
-  (`@maggioli-design-system/magma/loader`) breaks in Vite production builds, every
-  component throws when it loads. Register the components one by one, from
-  `@maggioli-design-system/magma/components`.
-- [magma#863](https://github.com/magma-design-system/magma/issues/863): the install guides
-  in the Magma packages copy svg-icons where mds-icon does not look for it, and leave out the
-  `mi/` and `mdi/` icons. The iconsauce setup of this page covers all three sets; the issue
-  also has a script that copies the icons without iconsauce.
