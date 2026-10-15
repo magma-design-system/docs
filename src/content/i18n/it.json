@@ -1,6 +1,8 @@
 {
   "nav.introduction": "Introduzione",
   "nav.foundation": "Fondamenti",
+  "nav.foundation.design": "Design",
+  "nav.foundation.content": "Contenuti",
   "nav.tokens": "Token",
   "nav.icons": "Icone",
   "nav.components": "Componenti",
@@ -8,6 +10,11 @@
   "nav.brand": "Asset del brand",
   "nav.development": "Sviluppo",
   "nav.community": "Community",
+
+  "cards.open": "Leggi",
+  "fonts.weights": "Pesi",
+  "fonts.license": "Licenza",
+  "fonts.download": "Scarica",
 
   "frame.brand.description": "Design System",
   "frame.sections": "Sezioni",

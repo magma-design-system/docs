@@ -1,0 +1,12 @@
+---
+// Examples to follow and to avoid, as `mds-usage` blocks written in the page:
+// side by side when the content column has room, one below the other when it
+// has not. `not-content`: Starlight would put 1rem above every block but the
+// first.
+---
+
+<div class="not-content @container my-600">
+  <div class="grid items-start gap-600 @xl:grid-cols-2">
+    <slot />
+  </div>
+</div>
