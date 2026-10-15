@@ -1,7 +1,43 @@
 ---
 title: Foundation
-description: Values, design principles, accessibility, ecology and content guidelines of Magma.
+description: The decisions Magma is built on, before any component - principles, accessibility, color, type, illustration and the way products speak.
 ---
 
-The principles Magma is designed on: values, design principles, accessibility, ecology and
-content (voice and tone, grammar, naming). The pages of this section are being written.
+import PageCards from '../../../components/PageCards.astro';
+
+The components, the tokens and the icons of Magma are the result of a few decisions taken
+before them: who the products are for, what they must never get wrong, how they look and how
+they speak. This section writes those decisions down, so that a team can apply them where no
+component reaches, and argue with them when they no longer fit.
+
+One set of [principles](principles/) holds them together. Every other page is a domain of
+decisions: each decision says what it serves, and none adds principles of its own.
+
+## Base
+
+<PageCards
+  pages={[
+    { slug: 'foundation/principles', icon: 'mi/outline/lightbulb' },
+    { slug: 'foundation/accessibility', icon: 'mi/outline/accessibility-new' },
+  ]}
+/>
+
+## Design
+
+<PageCards
+  pages={[
+    { slug: 'foundation/color', icon: 'mi/outline/palette' },
+    { slug: 'foundation/typography', icon: 'mi/outline/text-fields' },
+    { slug: 'foundation/illustration', icon: 'mi/outline/draw' },
+    { slug: 'icons/using-icons', icon: 'mi/outline/interests' },
+  ]}
+/>
+
+## Content
+
+<PageCards
+  pages={[
+    { slug: 'foundation/voice-and-tone', icon: 'mi/outline/record-voice-over' },
+    { slug: 'foundation/inclusive-language', icon: 'mi/outline/diversity-3' },
+  ]}
+/>

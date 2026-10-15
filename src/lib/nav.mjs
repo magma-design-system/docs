@@ -22,7 +22,23 @@ export const sections = [
   {
     id: 'foundation',
     icon: 'mi/outline/account-balance',
-    items: () => [{ slug: 'foundation' }],
+    items: () => [
+      { slug: 'foundation' },
+      { slug: 'foundation/principles' },
+      { slug: 'foundation/accessibility' },
+      {
+        ...sidebarLabel('nav.foundation.design'),
+        items: [
+          { slug: 'foundation/color' },
+          { slug: 'foundation/typography' },
+          { slug: 'foundation/illustration' },
+        ],
+      },
+      {
+        ...sidebarLabel('nav.foundation.content'),
+        items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
+      },
+    ],
   },
   {
     id: 'tokens',

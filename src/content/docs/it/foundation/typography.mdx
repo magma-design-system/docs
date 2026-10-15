@@ -1,0 +1,67 @@
+---
+title: Tipografia
+description: Perché Magma compone il testo in quattro famiglie, quando usare ogni stile della scala, e i font da scaricare per gli strumenti di design e da servire nei prodotti.
+---
+
+import FontFamilies from '../../../../components/FontFamilies.astro';
+
+Magma compone il testo in quattro famiglie, ognuna con un compito, e in una scala breve di
+stili al loro interno. Questa pagina dice perché, e quale stile usare quando; le dimensioni, le
+classi e i token di ogni stile sono in [Token: Tipografia](../../tokens/typography/).
+
+## Quattro famiglie, quattro compiti
+
+- **Title**, Roboto: titoli e azioni. Un bastoni che resta semplice e istituzionale nelle
+  dimensioni grandi e nei pesi forti.
+- **Info**, Karla: il testo dell'interfaccia, quello con cui si lavora: moduli, tabelle, menu,
+  messaggi. È leggibile anche piccolo, e la sua g minuscola richiama quella del logo
+  Maggioli.
+- **Read**, Merriweather: la lettura lunga, come articoli, commenti e testi di legge. Un
+  graziato disegnato per lo schermo, con forme robuste che reggono nella lettura prolungata.
+- **Code**, Roboto Mono: le stringhe in cui ogni carattere conta, come codici fiscali, IBAN,
+  numeri di protocollo, e il codice.
+
+## Informazione e conoscenza
+
+Maggioli scrive software e pubblica libri, riviste e banche dati giuridiche. Info e Read
+tengono separate le due cose: l'interfaccia in cui le persone lavorano parla in Karla, i
+contenuti che leggono e studiano parlano in Merriweather. A colpo d'occhio, si capisce se si
+sta lavorando o leggendo.
+
+## Scegliere uno stile
+
+- `h1`: il titolo della pagina, una volta per pagina.
+- `h2` e `h3`: le sezioni di una pagina, e i titoli degli articoli in un elenco.
+- Da `h4` a `h6`: sottosezioni, titoli di card e pannelli, anteprime in elenchi fitti.
+- `action`: il testo dei pulsanti e delle altre azioni.
+- `paragraph`: il testo che richiede tempo, come descrizioni, guide e, con `read`, articoli.
+- `detail`: il testo dell'interfaccia, come messaggi, descrizioni e celle di tabella.
+- `caption`: le informazioni secondarie, come date, autori, note e piè di pagina.
+- `label` e `tip`: il testo breve e piccolo, come etichette dei campi, badge e tooltip.
+- `option`: il testo più piccolo, in grassetto, per occhielli ed etichette di una o due
+  parole.
+- `snippet` e `hack`: codici e codice, `snippet` su una riga a sé, `hack` dentro una frase.
+
+Tre regole valgono per tutti:
+
+- **Il tag dice la struttura, lo stile dice l'aspetto.** Una sezione della pagina è un `h2`
+  anche quando sta in una card e sembra un `h5`: `mds-text` separa le due cose, con `tag` e
+  `typography`. Non saltare mai un livello di titolo per avere un testo più piccolo.
+- **Il grassetto con misura.** Un paragrafo pieno di grassetto non ha più enfasi.
+- **Il testo segue chi legge.** Le dimensioni sono in `rem`, quindi crescono con la
+  dimensione del testo che la persona imposta; il testo di lettura tiene righe abbastanza
+  brevi da seguire, tra 60 e 80 caratteri circa.
+
+## Font
+
+Tutti e quattro i font hanno licenze aperte, e i prodotti li servono da sé, dai propri file:
+mai dai server di Google. Un font caricato dal server di un terzo consegna a quel terzo
+l'indirizzo di ogni persona che usa il prodotto, e un prodotto della pubblica amministrazione
+non può farlo. Scarica i font da Google Fonts per lavorare negli strumenti di design; in un
+prodotto, installa i pacchetti Fontsource e carica i pesi della scala, come mostra la
+[guida all'installazione](../../development/installation/#font).
+
+<FontFamilies />
+
+Un font diverso da questi quattro richiede una licenza che l'azienda possiede, per ogni uso
+che se ne fa.

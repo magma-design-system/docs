@@ -1,0 +1,134 @@
+---
+title: Accessibilità
+description: L'obiettivo di accessibilità di Magma, di cosa si occupano i componenti e cosa resta al prodotto, e le decisioni su contrasto, tastiera, focus, preferenze e testo.
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+In Italia il software della pubblica amministrazione deve essere accessibile per legge: la
+Legge 4/2004 e le linee guida AgID gli chiedono di rispettare la EN 301 549, lo standard
+europeo che comprende le WCAG. Da giugno 2025 l'European Accessibility Act estende requisiti
+simili a molti prodotti e servizi venduti al pubblico. Per Magma viene prima della legge: è
+il primo dei suoi [principi](../principles/).
+
+## L'obiettivo
+
+Magma è progettato per le WCAG 2.x, livello AA. È un obiettivo di progettazione, non una
+certificazione: le storie di ogni componente eseguono controlli di accessibilità automatici,
+e non c'è ancora un audit indipendente. Un prodotto fatto con Magma è accessibile quando lo
+si verifica nel suo insieme, non perché lo sono le sue parti.
+
+## Chi fa cosa
+
+I componenti si occupano di ciò che è uguale ovunque: i ruoli e gli stati che le tecnologie
+assistive leggono, la tastiera, il focus visibile, le coppie di colori misurate per il
+contrasto, e i loro testi interni in italiano, inglese, spagnolo e greco.
+
+Il prodotto si occupa di ciò che sa solo lui: l'ordine dei titoli, le etichette dei campi e
+dei pulsanti con la sola icona, il testo alternativo delle sue immagini, l'ordine del focus
+nella pagina, i messaggi di errore, il flusso di ogni compito.
+
+## Contrasto
+
+Il testo e le icone che portano un significato rispettano i rapporti di contrasto AA.
+Dipingili con i ruoli di colore, nelle [coppie in cui sono misurati](../../tokens/color/#regole-di-abbinamento):
+le altre coppie non sono misurate. Chi ha bisogno di più contrasto lo chiede con la
+preferenza di contrasto, e i ruoli [la seguono](../../tokens/themes-and-preferences/).
+
+## Mai solo il colore
+
+Uno stato, una categoria o una scelta non si comunicano mai solo con il colore: hanno anche un
+testo, un'icona o una forma. Molte persone non distinguono il rosso dal verde, e un lettore
+di schermo non legge i colori.
+
+<Usages>
+<mds-usage variant="do">
+
+Il campo non valido ha il bordo rosso, un'icona di errore e un messaggio: "Inserisci una data
+successiva al 1 gennaio 2024".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il campo non valido diventa solo rosso.
+
+</mds-usage>
+</Usages>
+
+## Tastiera
+
+- Tutto ciò che funziona con il puntatore funziona con la tastiera, in un ordine che segue la
+  lettura della pagina.
+- Il focus è sempre visibile.
+- I controlli standard rispondono ai tasti standard: Invio e Spazio premono un pulsante, Esc
+  chiude una finestra di dialogo, le frecce si muovono dentro un gruppo. Un'interazione di
+  tipo nuovo ha bisogno di un'alternativa standard, e di istruzioni.
+
+## Il focus segue la persona
+
+Il focus si sposta solo quando la persona fa qualcosa che lo richiede. Spostarlo in altri
+momenti le fa perdere il segno, e chi usa un lettore di schermo lo perde senza vedere dove è
+finito.
+
+<Usages>
+<mds-usage variant="do">
+
+Aprire una finestra di dialogo porta il focus al suo interno; chiuderla lo riporta al
+pulsante che l'ha aperta.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una notifica che arriva mentre la persona scrive si prende il focus.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Inviare un modulo con errori porta il focus sul primo di essi.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un salvataggio automatico sposta il focus sul suo messaggio di conferma.
+
+</mds-usage>
+</Usages>
+
+L'unica eccezione è un compito che non può andare avanti: allora il prodotto ferma la
+persona, e dice perché.
+
+## Preferenze
+
+Le persone impostano le loro preferenze nel sistema o nel prodotto, con `mds-pref`: modalità
+chiara o scura, più contrasto, meno movimento, consumi ridotti. I componenti le seguono, e
+così fa il codice del prodotto quando dipinge con i token. Niente di essenziale avviene solo
+con il movimento: con meno movimento le transizioni si accorciano o si fermano, e il
+contenuto resta lo stesso.
+
+## Testo e zoom
+
+- Le pagine funzionano con lo zoom al 200% e con il testo più grande: niente altezze fisse sul
+  testo, niente testo dentro le immagini.
+- Un'immagine che porta informazioni le dice nel suo testo alternativo; un'immagine
+  decorativa ne ha uno vuoto.
+- Ogni pagina dichiara la sua lingua, così i lettori di schermo la pronunciano correttamente e
+  i componenti scelgono i loro testi.
+
+## Verifiche
+
+I controlli automatici trovano solo una parte dei problemi. Prima di un rilascio, percorri i
+compiti principali:
+
+- solo con la tastiera;
+- con un lettore di schermo: NVDA o JAWS su Windows, VoiceOver su macOS e iOS, TalkBack su
+  Android;
+- con lo zoom al 200%, in modalità scura e con più contrasto.
+
+## Fonti
+
+- [Legge 4/2004](https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004-01-09;4),
+  Normattiva
+- [European Accessibility Act, Direttiva (UE) 2019/882](https://eur-lex.europa.eu/eli/dir/2019/882/oj),
+  EUR-Lex
+- [Web Content Accessibility Guidelines (WCAG) 2.2](https://www.w3.org/TR/WCAG22/), W3C
+- [ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/), W3C
