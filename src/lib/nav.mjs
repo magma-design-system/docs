@@ -12,6 +12,7 @@ export const STORYBOOK = 'https://magma-design-system.github.io/magma/storybook/
 /**
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).
  * `items` are Starlight sidebar items: the first one is where the rail item links.
+ * A landing page titled like its section is labelled Overview in the section navigation.
  */
 export const sections = [
   {
@@ -22,10 +23,13 @@ export const sections = [
   {
     id: 'foundation',
     icon: 'mi/outline/account-balance',
+    // The groups of the landing page, in its order.
     items: () => [
-      { slug: 'foundation' },
-      { slug: 'foundation/principles' },
-      { slug: 'foundation/accessibility' },
+      { slug: 'foundation', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.foundation.base'),
+        items: [{ slug: 'foundation/principles' }, { slug: 'foundation/accessibility' }],
+      },
       {
         ...sidebarLabel('nav.foundation.design'),
         items: [
@@ -44,7 +48,7 @@ export const sections = [
     id: 'tokens',
     icon: 'mi/outline/palette',
     items: () => [
-      { slug: 'tokens' },
+      { slug: 'tokens', ...sidebarLabel('nav.overview') },
       { slug: 'tokens/color' },
       { slug: 'tokens/typography' },
       { slug: 'tokens/space-and-layout' },
@@ -81,7 +85,7 @@ export const sections = [
     id: 'brand',
     icon: 'mi/outline/design-services',
     items: () => [
-      { slug: 'brand' },
+      { slug: 'brand', ...sidebarLabel('nav.overview') },
       // Pages generated per folder of the identity package (src/lib/identity.mjs).
       ...IDENTITY_GROUPS.map(({ page }) => ({
         ...sidebarLabel(`brand.page.${page}.title`),
@@ -94,7 +98,7 @@ export const sections = [
     id: 'development',
     icon: 'mi/outline/code',
     items: () => [
-      { slug: 'development' },
+      { slug: 'development', ...sidebarLabel('nav.overview') },
       { slug: 'development/installation' },
       { slug: 'development/agentic-development' },
       { slug: 'development/versions' },

@@ -1,6 +1,8 @@
 {
   "nav.introduction": "Introduction",
+  "nav.overview": "Overview",
   "nav.foundation": "Foundation",
+  "nav.foundation.base": "Base",
   "nav.foundation.design": "Design",
   "nav.foundation.content": "Content",
   "nav.tokens": "Tokens",
