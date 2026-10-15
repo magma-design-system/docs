@@ -1,0 +1,42 @@
+---
+// Magma in numbers, under the hero of the home page, counted at build time
+// from the installed packages: the components (magma), the global design
+// tokens (design-tokens), the icons mds-icon draws (the three sets of
+// src/lib/icons.mjs) and the frameworks of the install guides. The figures
+// scramble in when they scroll into view (mds-kpi-item `threshold`), then
+// float (`float-wave`, src/styles/magma.css), each one a second after the one
+// before, so they move as a wave.
+import { FRAMEWORKS } from '../../lib/frameworks.mjs';
+import { ICON_SETS, iconSet } from '../../lib/icons.mjs';
+import { loadComponentDocs } from '../../lib/magma.mjs';
+import { tokenSet } from '../../lib/tokens.mjs';
+
+const { t, starlightRoute } = Astro.locals;
+const number = new Intl.NumberFormat(starlightRoute.lang);
+
+const stats = [
+  { key: 'components', icon: 'mi/outline/widgets', count: loadComponentDocs().components.length },
+  { key: 'tokens', icon: 'mi/outline/palette', count: tokenSet().size },
+  {
+    key: 'icons',
+    icon: 'mi/outline/interests',
+    count: ICON_SETS.reduce((sum, id) => sum + iconSet(id).icons.length, 0),
+  },
+  { key: 'frameworks', icon: 'mi/outline/layers', count: FRAMEWORKS.length },
+];
+---
+
+<div class="not-content mt-1000">
+  <mds-kpi>
+    {stats.map(({ key, icon, count }, index) => (
+      <mds-kpi-item
+        class="float-wave"
+        style={`animation-delay: ${index}s`}
+        icon={icon}
+        label={number.format(count)}
+        description={t(`home.stats.${key}` as never)}
+        threshold="0.2"
+      />
+    ))}
+  </mds-kpi>
+</div>

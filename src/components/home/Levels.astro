@@ -1,0 +1,11 @@
+---
+// The levels of adoption of Magma on the home page: Level cards in order, side
+// by side when the content column has room, one below the other otherwise.
+// Each level takes two rows, its card and its caption (Level.astro).
+---
+
+<div class="@container">
+  <ol class="grid gap-600 @2xl:grid-cols-2 @6xl:grid-cols-4">
+    <slot />
+  </ol>
+</div>

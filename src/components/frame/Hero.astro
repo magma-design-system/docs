@@ -1,0 +1,62 @@
+---
+// The opening of a page with a `hero` in its frontmatter (the home page),
+// replacing Starlight's: the Magma mark, the title, the tagline and the
+// actions, centered on a wash of the blue of the mark and of a violet,
+// fainter in dark mode, where the label palette turns deep. The title keeps
+// the id Starlight gives the <h1>. Actions: `primary` is the strong button
+// with an arrow, `secondary` the weak one, `minimal` a text button; their
+// links are written relative to the page, as in Starlight.
+//
+// The wash reaches the edges of the card (PageFrame.astro makes the card a
+// container for it): out to its sides by 50cqw around the middle of the
+// centered content, up to its top past the 1.5rem Starlight puts above the
+// content (and, below desktop, behind the mobile header), into its top
+// corners. At the bottom it fades out into the card.
+import Logo from './Logo.astro';
+
+const { entry } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
+
+const TONES = { primary: 'strong', secondary: 'weak', minimal: 'text' } as const;
+---
+
+<section class="not-content relative isolate mx-[calc(50%-50cqw)] -mt-[calc(var(--frame-header-height)+--spacing(600))] overflow-hidden px-600 pt-[calc(var(--frame-header-height)+--spacing(1600))] pb-1600 tablet:pt-[calc(var(--frame-header-height)+--spacing(2000))] tablet:pb-2000 desktop:rounded-t-[calc(var(--radius-2xl)-1px)]">
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 bg-radial-[at_10%_0%] from-label-blue-10 via-transparent to-transparent mask-b-from-50% dark:from-label-blue-10/40"
+  ></div>
+  <div
+    aria-hidden="true"
+    class="absolute inset-0 -z-10 bg-radial-[at_90%_10%] from-label-violet-10 via-transparent to-transparent mask-b-from-50% dark:from-label-violet-10/40"
+  ></div>
+  <div class="mx-auto flex max-w-(--container-3xl) flex-col items-center gap-600 text-center">
+    <Logo class="size-2000" />
+    <mds-text id="_top" typography="h1" tag="h1" class="block">
+      {title}
+    </mds-text>
+    {tagline && (
+      <mds-text typography="paragraph" variant="read" tag="p" class="block text-fg-muted">
+        {tagline}
+      </mds-text>
+    )}
+    {actions.length > 0 && (
+      <div class="mt-200 flex flex-wrap justify-center gap-300">
+        {actions.map(({ text, link, variant }) => (
+          <mds-button
+            href={link}
+            role="link"
+            type="a"
+            label={text}
+            variant="primary"
+            tone={TONES[variant]}
+            size="lg"
+            {...(variant === 'primary' && {
+              icon: 'mi/baseline/arrow-forward',
+              'icon-position': 'right',
+            })}
+          />
+        ))}
+      </div>
+    )}
+  </div>
+</section>

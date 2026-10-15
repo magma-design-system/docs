@@ -16,9 +16,10 @@ export const STORYBOOK = 'https://magma-design-system.github.io/magma/storybook/
  */
 export const sections = [
   {
-    id: 'introduction',
+    id: 'home',
     icon: 'mi/outline/home',
-    items: () => [{ slug: 'index' }, { slug: 'about' }],
+    // One page, without the section navigation (`template: splash`).
+    items: () => [{ slug: 'index', ...sidebarLabel('nav.overview') }],
   },
   {
     id: 'foundation',
@@ -123,6 +124,7 @@ export const sections = [
       { slug: 'community' },
       { slug: 'community/contributing' },
       { slug: 'community/code-of-conduct' },
+      { slug: 'community/about' },
     ],
   },
 ];
