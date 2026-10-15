@@ -3,6 +3,7 @@
 // holds what the desktop frame shows in its columns.
 import Brand from './Brand.astro';
 import DocsNav from './DocsNav.astro';
+import SearchField from './SearchField.astro';
 import SectionLinks from './SectionLinks.astro';
 import SectionNav from './SectionNav.astro';
 
@@ -15,10 +16,11 @@ const { t } = Astro.locals;
   nav="none"
   data-menu-label={t('menuButton.accessibleLabel')}
 >
-  <mds-header-bar>
+  <mds-header-bar class="bg-surface-overlay">
     <Brand />
   </mds-header-bar>
   <div slot="menu" class="flex flex-col gap-800 p-600">
+    <SearchField />
     <SectionLinks />
     <DocsNav headingId="menu-docs-nav-heading" />
     <SectionNav headingId="menu-section-nav-heading" />
