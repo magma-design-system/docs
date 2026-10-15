@@ -1,8 +1,10 @@
 name: Deploy to GitHub Pages
 
+# Pull requests to main are built and checked; what is merged into production
+# (by a pull request from main) is published.
 on:
   push:
-    branches: [main]
+    branches: [production]
   pull_request:
   workflow_dispatch:
 
@@ -36,7 +38,9 @@ jobs:
           package-manager: npm
 
   deploy:
-    if: github.event_name != 'pull_request'
+    # Also a manual run publishes only from production: the github-pages
+    # environment accepts no other branch.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/production'
     needs: build
     runs-on: ubuntu-latest
     permissions:
