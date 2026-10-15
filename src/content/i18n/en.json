@@ -244,7 +244,6 @@
   "brand.howTo": "Each card is one artwork: Download saves the SVG, and the arrow next to it opens the other formats, the PNG and WebP files by width in pixels, and the path of the file in the package, to copy and import it in a project, as the",
   "brand.howTo.link": "Identity package",
   "brand.howTo.after": " page tells.",
-  "brand.webpIsPng": "The WebP files of this version of the package hold PNG data: the same pictures as the PNG files, with no saving in size.",
   "brand.from": "Copied as they are from",
   "brand.kb": "{{size}} kB",
   "brand.download": "Download {{file}}, {{size}}",

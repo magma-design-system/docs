@@ -244,7 +244,6 @@
   "brand.howTo": "Ogni card è un artwork: Scarica salva l'SVG, e la freccia accanto apre gli altri formati, i file PNG e WebP per larghezza in pixel, e il percorso del file nel pacchetto, da copiare per importarlo in un progetto, come spiega la pagina",
   "brand.howTo.link": "Pacchetto identity",
   "brand.howTo.after": ".",
-  "brand.webpIsPng": "I file WebP di questa versione del pacchetto contengono dati PNG: le stesse immagini dei file PNG, senza risparmio di peso.",
   "brand.from": "Copiati così come sono da",
   "brand.kb": "{{size}} kB",
   "brand.download": "Scarica {{file}}, {{size}}",
