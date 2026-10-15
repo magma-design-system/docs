@@ -1,0 +1,478 @@
+---
+// The preview at the top of a component's overview: its first Pattern
+// example running in an iframe (src/pages/example/[tag].astro), away from the styles of the site,
+// on a stage where a handle at its right narrows it, to see the component in
+// less room (as in the layout mockups); then a control for each prop that
+// takes a value to type or pick, in a grid of compact fields: the control,
+// the prop's name, its kind and its description in an mds-help. Icon props
+// (`icon`, `iconChecked`) pick from the icons Magma's usage docs use most and
+// the ones of the example, or none. A control
+// sets the prop on the element of the example; when the component changes a
+// prop itself (an accordion item opened by a click), its control follows.
+// Reset loads the example again at full width. Controls wait, disabled, until
+// the preview is ready.
+import { plainText, propControl, type Control } from '../lib/controls';
+import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
+import { TEXT } from '../lib/markdown-text.mjs';
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+import TypeValue from './TypeValue.astro';
+
+interface Props {
+  tag: string;
+  props: any[];
+  /** The markup the preview runs. */
+  example: string;
+}
+
+const { tag, props, example } = Astro.props;
+const { t } = Astro.locals;
+const src = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${tag}/`;
+
+// Grouped by kind, so the switches share their rows and the fields theirs;
+// by name within a group. Props with no control (functions, arrays, files)
+// are left to the API page.
+const ORDER: Control['kind'][] = ['enum', 'boolean', 'string', 'number'];
+// A prop that takes an icon slug, which iconsauce has to know beforehand: a
+// select of icons it collects (it reads documentation.json) instead of a field.
+const ICON_PROP = /^icon(?:[A-Z]|$)/;
+const icons = [...new Set([...example.matchAll(ICON_SLUG)].map(([slug]) => slug))]
+  .concat(usageIcons(20))
+  .filter((slug, i, all) => all.indexOf(slug) === i)
+  .sort();
+const fields = props
+  .flatMap((prop) => {
+    const control = propControl(prop);
+    if (!control) return [];
+    const name = prop.name as string;
+    const icon = control.kind === 'string' && ICON_PROP.test(name);
+    return [{ name, docs: plainText(prop.docs), control, icon }];
+  })
+  .sort(
+    (a, b) =>
+      ORDER.indexOf(a.control.kind) - ORDER.indexOf(b.control.kind) || a.name.localeCompare(b.name),
+  );
+---
+
+<mds-text typography="detail" tag="p" class={TEXT.paragraph}>
+  {t('component.preview.intro')}
+  {fields.length > 0 && ` ${t('component.preview.controls')}`}
+</mds-text>
+{/*
+  The stage, sunken, and on it the frame, raised, as wide as the stage until
+  its handle is dragged or moved with the arrow keys (a window splitter: a
+  focusable separator with its value). Magma has no resize handle.
+*/}
+<div class="flex rounded-3xl bg-surface-sunken p-400">
+  <div
+    class="flex w-full max-w-full overflow-hidden rounded-xl bg-surface-raised shadow-sm"
+    data-playground-viewport={tag}
+  >
+    <iframe
+      src={src}
+      title={t('component.preview.title', {
+        tag: `<${tag}>`,
+        // Astro escapes the attribute: i18next does not need to.
+        interpolation: { escapeValue: false },
+      })}
+      class="block h-5000 min-w-0 flex-1 border-0"
+      data-playground-frame={tag}
+    ></iframe>
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={t('component.preview.resize')}
+      tabindex="0"
+      class="group mt-0 flex w-600 shrink-0 cursor-ew-resize touch-none items-center justify-center outline-none"
+      data-playground-handle={tag}
+    >
+      {/* Magma's focus ring on the bar, not on the strip that holds it. */}
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+    </div>
+  </div>
+</div>
+<div class="flex justify-end">
+  <mds-button
+    label={t('component.preview.reset')}
+    icon="mi/baseline/refresh"
+    variant="dark"
+    tone="text"
+    size="sm"
+    type="button"
+    data-playground-reset={tag}
+  ></mds-button>
+</div>
+
+{fields.length > 0 && (
+  <>
+    <Heading id="props" typography="h3" text={t('component.props')} />
+    {/*
+      As many columns of at least 13rem as the page has room for: 3 on
+      desktop, 1 on phones. `not-content`: Starlight would put 1rem above
+      each element that follows another, the kind after the name included.
+    */}
+    <div
+      class="not-content grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800"
+      data-playground-controls={tag}
+    >
+      {fields.map(({ name, docs, control, icon }) => (
+        <div class="flex min-w-0 flex-col gap-200">
+          {control.kind === 'boolean' && (
+            <mds-input-switch
+              type="switch"
+              disabled
+              data-prop={name}
+              data-kind={control.kind}
+              data-optional={control.optional}
+            >
+              <span class="sr-only">{name}</span>
+            </mds-input-switch>
+          )}
+          {control.kind === 'enum' && (
+            <mds-input-select
+              aria-label={name}
+              placeholder={control.optional ? '-' : undefined}
+              disabled
+              data-prop={name}
+              data-kind={control.kind}
+              data-optional={control.optional}
+            >
+              {control.options?.map((option) => (
+                <option value={option}>{option}</option>
+              ))}
+            </mds-input-select>
+          )}
+          {icon && (
+            <mds-input-select
+              aria-label={name}
+              placeholder="-"
+              disabled
+              data-prop={name}
+              data-kind={control.kind}
+              data-optional={control.optional}
+            >
+              {icons.map((slug) => (
+                <option value={slug}>{slug}</option>
+              ))}
+            </mds-input-select>
+          )}
+          {((control.kind === 'string' && !icon) || control.kind === 'number') && (
+            <mds-input
+              type={control.kind === 'number' ? 'number' : 'text'}
+              aria-label={name}
+              disabled
+              data-prop={name}
+              data-kind={control.kind}
+              data-optional={control.optional}
+            />
+          )}
+          <span class="flex min-w-0 items-center gap-200">
+            <Code typography="hack" name>
+              {name}
+            </Code>
+            <TypeValue text={control.kind} kind={control.kind} copy={false} />
+            {docs && <mds-help>{docs}</mds-help>}
+          </span>
+        </div>
+      ))}
+    </div>
+  </>
+)}
+
+<script>
+  type Kind = 'boolean' | 'enum' | 'string' | 'number';
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+  /** A Magma field of the grid, by the props it is set through. */
+  type Field = HTMLElement & { checked?: boolean; value?: unknown; disabled?: boolean };
+
+  interface Playground {
+    tag: string;
+    frame: HTMLIFrameElement;
+    controls: HTMLElement | null;
+    /** The element of the example the controls set, once the preview is ready. */
+    element?: HTMLElement;
+    /** What each control shows: the value its prop had last. */
+    shown: Map<string, unknown>;
+    /** Counts the loads of the preview: a newer one stops the setup of an older one. */
+    load: number;
+    stop?: () => void;
+  }
+
+  const playgrounds = new WeakMap<HTMLIFrameElement, Playground>();
+  /** Not a value: a number field holding something else than a number. */
+  const INVALID = Symbol('invalid');
+  const MODE = /^pref-mode-/;
+
+  const fields = (playground: Playground) => [
+    ...(playground.controls?.querySelectorAll<Field>('[data-prop]') ?? []),
+  ];
+
+  const prop = (element: HTMLElement, name: string) =>
+    (element as unknown as Record<string, unknown>)[name];
+
+  /** What a control's value sets its prop to. */
+  const fromField = (kind: Kind, optional: boolean, value: unknown): unknown => {
+    if (kind === 'boolean') return Boolean(value);
+    if (value === '' || value === null || value === undefined) {
+      if (kind === 'string' && !optional) return '';
+      return optional || kind === 'enum' ? undefined : INVALID;
+    }
+    if (kind === 'number') {
+      const number = Number(value);
+      return Number.isNaN(number) ? INVALID : number;
+    }
+    return String(value);
+  };
+
+  const showValue = (field: Field, kind: Kind, value: unknown) => {
+    if (kind === 'boolean') {
+      field.checked = Boolean(value);
+      return;
+    }
+    const text = value === undefined || value === null ? '' : String(value);
+    // A value the select has no option for, as an icon the component sets
+    // itself: it gets one, so the select can show it.
+    if (
+      text &&
+      field.localName === 'mds-input-select' &&
+      ![...field.querySelectorAll('option')].some((option) => option.value === text)
+    ) {
+      field.append(new Option(text, text));
+    }
+    field.value = text;
+  };
+
+  /** Every control on the value its prop has now. */
+  const show = (playground: Playground) => {
+    const { element } = playground;
+    if (!element) return;
+    for (const field of fields(playground)) {
+      const name = field.dataset.prop!;
+      const value = prop(element, name);
+      if (playground.shown.has(name) && Object.is(playground.shown.get(name), value)) continue;
+      playground.shown.set(name, value);
+      showValue(field, field.dataset.kind as Kind, value);
+    }
+  };
+
+  const enable = (playground: Playground, enabled: boolean) => {
+    for (const field of fields(playground)) field.disabled = !enabled;
+  };
+
+  /** A control changed: its prop takes the new value. */
+  const change = (playground: Playground, event: Event) => {
+    const field =
+      event.target instanceof Element ? event.target.closest<Field>('[data-prop]') : null;
+    const { element } = playground;
+    if (!field || !element) return;
+    const name = field.dataset.prop!;
+    const kind = field.dataset.kind as Kind;
+    const detail = (event as CustomEvent<{ checked?: boolean; value?: unknown }>).detail ?? {};
+    const value = fromField(
+      kind,
+      field.dataset.optional === 'true',
+      kind === 'boolean' ? detail.checked : detail.value,
+    );
+    // Also the echo of a control the preview has just set.
+    if (value === INVALID || Object.is(value, prop(element, name))) return;
+    playground.shown.set(name, value);
+    (element as unknown as Record<string, unknown>)[name] = value;
+  };
+
+  /** The light or dark mode of the page, in the preview too. */
+  const syncMode = (doc: Document) => {
+    const root = doc.documentElement;
+    root.classList.remove(...[...root.classList].filter((name) => MODE.test(name)));
+    root.classList.add(
+      ...[...document.documentElement.classList].filter((name) => MODE.test(name)),
+    );
+  };
+
+  /** A load of the preview: its height, its mode, then the controls on its element. */
+  const connect = async (playground: Playground) => {
+    playground.stop?.();
+    playground.stop = undefined;
+    playground.element = undefined;
+    playground.shown.clear();
+    enable(playground, false);
+    const load = ++playground.load;
+    const { frame, tag } = playground;
+    // `null` once a link of the example led to another site.
+    const doc = frame.contentDocument;
+    const win = frame.contentWindow as (Window & typeof globalThis) | null;
+    if (!doc || !win || !doc.body?.hasAttribute('data-preview')) return;
+
+    // As tall as the example, now and when it changes; the observers of the
+    // preview's own window.
+    const fit = () => {
+      frame.style.height = `${Math.ceil(doc.body.getBoundingClientRect().height)}px`;
+    };
+    fit();
+    const resize = new win.ResizeObserver(fit);
+    resize.observe(doc.body);
+    const mode = new MutationObserver(() => syncMode(doc));
+    mode.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    syncMode(doc);
+    let changes: MutationObserver | undefined;
+    playground.stop = () => {
+      resize.disconnect();
+      mode.disconnect();
+      changes?.disconnect();
+    };
+
+    const element = doc.querySelector<MagmaElement>(tag);
+    if (!element) return;
+    await win.customElements.whenDefined(tag);
+    await element.componentOnReady?.();
+    if (load !== playground.load) return;
+    playground.element = element;
+    show(playground);
+    // Props the component changes itself, as far as they show in its attributes.
+    changes = new win.MutationObserver(() => show(playground));
+    changes.observe(element, { attributes: true });
+    enable(playground, true);
+  };
+
+  /** The narrowest the example gets, in pixels: a small phone. */
+  const MIN_WIDTH = 320;
+  /** How far an arrow key moves the handle, with Shift for a longer step. */
+  const STEP = 16;
+  const LONG_STEP = 80;
+
+  /**
+   * The handle of the frame: dragged, or moved with the arrow keys, Home and
+   * End, it sets how wide the example is. Returns what gives the example the
+   * whole stage again.
+   */
+  const resizable = (frame: HTMLIFrameElement, tag: string) => {
+    const viewport = document.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
+    const handle = document.querySelector<HTMLElement>(`[data-playground-handle="${tag}"]`);
+    const stage = viewport?.parentElement;
+    if (!viewport || !handle || !stage) return () => {};
+
+    /** How wide the example can be: the stage without its padding and the handle. */
+    const limits = () => {
+      const style = getComputedStyle(stage);
+      const max =
+        stage.clientWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight) -
+        handle.offsetWidth;
+      return { min: Math.min(MIN_WIDTH, max), max };
+    };
+    const current = () => Math.round(frame.getBoundingClientRect().width);
+    /** The separator's value: the width of the example. */
+    const update = () => {
+      const { min, max } = limits();
+      handle.setAttribute('aria-valuemin', String(Math.round(min)));
+      handle.setAttribute('aria-valuemax', String(Math.round(max)));
+      handle.setAttribute('aria-valuenow', String(current()));
+      handle.setAttribute('aria-valuetext', `${current()} px`);
+    };
+    /** The example this wide; the whole stage when `undefined` or wider. */
+    const set = (width: number | undefined) => {
+      const { min, max } = limits();
+      if (width === undefined || width >= max) viewport.style.removeProperty('width');
+      else viewport.style.width = `${Math.max(min, width) + handle.offsetWidth}px`;
+      update();
+    };
+
+    /** Ends the drag in progress, if there is one. */
+    let endDrag: (() => void) | undefined;
+
+    handle.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      endDrag?.();
+      // The moves over the frame would go to the example's page.
+      frame.style.pointerEvents = 'none';
+      // Where on the handle it was taken, so it does not jump.
+      const offset = event.clientX - current();
+      const drag = new AbortController();
+      const { signal } = drag;
+      const end = () => {
+        drag.abort();
+        endDrag = undefined;
+        frame.style.removeProperty('pointer-events');
+        if (handle.hasPointerCapture(event.pointerId))
+          handle.releasePointerCapture(event.pointerId);
+      };
+      endDrag = end;
+      const ours = (other: PointerEvent) => other.pointerId === event.pointerId;
+      // Read on the window: a release outside the page, or outside the
+      // browser, does not always reach the handle, even with the pointer
+      // captured. A move with the button up means it went missing: the drag
+      // ends there instead of following the pointer back in.
+      addEventListener(
+        'pointermove',
+        (moved) => {
+          if (!ours(moved)) return;
+          if ((moved.buttons & 1) === 0) end();
+          else set(moved.clientX - offset);
+        },
+        { signal },
+      );
+      for (const type of ['pointerup', 'pointercancel'] as const) {
+        addEventListener(type, (released) => ours(released) && end(), { signal });
+      }
+      handle.addEventListener('lostpointercapture', end, { signal });
+      // Another window or app took over in the middle of it.
+      addEventListener('blur', end, { signal });
+      handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? LONG_STEP : STEP;
+      const width = {
+        ArrowLeft: current() - step,
+        ArrowRight: current() + step,
+        Home: limits().min,
+        End: limits().max,
+      }[event.key];
+      if (width === undefined) return;
+      event.preventDefault();
+      set(width);
+    });
+    // The page gets narrower or wider: the stage, and the room it has, too.
+    new ResizeObserver(update).observe(stage);
+    update();
+    return () => set(undefined);
+  };
+
+  /** The playgrounds of the page, again on every page of the router. */
+  const init = () => {
+    for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
+      if (playgrounds.has(frame)) continue;
+      const tag = frame.dataset.playgroundFrame!;
+      const playground: Playground = {
+        tag,
+        frame,
+        controls: document.querySelector(`[data-playground-controls="${tag}"]`),
+        shown: new Map(),
+        load: 0,
+      };
+      playgrounds.set(frame, playground);
+
+      for (const type of ['mdsInputSwitchChange', 'mdsInputSelectChange', 'mdsInputChange']) {
+        playground.controls?.addEventListener(type, (event) => change(playground, event));
+      }
+      const fullWidth = resizable(frame, tag);
+      document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
+        fullWidth();
+        // Setting `src` loads it again, wherever the example led the frame.
+        frame.src = frame.getAttribute('src') ?? '';
+      });
+      frame.addEventListener('load', () => connect(playground));
+      // Already loaded before this script ran.
+      if (frame.contentDocument?.readyState === 'complete') connect(playground);
+    }
+  };
+
+  // The frame goes with the page it is on.
+  document.addEventListener('astro:before-swap', () => {
+    for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
+      playgrounds.get(frame)?.stop?.();
+    }
+  });
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

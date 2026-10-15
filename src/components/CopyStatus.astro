@@ -1,0 +1,105 @@
+---
+// What happens to the values of a table row on click, in the row's `action`
+// slot: "Click to copy", then "Copied" for a moment after one of them was
+// copied (CopyToClipboard.astro). Hidden until the script finds a clipboard to
+// copy to; screen readers hear the copy from the page's live region instead.
+// The row it belongs to is marked `data-copy-scope`.
+//
+// `note`: a row with nothing to copy (the default slot) shows that text
+// instead, always: every row of an mds-table needs its action, or the
+// columns of the table no longer line up.
+//
+// The div keeps the status in the part of a tall row that is on screen, as
+// `position: sticky` would (script below), with the row's background under
+// it, since it moves away from the actions box mds-table-row draws.
+interface Props {
+  note?: string;
+}
+
+const { note } = Astro.props;
+const { t } = Astro.locals;
+---
+
+<div
+  slot="action"
+  class="translate-y-(--copy-status-offset) bg-(--mds-table-row-actions-background) my-0"
+  data-copy-status-wrap
+>
+  {note ? (
+    <mds-text
+      typography="caption"
+      tag="span"
+      class="my-0 whitespace-nowrap text-fg-muted py-400 pl-400 h-full"
+    >
+      {note}
+    </mds-text>
+  ) : (
+    <mds-text
+      typography="caption"
+      tag="span"
+      class="hidden my-0 whitespace-nowrap text-fg-muted py-400 pl-400 h-full"
+      aria-hidden="true"
+      data-copy-status
+      data-copied={t('copy.copied')}
+      data-failed={t('copy.notCopied')}
+    >
+      {t('copy.hint')}
+    </mds-text>
+  )}
+</div>
+
+<script>
+  // `position: sticky` cannot do it: mds-table scrolls sideways, so its
+  // wrapper, not the page, is the scroll container its rows would stick to.
+  // Instead, for the rows on screen, the status moves to the middle of the
+  // part of its row that is visible, below the frame's header.
+  const WRAP = '[data-copy-status-wrap]';
+  const shown = new Set<HTMLElement>();
+  let frame = 0;
+
+  const place = () => {
+    frame = 0;
+    const frameRoot = document.querySelector('[data-frame]');
+    // The fixed header of small screens; 0 on desktop.
+    const top = frameRoot ? parseFloat(getComputedStyle(frameRoot).paddingTop) || 0 : 0;
+    for (const wrap of shown) {
+      const row = wrap.closest('[data-copy-scope]');
+      if (!row) continue;
+      const box = row.getBoundingClientRect();
+      // The status sits in the middle of its row: move it by how far the
+      // middle of the visible part is from there, staying inside the row.
+      const visible = (Math.max(box.top, top) + Math.min(box.bottom, innerHeight)) / 2;
+      const room = Math.max(0, (box.height - wrap.offsetHeight) / 2);
+      const offset = Math.min(room, Math.max(-room, visible - (box.top + box.height / 2)));
+      wrap.style.setProperty('--copy-status-offset', `${offset}px`);
+    }
+  };
+  const schedule = () => {
+    frame ||= requestAnimationFrame(place);
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const wrap = entry.target.querySelector<HTMLElement>(WRAP);
+      if (!wrap) continue;
+      if (entry.isIntersecting) shown.add(wrap);
+      else shown.delete(wrap);
+    }
+    schedule();
+  });
+
+  /** The rows of the page with a status, again on every page of the router. */
+  const watch = () => {
+    observer.disconnect();
+    shown.clear();
+    for (const wrap of document.querySelectorAll(WRAP)) {
+      const row = wrap.closest('[data-copy-scope]');
+      if (row) observer.observe(row);
+    }
+  };
+
+  addEventListener('scroll', schedule, { passive: true });
+  addEventListener('resize', schedule);
+  document.addEventListener('astro:page-load', watch);
+  watch();
+</script>

@@ -7,16 +7,20 @@ import { locales } from './src/lib/i18n.mjs';
 import { sidebar } from './src/lib/nav.mjs';
 
 /**
- * Starlight components replaced by the frame built with Magma components, and
- * the <head> that adds Astro's ClientRouter to it.
+ * Starlight components replaced by the frame built with Magma components (the
+ * page title and the draft and untranslated notices included), and the <head>
+ * that adds Astro's ClientRouter to it.
  */
 const frame = Object.fromEntries(
   [
+    'DraftContentNotice',
+    'FallbackContentNotice',
     'Footer',
     'Head',
     'Header',
     'PageFrame',
     'PageSidebar',
+    'PageTitle',
     'Sidebar',
     'TableOfContents',
     'ThemeProvider',

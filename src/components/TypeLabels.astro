@@ -1,0 +1,24 @@
+---
+// A prop type as its union members one per line (some unions have tens of
+// them), each colored by what it is (TypeValue.astro), strings of an enum
+// without their quotes, instead of `"left" | "right" | undefined` in one
+// piece. Each member is copied on its own when clicked (TypeValue.astro);
+// the `|` between them stays for screen readers and selecting the text.
+import { typeKind, unionMembers, unquote } from '../lib/types';
+import TypeValue from './TypeValue.astro';
+
+interface Props {
+  type: string;
+}
+
+const members = unionMembers(Astro.props.type);
+---
+
+<span class="flex flex-col items-start gap-100">
+  {members.map((member, i) => (
+    <>
+      {i > 0 && <span class="sr-only"> | </span>}
+      <TypeValue text={unquote(member)} kind={typeKind(member)} />
+    </>
+  ))}
+</span>

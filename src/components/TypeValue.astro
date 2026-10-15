@@ -1,0 +1,38 @@
+---
+// One member of a prop type as code colored by what it is
+// (src/lib/types.ts): strings green, enums blue, numbers violet, booleans
+// orange, on a light tint of Magma's label palette (Magma turns the palette
+// around in dark mode, so the tint goes dark and the text light there).
+// Other types look like the other code of the tables; `undefined` and `null`
+// are gray text only: they say a value can be missing, not what it is. No
+// ring around them, unlike code in running text. Copied when clicked
+// (CopyToClipboard.astro), unless `copy` is false.
+import { TEXT } from '../lib/markdown-text.mjs';
+import type { TypeKind } from '../lib/types';
+
+interface Props {
+  text: string;
+  kind: TypeKind;
+  copy?: boolean;
+}
+
+const COLOR: Record<TypeKind, string> = {
+  string: 'shadow-none bg-label-green-10/60 text-label-green-03',
+  enum: 'shadow-none bg-label-blue-10/60 text-label-blue-03',
+  number: 'shadow-none bg-label-violet-10/60 text-label-violet-03',
+  boolean: 'shadow-none bg-label-orange-10/60 text-label-orange-03',
+  other: TEXT.code.hack,
+  empty: 'shadow-none bg-transparent text-fg-muted',
+};
+
+const { text, kind, copy = true } = Astro.props;
+---
+
+<mds-text
+  typography="hack"
+  tag="code"
+  class:list={['shrink-0', COLOR[kind]]}
+  data-copy={copy ? text : undefined}
+>
+  {text}
+</mds-text>

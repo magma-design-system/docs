@@ -39,6 +39,7 @@ export const collections = {
       descriptionHtml: z.string(),
       pattern: guide,
       antipattern: guide,
+      example: z.string(),
       props: z.array(documented),
       events: z.array(z.looseObject({ event: z.string(), docsHtml: z.string() })),
       methods: z.array(documented),

@@ -1,0 +1,31 @@
+---
+// A section heading of a page written in .astro, with the anchor in front of
+// it that the Markdown headings get (src/lib/markdown-text.mjs): an icon
+// button linking to the heading, so its address can be copied and reached.
+// `typography`: the heading's look, its tag's by default.
+import { ANCHOR, TEXT } from '../lib/markdown-text.mjs';
+
+interface Props {
+  id: string;
+  text: string;
+  level?: 2 | 3;
+  typography?: string;
+}
+
+const { id, text, level = 2 } = Astro.props;
+const tag = `h${level}` as const;
+const { typography = tag } = Astro.props;
+const { t } = Astro.locals;
+---
+
+<div class={TEXT.anchored[tag]}>
+  <mds-button
+    href={`#${id}`}
+    role="link"
+    {...ANCHOR}
+    aria-label={t('heading.anchorLabel', { title: text, interpolation: { escapeValue: false } })}
+  ></mds-button>
+  <mds-text id={id} typography={typography} tag={tag} class={TEXT.headingText}>
+    {text}
+  </mds-text>
+</div>
