@@ -1,0 +1,26 @@
+---
+// Light/dark mode before the first paint. The picker is mds-pref-mode, which
+// stores the choice in localStorage (`mdsPrefMode`) and sets `pref-mode-*` on
+// <html>; Starlight's styles read `data-theme`, resolved here from the same
+// choice. src/scripts/magma.ts keeps the two in sync afterwards, PageFrame.astro
+// carries them over when pages change in place.
+---
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    let mode = 'system';
+    try {
+      const stored = localStorage.getItem('mdsPrefMode');
+      if (stored === 'light' || stored === 'dark' || stored === 'system') mode = stored;
+    } catch {}
+    root.setAttribute('data-magma-pref', '');
+    root.classList.add(`pref-mode-${mode}`);
+    root.dataset.theme =
+      mode === 'system'
+        ? matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light'
+        : mode;
+  })();
+</script>

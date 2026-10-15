@@ -1,0 +1,75 @@
+---
+// Desktop rail: brand, the 8 sections and the preferences. Collapsed, it keeps
+// only the logo, which expands it again. The state is kept in localStorage and
+// restored before the first paint (inline script below); the `rail-collapsed`
+// variant (src/styles/magma.css) follows it.
+import Brand from './Brand.astro';
+import Logo from './Logo.astro';
+import Preferences from './Preferences.astro';
+import SectionLinks from './SectionLinks.astro';
+
+const { t } = Astro.locals;
+---
+
+<script is:inline>
+  // Same key as the toggle script below.
+  try {
+    if (localStorage.getItem('magma-docs:rail') === 'collapsed') {
+      document.documentElement.dataset.rail = 'collapsed';
+    }
+  } catch {}
+</script>
+
+<div class="flex flex-col gap-1000 overflow-y-auto px-400 py-600 [scrollbar-width:thin] rail-collapsed:w-auto w-full">
+  <div>
+    <div class="flex items-center justify-between gap-400 rail-collapsed:hidden">
+      <Brand />
+      <mds-button
+        data-rail-toggle="collapse"
+        type="button"
+        icon="mi/baseline/arrow-back"
+        aria-label={t('frame.rail.collapse')}
+        aria-controls="rail-body"
+        aria-expanded="true"
+        variant="dark"
+        tone="text"
+      ></mds-button>
+    </div>
+    <button
+      class="hidden cursor-pointer rounded-lg border-0 bg-transparent p-0 focus-visible:[outline-offset:var(--magma-outline-focus-offset)] focus-visible:[outline:var(--magma-outline-focus)] rail-collapsed:inline-flex"
+      type="button"
+      data-rail-toggle="expand"
+      aria-label={t('frame.rail.expand')}
+      aria-controls="rail-body"
+      aria-expanded="false"
+    >
+      <Logo />
+    </button>
+  </div>
+  <div class="flex flex-1 flex-col justify-between gap-1000 rail-collapsed:hidden" id="rail-body">
+    <SectionLinks />
+    <div data-preferences="rail">
+      <Preferences />
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'magma-docs:rail';
+  const root = document.documentElement;
+
+  document.querySelectorAll('[data-rail-toggle]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const collapse = toggle.getAttribute('data-rail-toggle') === 'collapse';
+      if (collapse) root.dataset.rail = 'collapsed';
+      else delete root.dataset.rail;
+      try {
+        localStorage.setItem(STORAGE_KEY, collapse ? 'collapsed' : 'expanded');
+      } catch {}
+      // The toggle just clicked is hidden now: keep the focus on the other one.
+      document
+        .querySelector<HTMLElement>(`[data-rail-toggle="${collapse ? 'expand' : 'collapse'}"]`)
+        ?.focus();
+    });
+  });
+</script>
