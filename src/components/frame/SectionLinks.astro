@@ -7,9 +7,13 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
 ---
 
 <nav aria-label={t('frame.sections')}>
+  {/*
+    The items are flex boxes: in a block, the button would sit on a line of
+    text, whose line height adds space below it to the gap.
+  */}
   <ul class="m-0 flex list-none flex-col gap-100 p-0">
     {sections.map((section) => (
-      <li>
+      <li class="flex">
         <mds-button
           class="max-w-full"
           href={section.href}

@@ -32,7 +32,7 @@ const items = toc ? flatten(toc.items) : [];
         <ul class="m-0 flex list-none flex-col gap-100 p-0 hyphens-auto">
           {items.map((item) => (
             <li
-              class="ps-[calc(var(--depth)*--spacing(300))]"
+              class="flex ps-[calc(var(--depth)*--spacing(300))]"
               style={`--depth: ${item.depth - toc.minHeadingLevel}`}
             >
               <mds-button
