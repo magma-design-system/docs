@@ -8,6 +8,7 @@
 import mi from '@iconsauce/material-icons';
 import mdi from '@iconsauce/mdi-svg';
 import mgg from '@iconsauce/mgg-icons';
+import lobe from './src/lib/iconsauce-lobe-icons.mjs';
 import { resolveMagma } from './src/lib/magma.mjs';
 
 export default {
@@ -16,5 +17,5 @@ export default {
     // The usage examples of every component page.
     resolveMagma('magma/dist/documentation.json'),
   ],
-  plugin: [mi, mdi, mgg],
+  plugin: [mi, mdi, mgg, lobe],
 };
