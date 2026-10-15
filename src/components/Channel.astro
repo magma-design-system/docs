@@ -23,9 +23,9 @@ interface Props {
 const { name, kind, icon, href, action, variant, tone = 'weak' } = Astro.props;
 ---
 
-<mds-card>
-  <mds-card-header class="items-start">
-    <mds-entity icon={icon} variant={variant} tone={tone}>
+<mds-card class="bg-surface-overlay">
+  <mds-card-header class="items-start bg-surface-overlay">
+    <mds-entity icon={icon} variant={variant} tone={tone} class="shadow-none p-0 bg-transparent">
       <mds-text typography="h6" tag="h3">
         {name}
       </mds-text>
@@ -33,8 +33,14 @@ const { name, kind, icon, href, action, variant, tone = 'weak' } = Astro.props;
         {kind}
       </mds-text>
     </mds-entity>
+  </mds-card-header>
+  <mds-card-content class="pt-0 bg-surface-overlay">
+    <mds-text>
+      <slot />
+    </mds-text>
+  </mds-card-content>
+  <mds-card-footer class="bg-surface-overlay">
     <mds-button
-      slot="action"
       href={href}
       target="blank"
       role="link"
@@ -45,10 +51,5 @@ const { name, kind, icon, href, action, variant, tone = 'weak' } = Astro.props;
       size="lg"
       tone="text"
     ></mds-button>
-  </mds-card-header>
-  <mds-card-content class="pt-0">
-    <mds-text>
-      <slot />
-    </mds-text>
-  </mds-card-content>
+  </mds-card-footer>
 </mds-card>
