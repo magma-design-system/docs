@@ -1,0 +1,93 @@
+---
+title: Usare le icone
+description: Quando un'icona aiuta, da quale set prenderla, come tenere un'icona per concetto, e cosa fare prima di disegnarne una nuova.
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+Le icone aiutano a trovare e a riconoscere: un'azione, una sezione, uno stato. Sono un
+linguaggio, e come ogni linguaggio funzionano solo se ogni segno mantiene il suo significato.
+Questa pagina dice come usarle; [Set di icone](../) le elenca tutte, e
+[Usare iconsauce](../iconsauce/) spiega come arrivano in un prodotto.
+
+## Quale set
+
+Cerca nei set in questo ordine, e prendi la prima icona adatta:
+
+1. **Material Icons** (`mi`), il set di Google: la base dell'interfaccia, per azioni,
+   navigazione e stati. La maggior parte delle persone conosce già le sue icone da altri
+   prodotti.
+2. **Maggioli** (`mgg`): i concetti del mondo Maggioli che Material non ha, come ANPR, pagoPA,
+   area edificabile o cittadinanza.
+3. **Material Design Icons** (`mdi`), un set della community: ciò che gli altri due non hanno,
+   come i loghi di altri servizi.
+
+## Quando usarne una
+
+Le icone stanno nella navigazione, nei titoli delle sezioni, nei pulsanti delle azioni
+principali, nei banner e nei messaggi che comunicano uno stato, e accanto a una parola quando
+la rendono più chiara. Non su ogni voce di un elenco o su ogni pulsante di una pagina: quando
+tutto ha un'icona, nessuna risalta.
+
+## Come sceglierla
+
+- **Semplice.** Meno dettagli si leggono meglio, soprattutto nelle dimensioni piccole.
+- **Letterale prima che metaforica.** Un documento per i documenti, un calendario per le date.
+  Quando un concetto non ha un'immagine propria, prendi l'oggetto più vicino.
+- **Seria.** Un'icona informa; non è lì per divertire.
+- **Un concetto, un'icona.** Tutte le impostazioni usano lo stesso ingranaggio, qualunque cosa
+  impostino, e un'icona non significa mai due cose diverse nello stesso prodotto.
+- **Le convenzioni restano come sono.** Cerca, impostazioni, elimina, chiudi, scarica: le
+  persone conoscono queste icone, e un disegno nuovo le farebbe solo esitare.
+- **Comprensibile ovunque.** I prodotti Maggioli parlano anche spagnolo e greco: evita icone
+  costruite su oggetti o gesti locali.
+
+<Usages>
+<mds-usage variant="do">
+
+Le impostazioni dell'account, della stampa e delle notifiche usano tutte l'icona
+dell'ingranaggio.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Ogni tipo di impostazioni ha un'icona propria: una persona, una stampante, una campanella con
+un ingranaggio.
+
+</mds-usage>
+</Usages>
+
+## Con un'etichetta
+
+Un'icona va con una parola. Solo le azioni che tutti conoscono, come chiudi, cerca e il menu,
+possono stare da sole: allora il pulsante ha comunque un'etichetta per i lettori di schermo, e
+un tooltip che la mostra. `mds-icon` è decorativa per impostazione predefinita, quindi il
+significato viene sempre dal testo o dall'etichetta del controllo che la contiene.
+
+<Usages>
+<mds-usage variant="do">
+
+Un pulsante con l'icona di download e l'etichetta "Scarica la ricevuta".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una barra di cinque pulsanti con la sola icona, alcune disegnate apposta per questo prodotto.
+
+</mds-usage>
+</Usages>
+
+## Dimensione
+
+Le icone sono di 24px, la dimensione che `mds-icon` prende per impostazione predefinita; i
+componenti dimensionano le icone che contengono in base al loro testo. Un'immagine più grande
+non è più un'icona, è un'[illustrazione](../../foundation/illustration/).
+
+## Una nuova icona
+
+Prima di disegnarne una, cerca nei tre set, anche per tag: l'icona potrebbe esserci con un
+altro nome. Se nessuna va bene, proponila per il set Maggioli con una
+[proposta di contributo](https://github.com/magma-design-system/magma/issues/new?template=3-contribution-proposal.yml):
+il concetto, dove si usa, e perché le icone esistenti non vanno bene. Una nuova icona
+Maggioli si disegna sulla stessa griglia di 24px di Material Icons, con gli stessi tratti e
+gli stessi angoli, perché possa stare accanto a loro.

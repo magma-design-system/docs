@@ -1,0 +1,90 @@
+---
+title: Using icons
+description: When an icon helps, which set to take it from, how to keep one icon per concept, and what to do before drawing a new one.
+---
+
+import Usages from '../../../components/Usages.astro';
+
+Icons help people find and recognize things: an action, a section, a state. They are a
+language, and like a language they work only if every sign keeps its meaning. This page says
+how to use them; [Icon sets](../) lists them all, and [Using iconsauce](../iconsauce/)
+explains how they get into a product.
+
+## Which set
+
+Look in the sets in this order, and take the first icon that fits:
+
+1. **Material Icons** (`mi`), Google's set: the base of the interface, for actions,
+   navigation and states. Most users already know its icons from other products.
+2. **Maggioli** (`mgg`): the concepts of Maggioli's field that Material does not have, such
+   as ANPR, pagoPA, building land or citizenship.
+3. **Material Design Icons** (`mdi`), a community set: what neither of the others has, such
+   as the logos of other services.
+
+## When to use one
+
+Icons belong in the navigation, in the titles of sections, in the buttons of the main
+actions, in banners and messages that report a state, and next to a word when they make it
+clearer. Not on every item of a list or every button of a page: when everything has an icon,
+none of them stands out.
+
+## How to choose one
+
+- **Simple.** Fewer details read better, especially at small sizes.
+- **Literal before metaphorical.** A document for documents, a calendar for dates. When a
+  concept has no image of its own, take the object closest to it.
+- **Serious.** An icon informs; it is not there to amuse.
+- **One concept, one icon.** All settings use the same gear, whatever they set, and an icon
+  never means two different things in the same product.
+- **Conventions stay as they are.** Search, settings, delete, close, download: people know
+  these icons, and a new drawing would only make them think twice.
+- **Understood everywhere.** Maggioli's products also speak Spanish and Greek: avoid icons
+  built on local objects or gestures.
+
+<Usages>
+<mds-usage variant="do">
+
+The settings of the account, of the printing and of the notifications all use the gear icon.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Each kind of settings gets an icon of its own: a person, a printer, a bell with a gear.
+
+</mds-usage>
+</Usages>
+
+## With a label
+
+An icon goes with a word. Only the actions everyone knows, such as close, search and the
+menu, can stand alone: then the button still has a label for screen readers, and a tooltip
+that shows it. `mds-icon` is decorative by default, so the meaning always comes from the
+text or from the label of the control around it.
+
+<Usages>
+<mds-usage variant="do">
+
+A button with the download icon and the label "Download the receipt".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A toolbar of five buttons with only an icon each, some of them drawn for this product.
+
+</mds-usage>
+</Usages>
+
+## Size
+
+Icons are 24px, the size `mds-icon` takes by default; the components size the icons they
+hold to their text. A larger image is no longer an icon, it is an
+[illustration](../../foundation/illustration/).
+
+## A new icon
+
+Before drawing one, search the three sets, also by their tags: the icon may be there under
+another name. If none fits, propose it for the Maggioli set with a
+[contribution proposal](https://github.com/magma-design-system/magma/issues/new?template=3-contribution-proposal.yml):
+the concept, where it is used, and why the existing icons do not fit. A new Maggioli icon is
+drawn on the same 24px grid as Material Icons, with the same strokes and corners, so that it
+can sit next to them.

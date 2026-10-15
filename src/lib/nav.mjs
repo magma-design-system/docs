@@ -48,6 +48,7 @@ export const sections = [
       { ...sidebarLabel('icons.page.mgg.title'), link: '/icons/maggioli/' },
       { ...sidebarLabel('icons.page.mi.title'), link: '/icons/material-icons/' },
       { ...sidebarLabel('icons.page.mdi.title'), link: '/icons/material-design-icons/' },
+      { slug: 'icons/using-icons' },
       { slug: 'icons/iconsauce' },
       { slug: 'icons/icons-package' },
     ],
