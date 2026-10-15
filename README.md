@@ -111,5 +111,8 @@ Never use `npm link`: symlinks hide exactly the packaging bugs this site is mean
 
 ## Deploy
 
-`.github/workflows/deploy.yml` builds every pull request and deploys `main` to GitHub
-Pages with `withastro/action`.
+`.github/workflows/deploy.yml` type-checks and builds every pull request, and deploys the
+`production` branch to GitHub Pages with `withastro/action`. Work goes into `main` through
+pull requests; to publish, open a pull request from `main` to `production` and merge it.
+`production` only takes pull requests, and the `github-pages` environment only accepts
+deployments from it.
