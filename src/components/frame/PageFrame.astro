@@ -9,6 +9,10 @@
 // `transition:persist` stay mounted from page to page while their links are
 // the same (script below): their Magma components do not hydrate again, the
 // columns keep their scroll position.
+//
+// The rail is sticky, so its own stacking context: on Magma's header layer,
+// its dropdown and tooltips show over the card (whose sticky columns would
+// paint over them otherwise), under what floats from the content.
 import Search from '@astrojs/starlight/components/Search.astro';
 import Rail from './Rail.astro';
 
@@ -25,7 +29,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
   <div
     data-frame-rail
     transition:persist="frame-rail"
-    class="hidden desktop:sticky desktop:top-0 desktop:flex desktop:h-screen print:hidden"
+    class="hidden desktop:sticky desktop:top-0 desktop:z-(--magma-header-z-index) desktop:flex desktop:h-screen print:hidden"
   >
     <Rail />
   </div>
@@ -140,6 +144,7 @@ const { hasSidebar } = Astro.locals.starlightRoute;
     // which one is current changes. Other links (another section, another
     // component, the table of contents of a page) make a new column.
     scrolled.clear();
+    const copies: Element[] = [];
     for (const column of next.querySelectorAll(`[${PERSIST}]`)) {
       const kept = document.querySelector(`[${PERSIST}="${column.getAttribute(PERSIST)}"]`);
       if (!kept) continue;
@@ -164,7 +169,20 @@ const { hasSidebar } = Astro.locals.starlightRoute;
           scrolled.set(element, [element.scrollTop, element.scrollLeft]);
         }
       }
+      copies.push(column);
     }
+
+    // The router puts the new page in, then the kept columns in place of
+    // their copies: for that moment the copies are on the page, and their
+    // components start loading for nothing. mds-tooltip and mds-dropdown
+    // (magma 2.2.0) then throw, taken off the page before they have loaded
+    // (https://github.com/magma-design-system/magma/issues/527). Emptied once
+    // every listener has read the new page, right before the swap.
+    const swap = (event as TransitionBeforeSwapEvent).swap;
+    (event as TransitionBeforeSwapEvent).swap = () => {
+      for (const copy of copies) copy.replaceChildren();
+      swap();
+    };
   });
 
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
