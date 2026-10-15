@@ -149,7 +149,8 @@ Built (2026-10-15): the section (overview + Data group) and **list with filters*
   need a note), tabs for data / documents / history, back link that returns to the
   list as it was. The list example now opens it from its numbers, so the two previews
   are connected.
-- Magma gaps found and filed: magma#941, #942, #943 (filter, table sort). Worked around
+- Magma gaps found and filed: magma#941, #942, #943 (filter, table sort; fixed in Magma
+  2.3.0). Worked around
   in the detail code: `mds-file` without role and keys (#820), `mds-toast` not announced
   (#821). Not filed yet: `mds-toast` shows its text only when it has one at load (a gap
   left by #688), the required tip of `mds-input` stays green after a value cleared from

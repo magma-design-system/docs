@@ -204,8 +204,7 @@ export function ListWithFilters() {
           const value = event.detail.value;
           if (isStatus(value)) return update({ status: value });
           // Picking the selected status again leaves none selected: that is
-          // All, selected here too, since its prop may not change and
-          // mds-filter has no method for it (https://github.com/magma-design-system/magma/issues/942).
+          // All, selected here too, since its prop may not change.
           event.target.querySelector('mds-filter-item[value="all"]')?.setAttribute('selected', '');
           update({ status: 'all' });
         }}

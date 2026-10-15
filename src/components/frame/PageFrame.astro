@@ -80,29 +80,18 @@ const hasHero = Boolean(entry.data.hero);
     type TransitionBeforePreparationEvent,
     type TransitionBeforeSwapEvent,
   } from 'astro:transitions/client';
+  import { NavigationService } from '@maggioli-design-system/magma/services';
 
   const PERSIST = 'data-astro-transition-persist';
 
-  // mds-button follows its `href` with `location.href` (no <a>, magma#806),
-  // which the router does not see: send its links within the site through it.
-  document.addEventListener(
-    'click',
-    (event) => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
-        return;
-      const button =
-        event.target instanceof Element ? event.target.closest('mds-button[href]') : null;
-      if (!button || button.getAttribute('target') === 'blank') return;
-      const url = new URL(button.getAttribute('href') ?? '', location.href);
-      // Other sites, and anchors of this page, are left to mds-button.
-      if (url.origin !== location.origin || (url.pathname === location.pathname && url.hash))
-        return;
-      event.preventDefault();
-      event.stopPropagation();
-      navigate(url.href);
-    },
-    { capture: true },
-  );
+  // The links of the components (mds-button, mds-tab-item) are anchors in
+  // their shadow roots, which the router does not see: Magma hands it their
+  // plain clicks within the site. Anchors of this page stay with the browser.
+  NavigationService.setHandler((href) => {
+    const url = new URL(href, location.href);
+    if (url.pathname === location.pathname && url.hash) return false;
+    navigate(url.href);
+  });
 
   // Another language is a full load: the columns and the search kept by the
   // router are in the language of this page.

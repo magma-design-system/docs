@@ -167,10 +167,7 @@
   const filtered = () =>
     query.q !== DEFAULTS.q || query.status !== DEFAULTS.status || query.office !== DEFAULTS.office;
 
-  /**
-   * Selects the status item of `value`: mds-filter has no method for it
-   * (https://github.com/magma-design-system/magma/issues/942).
-   */
+  /** Selects the status item of `value`, as a click on it would. */
   function selectStatus(value) {
     for (const item of status.querySelectorAll('mds-filter-item')) {
       item.selected = item.value === value;

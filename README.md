@@ -73,7 +73,7 @@ Starlight's sidebar: one group per section, the first item is where the rail lin
 component has a main page and the sub-pages its `documentation.json` data allows (API, CSS,
 Pattern, Antipattern): [`src/lib/components.ts`](src/lib/components.ts). The three usage files
 are the component's prose: Description on the main page, then the Pattern and Antipattern
-sub-pages. The readme is not shown (magma#842).
+sub-pages. The readme is not shown: it holds a generic intro only.
 
 ## Languages
 

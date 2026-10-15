@@ -1,7 +1,7 @@
 ---
 // The sections of the site, in the rail and in the mobile menu. `compact`
-// (the collapsed rail): icons only, each named by the label of its section,
-// which a tooltip shows on hover.
+// (the collapsed rail): icons only, each named by the label of its section in
+// a tooltip, which shows it on hover.
 import { frameNav } from '../../lib/frame';
 
 interface Props {
@@ -28,7 +28,6 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
           role="link"
           type="a"
           aria-current={section.current ? 'page' : undefined}
-          aria-label={compact ? section.label : undefined}
           icon={section.icon}
           label={compact ? undefined : section.label}
           variant="dark"
@@ -37,6 +36,7 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
         {compact && (
           <mds-tooltip
             target={`#rail-section-${section.id}`}
+            relation="label"
             placement="right"
             disable-auto-placement
           >

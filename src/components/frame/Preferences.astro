@@ -27,9 +27,7 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
 // Magma's named themes (magma/agents/theming.md): `default` is the base theme,
 // the others retint the neutral roles (surfaces, wash, borders, text) with
 // their family. The swatch of an item is the wash of its family; the dots on
-// it (accent and status colors) are the same in every theme. (In magma 2.2.0
-// the swatch is not shown: mds-pref-theme-item puts it in the text-only
-// default slot of an mds-button, magma#910.)
+// it (accent and status colors) are the same in every theme.
 const themes = [
   { name: 'default', family: 'neutral', label: t('frame.theme.default') },
   { name: 'cool', family: 'porcelain', label: t('frame.theme.cool') },
@@ -84,7 +82,7 @@ const themes = [
           />
         ))}
       </mds-pref-language>
-      <mds-pref-mode class="relative w-full gap-200" size="sm"></mds-pref-mode>
+      <mds-pref-mode class="relative w-full" size="sm"></mds-pref-mode>
       <mds-pref-theme class="relative w-full" size="sm">
         {themes.map(({ name, family, label }) => (
           <mds-pref-theme-item
@@ -100,35 +98,6 @@ const themes = [
 
 <script>
   import type { TransitionBeforeSwapEvent } from 'astro:transitions/client';
-
-  // magma 2.2.0: mds-pref takes data-magma-pref off <html> when it leaves the
-  // page, moved too (its disconnectedCallback, a microtask later), and sets it
-  // only when it first loads: moved below, it would leave the styles following
-  // the system's preferences. The panel is always on the page (and
-  // ThemeProvider.astro sets the flag before the first paint): put it back.
-  // Tracked in https://github.com/magma-design-system/magma/issues/922
-  const root = document.documentElement;
-  new MutationObserver(() => {
-    if (!root.hasAttribute('data-magma-pref')) root.setAttribute('data-magma-pref', '');
-  }).observe(root, { attributeFilter: ['data-magma-pref'] });
-
-  // magma 2.2.0: mds-pref-language and mds-pref-theme put their label and tab
-  // in a `.menu` with no layout of its own: the label is inline, in a line as
-  // tall as the page's line height, and the tab follows with no gap. The other
-  // mds-pref-* lay the two out in a grid with a gap (which the panel doubles,
-  // gap-200 on mds-pref-mode): the same grid and gap in the two menus.
-  // Tracked in https://github.com/magma-design-system/magma/issues/927
-  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
-  const menu = new CSSStyleSheet();
-  menu.replaceSync('.menu { display: grid; gap: calc(var(--spacing, 0.0025rem) * 200); }');
-  document
-    .querySelectorAll<MagmaElement>('#preferences-panel :is(mds-pref-language, mds-pref-theme)')
-    .forEach(async (pref) => {
-      await customElements.whenDefined(pref.localName);
-      await pref.componentOnReady?.();
-      const shadow = pref.shadowRoot;
-      if (shadow) shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, menu];
-    });
 
   /** Moves `element` into the one of the `data-preferences` boxes named `where`. */
   const move = (element: HTMLElement | null, where: string) => {
