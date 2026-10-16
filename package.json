@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.4.3",
-    "@astrojs/starlight": "0.42.5",
+    "@astrojs/starlight": "0.42.6",
     "@fontsource/karla": "5.1.0",
     "@fontsource/merriweather": "5.1.0",
     "@fontsource/roboto": "5.1.0",
