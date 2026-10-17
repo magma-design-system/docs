@@ -13,9 +13,10 @@
   // nods, over a framework tab or the button it smiles, over the prompt it
   // thinks until the pointer leaves; a click on a tab or on the copy button
   // of the prompt makes it nod. The keyboard focus counts as the pointer.
-  // Each nod or smile plays to the end: what the pointer reaches meanwhile
-  // waits for it, only a click cuts it short. With reduced motion (the
-  // system's, under Magma's `pref-animation-system`, or
+  // After a reaction it rests for REST: what the pointer or a click reaches
+  // meanwhile is let go, a mascot that reacts to every move is tiring to use
+  // (the thinking ends when the pointer leaves, rest or not). With reduced
+  // motion (the system's, under Magma's `pref-animation-system`, or
   // `pref-animation-reduce`) it does not react: mds-emoji keeps the pointer
   // and the blinking still by itself, not its expressions.
   type Emoji = HTMLElement & {
@@ -44,6 +45,8 @@
   ];
   /** How long the thinking hand takes to come in or out, in seconds. */
   const HAND = 0.4;
+  /** The rest after a reaction, in ms: a new one each time, between the two. */
+  const REST = { min: 10_000, max: 15_000 };
 
   const root = document.documentElement;
   const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
@@ -71,23 +74,15 @@
 
     /** The element the pointer or the focus is on, with its reaction. */
     let current: ReturnType<typeof match>;
-    /** The nod or smile playing, if any. */
-    let playing: Promise<void> | undefined;
+    /** When the rest after the last reaction ends (`performance.now()`). */
+    let rested = 0;
 
-    const react = async (reaction: Reaction, cut = false) => {
-      if (reduced()) return;
-      if (reaction === 'think') {
-        if (!playing) emoji.startThinking(HAND);
-        return;
-      }
-      if (playing && !cut) return;
-      const started = current;
-      const expression = (playing = emoji[reaction]());
-      await expression;
-      if (playing !== expression || signal.aborted) return;
-      playing = undefined;
-      // The pointer moved on while it played: it reacts to where it is now.
-      if (current && current !== started) react(current.reaction);
+    const react = (reaction: Reaction) => {
+      const now = performance.now();
+      if (reduced() || now < rested) return;
+      rested = now + REST.min + Math.random() * (REST.max - REST.min);
+      if (reaction === 'think') emoji.startThinking(HAND);
+      else emoji[reaction]();
     };
 
     const enter = (event: Event) => {
@@ -110,7 +105,7 @@
       'click',
       (event) => {
         const found = match(CLICK, event.target, band);
-        if (found) react(found.reaction, true);
+        if (found) react(found.reaction);
       },
       { signal },
     );
