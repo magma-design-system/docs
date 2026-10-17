@@ -1,11 +1,14 @@
 // The controls of a component's preview (src/components/Playground.astro): one
 // per prop whose value can be typed or picked, chosen from the values
 // documentation.json lists for it. Functions, arrays and objects get none.
+import { unquote } from './types';
 
 /** A prop as documentation.json describes it, as far as the controls go. */
 interface DocumentedProp {
   name: string;
   values?: { type: string; value?: string }[];
+  docs?: string;
+  docsTags?: { name: string; text?: string }[];
 }
 
 /**
@@ -41,6 +44,38 @@ export function propControl(prop: DocumentedProp): Control | undefined {
     return { kind: 'string', optional };
   }
   return undefined;
+}
+
+/** A date or time format written out in a description: `YYYY-MM-DD`, `HH:mm`. */
+const FORMAT = /\b(?:YYYY|YY|MM|DD|HH|hh|mm|ss)(?:[-/.:T](?:YYYY|YY|MM|DD|HH|hh|mm|ss))+\b/;
+/**
+ * The date a format is filled with, part by part: a day past 12, so that it
+ * cannot be taken for the month.
+ */
+const SAMPLE: Record<string, string> = {
+  YYYY: '2025',
+  YY: '25',
+  MM: '12',
+  DD: '31',
+  HH: '18',
+  hh: '06',
+  mm: '30',
+  ss: '00',
+};
+
+/**
+ * A value the prop takes, for the placeholder of its field: its `@example`
+ * (`'2023-10-01'`), or else a date in the format its description writes
+ * (`YYYY-MM-DD` gives `2025-12-31`). Most props have neither.
+ */
+export function propExample(prop: DocumentedProp): string | undefined {
+  const tags = prop.docsTags ?? [];
+  const example = tags.find((tag) => tag.name === 'example')?.text?.trim();
+  // A one-line value, not a snippet of markup.
+  if (example && !example.includes('\n')) return unquote(example);
+  const descriptions = tags.filter((tag) => tag.name === 'description').map((tag) => tag.text);
+  const format = [prop.docs, ...descriptions].join(' ').match(FORMAT)?.[0];
+  return format?.replace(/YYYY|YY|MM|DD|HH|hh|mm|ss/g, (part) => SAMPLE[part]);
 }
 
 /**

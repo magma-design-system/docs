@@ -43,6 +43,7 @@
   "component.preview.title": "Preview of {{tag}}",
   "component.preview.reset": "Reset",
   "component.preview.resize": "Resize the preview",
+  "component.preview.example": "E.g. {{value}}",
   "pattern.preview.intro": "The pattern running as the page of an application: use it, then narrow it with the handle on the right to see it on a phone.",
   "pattern.preview.title": "Preview of the pattern",
   "pattern.preview.open": "Open in a new tab",

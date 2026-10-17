@@ -43,6 +43,7 @@
   "component.preview.title": "Anteprima di {{tag}}",
   "component.preview.reset": "Ripristina",
   "component.preview.resize": "Ridimensiona l'anteprima",
+  "component.preview.example": "Es: {{value}}",
   "pattern.preview.intro": "Il pattern in funzione come la pagina di un'applicazione: usalo, poi stringilo con la maniglia a destra per vederlo su un telefono.",
   "pattern.preview.title": "Anteprima del pattern",
   "pattern.preview.open": "Apri in una nuova scheda",
