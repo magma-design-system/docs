@@ -4,7 +4,9 @@
 // on a stage where a handle at its right narrows it, to see the component in
 // less room (as in the layout mockups); then a control for each prop that
 // takes a value to type or pick, in a grid of compact fields: the control,
-// the prop's name, its kind and its description in an mds-help. Icon props
+// the prop's name, its kind and its description in an mds-help; a text or
+// number field shows, while empty, an example of what the prop takes, when
+// documentation.json has one (src/lib/controls.ts). Icon props
 // (`icon`, `iconChecked`) pick from the icons Magma's usage docs use most and
 // the ones of the example, or none. A control
 // sets the prop on the element of the example; when the component changes a
@@ -13,7 +15,7 @@
 // the preview is ready. A pattern (src/components/PatternPreview.astro) runs
 // its own page on the same stage, with its own texts and without controls;
 // the buttons of the `actions` slot go next to Reset.
-import { plainText, propControl, type Control } from '../lib/controls';
+import { plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
@@ -54,7 +56,9 @@ const fields = props
     if (!control) return [];
     const name = prop.name as string;
     const icon = control.kind === 'string' && ICON_PROP.test(name);
-    return [{ name, docs: plainText(prop.docs), control, icon }];
+    return [
+      { name, docs: plainText(prop.docs), control, icon, example: propExample(prop) },
+    ];
   })
   .sort(
     (a, b) =>
@@ -127,7 +131,7 @@ const fields = props
       class="not-content grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800"
       data-playground-controls={tag}
     >
-      {fields.map(({ name, docs, control, icon }) => (
+      {fields.map(({ name, docs, control, icon, example }) => (
         <div class="flex min-w-0 flex-col gap-200">
           {control.kind === 'boolean' && (
             <mds-input-switch
@@ -172,6 +176,14 @@ const fields = props
             <mds-input
               type={control.kind === 'number' ? 'number' : 'text'}
               aria-label={name}
+              placeholder={
+                example &&
+                // Astro escapes the attribute: i18next does not need to.
+                t('component.preview.example', {
+                  value: example,
+                  interpolation: { escapeValue: false },
+                })
+              }
               disabled
               data-prop={name}
               data-kind={control.kind}

@@ -121,7 +121,7 @@
   100% {
     translate: 0 0;
     rotate: 0deg;
-    box-shadow: var(--shadow-glow-near-strong);
+    box-shadow: var(--shadow-box-md);
   }
 
   25% {
@@ -152,6 +152,17 @@
     :where(.pref-animation-system, html:not([class*='pref-animation-'])) & {
       animation: none;
     }
+  }
+}
+
+mds-button[icon='mi/baseline/arrow-forward'] {
+  &:hover::part(icon),
+  &:focus-visible::part(icon) {
+    transform: translateX(var(--spacing-xs));
+  }
+  &::part(icon) {
+    @apply transition-cosmetic duration-300;
+    transform: translateX(0);
   }
 }
 
@@ -281,8 +292,9 @@
     @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
 
+  mds-benchmark-bar,
   mds-progress {
-    corner-shape: round;
+    --magma-corner-shape: round;
   }
 
   /*

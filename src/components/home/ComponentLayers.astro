@@ -14,14 +14,17 @@
 // The pose lives in custom properties on the stage: `--explode` (0, a flat
 // card facing the reader; 1, turned and open), `--tilt-x` and `--tilt-y`
 // (added to the turn). The script below keeps the card flat until most of it
-// is on screen, then turns it and opens it, and tilts it with the scroll and
-// the pointer: the planes, at different depths, slide past each other. It
-// also puts the flags on their components, once they are laid out. Without
-// it the card stays flat, as the components need it to show anyway; with
-// reduced motion it is open and still, from the start.
+// is on screen, then turns it and opens it, flat again once it scrolls away,
+// and tilts it with the scroll and the pointer: the planes, at different
+// depths, slide past each other. The switch above the card turns on and off
+// with it, and opens and closes it too; the words on its sides are only
+// seen, its name is in its slot. The script also puts the flags on their
+// components, once they are laid out. Without it the card stays flat, as the
+// components need it to show anyway; with reduced motion it is open and
+// still, from the start, until the switch closes it.
 // The components follow the preferences of the page (mode, contrast, theme)
 // like everything else. A picture: one name for screen readers, inert, left
-// out of the search.
+// out of the search; the switch beside it, outside the picture.
 import Logo from '../frame/Logo.astro';
 
 const { t } = Astro.locals;
@@ -89,9 +92,26 @@ const at = (index: number, depth: number) => ({
 });
 ---
 
-<div data-pagefind-ignore role="img" aria-label={t('home.layers.label')} class="@container">
+<div data-pagefind-ignore data-layers-root class="@container">
+  <div class="flex items-center justify-center gap-300 @xl:pr-3200 @xl:pl-4400">
+    <mds-text aria-hidden="true" typography="label" class="text-fg-muted uppercase">
+      {t('home.layers.off')}
+    </mds-text>
+    {/*
+      Its name only for screen readers: `gap-0`, or the space the switch
+      keeps before its label would leave the words on its sides uneven.
+    */}
+    <mds-input-switch data-layers-toggle explicit class="gap-0">
+      <span class="sr-only">{t('home.layers.switch')}</span>
+    </mds-input-switch>
+    <mds-text aria-hidden="true" typography="label" class="text-fg-muted uppercase">
+      {t('home.layers.on')}
+    </mds-text>
+  </div>
   <div
     data-layers
+    role="img"
+    aria-label={t('home.layers.label')}
     class="flex justify-center perspective-distant py-1000 @xl:pr-3200 @xl:pl-4400"
     style={STAGE}
   >
@@ -210,11 +230,15 @@ const at = (index: number, depth: number) => ({
   // The motion of the card of ComponentLayers.astro, on every page the router
   // shows. For each stage (`data-layers`): the card stays flat until SHOWN of
   // the stage is on screen, then turns and opens, in OPENING ms; it closes
-  // again once the stage has left the screen, to open again the next time. It
-  // tilts with the scroll and the pointer, easing toward them, only on the
-  // frames after a scroll or a move of the pointer. With reduced motion (the
-  // system's or Magma's `pref-animation-reduce`) it leaves the pose of the
-  // markup: open, still. The flags are placed on their components (place()).
+  // the same way once less than HIDDEN of it is left, either way the page
+  // scrolls, and at once if it leaves the screen before. The switch of the
+  // stage (`data-layers-toggle`) turns on and off with it; used, it opens or
+  // closes the card, until the scroll next takes the stage in or out of
+  // view. It tilts with the scroll and the pointer, easing toward them, only
+  // on the frames after a scroll or a move of the pointer. With reduced
+  // motion (the system's or Magma's `pref-animation-reduce`) it is open and
+  // still, and only the switch closes it, at once. The flags are placed on
+  // their components (place()).
   const root = document.documentElement;
   const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
   const reduced = () => systemReduce.matches || root.classList.contains('pref-animation-reduce');
@@ -223,18 +247,25 @@ const at = (index: number, depth: number) => ({
   const easeInOut = (share: number) =>
     share < 0.5 ? 4 * share ** 3 : 1 - (-2 * share + 2) ** 3 / 2;
 
-  /** The share of the stage on screen that opens the card (or of the viewport, if taller). */
+  /**
+   * The share of the stage on screen (or of the viewport, if taller) that
+   * opens the card, and the one below which it closes: the gap keeps a scroll
+   * back and forth around one of them from opening and closing it at once.
+   */
   const SHOWN = 0.6;
+  const HIDDEN = 0.4;
   /** How long the card takes to turn and open, or to close, in ms. */
   const OPENING = 1200;
   /** How fast the tilt catches up: the time it takes to cover 63% of the distance, in ms. */
   const EASE = 120;
   /** The largest tilt, in degrees: from the scroll (around X), from the pointer (X and Y). */
   const TILT = { scroll: 6, pointerX: 6, pointerY: 12 };
-  /** The pose with reduced motion: open, still. */
-  const REST = { explode: 1, x: 0, y: 0 };
+  /** The tilt with reduced motion: none. */
+  const STILL = { x: 0, y: 0 };
 
-  const write = (stage: HTMLElement, pose: typeof REST) => {
+  type Pose = { explode: number; x: number; y: number };
+
+  const write = (stage: HTMLElement, pose: Pose) => {
     stage.style.setProperty('--explode', pose.explode.toFixed(4));
     stage.style.setProperty('--tilt-x', `${pose.x.toFixed(3)}deg`);
     stage.style.setProperty('--tilt-y', `${pose.y.toFixed(3)}deg`);
@@ -271,8 +302,8 @@ const at = (index: number, depth: number) => ({
     stage.style.setProperty('--flags', '1');
   }
 
-  function animate(stage: HTMLElement, signal: AbortSignal) {
-    const pose = { ...REST, explode: 0 };
+  function animate(stage: HTMLElement, toggle: HTMLElement | null, signal: AbortSignal) {
+    const pose: Pose = { explode: 0, ...STILL };
     let pointer = { x: 0, y: 0 };
     let onScreen = false;
     let frame = 0;
@@ -283,27 +314,42 @@ const at = (index: number, depth: number) => ({
     /** Whether the card is open or opening, and the turn under way: from where, since when. */
     let open = false;
     let turn: { from: number; start?: number } | undefined;
+    /** Whether the stage was in view at the last frame: the scroll moves the card when it changes. */
+    let inView: boolean | undefined;
+    /** Whether reduced motion has opened the card: once, so that the switch can close it. */
+    let still = false;
 
-    /** Whether enough of the stage is on screen to open the card. */
-    const shown = (box: DOMRect) => {
-      const visible = Math.min(box.bottom, innerHeight) - Math.max(box.top, 0);
-      return visible >= SHOWN * Math.min(box.height, innerHeight);
+    /** Opens or closes the card, and the switch with it: set from code, it sends no event. */
+    const set = (value: boolean) => {
+      open = value;
+      toggle?.toggleAttribute('checked', value);
     };
+
+    /** The share of the stage on screen, or of the viewport if the stage is taller. */
+    const shown = (box: DOMRect) =>
+      (Math.min(box.bottom, innerHeight) - Math.max(box.top, 0)) /
+      Math.min(box.height, innerHeight);
 
     const tick = (time: number) => {
       frame = 0;
       if (reduced()) {
-        Object.assign(pose, REST);
-        open = true;
+        if (!still) set(true);
+        still = true;
+        Object.assign(pose, STILL, { explode: open ? 1 : 0 });
         turn = undefined;
         write(stage, pose);
         jump = true;
         return;
       }
+      still = false;
       const box = stage.getBoundingClientRect();
-      if (!open && shown(box)) {
-        open = true;
-        turn = { from: pose.explode };
+      const now = shown(box) >= (inView ? HIDDEN : SHOWN);
+      if (now !== inView) {
+        inView = now;
+        if (now !== open) {
+          set(now);
+          turn = { from: pose.explode };
+        }
       }
       // From 1 to -1 as its middle crosses the viewport, bottom to top.
       const scroll = clamp((box.top + box.height / 2 - innerHeight / 2) / (innerHeight / 2));
@@ -339,9 +385,10 @@ const at = (index: number, depth: number) => ({
 
     const observer = new IntersectionObserver(([entry]) => {
       onScreen = entry.isIntersecting;
-      // Off screen: flat again at once, without a turn nobody sees.
-      if (!onScreen && open && !reduced()) {
-        open = false;
+      // Off screen: flat and off at once, without a turn nobody sees.
+      if (!onScreen && !reduced()) {
+        inView = false;
+        set(false);
         turn = undefined;
         pose.explode = 0;
         write(stage, pose);
@@ -385,6 +432,16 @@ const at = (index: number, depth: number) => ({
       },
       { signal, passive: true },
     );
+    // The switch: from where the card is, toward its new state.
+    toggle?.addEventListener(
+      'mdsInputSwitchChange',
+      (event) => {
+        open = (event as CustomEvent<{ checked: boolean }>).detail.checked;
+        turn = { from: pose.explode };
+        wake();
+      },
+      { signal },
+    );
     // The scrolls of the page and of any box around the stage.
     document.addEventListener('scroll', wake, { signal, passive: true, capture: true });
     addEventListener('resize', wake, { signal, passive: true });
@@ -396,7 +453,10 @@ const at = (index: number, depth: number) => ({
     pages?.abort();
     pages = new AbortController();
     for (const stage of document.querySelectorAll<HTMLElement>('[data-layers]')) {
-      animate(stage, pages.signal);
+      const toggle = stage
+        .closest('[data-layers-root]')
+        ?.querySelector<HTMLElement>('[data-layers-toggle]');
+      animate(stage, toggle ?? null, pages.signal);
     }
   });
 </script>

@@ -16,16 +16,20 @@ hero:
 import FrameworkTabs from '../../components/FrameworkTabs.astro';
 import AgentNames from '../../components/home/AgentNames.astro';
 import ComponentLayers from '../../components/home/ComponentLayers.astro';
+import DepthScene from '../../components/home/DepthScene.astro';
 import Feature from '../../components/home/Feature.astro';
 import Features from '../../components/home/Features.astro';
 import HomeSection from '../../components/home/HomeSection.astro';
 import HomeStats from '../../components/home/HomeStats.astro';
 import Level from '../../components/home/Level.astro';
 import Levels from '../../components/home/Levels.astro';
+import Mascot from '../../components/home/Mascot.astro';
 import SectionCards from '../../components/home/SectionCards.astro';
 import { apiCounts } from '../../lib/magma.mjs';
 
 export const api = apiCounts();
+
+<DepthScene />
 
 <HomeStats />
 
@@ -37,51 +41,55 @@ export const api = apiCounts();
   <Features>
     <Feature
       icon="mi/outline/layers"
-      variant="blue"
       title="One library, every framework"
-      text="The components are standard custom elements, compiled once. They run as they are in plain JavaScript and in any template; the React and Angular wrappers, generated from the same source and released with it, add types, events and forms the way each framework expects."
+      description="Standard custom elements that work in every framework."
+      text="Compiled once, from one source, they run as they are in plain JavaScript and in any template. The React and Angular wrappers, generated from that source and released with it, add types, events and forms the way each framework expects."
       href="development/installation/"
       action="Install Magma"
     />
     <Feature
       icon="mi/outline/integration-instructions"
-      variant="violet"
       title="Web standards, nothing else"
-      text="Options are HTML attributes that take strings, numbers and booleans, not arrays, objects or callbacks that only a framework can pass. Content goes into slots and child components, events are DOM events: what works in an HTML file works everywhere."
-      stat={`${api.attributes} / ${api.properties}`}
-      statLabel="properties are plain attributes"
+      description="What works in a plain HTML file works in every framework."
+      text="Options are HTML attributes that take strings, numbers and booleans, not arrays, objects or callbacks that only a framework can pass. Content goes into slots and child components, events are DOM events."
+      stat={{
+        value: api.attributes,
+        total: api.properties,
+        label: 'properties are plain attributes',
+      }}
       href="development/"
       action="Read the rules"
     />
     <Feature
       icon="mi/outline/stairs"
-      variant="green"
       title="Adopt it a level at a time"
-      text="Start from the tokens, add the styles, then the components and the wrappers. Each level works on its own: a product takes what its stack, its deadlines and its users allow, and moves up when it can."
+      description="Tokens, styles, components and wrappers: take only what you need."
+      text="Each level works on its own: a product takes what its stack, its deadlines and its users allow, and moves up when it can."
       href="#adoption"
       action="See the levels"
     />
     <Feature
       icon="mi/outline/auto-awesome"
-      variant="orchid"
+      variant="ai"
       title="Ready for AI agents"
-      text="The component packages ship an AGENTS.md and guides written for coding agents: how to install, the API of every component, the right and the wrong ways to use it. The agent works with the version you installed, not with what it remembers."
+      description="Agents work with the version you installed, not with what they remember."
+      text="The component packages ship an AGENTS.md and guides written for coding agents: how to install, the API of every component, the right and the wrong ways to use it."
       href="development/agentic-development/"
       action="Work with agents"
     />
     <Feature
       icon="mi/outline/accessibility-new"
-      variant="sky"
       title="Accessible and adaptive"
-      text="Designed for WCAG 2.x AA, with light and dark mode, higher contrast, reduced motion, low consumption and themes built in: the preferences are set once on the page, and every component follows them."
+      description="Designed for WCAG 2.x AA and for the preferences of every user."
+      text="Light and dark mode, higher contrast, reduced motion, low consumption and themes come built in: the preferences are set once on the page, and every component follows them."
       href="foundation/accessibility/"
       action="Accessibility"
     />
     <Feature
       icon="mi/outline/palette"
-      variant="orange"
       title="One source for design decisions"
-      text="Color, type, space and motion live in design tokens, published for CSS, Tailwind, SCSS, JavaScript and DTCG, for Figma as variables, and for iOS, Android and Flutter. A decision changed once reaches every product with its next update."
+      description="A decision changed once reaches every product."
+      text="Color, type, space and motion live in design tokens, published for CSS, Tailwind, SCSS, JavaScript and DTCG, for Figma as variables, and for iOS, Android and Flutter. Every product gets the changes with its next update."
       href="tokens/"
       action="Explore the tokens"
     />
@@ -211,6 +219,8 @@ export class SubscribeComponent {
   href="development/agentic-development/"
   action="Agentic development"
 >
+<Mascot slot="before" />
+
 <AgentNames />
 
 <FrameworkTabs>

@@ -27,6 +27,7 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 | [magma#944](https://github.com/magma-design-system/magma/issues/944) | `src/components/home/AgentNames.astro`              | `bg-surface-overlay` on `mds-chip`, whose default ground is grey                                                                                                                 |
 | [magma#955](https://github.com/magma-design-system/magma/issues/955) | `src/styles/magma.css`                              | Neutral `mds-banner` on `surface-overlay` instead of the card's color                                                                                                            |
 | not filed                                                            | `src/components/IdentityFamily.astro`               | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
+| not filed                                                            | `src/components/home/ComponentLayers.astro`         | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
 | not filed, listed in docs#1                                          | `src/styles/magma.css`                              | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
 | #820, #821, #823, #951, #952                                         | `src/patterns/` (pattern code, the feedback sketch) | Keyboard and roles for `mds-file`, `sr-only` live regions for toasts, a hand-made toast stack and close button                                                                   |
 
@@ -36,7 +37,13 @@ As of Magma 2.3.0: #527, #790 (shadow ink flips to white in dark mode), #820, #8
 #829, #830, #944, #951 (toasts overlap), #952 (toast close control), #955, #956 (`mds-avatar`
 keeps its fallback glyph after a failed `src`: the component preview hits it with the example's
 broken image), #957 (`@example` on props that take a format: the preview placeholders appear
-when it ships), and the epic #693 (theme studio, for the Themes and preferences page).
+when it ships), #981 (`magma`, `magma-react` and `magma-angular` ship `CHANGELOG.md` but leave
+it out of `exports`, so `resolveMagma()` cannot read it; breaking entries drop their
+`BREAKING CHANGE:` note), #983 (`mds-benchmark-bar`: `mds-progress` overwrites the `alias` with
+its Italian `steps`, so the home page bar is announced "Fine"), #984 (`mds-text` with
+`truncate` and the `label` or `option` typography clips the accents of capitals: the Italian
+home page bar reads "PROPRIETA"), and the epic #693 (theme studio, for the Themes and
+preferences page).
 
 ## Seen, not filed yet
 
@@ -51,6 +58,12 @@ against open issues before filing.
   #786); the email validator returns a hard-coded Italian message; `mds-input-field` overwrites
   the `message` and `variant` set by the application on `mdsInputValidation`, and marks every
   valid field as success (2.3.0).
+- `mds-input-switch` names its input "Select <label>" while unchecked and "Deselect <label>"
+  while checked (`aria-label`, localized), on every type: the name of a switch changes with its
+  state, and adds a verb to what `role="switch"` and the checked state already say. The label
+  is read once from `host.textContent` at load, so a later text never reaches the name. A
+  switch can only be named by its slot: with a visually hidden slot (`sr-only`) the host keeps
+  its 8px gap before the label, and an `aria-label` on the host is not passed on (2.3.0).
 - `mds-breadcrumb` has no links; Magma has no description list, no ordered list, no link and
   no code block component.
 - `mds-button[href]` has no `download`.
@@ -62,3 +75,7 @@ against open issues before filing.
   has only the neutral tone (2.3.0).
 - `mds-pref-mode` disables itself and forces light mode on Safari, a Magma 1 leftover (2.1.0).
 - `mds-icon` fills with the inherited `fill`, not `currentColor` (2.1.0).
+- `mds-emoji` plays `agree`, `smile`, `disagree` and `startThinking` with reduced motion: only
+  the pointer tracking and the blinking stay still, so `Mascot.astro` holds the expressions back
+  itself (may belong in #821). Its methods report no state and fire no event: a page that must
+  not cut an expression short keeps its promises (2.3.0).
