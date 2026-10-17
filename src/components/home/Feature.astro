@@ -38,14 +38,14 @@ const fill = stat && Math.min((stat.value / stat.total) * 100, MAX_FILL);
 
 <mds-card class="h-full bg-surface-overlay">
   <mds-card-header class="items-start justify-start p-600 bg-surface-overlay">
-    <mds-icon name={icon} class:list={['w-1200', accent.icon]}></mds-icon>
-    <mds-text typography="h5" tag="h3">
+    <mds-icon name={icon} class:list={['w-1200 shrink-0', accent.icon]}></mds-icon>
+    <mds-text typography="h4" tag="h3" class="w-full">
       {title}
     </mds-text>
   </mds-card-header>
   <mds-card-content class="flex grow flex-col gap-600 pt-0 p-600 bg-surface-overlay">
     <div class:list={['flex flex-col gap-400 p-400 -mx-200 rounded-lg', accent.band]}>
-      <mds-text typography="caption" tag="p" class="whitespace-normal">
+      <mds-text typography="caption" tag="p">
         {description}
       </mds-text>
       {stat && (
