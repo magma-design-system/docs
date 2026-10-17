@@ -1,0 +1,391 @@
+---
+// Under the hero of the home page: fragments of one service, a request and
+// the screens around it, made of live Magma components and laid out on four
+// planes, back to front by the surface level of what they hold (Magma's
+// elevation ladder): on the page, a table, tabs and a calendar; raised, the
+// card of the request; floating above, a filled field, a switch and a
+// button; and above them all, the confirmation that the request is sent.
+// The deeper a plane, the smaller, fainter and more out of focus its
+// fragments; one comes into focus under the pointer.
+//
+// The planes move by custom properties on the stage: `--scroll` (1 when the
+// stage comes in at the bottom of the viewport, -1 when it leaves at the
+// top) and `--pointer-x`, `--pointer-y` (-1 to 1, the pointer from the middle
+// of the stage, over the viewport). Each plane moves by them as far as its
+// `shift` and `sway`: the nearest the most, the page plane not at all, so
+// they slide past each other as the page scrolls and the pointer moves. The
+// script below keeps them, eased; without it, or with reduced motion, the
+// planes stay where the markup puts them. Below the narrow container the
+// page plane and the confirmation leave, so the rest keeps its room.
+//
+// A picture: one name for screen readers, left out of the search; the
+// caption under it is read as text. Every component is `inert`, so nothing
+// in it can be focused or clicked; the pointer passes through it to the box
+// around it (FRAGMENT), which knows when it is under the pointer.
+const { t } = Astro.locals;
+
+/**
+ * The planes, back to front: the size of their fragments, how much of them
+ * shows and how far out of focus they are, in rem (both until the pointer is
+ * on one), and how far they move, in rem, with the scroll (`shift`, each
+ * way) and the pointer (`sway`).
+ */
+const PLANES = [
+  { size: 0.78, fade: 0.7, blur: 0.2, shift: 0, sway: 0 },
+  { size: 0.9, fade: 1, blur: 0.08, shift: 3, sway: 0.6 },
+  { size: 1, fade: 1, blur: 0, shift: 6, sway: 1.2 },
+  { size: 1.04, fade: 1, blur: 0, shift: 10, sway: 1.8 },
+] as const;
+
+/**
+ * A plane over the whole stage, moved by the pose as far as its own share.
+ * It lets the pointer through to the planes under it, but not its fragments.
+ */
+const plane = (index: number) => {
+  const { size, fade, blur, shift, sway } = PLANES[index];
+  return [
+    `--size: ${size}; --fade: ${fade}; --blur: ${blur}rem;`,
+    'translate:',
+    `calc(var(--pointer-x) * ${sway}rem)`,
+    `calc(var(--scroll) * ${shift}rem + var(--pointer-y) * ${sway / 2}rem);`,
+  ].join(' ');
+};
+const PLANE = 'pointer-events-none absolute inset-0';
+
+/**
+ * The box of a fragment: drawn as its plane says, in focus under the pointer.
+ * Out of focus only with a fine pointer: on touch nothing would bring it back.
+ */
+const FRAGMENT = [
+  'pointer-events-auto absolute scale-(--size) opacity-(--fade) pointer-fine:blur-(--blur)',
+  'transition-[filter,opacity] duration-300 hover:opacity-100 hover:blur-none',
+];
+
+/** The pose before the script runs. */
+const STAGE = '--scroll: 0; --pointer-x: 0; --pointer-y: 0;';
+
+/** The requests of the table on the page plane. */
+const ROWS = [
+  {
+    number: '2481',
+    subject: 'home.scene.permit',
+    status: 'home.scene.inReview',
+    variant: 'warning',
+  },
+  {
+    number: '2477',
+    subject: 'home.scene.parking',
+    status: 'home.scene.approved',
+    variant: 'success',
+  },
+  {
+    number: '2469',
+    subject: 'home.scene.residence',
+    status: 'home.scene.approved',
+    variant: 'success',
+  },
+] as const;
+
+/** The surface of a card on the floating planes (Magma's top level), see agents/styling.md. */
+const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
+---
+
+<div data-pagefind-ignore class="not-content @container -mt-800 tablet:-mt-1200 pb-1200">
+  <div
+    data-depth
+    role="img"
+    aria-label={t('home.scene.label')}
+    class="relative mx-auto h-13000 max-w-(--container-6xl) @max-3xl:h-12000"
+    style={STAGE}
+  >
+    {/* The page: what lies on it. */}
+    <div class={PLANE} style={plane(0)}>
+      <div
+        class:list={[
+          FRAGMENT,
+          'top-0 right-0 hidden w-(--container-md) origin-top-right @3xl:block',
+        ]}
+      >
+        <mds-table inert class="w-full shadow-md-sharp">
+          <mds-table-header>
+            <mds-table-header-cell label={t('home.scene.number')} />
+            <mds-table-header-cell label={t('home.scene.subject')} />
+            <mds-table-header-cell label={t('home.scene.status')} />
+          </mds-table-header>
+          <mds-table-body>
+            {ROWS.map(({ number, subject, status, variant }) => (
+              <mds-table-row>
+                <mds-table-cell>
+                  <mds-text typography="detail" class="whitespace-nowrap">
+                    {number}
+                  </mds-text>
+                </mds-table-cell>
+                <mds-table-cell>
+                  <mds-text typography="detail" class="whitespace-nowrap">
+                    {t(subject)}
+                  </mds-text>
+                </mds-table-cell>
+                <mds-table-cell>
+                  <mds-badge label={t(status)} variant={variant} tone="weak" />
+                </mds-table-cell>
+              </mds-table-row>
+            ))}
+          </mds-table-body>
+        </mds-table>
+      </div>
+      <div class:list={[FRAGMENT, 'top-0 left-0 hidden origin-top-left @3xl:block']}>
+        <mds-calendar
+          inert
+          class="rounded-xl bg-surface-raised shadow-md-sharp"
+          single-picker
+          hide-today
+          view-date="2026-11-01"
+          start-date="2026-11-12"
+        />
+      </div>
+      <div
+        class:list={[
+          FRAGMENT,
+          'right-1/12 bottom-0 hidden w-(--container-xs) origin-bottom @3xl:block',
+        ]}
+      >
+        <mds-card inert>
+          <mds-card-content>
+            <mds-tab size="sm">
+              <mds-tab-item label={t('home.scene.details')} />
+              <mds-tab-item label={t('home.scene.documents')} selected />
+              <mds-tab-item label={t('home.scene.history')} />
+              <div slot="content">
+                <mds-text typography="detail">{t('home.scene.submitted')}</mds-text>
+              </div>
+              <div slot="content" class="pt-300">
+                <mds-file filename={t('home.scene.file')} />
+              </div>
+              <div slot="content">
+                <mds-text typography="detail">{t('home.scene.assigned')}</mds-text>
+              </div>
+            </mds-tab>
+          </mds-card-content>
+        </mds-card>
+      </div>
+    </div>
+
+    {/* Raised: the card of the request. */}
+    <div class={PLANE} style={plane(1)}>
+      <div
+        class:list={[
+          FRAGMENT,
+          'top-1/12 left-1/2 w-(--container-xs) origin-top -translate-x-1/2 @3xl:left-1/4 @3xl:translate-x-0',
+        ]}
+      >
+        <mds-card inert class="shadow-lg">
+          <mds-card-header>
+            <mds-author>
+              <mds-avatar slot="avatar" initials="lf" variant="violet" tone="weak" />
+              <mds-text typography="h6" tag="p">
+                {t('home.scene.officer')}
+              </mds-text>
+              <mds-text typography="caption" tag="p" class="text-fg-muted">
+                {t('home.scene.officerRole')}
+              </mds-text>
+            </mds-author>
+          </mds-card-header>
+          <mds-card-content class="flex flex-col gap-300">
+            <div class="flex items-center justify-between gap-300">
+              <mds-text typography="caption" class="text-fg-muted">
+                {t('home.scene.request')}
+              </mds-text>
+              <mds-badge label={t('home.scene.inReview')} variant="warning" tone="weak" />
+            </div>
+            <mds-text typography="h5" tag="p">
+              {t('home.scene.permit')}
+            </mds-text>
+            <mds-progress progress="0.5" size="md" />
+            <div class="flex items-center justify-between gap-300">
+              <mds-text typography="caption" class="text-fg-muted">
+                {t('home.scene.step')}
+              </mds-text>
+              <mds-avatar-stack size="sm">
+                <mds-avatar-stack-item initials="mr" variant="blue" />
+                <mds-avatar-stack-item initials="lf" variant="violet" />
+                <mds-avatar-stack-item initials="gb" variant="green" />
+              </mds-avatar-stack>
+            </div>
+          </mds-card-content>
+        </mds-card>
+      </div>
+    </div>
+
+    {/* Floating above: what the person is doing now. */}
+    <div class={PLANE} style={plane(2)}>
+      <div
+        class:list={[
+          FRAGMENT,
+          'bottom-1/4 left-0 w-(--container-2xs) @3xl:bottom-1/6 @3xl:left-1/12',
+        ]}
+      >
+        <mds-card inert class:list={['shadow-2xl', OVERLAY]}>
+          <mds-card-content>
+            <mds-input-field label={t('home.scene.applicant')}>
+              <mds-input value={t('home.scene.applicantName')} size="md" />
+            </mds-input-field>
+          </mds-card-content>
+        </mds-card>
+      </div>
+      <div
+        class:list={[
+          FRAGMENT,
+          'right-0 bottom-0 w-full @3xl:right-auto @3xl:left-1/3 @3xl:w-(--container-md)',
+        ]}
+      >
+        <mds-card inert class:list={['shadow-2xl', OVERLAY]}>
+          <mds-card-content class="flex items-center justify-between gap-600">
+            <mds-input-switch checked explicit>
+              {t('home.scene.notify')}
+            </mds-input-switch>
+            <mds-button
+              class="shrink-0"
+              label={t('home.scene.send')}
+              icon="mi/baseline/send"
+              icon-position="right"
+              variant="primary"
+            />
+          </mds-card-content>
+        </mds-card>
+      </div>
+    </div>
+
+    {/* Above them all: the request is sent. */}
+    <div class={PLANE} style={plane(3)}>
+      <div
+        class:list={[
+          FRAGMENT,
+          'top-1/4 right-0 hidden w-(--container-xs) @3xl:block @3xl:right-1/5',
+        ]}
+      >
+        <mds-banner
+          inert
+          class="shadow-2xl"
+          variant="success"
+          icon="mi/baseline/check-circle"
+          headline={t('home.scene.sentTitle')}
+        >
+          {t('home.scene.sentText')}
+        </mds-banner>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // The motion of DepthScene.astro, on every page the router shows. For each
+  // stage (`data-depth`): the pose follows the scroll and the pointer, easing
+  // toward them, only on the frames after a scroll or a move of the pointer
+  // and while the stage is on screen. With reduced motion (the system's or
+  // Magma's `pref-animation-reduce`) it goes back to the pose of the markup,
+  // and stays.
+  const root = document.documentElement;
+  const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = () => systemReduce.matches || root.classList.contains('pref-animation-reduce');
+
+  const clamp = (value: number, min = -1, max = 1) => Math.min(max, Math.max(min, value));
+
+  /** How fast the pose catches up: the time it takes to cover 63% of the distance, in ms. */
+  const EASE = 120;
+
+  type Pose = { scroll: number; x: number; y: number };
+  const REST: Pose = { scroll: 0, x: 0, y: 0 };
+
+  const write = (stage: HTMLElement, pose: Pose) => {
+    stage.style.setProperty('--scroll', pose.scroll.toFixed(4));
+    stage.style.setProperty('--pointer-x', pose.x.toFixed(4));
+    stage.style.setProperty('--pointer-y', pose.y.toFixed(4));
+  };
+
+  function animate(stage: HTMLElement, signal: AbortSignal) {
+    const pose: Pose = { ...REST };
+    let pointer = { x: 0, y: 0 };
+    let onScreen = false;
+    let frame = 0;
+    /** The time of the previous frame, while the pose moves. */
+    let last: number | undefined;
+    /** The next frame puts the pose on its goal: the first one, the first after reduced motion. */
+    let jump = true;
+
+    const tick = (time: number) => {
+      frame = 0;
+      if (reduced()) {
+        Object.assign(pose, REST);
+        write(stage, pose);
+        jump = true;
+        return;
+      }
+      const box = stage.getBoundingClientRect();
+      // From 1 to -1, from the top of the stage at the bottom of the viewport
+      // to its bottom at the top.
+      const middle = box.top + box.height / 2 - innerHeight / 2;
+      const goal: Pose = {
+        scroll: clamp(middle / ((innerHeight + box.height) / 2)),
+        x: pointer.x,
+        y: pointer.y,
+      };
+      let moving = false;
+      // The share of the distance covered since the previous frame, whatever
+      // the frame rate; after a still pose, as if one frame had passed.
+      const step = jump ? 1 : 1 - Math.exp(-(time - (last ?? time - 1000 / 60)) / EASE);
+      jump = false;
+      for (const key of ['scroll', 'x', 'y'] as const) {
+        pose[key] += (goal[key] - pose[key]) * step;
+        if (Math.abs(goal[key] - pose[key]) > 0.0005) moving = true;
+        else pose[key] = goal[key];
+      }
+      write(stage, pose);
+      last = moving ? time : undefined;
+      if (moving) wake();
+    };
+
+    const wake = () => {
+      if (onScreen && !frame) frame = requestAnimationFrame(tick);
+    };
+
+    const observer = new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      wake();
+    });
+    observer.observe(stage);
+
+    signal.addEventListener('abort', () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    });
+
+    // Where the pointer is, from the middle of the stage, over the viewport.
+    // Not for touch.
+    document.addEventListener(
+      'pointermove',
+      (event) => {
+        if (event.pointerType === 'touch') return;
+        const box = stage.getBoundingClientRect();
+        pointer = {
+          x: clamp((event.clientX - (box.left + box.width / 2)) / (innerWidth / 2)),
+          y: clamp((event.clientY - (box.top + box.height / 2)) / (innerHeight / 2)),
+        };
+        wake();
+      },
+      { signal, passive: true },
+    );
+    // The scrolls of the page and of any box around the stage.
+    document.addEventListener('scroll', wake, { signal, passive: true, capture: true });
+    addEventListener('resize', wake, { signal, passive: true });
+    systemReduce.addEventListener('change', wake, { signal });
+  }
+
+  let pages: AbortController | undefined;
+  document.addEventListener('astro:page-load', () => {
+    pages?.abort();
+    pages = new AbortController();
+    for (const stage of document.querySelectorAll<HTMLElement>('[data-depth]')) {
+      animate(stage, pages.signal);
+    }
+  });
+</script>

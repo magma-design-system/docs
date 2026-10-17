@@ -16,6 +16,7 @@ hero:
 import FrameworkTabs from '../../../components/FrameworkTabs.astro';
 import AgentNames from '../../../components/home/AgentNames.astro';
 import ComponentLayers from '../../../components/home/ComponentLayers.astro';
+import DepthScene from '../../../components/home/DepthScene.astro';
 import Feature from '../../../components/home/Feature.astro';
 import Features from '../../../components/home/Features.astro';
 import HomeSection from '../../../components/home/HomeSection.astro';
@@ -27,6 +28,8 @@ import SectionCards from '../../../components/home/SectionCards.astro';
 import { apiCounts } from '../../../lib/magma.mjs';
 
 export const api = apiCounts();
+
+<DepthScene />
 
 <HomeStats />
 
