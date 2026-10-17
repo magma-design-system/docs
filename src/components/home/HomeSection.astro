@@ -1,10 +1,11 @@
 ---
 // A band of the home page: a centered heading with its lead, then the slot,
 // then, when given, a button to the page that tells more (`href`, labelled
-// `action`, relative to the page). With an `aside` slot, the heading and the
-// lead sit on its left, aligned to the start, once the band is wide enough
-// for both (centered above it before). `not-content`: the band sets its own
-// space, Starlight would add 1rem.
+// `action`, relative to the page). The `before` slot goes above the heading,
+// in its column (the mascot of the agents band). With an `aside` slot, the
+// heading and the lead sit on its left, aligned to the start, once the band
+// is wide enough for both (centered above it before). `not-content`: the band
+// sets its own space, Starlight would add 1rem.
 interface Props {
   /** Id of the heading, for links to the band. */
   id: string;
@@ -32,6 +33,7 @@ const aside = Astro.slots.has('aside');
           : 'mx-auto mb-1000 max-w-(--container-3xl) items-center text-center',
       ]}
     >
+      <slot name="before" />
       <mds-text id={id} typography="h2" tag="h2" class="block scroll-mt-600">
         {title}
       </mds-text>

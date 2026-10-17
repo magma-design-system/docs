@@ -22,6 +22,7 @@ import HomeSection from '../../components/home/HomeSection.astro';
 import HomeStats from '../../components/home/HomeStats.astro';
 import Level from '../../components/home/Level.astro';
 import Levels from '../../components/home/Levels.astro';
+import Mascot from '../../components/home/Mascot.astro';
 import SectionCards from '../../components/home/SectionCards.astro';
 import { apiCounts } from '../../lib/magma.mjs';
 
@@ -211,6 +212,8 @@ export class SubscribeComponent {
   href="development/agentic-development/"
   action="Agentic development"
 >
+<Mascot slot="before" />
+
 <AgentNames />
 
 <FrameworkTabs>
