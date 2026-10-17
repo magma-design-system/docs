@@ -281,8 +281,9 @@
     @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
 
+  mds-benchmark-bar,
   mds-progress {
-    corner-shape: round;
+    --magma-corner-shape: round;
   }
 
   /*

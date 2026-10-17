@@ -41,51 +41,55 @@ export const api = apiCounts();
   <Features>
     <Feature
       icon="mi/outline/layers"
-      variant="blue"
       title="Una libreria, ogni framework"
-      text="I componenti sono custom element standard, compilati una volta sola. Funzionano così come sono in JavaScript e in qualunque template; i wrapper per React e Angular, generati dallo stesso sorgente e rilasciati insieme, aggiungono tipi, eventi e form nel modo che ogni framework si aspetta."
+      description="Custom element standard che funzionano in ogni framework."
+      text="Compilati una volta sola, da un solo sorgente, funzionano così come sono in JavaScript e in qualunque template. I wrapper per React e Angular, generati da quel sorgente e rilasciati insieme, aggiungono tipi, eventi e form nel modo che ogni framework si aspetta."
       href="development/installation/"
       action="Installa Magma"
     />
     <Feature
       icon="mi/outline/integration-instructions"
-      variant="violet"
       title="Solo standard web"
-      text="Le opzioni sono attributi HTML che prendono stringhe, numeri e booleani, non array, oggetti o callback che solo un framework sa passare. I contenuti vanno negli slot e nei componenti figli, gli eventi sono eventi DOM: quello che funziona in un file HTML funziona ovunque."
-      stat={`${api.attributes} / ${api.properties}`}
-      statLabel="proprietà sono attributi semplici"
+      description="Quello che funziona in un file HTML funziona in ogni framework."
+      text="Le opzioni sono attributi HTML che prendono stringhe, numeri e booleani, non array, oggetti o callback che solo un framework sa passare. I contenuti vanno negli slot e nei componenti figli, gli eventi sono eventi DOM."
+      stat={{
+        value: api.attributes,
+        total: api.properties,
+        label: 'proprietà sono attributi semplici',
+      }}
       href="development/"
       action="Leggi le regole"
     />
     <Feature
       icon="mi/outline/stairs"
-      variant="green"
       title="Un livello alla volta"
-      text="Si parte dai token, si aggiungono gli stili, poi i componenti e i wrapper. Ogni livello funziona da solo: un prodotto prende quello che il suo stack, le sue scadenze e i suoi utenti permettono, e sale quando può."
+      description="Token, stili, componenti e wrapper: si prende solo quello che serve."
+      text="Ogni livello funziona da solo: un prodotto prende quello che il suo stack, le sue scadenze e i suoi utenti permettono, e sale quando può."
       href="#adoption"
       action="Vedi i livelli"
     />
     <Feature
       icon="mi/outline/auto-awesome"
-      variant="orchid"
+      variant="ai"
       title="Pronto per gli agenti AI"
-      text="I pacchetti dei componenti contengono un AGENTS.md e guide scritte per gli agenti di sviluppo: come installare, l'API di ogni componente, i modi giusti e quelli sbagliati di usarlo. L'agente lavora con la versione che hai installato, non con quello che ricorda."
+      description="L'agente lavora con la versione che hai installato, non con quello che ricorda."
+      text="I pacchetti dei componenti contengono un AGENTS.md e guide scritte per gli agenti di sviluppo: come installare, l'API di ogni componente, i modi giusti e quelli sbagliati di usarlo."
       href="development/agentic-development/"
       action="Lavora con gli agenti"
     />
     <Feature
       icon="mi/outline/accessibility-new"
-      variant="sky"
       title="Accessibile e adattivo"
-      text="Progettato per WCAG 2.x AA, con modalità chiara e scura, contrasto più alto, movimento ridotto, basso consumo e temi già inclusi: le preferenze si impostano una volta sulla pagina e ogni componente le segue."
+      description="Progettato per WCAG 2.x AA e per le preferenze di ogni utente."
+      text="Modalità chiara e scura, contrasto più alto, movimento ridotto, basso consumo e temi sono già inclusi: le preferenze si impostano una volta sulla pagina e ogni componente le segue."
       href="foundation/accessibility/"
       action="Accessibilità"
     />
     <Feature
       icon="mi/outline/palette"
-      variant="orange"
       title="Una sola fonte per le decisioni di design"
-      text="Colori, tipografia, spazi e movimento vivono nei design token, pubblicati per CSS, Tailwind, SCSS, JavaScript e DTCG, per Figma come variabili e per iOS, Android e Flutter. Una decisione cambiata una volta arriva a ogni prodotto con il suo prossimo aggiornamento."
+      description="Una decisione cambiata una volta arriva a ogni prodotto."
+      text="Colori, tipografia, spazi e movimento vivono nei design token, pubblicati per CSS, Tailwind, SCSS, JavaScript e DTCG, per Figma come variabili e per iOS, Android e Flutter. Ogni prodotto riceve le modifiche con il suo prossimo aggiornamento."
       href="tokens/"
       action="Scopri i token"
     />
