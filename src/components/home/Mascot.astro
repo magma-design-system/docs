@@ -1,0 +1,131 @@
+---
+// Mia, Magma's AI mascot (mds-emoji), above the heading of the agents band,
+// reacting to what the band holds (script below). Decorative: hidden from
+// screen readers, the band says it all in words.
+---
+
+<mds-emoji name="mia" data-mascot aria-hidden="true" class="size-2400" />
+
+<script>
+  // The reactions of each mascot (`data-mascot`) to the band it heads, the
+  // closest `section`, on every page the router shows. It blinks, and follows
+  // the pointer while the band is on screen. Over the agents (`mds-chip`) it
+  // nods, over a framework tab or the button it smiles, over the prompt it
+  // thinks until the pointer leaves; a click on a tab or on the copy button
+  // of the prompt makes it nod. The keyboard focus counts as the pointer.
+  // After a reaction it rests for REST: what the pointer or a click reaches
+  // meanwhile is let go, a mascot that reacts to every move is tiring to use
+  // (the thinking ends when the pointer leaves, rest or not). With reduced
+  // motion (the system's, under Magma's `pref-animation-system`, or
+  // `pref-animation-reduce`) it does not react: mds-emoji keeps the pointer
+  // and the blinking still by itself, not its expressions.
+  type Emoji = HTMLElement & {
+    componentOnReady?: () => Promise<unknown>;
+    agree: () => Promise<void>;
+    smile: () => Promise<void>;
+    startThinking: (duration?: number) => Promise<void>;
+    stopThinking: (duration?: number) => Promise<void>;
+    startBlinking: () => Promise<void>;
+    startFollowMouse: () => Promise<void>;
+    stopFollowMouse: () => Promise<void>;
+  };
+  type Reaction = 'agree' | 'smile' | 'think';
+
+  /** What the pointer or the focus over an element of the band does, first match first. */
+  const HOVER: [string, Reaction][] = [
+    ['mds-chip', 'agree'],
+    ['mds-tab-item', 'smile'],
+    ['.expressive-code', 'think'],
+    ['mds-button', 'smile'],
+  ];
+  /** What a click on an element of the band does. */
+  const CLICK: [string, Reaction][] = [
+    ['.expressive-code .copy button', 'agree'],
+    ['mds-tab-item', 'agree'],
+  ];
+  /** How long the thinking hand takes to come in or out, in seconds. */
+  const HAND = 0.4;
+  /** The rest after a reaction, in ms: a new one each time, between the two. */
+  const REST = { min: 10_000, max: 15_000 };
+
+  const root = document.documentElement;
+  const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = () =>
+    root.classList.contains('pref-animation-reduce') ||
+    (!root.classList.contains('pref-animation-no-preference') && systemReduce.matches);
+
+  /** The element of the band an event is about, and what it does. */
+  const match = (rules: [string, Reaction][], target: EventTarget | null, band: Element) => {
+    if (!(target instanceof Element)) return undefined;
+    for (const [selector, reaction] of rules) {
+      const element = target.closest(selector);
+      if (element && band.contains(element)) return { element, reaction };
+    }
+    return undefined;
+  };
+
+  async function wake(emoji: Emoji, signal: AbortSignal) {
+    const band = emoji.closest('section');
+    if (!band) return;
+    await customElements.whenDefined('mds-emoji');
+    await emoji.componentOnReady?.();
+    if (signal.aborted) return;
+    emoji.startBlinking();
+
+    /** The element the pointer or the focus is on, with its reaction. */
+    let current: ReturnType<typeof match>;
+    /** When the rest after the last reaction ends (`performance.now()`). */
+    let rested = 0;
+
+    const react = (reaction: Reaction) => {
+      const now = performance.now();
+      if (reduced() || now < rested) return;
+      rested = now + REST.min + Math.random() * (REST.max - REST.min);
+      if (reaction === 'think') emoji.startThinking(HAND);
+      else emoji[reaction]();
+    };
+
+    const enter = (event: Event) => {
+      const found = match(HOVER, event.target, band);
+      if (found?.element === current?.element) return;
+      current = found;
+      if (found) react(found.reaction);
+    };
+    const leave = (event: Event) => {
+      const next = (event as PointerEvent | FocusEvent).relatedTarget;
+      if (!current || (next instanceof Node && current.element.contains(next))) return;
+      if (current.reaction === 'think') emoji.stopThinking(HAND);
+      current = undefined;
+    };
+    band.addEventListener('pointerover', enter, { signal });
+    band.addEventListener('focusin', enter, { signal });
+    band.addEventListener('pointerout', leave, { signal });
+    band.addEventListener('focusout', leave, { signal });
+    band.addEventListener(
+      'click',
+      (event) => {
+        const found = match(CLICK, event.target, band);
+        if (found) react(found.reaction);
+      },
+      { signal },
+    );
+
+    // Following the pointer only while the band is on screen. An expression
+    // that ends starts it again, but they all start in the band.
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) emoji.startFollowMouse();
+      else emoji.stopFollowMouse();
+    });
+    observer.observe(band);
+    signal.addEventListener('abort', () => observer.disconnect());
+  }
+
+  let pages: AbortController | undefined;
+  document.addEventListener('astro:page-load', () => {
+    pages?.abort();
+    pages = new AbortController();
+    for (const emoji of document.querySelectorAll<Emoji>('[data-mascot]')) {
+      wake(emoji, pages.signal);
+    }
+  });
+</script>

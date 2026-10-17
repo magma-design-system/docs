@@ -10,15 +10,15 @@ import '../../../styles/magma.css';
 import { patternExample, patternIds } from '../../../lib/patterns';
 
 export async function getStaticPaths() {
-  // A pattern whose page is a draft has no preview in a production build
-  // either, as its page.
-  const drafts = await getCollection(
+  // A production build has the previews of the published pattern pages only:
+  // a draft page, or a sketch with no page yet, stays in dev.
+  const pages = await getCollection(
     'docs',
-    ({ id, data }) => import.meta.env.PROD && data.draft && id.startsWith('patterns/'),
+    ({ id, data }) => !data.draft && id.startsWith('patterns/'),
   );
-  const unpublished = new Set(drafts.map(({ id }) => id.slice('patterns/'.length)));
+  const published = new Set(pages.map(({ id }) => id.slice('patterns/'.length)));
   return patternIds()
-    .filter((id) => !unpublished.has(id))
+    .filter((id) => !import.meta.env.PROD || published.has(id))
     .map((id) => ({ params: { id }, props: { example: patternExample(id) } }));
 }
 

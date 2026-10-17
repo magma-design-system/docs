@@ -1,0 +1,631 @@
+<!--
+  Feedback, a sketch: where each message of an application goes. The rule: a
+  message goes where the thing it talks about is. One screen, the users of a
+  back office, with an action for each case, and a demo panel that makes the
+  server fail or the session end. Plain HTML with Magma's components, styles
+  and Tailwind theme.
+
+  Not a pattern page yet: it is here to look at the cases together before
+  writing one, so it has no React and Angular versions.
+-->
+<main class="flex min-w-0 flex-col gap-600">
+  <header class="flex flex-wrap items-end justify-between gap-400">
+    <div class="flex flex-col gap-200">
+      <mds-text id="title" typography="h3" tag="h1" tabindex="-1">Users</mds-text>
+      <mds-text typography="detail" tag="p" class="text-fg-muted">
+        The people who can sign in to the back office of the municipality.
+      </mds-text>
+    </div>
+    <mds-button id="add" type="button" label="Add user" icon="mi/baseline/person-add"></mds-button>
+  </header>
+
+  <!-- Demo only: not part of the screen. -->
+  <aside aria-labelledby="demo-title" class="flex flex-col gap-400 rounded-xl bg-surface-sunken p-500">
+    <mds-text id="demo-title" typography="h6" tag="h2">Try the cases</mds-text>
+    <ol class="m-0 grid list-decimal gap-100 ps-600">
+      <li>
+        <mds-text typography="detail"
+          >A field: Add user, then Save with the email empty. The message is under the
+          field.</mds-text
+        >
+      </li>
+      <li>
+        <mds-text typography="detail"
+          >A part of the page: the server fails, Reload the list. A banner where the list
+          is.</mds-text
+        >
+      </li>
+      <li>
+        <mds-text typography="detail"
+          >An action whose place is still open: the server fails, Save in the dialog. A banner
+          in the dialog; what you wrote stays.</mds-text
+        >
+      </li>
+      <li>
+        <mds-text typography="detail"
+          >An action whose place is gone: Save, Delete, Resend invitation. A toast that leaves
+          after 5 seconds.</mds-text
+        >
+      </li>
+      <li>
+        <mds-text typography="detail"
+          >The same, failed: the server fails, Resend invitation. A toast that stays, with Try
+          again.</mds-text
+        >
+      </li>
+      <li>
+        <mds-text typography="detail">A decision: Delete. A dialog asks first.</mds-text>
+      </li>
+      <li>
+        <mds-text typography="detail"
+          >The whole application, with a decision and a deadline: The session is about to end. A
+          dialog, also over an open one.</mds-text
+        >
+      </li>
+    </ol>
+    <div class="flex flex-wrap items-center gap-400">
+      <mds-input-switch id="fail">The server fails</mds-input-switch>
+      <mds-button
+        id="reload"
+        type="button"
+        label="Reload the list"
+        variant="dark"
+        tone="weak"
+        size="sm"
+      ></mds-button>
+      <mds-button
+        id="session"
+        type="button"
+        label="The session is about to end"
+        variant="dark"
+        tone="weak"
+        size="sm"
+      ></mds-button>
+    </div>
+  </aside>
+
+  <!-- 2. A part of the page that failed: the message is in its place. -->
+  <mds-banner
+    id="load-error"
+    hidden
+    variant="error"
+    icon="mi/baseline/error"
+    headline="The users could not be loaded"
+  >
+    <mds-text typography="detail">Check the connection, then try again.</mds-text>
+    <mds-button slot="action" id="retry" type="button" label="Try again" variant="error"></mds-button>
+  </mds-banner>
+
+  <mds-table id="users" class="w-full [&_mds-text]:text-nowrap">
+    <mds-table-header>
+      <mds-table-header-cell label="Name"></mds-table-header-cell>
+      <mds-table-header-cell label="Email"></mds-table-header-cell>
+      <mds-table-header-cell label="Role"></mds-table-header-cell>
+      <mds-table-header-cell label="Status"></mds-table-header-cell>
+    </mds-table-header>
+    <mds-table-body id="rows"></mds-table-body>
+  </mds-table>
+
+  <!-- Add or edit a user. -->
+  <mds-modal id="edit">
+    <form id="edit-form" class="flex flex-col gap-500 p-600" novalidate>
+      <mds-text id="edit-title" typography="h5" tag="h2"></mds-text>
+      <!-- 3. The action failed while its place is open: the message is in the dialog. -->
+      <mds-banner
+        id="edit-error"
+        hidden
+        variant="error"
+        icon="mi/baseline/error"
+        headline="The user could not be saved"
+      >
+        <mds-text typography="detail">What you wrote is still here: try again in a moment.</mds-text>
+      </mds-banner>
+      <!-- 1. A field: the message is under it. -->
+      <mds-input-field id="name-field" label="Name">
+        <mds-input id="name" name="name" autocomplete="off" required></mds-input>
+      </mds-input-field>
+      <mds-input-field id="email-field" label="Email">
+        <mds-input id="email" type="email" name="email" autocomplete="off" required></mds-input>
+      </mds-input-field>
+      <mds-input-field label="Role">
+        <mds-input-select id="role" name="role">
+          <option value="admin">Administrator</option>
+          <option value="editor">Editor</option>
+          <option value="viewer">Viewer</option>
+        </mds-input-select>
+      </mds-input-field>
+      <div class="flex flex-wrap justify-end gap-200">
+        <mds-button
+          id="edit-cancel"
+          type="button"
+          label="Cancel"
+          variant="dark"
+          tone="weak"
+        ></mds-button>
+        <mds-button id="edit-save" type="submit" label="Save"></mds-button>
+      </div>
+    </form>
+  </mds-modal>
+
+  <!-- 6. A decision before going on: delete asks first. -->
+  <mds-modal id="confirm">
+    <div class="flex flex-col gap-500 p-600">
+      <mds-text id="confirm-title" typography="h5" tag="h2"></mds-text>
+      <mds-text id="confirm-text" typography="detail" tag="p"></mds-text>
+      <mds-banner
+        id="confirm-error"
+        hidden
+        variant="error"
+        icon="mi/baseline/error"
+        headline="The user could not be deleted"
+      >
+        <mds-text typography="detail">Nothing was changed. Try again in a moment.</mds-text>
+      </mds-banner>
+      <div class="flex flex-wrap justify-end gap-200">
+        <mds-button
+          id="confirm-cancel"
+          type="button"
+          label="Cancel"
+          variant="dark"
+          tone="weak"
+        ></mds-button>
+        <mds-button id="confirm-delete" type="button" label="Delete" variant="error"></mds-button>
+      </div>
+    </div>
+  </mds-modal>
+
+  <!--
+    7. The whole application, when it needs a decision before a deadline: a
+    dialog, which also opens over another one. A toast cannot: over an open
+    dialog it is out of reach (see the toasts below). Strict: only a choice
+    closes it.
+  -->
+  <mds-modal id="session-dialog" interaction="strict" aria-label="Your session is about to end">
+    <div class="flex flex-col gap-500 p-600">
+      <mds-text typography="h5" tag="h2">Your session is about to end</mds-text>
+      <mds-text typography="detail" tag="p">
+        In 5 minutes you will be signed out, and what is not saved would be lost.
+      </mds-text>
+      <div class="flex flex-wrap justify-end gap-200">
+        <mds-button
+          id="sign-out"
+          type="button"
+          label="Sign out"
+          variant="dark"
+          tone="weak"
+        ></mds-button>
+        <mds-button id="stay" type="button" label="Stay signed in"></mds-button>
+      </div>
+    </div>
+  </mds-modal>
+</main>
+
+<!--
+  The toasts, in a container at the bottom edge: the one proposed in
+  https://github.com/magma-design-system/magma/issues/951, here by hand. A
+  popover, so it is above the page; a dialog opened later goes above it. That is
+  wanted: mds-modal opens a modal <dialog>, which leaves everything outside it
+  inert, top layer included, so a toast over an open dialog could be seen but
+  not used, and a click on it would reach the backdrop and close the dialog.
+  It also holds the two live regions that read the messages out: mds-toast is
+  not, yet (https://github.com/magma-design-system/magma/issues/821).
+-->
+<div
+  id="toasts"
+  popover="manual"
+  class="pointer-events-none inset-x-0 top-auto bottom-0 m-0 flex w-full flex-col items-center gap-200 overflow-visible border-0 bg-transparent p-0 pb-400"
+>
+  <mds-text id="polite" role="status" class="sr-only"></mds-text>
+  <mds-text id="assertive" role="alert" class="sr-only"></mds-text>
+</div>
+
+<!-- One row of the table, filled by render() for each user. -->
+<template id="row">
+  <mds-table-row>
+    <mds-table-cell><mds-text data-field="name" typography="detail"></mds-text></mds-table-cell>
+    <mds-table-cell><mds-text data-field="email" typography="detail"></mds-text></mds-table-cell>
+    <mds-table-cell><mds-text data-field="role" typography="detail"></mds-text></mds-table-cell>
+    <mds-table-cell><mds-badge data-field="status"></mds-badge></mds-table-cell>
+    <mds-button
+      slot="action"
+      type="button"
+      data-action="resend"
+      icon="mi/baseline/forward-to-inbox"
+      title="Resend invitation"
+      variant="primary"
+      tone="text"
+    ></mds-button>
+    <mds-button
+      slot="action"
+      type="button"
+      data-action="edit"
+      icon="mi/baseline/edit"
+      title="Edit"
+      variant="primary"
+      tone="text"
+    ></mds-button>
+    <mds-button
+      slot="action"
+      type="button"
+      data-action="delete"
+      icon="mi/baseline/delete"
+      title="Delete"
+      variant="error"
+      tone="text"
+    ></mds-button>
+  </mds-table-row>
+</template>
+
+<script type="module">
+  const ROLES = { admin: 'Administrator', editor: 'Editor', viewer: 'Viewer' };
+  const STATUSES = {
+    active: { label: 'Active', variant: 'success' },
+    invited: { label: 'Invited', variant: 'info' },
+  };
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const $ = (id) => document.getElementById(id);
+  const [title, table, rows, loadError, edit, form, confirm, sessionDialog, toasts] = [
+    'title',
+    'users',
+    'rows',
+    'load-error',
+    'edit',
+    'edit-form',
+    'confirm',
+    'session-dialog',
+    'toasts',
+  ].map($);
+
+  let users = [];
+
+  // ---- The messages ---------------------------------------------------------
+
+  /** Reads a message out, also when it is the same as the last one. */
+  function announce(message, urgent) {
+    const region = $(urgent ? 'assertive' : 'polite');
+    region.textContent = '';
+    // A moment later, so that the change is read out; not on the next frame,
+    // which a hidden tab never paints.
+    setTimeout(() => (region.textContent = message), 100);
+  }
+
+  /** Hides a toast and removes it once its animation is over. */
+  function dismiss(toast) {
+    // Its buttons go with it: the focus goes to the title of the page.
+    if (toast.contains(document.activeElement)) title.focus();
+    // Hidden from code it emits no mdsToastClose
+    // (https://github.com/magma-design-system/magma/issues/952).
+    toast.visible = false;
+    setTimeout(() => toast.remove(), 400);
+  }
+
+  /**
+   * A toast. With no actions it leaves after 5 s; with actions it stays until
+   * one is used, and Dismiss stands in for the close control it lacks
+   * (https://github.com/magma-design-system/magma/issues/952). Three at most:
+   * a new one pushes out the oldest.
+   */
+  function toast(message, { variant = 'success', actions = [] } = {}) {
+    const element = document.createElement('mds-toast');
+    element.variant = variant;
+    element.textContent = message;
+    if (actions.length) {
+      element.duration = 0;
+      for (const action of [...actions, { label: 'Dismiss' }]) {
+        const button = document.createElement('mds-button');
+        button.slot = 'action';
+        button.type = 'button';
+        button.label = action.label;
+        button.variant = 'dark';
+        button.tone = action.run ? 'strong' : 'text';
+        button.size = 'sm';
+        button.addEventListener('click', async () => {
+          if (action.run) {
+            button.await = true;
+            const done = await action.run();
+            button.await = false;
+            if (!done) return;
+          }
+          dismiss(element);
+        });
+        element.append(button);
+      }
+    } else {
+      // The timer emits it again every 5 s after the first time
+      // (https://github.com/magma-design-system/magma/issues/823): once.
+      element.addEventListener('mdsToastClose', () => element.remove(), { once: true });
+    }
+    // In flow inside the container, not fixed each on its own.
+    element.classList.add('static');
+    element.visible = true;
+    const shown = toasts.querySelectorAll('mds-toast');
+    if (shown.length >= 3) shown[0].remove();
+    toasts.append(element);
+    announce(message, variant === 'error' || variant === 'warning');
+  }
+
+  // ---- The list -------------------------------------------------------------
+
+  async function load() {
+    $('reload').await = true;
+    $('retry').await = true;
+    table.setAttribute('aria-busy', 'true');
+    try {
+      users = await server.listUsers();
+      loadError.hidden = true;
+      render();
+    } catch (reason) {
+      console.error(reason);
+      // The list on screen, if any, stays: the banner says it is not current.
+      loadError.hidden = false;
+      table.hidden = users.length === 0;
+    } finally {
+      $('reload').await = false;
+      $('retry').await = false;
+      table.removeAttribute('aria-busy');
+    }
+  }
+
+  function render() {
+    const row = $('row').content.firstElementChild;
+    rows.replaceChildren(
+      ...users.map((user) => {
+        const element = row.cloneNode(true);
+        const field = (name) => element.querySelector(`[data-field="${name}"]`);
+        field('name').textContent = user.name;
+        field('email').textContent = user.email;
+        field('role').textContent = ROLES[user.role];
+        field('status').label = STATUSES[user.status].label;
+        field('status').variant = STATUSES[user.status].variant;
+        for (const button of element.querySelectorAll('[data-action]')) {
+          button.dataset.id = user.id;
+          button.setAttribute('aria-label', `${button.title} ${user.name}`);
+        }
+        // Only an invited user has an invitation to send again.
+        if (user.status !== 'invited') element.querySelector('[data-action="resend"]').remove();
+        return element;
+      }),
+    );
+    table.hidden = false;
+  }
+
+  rows.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-action]');
+    if (!button) return;
+    const user = users.find(({ id }) => id === Number(button.dataset.id));
+    ({ resend, edit: openEdit, delete: openConfirm })[button.dataset.action](user, button);
+  });
+
+  // ---- 4 and 5: an action whose place is gone -------------------------------
+
+  async function resend(user, button) {
+    button.await = true;
+    const sent = await sendInvitation(user);
+    button.await = false;
+    if (sent) return;
+    const message = `The invitation to ${user.name} could not be sent.`;
+    toast(message, {
+      variant: 'error',
+      actions: [
+        {
+          label: 'Try again',
+          // Failed again: the same toast stays, and says it again.
+          run: async () => (await sendInvitation(user)) || (announce(message, true), false),
+        },
+      ],
+    });
+  }
+
+  async function sendInvitation(user) {
+    try {
+      await server.resendInvitation(user.id);
+      toast(`Invitation sent to ${user.email}.`);
+      return true;
+    } catch (reason) {
+      console.error(reason);
+      return false;
+    }
+  }
+
+  // ---- 1 and 3: add or edit, in a dialog ------------------------------------
+
+  let editing;
+  const fields = {
+    name: { field: $('name-field'), input: $('name') },
+    email: { field: $('email-field'), input: $('email') },
+  };
+
+  function setError(name, message) {
+    const { field } = fields[name];
+    field.variant = message ? 'error' : undefined;
+    field.message = message;
+  }
+
+  function openEdit(user) {
+    editing = user;
+    $('edit-title').textContent = user ? `Edit ${user.name}` : 'Add user';
+    edit.setAttribute('aria-label', $('edit-title').textContent);
+    $('edit-save').label = user ? 'Save' : 'Add';
+    $('edit-error').hidden = true;
+    fields.name.input.value = user?.name ?? '';
+    fields.email.input.value = user?.email ?? '';
+    $('role').value = user?.role ?? 'editor';
+    setError('name');
+    setError('email');
+    edit.opened = true;
+  }
+
+  /** The errors of the fields, by name: none when the form is valid. */
+  function validate() {
+    const name = fields.name.input.value?.trim() ?? '';
+    const email = fields.email.input.value?.trim() ?? '';
+    const errors = {};
+    if (!name) errors.name = 'Enter the name of the person.';
+    if (!email) errors.email = 'Enter an email address: the invitation is sent there.';
+    else if (!EMAIL.test(email)) errors.email = 'Enter an email address like name@example.com.';
+    return errors;
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const errors = validate();
+    for (const name of Object.keys(fields)) setError(name, errors[name]);
+    const first = Object.keys(fields).find((name) => errors[name]);
+    if (first) {
+      fields[first].input.setFocus();
+      return;
+    }
+    const save = $('edit-save');
+    save.await = true;
+    $('edit-error').hidden = true;
+    try {
+      const user = await server.saveUser({
+        id: editing?.id,
+        name: fields.name.input.value.trim(),
+        email: fields.email.input.value.trim(),
+        role: $('role').value,
+        status: editing?.status ?? 'invited',
+      });
+      users = editing
+        ? users.map((other) => (other.id === user.id ? user : other))
+        : [...users, user];
+      render();
+      edit.close();
+      toast(editing ? `Changes to ${user.name} saved.` : `${user.name} added. The invitation is on its way.`);
+    } catch (reason) {
+      console.error(reason);
+      $('edit-error').hidden = false;
+    } finally {
+      save.await = false;
+    }
+  });
+
+  // A field's message goes once the field changes.
+  for (const name of Object.keys(fields)) {
+    fields[name].input.addEventListener('mdsInputChange', () => setError(name));
+  }
+  $('edit-cancel').addEventListener('click', () => edit.close());
+
+  // ---- 6: delete, after asking ----------------------------------------------
+
+  let deleting;
+
+  function openConfirm(user) {
+    deleting = user;
+    $('confirm-title').textContent = `Delete ${user.name}?`;
+    confirm.setAttribute('aria-label', $('confirm-title').textContent);
+    $('confirm-text').textContent =
+      'They will no longer be able to sign in. Their changes stay, under their name.';
+    $('confirm-error').hidden = true;
+    confirm.opened = true;
+  }
+
+  let focusTitle = false;
+  $('confirm-delete').addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.await = true;
+    $('confirm-error').hidden = true;
+    try {
+      await server.deleteUser(deleting.id);
+      users = users.filter(({ id }) => id !== deleting.id);
+      render();
+      // Its row is gone, with the button that opened the dialog.
+      focusTitle = true;
+      confirm.close();
+      toast(`${deleting.name} deleted.`);
+    } catch (reason) {
+      console.error(reason);
+      $('confirm-error').hidden = false;
+    } finally {
+      button.await = false;
+    }
+  });
+  $('confirm-cancel').addEventListener('click', () => confirm.close());
+
+  for (const dialog of [edit, confirm, sessionDialog]) {
+    dialog.addEventListener('mdsModalClose', () => (dialog.opened = undefined));
+  }
+  confirm.addEventListener('mdsModalHide', () => {
+    if (!focusTitle) return;
+    focusTitle = false;
+    title.focus();
+  });
+
+  // ---- 7: the whole application ---------------------------------------------
+
+  // Demo only: in an application, a timer opens it 5 minutes before the end.
+  $('session').addEventListener('click', () => (sessionDialog.opened = true));
+  $('stay').addEventListener('click', async (event) => {
+    const button = event.currentTarget;
+    button.await = true;
+    try {
+      await server.extendSession();
+      sessionDialog.close();
+    } catch (reason) {
+      // The dialog stays: the person can try again before the deadline.
+      console.error(reason);
+      announce('The session could not be extended. Try again.', true);
+    } finally {
+      button.await = false;
+    }
+  });
+  // Demo only: in an application, the sign out.
+  $('sign-out').addEventListener('click', () => sessionDialog.close());
+
+  $('add').addEventListener('click', () => openEdit());
+  $('reload').addEventListener('click', load);
+  $('retry').addEventListener('click', load);
+  $('fail').addEventListener('mdsInputSwitchChange', (event) => {
+    server.failing = event.detail.checked;
+  });
+
+  /** Demo only: stands in for the back end. */
+  const server = {
+    failing: false,
+    nextId: 9,
+    async reply(value) {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      if (this.failing) throw new Error('Demo: the server failed');
+      return value;
+    },
+    listUsers() {
+      return this.reply(structuredClone(USERS));
+    },
+    saveUser(user) {
+      return this.reply({ ...user, id: user.id ?? this.nextId++ });
+    },
+    deleteUser(id) {
+      return this.reply(id);
+    },
+    resendInvitation(id) {
+      return this.reply(id);
+    },
+    extendSession() {
+      return this.reply(true);
+    },
+  };
+
+  /** Demo only: the users on every load. */
+  const USERS = [
+    ['Giulia Bianchi', 'admin', 'active'],
+    ['Marco Rossi', 'editor', 'active'],
+    ['Sara Conti', 'editor', 'invited'],
+    ['Luca Ferrari', 'viewer', 'active'],
+    ['Elena Ricci', 'editor', 'active'],
+    ['Paolo Greco', 'viewer', 'invited'],
+    ['Anna Marino', 'admin', 'active'],
+    ['Davide Gallo', 'viewer', 'active'],
+  ].map(([name, role, status], index) => ({
+    id: index + 1,
+    name,
+    email: `${name.toLowerCase().replace(' ', '.')}@comune.example`,
+    role,
+    status,
+  }));
+
+  // Open from the start, so that the live regions are there before the first
+  // message.
+  toasts.showPopover();
+  load();
+</script>

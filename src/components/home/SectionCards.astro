@@ -63,7 +63,7 @@ const cards = [
 ---
 
 <div class="not-content @container">
-  <div class="grid gap-600 @2xl:grid-cols-2 @5xl:grid-cols-4">
+  <div class="grid gap-600 @2xl:grid-cols-2 @4xl:grid-cols-3 @6xl:grid-cols-4">
     {cards.map(({ icon, variant, title, description, href, external, soon }) => {
       const action = external ? t('home.storybook.open') : t('cards.open');
       return (
@@ -73,7 +73,7 @@ const cards = [
               icon={icon}
               variant={variant}
               tone="weak"
-              class="shadow-none p-0 bg-transparent"
+              class="shadow-none p-0 bg-transparent w-full"
             >
               <mds-text typography="h6" tag="h3">
                 {title}
