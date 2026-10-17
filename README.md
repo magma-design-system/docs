@@ -6,6 +6,16 @@ https://magma-design-system.github.io/docs/.
 Built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build),
 statically, from the **published** Magma packages installed in `node_modules`.
 
+## Working on the site
+
+[`AGENTS.md`](AGENTS.md) holds the rules of this repository and a map of the code, and
+[`agents/`](agents/) the details: how each part is built, writing pages, styling, workflow
+and publishing, Magma's open issues and the site's workarounds, patterns. They are written
+for coding agents (Claude Code reads them through `CLAUDE.md`) and are just as useful to
+people. [`plan/`](plan/) holds the decisions ([`CONTENT_STRUCTURE.md`](plan/CONTENT_STRUCTURE.md),
+[`DIRECTION.md`](plan/DIRECTION.md)) and the open work ([`BACKLOG.md`](plan/BACKLOG.md)).
+Whoever learns something the next person needs writes it there, in the same pull request.
+
 ## Rule: read Magma only from node_modules
 
 The site never reads the Magma monorepo. Everything comes from the npm packages, exactly as
@@ -32,11 +42,11 @@ The site loads Magma the way a consumer does:
   with `mds-pref-mode`.
 - [`src/integrations/magma.mjs`](src/integrations/magma.mjs): injects that script into
   every page and runs [iconsauce](https://www.npmjs.com/package/@iconsauce/core) as Magma
-  does: every icon slug (`mi/<variant>/<name>`, `mdi/<name>`, `mgg/<name>`) found in the
-  sources, in the component usage examples and in the `svg-icons` list is copied to
-  `public/svg/` (gitignored), where `<mds-icon name="...">` fetches it. The globs are in
-  [`iconsauce.config.mjs`](iconsauce.config.mjs). In dev, a change under `src/` collects
-  them again. It also renders Markdown tables as `mds-table`
+  does: every icon of its sets (`mi/<variant>/<name>`, `mdi/<name>`, `mgg/<name>`, and
+  `lobe/<name>` for AI brand logos) is copied to `public/svg/` (gitignored), where
+  `<mds-icon name="...">` fetches it, since the Icons pages show whole sets. The sets are in
+  [`iconsauce.config.mjs`](iconsauce.config.mjs); the copy is skipped when they did not
+  change. It also renders Markdown tables as `mds-table`
   ([`src/lib/markdown-tables.mjs`](src/lib/markdown-tables.mjs)), cells on one line
   (`whitespace-nowrap`): the table takes the width of the page and `mds-table` scrolls
   it sideways, instead of squeezing its columns. The component pages build their tables
@@ -49,9 +59,9 @@ built with Magma components, following the layout decisions in `plan/CONTENT_STR
 (added by [#3](https://github.com/magma-design-system/docs/pull/3)). The overrides are in
 [`src/components/frame/`](src/components/frame/), listed in `astro.config.mjs`:
 
-- **Rail** (desktop): brand, the 8 sections as `mds-button` links, search, the repository
-  link, `mds-pref-mode` and `mds-pref-language`. It collapses to the logo only; the state is
-  kept in `localStorage`.
+- **Rail** (desktop): brand, search, the 10 sections as `mds-button` links, the repository
+  and Storybook links, and the preferences (`mds-pref` with mode, language and theme) in a
+  dropdown. It collapses to icons with tooltips; the state is kept in `localStorage`.
 - **Section navigation**: the pages of the current section, first column of the card.
 - **Right column**: on component pages, the "Documentation" column with the component's
   sub-pages; elsewhere, the table of contents with a reading indicator (a vertical
