@@ -66,15 +66,21 @@ export const sections = [
   {
     id: 'icons',
     icon: 'mi/outline/brush',
+    // The guides, then the packages, as on the landing page.
     items: () => [
-      { slug: 'icons' },
-      // Pages generated per set and category (src/lib/icon-pages.ts).
-      { ...sidebarLabel('icons.page.mgg.title'), link: '/icons/maggioli/' },
-      { ...sidebarLabel('icons.page.mi.title'), link: '/icons/material-icons/' },
-      { ...sidebarLabel('icons.page.mdi.title'), link: '/icons/material-design-icons/' },
+      { slug: 'icons', ...sidebarLabel('nav.overview') },
       { slug: 'icons/using-icons' },
       { slug: 'icons/iconsauce' },
-      { slug: 'icons/icons-package' },
+      {
+        ...sidebarLabel('nav.icons.packages'),
+        items: [
+          // Pages generated per set and category (src/lib/icon-pages.ts).
+          { ...sidebarLabel('icons.page.mgg.title'), link: '/icons/maggioli/' },
+          { ...sidebarLabel('icons.page.mi.title'), link: '/icons/material-icons/' },
+          { ...sidebarLabel('icons.page.mdi.title'), link: '/icons/material-design-icons/' },
+          { slug: 'icons/icons-package' },
+        ],
+      },
     ],
   },
   {

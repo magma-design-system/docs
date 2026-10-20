@@ -1,14 +1,27 @@
 ---
-title: Icon sets
-description: The icon sets of Magma, each on a page of its own to search and copy its icons, and the names of the legacy icons package.
+title: Icons
+description: How Magma names and uses its icons, and the packages they come from - three sets to search and copy, and the legacy icons package.
 ---
 
 import IconSets from '../../../components/IconSets.astro';
+import PageCards from '../../../components/PageCards.astro';
 
 Magma names an icon by its slug: the set it comes from, then its name. `mds-icon` and every
 component with an `icon` prop take a slug and load the SVG file of that name;
-[iconsauce](iconsauce/) writes the files, or an icon font with the same names. Three sets
-work this way:
+[iconsauce](iconsauce/) writes the files, or an icon font with the same names.
+
+How to use the icons, and how they get into a product:
+
+<PageCards
+  pages={[
+    { slug: 'icons/using-icons', icon: 'mi/outline/interests' },
+    { slug: 'icons/iconsauce', icon: 'mi/outline/terminal' },
+  ]}
+/>
+
+## Packages
+
+Three sets work this way, each from a package of its own:
 
 <IconSets />
 
@@ -16,8 +29,5 @@ The page of each set lists all its icons, one category at a time, and its search
 through the whole set, also by the tags the set gives its icons. A click on an icon copies
 its slug, or the markup that uses it.
 
-Which set to take an icon from, when to use one and how to choose it:
-[Using icons](using-icons/).
-
 Apps that still use the legacy icons package find its names, each with the slug that
-replaces it, in [icons package (legacy)](icons-package/).
+replaces it, in [Icons package (legacy)](icons-package/).

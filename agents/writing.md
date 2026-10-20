@@ -78,7 +78,7 @@ Every other piece of interface text (cards, banners, captions, tiles, tables) is
   navigation mirrors the groups of its landing page, in the same order.
 - The landing page of a section is labelled "Overview" / "Panoramica" (`nav.overview`) when its
   title repeats the section's name. Sections whose landing page has its own title keep it
-  (Icons: "Icon sets", Community: "Channels").
+  (Community: "Channels").
 - Edits to `nav.mjs` need a dev server restart.
 
 ## Under construction and drafts
