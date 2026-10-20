@@ -1,6 +1,7 @@
 {
-  "vittorio.vittori@maggioli.it": {
+  "vitto": {
     "name": "Vittorio Vittori",
-    "role": "Design System Architect"
+    "role": "Design System Architect",
+    "emails": ["vittorio.vittori@maggioli.it", "vittorio.vittori@proton.me"]
   }
 }

@@ -25,11 +25,16 @@ const uiStrings = z.object(
 export const collections = {
   docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
   i18n: defineCollection({ loader: i18nLoader(), schema: i18nSchema({ extend: uiStrings }) }),
-  // The people who write the pages, by the email of their commits: the name
-  // and role shown in the page footer (src/components/frame/Footer.astro).
+  // The people who write the pages, by GitHub login: the name and role shown
+  // in the page footer (src/components/frame/Footer.astro), and the emails of
+  // their commits besides GitHub's noreply one (src/lib/authors.mjs).
   authors: defineCollection({
     loader: file('src/content/authors.json'),
-    schema: z.object({ name: z.string(), role: z.string() }),
+    schema: z.object({
+      name: z.string(),
+      role: z.string(),
+      emails: z.array(z.email()).optional(),
+    }),
   }),
   components: defineCollection({
     loader: componentsLoader(),

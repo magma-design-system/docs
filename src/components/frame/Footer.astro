@@ -1,20 +1,23 @@
 ---
 // Page footer (layout decision 2 in plan/CONTENT_STRUCTURE.md): who modified the
-// page last and who created it, from the git history of its source file
-// (src/lib/history.ts), with name and role from src/content/authors.json, then
-// the button to edit the page on GitHub. Pages without a source file (the
-// component pages, generated from Magma) have neither, so no footer. Replaces
-// Starlight's footer: no previous/next links, as in the layout mockups.
+// page last and who created it, from the editorial commits of its source file
+// (src/lib/history.mjs), with name and role from src/content/authors.json by
+// GitHub login (src/lib/authors.mjs), then the button to edit the page on
+// GitHub. An author missing from authors.json shows the git name without a
+// role; CI fails on it (scripts/check-authors.mjs). Pages without a source file
+// (the component pages, generated from Magma) have neither, so no footer.
+// Replaces Starlight's footer: no previous/next links, as in the layout mockups.
 import { getCollection } from 'astro:content';
+import { authorResolver } from '../../lib/authors.mjs';
 import { relativeDate } from '../../lib/dates';
-import { pageHistory } from '../../lib/history';
+import { pageHistory } from '../../lib/history.mjs';
 
 const { t, starlightRoute } = Astro.locals;
 const { entry, editUrl, lang } = starlightRoute;
 
 const history = pageHistory(entry.filePath);
-const authors = new Map(
-  (await getCollection('authors')).map(({ id, data }) => [id.toLowerCase(), data]),
+const authorOf = authorResolver(
+  (await getCollection('authors')).map(({ id, data }) => [id, data] as const),
 );
 
 const events = (
@@ -24,7 +27,7 @@ const events = (
   ] as const
 ).flatMap(([key, commit]) => {
   if (!commit) return [];
-  const author = authors.get(commit.email);
+  const { author } = authorOf(commit.email);
   // `{date}` is filled in here and again in the browser (script below).
   const template = t(key, { date: '{date}', interpolation: { escapeValue: false } });
   return [
