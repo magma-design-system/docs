@@ -42,7 +42,9 @@ it out of `exports`, so `resolveMagma()` cannot read it; breaking entries drop t
 `BREAKING CHANGE:` note), #983 (`mds-benchmark-bar`: `mds-progress` overwrites the `alias` with
 its Italian `steps`, so the home page bar is announced "Fine"), #984 (`mds-text` with
 `truncate` and the `label` or `option` typography clips the accents of capitals: the Italian
-home page bar reads "PROPRIETA"), and the epic #693 (theme studio, for the Themes and
+home page bar reads "PROPRIETA"), #1037 (`mds-entity`: no gap between the name and the
+`detail` slot, where the home page cards put the Under construction badge, and no part on that
+column to change it), and the epic #693 (theme studio, for the Themes and
 preferences page).
 
 ## Seen, not filed yet

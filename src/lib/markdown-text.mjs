@@ -61,6 +61,25 @@ export const READING = KIND.reading.text;
 export const KIND_FIELD = 'magmaText';
 
 /**
+ * The frontmatter field that marks a Markdown text whose HTML is text to show,
+ * not markup: the JSDoc descriptions of documentation.json
+ * (src/loaders/components.ts) are written to be read as they are, and
+ * `Specifies the name of an <input> element` would otherwise put a text field
+ * in the API table.
+ */
+export const HTML_AS_TEXT_FIELD = 'magmaHtmlAsText';
+
+/**
+ * The tree with the raw HTML of the Markdown (`raw` nodes) as text.
+ * @param {any} node
+ * @returns {any}
+ */
+const htmlAsText = (node) => {
+  if (node.type === 'raw') return { type: 'text', value: node.value };
+  return node.children ? { ...node, children: node.children.map(htmlAsText) } : node;
+};
+
+/**
  * Utilities of the elements, also used by the pages that write the same
  * elements by hand. Paragraphs keep the reading measure (`--spacing-text`, see
  * src/styles/magma.css). Starlight puts 1rem between the blocks of a page;
@@ -337,10 +356,11 @@ export function magmaText() {
           ids.element.visit(node, ctx);
           return node.properties?.id ?? ctx.data.astro?.headings?.at(-1)?.slug;
         };
+        const frontmatter = ctx.data.astro?.frontmatter ?? {};
         const kind =
-          KIND[/** @type {keyof typeof KIND} */ (ctx.data.astro?.frontmatter?.[KIND_FIELD])] ??
-          KIND.reading;
-        ctx.replaceNode(root, convert(root, heading, kind));
+          KIND[/** @type {keyof typeof KIND} */ (frontmatter[KIND_FIELD])] ?? KIND.reading;
+        const tree = frontmatter[HTML_AS_TEXT_FIELD] === true ? htmlAsText(root) : root;
+        ctx.replaceNode(root, convert(tree, heading, kind));
       },
     };
   };

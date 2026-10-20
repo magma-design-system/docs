@@ -13,6 +13,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "check:authors": "node scripts/check-authors.mjs",
     "astro": "astro",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

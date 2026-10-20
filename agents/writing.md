@@ -11,8 +11,29 @@
 - **Renaming or moving a page** (also `.md` -> `.mdx`): commit the rename alone, with no other
   change. The page footer reads the history with `git log --follow`, which loses a file whose
   content changed together with its name.
-- Your first page: add your commit email to `src/content/authors.json` (name and role), or the
-  footer shows your git name without a role.
+- **Your first page**: add yourself to `src/content/authors.json`, keyed by your GitHub login,
+  with your name, your role and the emails of your commits (`git config user.email`):
+  `"login": { "name": "...", "role": "...", "emails": ["..."] }`. Commits with GitHub's
+  noreply email need no `emails`: the login is in it. The check "Page authors" of your pull
+  request flags a page author missing from the file (`npm run check:authors` locally); it
+  does not block the merge ([workflow.md](workflow.md)).
+- **Editing on GitHub** (the edit button in the page footer): if you are not in
+  `authors.json` yet, the check "Page authors" of the pull request turns red and its summary
+  shows the entry to add. Add it, with your role, in the same pull request if you can;
+  otherwise the pull request is merged anyway and a maintainer adds you. Until the next
+  publication after that, the page shows your git name without a role.
+- **Text by someone who does not commit** (sent by email, written in a meeting): commit it
+  with them as author, `git commit --author="Name <login@users.noreply.github.com>"` with
+  their GitHub login: the footer maps that email to the login.
+- **Text written together**: you are the author, the others go in `Co-authored-by: Name
+<email>` trailers at the end of the commit message. History keeps them; the footer does
+  not show co-authors yet.
+- **Someone without a GitHub account**: any key in `authors.json` (letters, digits, hyphens)
+  with their email in `emails`, and commit their text with `--author="Name <email>"`.
+- The footer counts editorial commits only: a commit of type `style`, `build`, `chore`,
+  `refactor` or `ci` does not make you the author of a page, nor does a rename alone. Type
+  a commit that changes what a page says `docs`, `feat` or `fix` (or leave GitHub's
+  "Update ..." subject).
 
 ## Languages
 
@@ -54,6 +75,10 @@ when they hold code, links or bold.
 
 Every other piece of interface text (cards, banners, captions, tiles, tables) is `detail` with
 `hack` code.
+
+The API descriptions are JSDoc from `documentation.json`, written to be read as they are: their
+HTML is shown as text (frontmatter `magmaHtmlAsText: true`), so `the name of an <input>
+element` does not put a text field in the table. The usage files stay Markdown with HTML.
 
 ### Inline code
 

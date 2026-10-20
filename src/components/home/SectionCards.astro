@@ -3,7 +3,7 @@
 // icon of the section (src/lib/nav.mjs) in a label color of its own, its
 // name, and the description of its landing page in the language of the page
 // (the components landing is generated: its description is a UI string),
-// with a badge on the sections still being written (`soon`).
+// with a badge under the name of the sections still being written (`soon`).
 // The home section itself is left out; Storybook closes the grid, opening in
 // a new tab.
 import type { ThemeFullVariantAvatarType } from '@maggioli-design-system/magma';
@@ -78,12 +78,10 @@ const cards = [
               <mds-text typography="h6" tag="h3">
                 {title}
               </mds-text>
+              {soon && (
+                <mds-badge slot="detail" variant="info" tone="weak" label={t('soon.title')} />
+              )}
             </mds-entity>
-            {soon && (
-              <mds-badge variant="info" tone="weak" class="ml-auto shrink-0">
-                {t('soon.title')}
-              </mds-badge>
-            )}
           </mds-card-header>
           <mds-card-content class="grow pt-0 bg-surface-overlay">
             <mds-text typography="detail">{description}</mds-text>

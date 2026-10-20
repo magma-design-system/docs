@@ -1,6 +1,6 @@
 import type { Loader } from 'astro/loaders';
 import { loadComponentDocs } from '../lib/magma.mjs';
-import { KIND_FIELD } from '../lib/markdown-text.mjs';
+import { HTML_AS_TEXT_FIELD, KIND_FIELD } from '../lib/markdown-text.mjs';
 
 // Relative links to .md files. The usage docs are written next to the
 // per-component docs of the package (dist/collection/components/<tag>/), so a
@@ -85,19 +85,22 @@ export function componentsLoader(): Loader {
       let unlinked = 0;
 
       // `depth`: 0 for what goes on the overview, 1 for the sub-pages.
-      // `kind`: the kind of text it becomes when it is not text to read
-      // (KIND in src/lib/markdown-text.mjs), told to the Markdown plugin
+      // `jsdoc`: a JSDoc description, for the cells of the API tables: the
+      // kind of text of the tables (KIND in src/lib/markdown-text.mjs), and
+      // its HTML shown as written. Both are told to the Markdown plugin
       // through the frontmatter.
-      const render = async (markdown: string | undefined, depth: number, kind?: 'table') => {
+      const render = async (markdown: string | undefined, depth: number, jsdoc = false) => {
         if (!markdown?.trim()) return { html: '', headings: [] };
         const rewritten = rewriteLinks(markdown, depth, tags);
         unlinked += rewritten.unlinked;
-        const text = kind ? `---\n${KIND_FIELD}: ${kind}\n---\n${rewritten.text}` : rewritten.text;
+        const text = jsdoc
+          ? `---\n${KIND_FIELD}: table\n${HTML_AS_TEXT_FIELD}: true\n---\n${rewritten.text}`
+          : rewritten.text;
         const { html, metadata } = await renderMarkdown(text);
         return { html, headings: metadata?.headings ?? [] };
       };
-      const toHtml = async (markdown: string | undefined, depth: number, kind?: 'table') =>
-        (await render(markdown, depth, kind)).html;
+      const toHtml = async (markdown: string | undefined, depth: number, jsdoc = false) =>
+        (await render(markdown, depth, jsdoc)).html;
 
       store.clear();
       for (const component of components) {
@@ -117,7 +120,7 @@ export function componentsLoader(): Loader {
           Promise.all(
             items.map(async (item) => ({
               ...item,
-              docsHtml: await toHtml(item.docs, 1, 'table'),
+              docsHtml: await toHtml(item.docs, 1, true),
             })),
           );
 
