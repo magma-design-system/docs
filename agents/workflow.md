@@ -62,7 +62,41 @@ WebSocket (Node's global `WebSocket`): `browsingContext.create`, `script.evaluat
   is a commit of its own ([writing.md](writing.md)).
 - `npm run format:check` before pushing (CI does not run it).
 - Pull request to `main`. CI (`.github/workflows/deploy.yml`, job `build`: `npm ci`,
-  `astro check`, build) must be green. Maintainers review and merge; agents never merge.
+  `astro check`, build) must be green; the job `authors` is a signal (below). Maintainers
+  review and merge; agents never merge.
+- **Merging**: content pull requests are merged with "Create a merge commit", which keeps the
+  author of each commit: the page footer shows them. A squash merge would make the pull
+  request's author the author of every page it touches, the others only `Co-authored-by`
+  trailers. Squash stays enabled for Renovate, whose pull requests merge themselves (GitHub
+  auto-merge).
+
+### Page authors
+
+The job `authors` runs on pull requests only:
+`npm run check:authors -- --base origin/<base branch>`
+([`scripts/check-authors.mjs`](../scripts/check-authors.mjs)). It checks the pages the pull
+request changes (`git diff <base>...HEAD`, English and Italian), and `authors.json` when it
+changes too. It turns red when an author those page footers show is missing from
+`src/content/authors.json`, or has no name or role; its log and job summary list each one with
+the pages and the entry to paste. Locally, `npm run check:authors` checks every page. It needs
+the whole history (it fails in a shallow clone).
+
+It is a signal, not a gate: no status check is required to merge, and `deploy` does not depend
+on it, so a push to `production` always deploys. A pull request that changes no page
+(Renovate's) passes. The publication pull request `main` -> `production` holds every page
+change not published yet, so it flags again every author still missing right before
+publishing.
+
+A new author, step by step:
+
+1. Their pull request turns red on "Page authors", with the entry to paste in the summary.
+2. Merge it anyway, or add the entry in the same pull request.
+3. A maintainer adds the entry, with the role, to `src/content/authors.json` (any pull
+   request).
+4. The next publication (pull request `main` -> `production`) shows the name and the role.
+   Until then the page shows the git name without a role. The authors are read at build time:
+   no page needs touching.
+
 - Prefer few pull requests, each complete, over stacks of pull requests based on each other.
 - Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue).
 
