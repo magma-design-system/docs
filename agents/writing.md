@@ -76,6 +76,10 @@ when they hold code, links or bold.
 Every other piece of interface text (cards, banners, captions, tiles, tables) is `detail` with
 `hack` code.
 
+The API descriptions are JSDoc from `documentation.json`, written to be read as they are: their
+HTML is shown as text (frontmatter `magmaHtmlAsText: true`), so `the name of an <input>
+element` does not put a text field in the table. The usage files stay Markdown with HTML.
+
 ### Inline code
 
 - Always `mds-text tag="code"` (`Code.astro`), without the ring and on a light background
