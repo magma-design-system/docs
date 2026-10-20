@@ -73,14 +73,15 @@ edit it on GitHub. Git history is the only source (layout decision 2 in
   is keyed by GitHub login (`name`, `role`, `emails`). The commit email is looked up in the
   `emails` of the entries, then a GitHub noreply email (`<id>+<login>@users.noreply.github.com`
   or `<login>@...`) gives the login by itself. Logins and emails are compared in lowercase.
-- An author not found shows the git name without a role: the build does not fail on it, the
-  check does. [`scripts/check-authors.mjs`](../scripts/check-authors.mjs)
-  (`npm run check:authors`) runs both modules on every page of `src/content/docs/` and fails
-  on an author not found, or on an entry without a name, a role or a login as key; it prints
-  the entries to paste ([workflow.md](workflow.md)).
-- Squash merging on GitHub makes the pull request's author the author of every page it
-  touches (other authors only as `Co-authored-by` trailers, which the footer does not read);
-  merge commits and rebase keep the author of each commit.
+- An author not found shows the git name without a role; the build does not fail on it.
+  [`scripts/check-authors.mjs`](../scripts/check-authors.mjs) (`npm run check:authors`) runs
+  both modules on every page of `src/content/docs/`, or with `--base <ref>` on the pages
+  changed since the merge base, and fails on an author not found or on an entry without a
+  name, a role or a login-like key; it prints the entries to paste. CI runs it on pull
+  requests as a signal that never blocks ([workflow.md](workflow.md)).
+- Content pull requests are merged with a merge commit, which keeps the author of each
+  commit. A squash merge would make the pull request's author the author of every page it
+  touches; `Co-authored-by` trailers stay in history, but the footer does not read them.
 
 ## Sections
 

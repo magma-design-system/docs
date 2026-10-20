@@ -73,10 +73,10 @@ built with Magma components, following the layout decisions in `plan/CONTENT_STR
   commits of its source file ([`src/lib/history.mjs`](src/lib/history.mjs)), and a button
   to edit the page on GitHub. Names and roles come from
   [`src/content/authors.json`](src/content/authors.json), keyed by GitHub login: add
-  yourself there with your first page. CI fails on a page author missing from it and says
-  what to add (`npm run check:authors`). Pages generated from Magma (the components) have
-  no footer. The deploy workflow fetches the whole history (`fetch-depth: 0`): in a shallow
-  clone the footer leaves out the authors.
+  yourself there with your first page. CI flags a page author missing from it and says what
+  to add (`npm run check:authors`), without blocking. Pages generated from Magma (the
+  components) have no footer. The deploy workflow fetches the whole history
+  (`fetch-depth: 0`): in a shallow clone the footer leaves out the authors.
 
 The sections are defined once in [`src/lib/nav.mjs`](src/lib/nav.mjs), which builds
 Starlight's sidebar: one group per section, the first item is where the rail links. Each

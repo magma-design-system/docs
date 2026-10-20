@@ -68,9 +68,11 @@ only until Magma publishes translations.
    data file (`authors.json`, GitHub login -> name, role and commit emails). Git history is
    the only source: no authors in the frontmatter, no GitHub API at build time. Only
    editorial commits count: not a bot's, not `style`, `build`, `chore`, `refactor`, `ci`,
-   not a rename alone. CI fails on an author missing from `authors.json`, so nothing is
-   published without a name and a role (decided 2026-10-20). Co-authors are not shown
-   yet.
+   not a rename alone. CI flags, on the pull request that changes a page, an author missing
+   from `authors.json`, as a signal that never blocks: a maintainer adds the entry and the
+   role shows up at the next publication. Content pull requests are merged with a merge
+   commit, which keeps the author of each commit (decided 2026-10-20). Co-authors are not
+   shown yet.
 3. Component preview: inline, driven by the attributes table. Iframe only for full demos.
 4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Pattern,
    Antipattern, Installation) is a sub-page of the component. What goes into Anatomy is
