@@ -62,7 +62,16 @@ WebSocket (Node's global `WebSocket`): `browsingContext.create`, `script.evaluat
   is a commit of its own ([writing.md](writing.md)).
 - `npm run format:check` before pushing (CI does not run it).
 - Pull request to `main`. CI (`.github/workflows/deploy.yml`, job `build`: `npm ci`,
-  `astro check`, build) must be green. Maintainers review and merge; agents never merge.
+  `astro check`, build, page authors) must be green. Maintainers review and merge; agents
+  never merge.
+- **Page authors**, the last step of CI (`npm run check:authors`,
+  [`scripts/check-authors.mjs`](../scripts/check-authors.mjs)): every author the page footers
+  show is in `src/content/authors.json`. On a failure it lists each unknown author with the
+  pages they touched and the entries to paste, in the log and in the job summary; it runs
+  even when the type check or the build failed. It needs the whole history (it fails in a
+  shallow clone). It runs on every pull request, the one `main` -> `production` too: nothing
+  is published with an unknown author. The fix is an entry in `authors.json` in the same pull
+  request ([writing.md](writing.md)).
 - Prefer few pull requests, each complete, over stacks of pull requests based on each other.
 - Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue).
 

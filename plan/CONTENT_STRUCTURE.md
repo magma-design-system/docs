@@ -65,7 +65,12 @@ only until Magma publishes translations.
 1. No user block in the rail: it came from the earlier Strapi plan (authenticated
    editorial editing) and has no meaning on a static site.
 2. Page footer "created by / modified by": names and dates from git history, roles from a
-   data file (`authors.json`, email -> name and role).
+   data file (`authors.json`, GitHub login -> name, role and commit emails). Git history is
+   the only source: no authors in the frontmatter, no GitHub API at build time. Only
+   editorial commits count: not a bot's, not `style`, `build`, `chore`, `refactor`, `ci`,
+   not a rename alone. CI fails on an author missing from `authors.json`, so nothing is
+   published without a name and a role (decided 2026-10-20). Co-authors are not shown
+   yet.
 3. Component preview: inline, driven by the attributes table. Iframe only for full demos.
 4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Pattern,
    Antipattern, Installation) is a sub-page of the component. What goes into Anatomy is

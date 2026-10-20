@@ -49,15 +49,38 @@ Starlight's components listed in `astro.config.mjs` are replaced by
 - `TwoColumnContent` / `PageSidebar` / `TableOfContents` / `DocsNav`: the right column, a table
   of contents with a reading indicator, or the sub-pages of a component, an icon set or a brand
   group (`DocsNav`).
-- `PageTitle`, `Hero` (the home page's splash), `Footer` (page footer: last modified and created
-  by, from `git log --follow` of the source file in `src/lib/history.ts`, names and roles from
-  `src/content/authors.json`), `ThemeProvider` (mode and theme before the first paint).
+- `PageTitle`, `Hero` (the home page's splash), `Footer` (page footer, see below),
+  `ThemeProvider` (mode and theme before the first paint).
 
 **Page changes** use Astro's ClientRouter (added in `Head.astro`). The rail, the section column
 and the right column are `transition:persist`: they stay mounted while their links are the same,
 and keep their scroll. `PageFrame`'s script carries the attributes of `<html>` over (mode,
 theme, rail state), and hands `mds-button[href]` navigation to the router through Magma's
 `NavigationService.setHandler`. Changing language is a full page load.
+
+**Page footer** (`Footer`): who modified the page last and who created it, with the button to
+edit it on GitHub. Git history is the only source (layout decision 2 in
+[plan/CONTENT_STRUCTURE.md](../plan/CONTENT_STRUCTURE.md)):
+
+- [`src/lib/history.mjs`](../src/lib/history.mjs) runs
+  `git log --follow --no-merges --name-status` on the page's source file and keeps the
+  editorial commits: not a bot's (author ending in `[bot]`), not of type `style`, `build`,
+  `chore`, `refactor` or `ci` (with or without scope or `!`), not a rename alone (`R100`). A
+  subject that is not a Conventional Commit (GitHub's "Update page.md") is editorial. The
+  newest is "modified", the oldest "created". No history in a shallow clone, for an
+  uncommitted file or for a page without editorial commits: no names in the footer.
+- [`src/lib/authors.mjs`](../src/lib/authors.mjs) finds the author: `src/content/authors.json`
+  is keyed by GitHub login (`name`, `role`, `emails`). The commit email is looked up in the
+  `emails` of the entries, then a GitHub noreply email (`<id>+<login>@users.noreply.github.com`
+  or `<login>@...`) gives the login by itself. Logins and emails are compared in lowercase.
+- An author not found shows the git name without a role: the build does not fail on it, the
+  check does. [`scripts/check-authors.mjs`](../scripts/check-authors.mjs)
+  (`npm run check:authors`) runs both modules on every page of `src/content/docs/` and fails
+  on an author not found, or on an entry without a name, a role or a login as key; it prints
+  the entries to paste ([workflow.md](workflow.md)).
+- Squash merging on GitHub makes the pull request's author the author of every page it
+  touches (other authors only as `Co-authored-by` trailers, which the footer does not read);
+  merge commits and rebase keep the author of each commit.
 
 ## Sections
 

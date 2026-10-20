@@ -85,7 +85,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/pages/`                                         | Generated routes: component, icon and brand pages, downloads, favicons, preview iframes |
 | `src/patterns/<id>/`                                 | Pattern code: `example.html`, `react.tsx`, `angular.ts`                                 |
 | `src/content/docs/`                                  | Pages: English at the root, Italian under `it/`                                         |
-| `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer                               |
+| `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login              |
 | `plan/`                                              | Decision records and open work                                                          |
 
 ## Guides

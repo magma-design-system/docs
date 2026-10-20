@@ -11,8 +11,20 @@
 - **Renaming or moving a page** (also `.md` -> `.mdx`): commit the rename alone, with no other
   change. The page footer reads the history with `git log --follow`, which loses a file whose
   content changed together with its name.
-- Your first page: add your commit email to `src/content/authors.json` (name and role), or the
-  footer shows your git name without a role.
+- **Your first page**: add yourself to `src/content/authors.json`, keyed by your GitHub login,
+  with your name, your role and the emails of your commits (`git config user.email`):
+  `"login": { "name": "...", "role": "...", "emails": ["..."] }`. Commits with GitHub's
+  noreply email need no `emails`: the login is in it. CI fails on a page author missing
+  from the file (`npm run check:authors` locally), so add it in the pull request of your
+  first page.
+- **Editing on GitHub** (the edit button in the page footer): if you are not in
+  `authors.json` yet, the pull request's check "Page authors" fails and its summary shows
+  the entry to add. Add it, with your role, to `src/content/authors.json` in the same pull
+  request; the check runs again.
+- The footer counts editorial commits only: a commit of type `style`, `build`, `chore`,
+  `refactor` or `ci` does not make you the author of a page, nor does a rename alone. Type
+  a commit that changes what a page says `docs`, `feat` or `fix` (or leave GitHub's
+  "Update ..." subject).
 
 ## Languages
 
