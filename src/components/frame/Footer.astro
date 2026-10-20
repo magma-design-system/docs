@@ -4,7 +4,7 @@
 // (src/lib/history.mjs), with name and role from src/content/authors.json by
 // GitHub login (src/lib/authors.mjs), then the button to edit the page on
 // GitHub. An author missing from authors.json shows the git name without a
-// role; CI fails on it (scripts/check-authors.mjs). Pages without a source file
+// role; CI flags it (scripts/check-authors.mjs). Pages without a source file
 // (the component pages, generated from Magma) have neither, so no footer.
 // Replaces Starlight's footer: no previous/next links, as in the layout mockups.
 import { getCollection } from 'astro:content';

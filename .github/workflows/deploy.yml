@@ -36,13 +36,30 @@ jobs:
         with:
           node-version: 24
           package-manager: npm
-      # Every author the page footers show is in src/content/authors.json: a
-      # pull request that adds one learns here what to add, and nothing is
-      # published without it (scripts/check-authors.mjs). Runs after a failed
-      # type check or build too, to report everything at once.
+
+  # The authors of the pages a pull request changes are in
+  # src/content/authors.json (scripts/check-authors.mjs). A signal, not a gate:
+  # no required check, and deploy does not wait for it. Its summary says what
+  # to add; the role shows up at the next publication. A pull request that
+  # changes no page (Renovate's) passes; the one main -> production checks
+  # every page not published yet.
+  authors:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The whole history: the authors of each page, and the base branch to compare with.
+          fetch-depth: 0
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
       - name: Page authors
-        if: ${{ !cancelled() }}
-        run: npm run check:authors
+        env:
+          BASE: origin/${{ github.base_ref }}
+        run: npm run check:authors -- --base "$BASE"
 
   deploy:
     # Also a manual run publishes only from production: the github-pages
