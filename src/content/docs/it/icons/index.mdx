@@ -1,23 +1,33 @@
 ---
-title: Set di icone
-description: I set di icone di Magma, ognuno con una pagina sua per cercare e copiare le sue icone, e i nomi del pacchetto icons legacy.
+title: Icone
+description: Come Magma chiama e usa le sue icone, e i pacchetti da cui vengono - tre set da cercare e copiare, e il pacchetto icons legacy.
 ---
 
 import IconSets from '../../../../components/IconSets.astro';
+import PageCards from '../../../../components/PageCards.astro';
 
 Magma chiama un'icona con il suo slug: il set da cui viene, poi il suo nome. `mds-icon` e ogni
 componente con una prop `icon` ricevono uno slug e caricano il file SVG con quel nome;
-[iconsauce](iconsauce/) scrive i file, oppure un font di icone con gli stessi nomi. Tre set
-funzionano così:
+[iconsauce](iconsauce/) scrive i file, oppure un font di icone con gli stessi nomi.
+
+Come usare le icone, e come arrivano in un prodotto:
+
+<PageCards
+  pages={[
+    { slug: 'icons/using-icons', icon: 'mi/outline/interests' },
+    { slug: 'icons/iconsauce', icon: 'mi/outline/terminal' },
+  ]}
+/>
+
+## Pacchetti
+
+Tre set funzionano così, ognuno da un pacchetto suo:
 
 <IconSets />
 
 La pagina di ogni set elenca tutte le sue icone, una categoria alla volta, e la sua ricerca
 guarda in tutto il set, anche nei tag che il set dà alle sue icone. Un clic su un'icona copia
 il suo slug, oppure il markup che la usa.
-
-Da quale set prendere un'icona, quando usarla e come sceglierla:
-[Usare le icone](using-icons/).
 
 Le app che usano ancora il pacchetto icons legacy trovano i suoi nomi, ognuno con lo slug che
 lo sostituisce, in [Pacchetto icons (legacy)](icons-package/).
