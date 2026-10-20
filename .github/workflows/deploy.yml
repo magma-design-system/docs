@@ -22,7 +22,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
         with:
-          # The whole history: page footers show who created each page (src/lib/history.ts).
+          # The whole history: page footers show who created each page (src/lib/history.mjs).
           fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -36,6 +36,13 @@ jobs:
         with:
           node-version: 24
           package-manager: npm
+      # Every author the page footers show is in src/content/authors.json: a
+      # pull request that adds one learns here what to add, and nothing is
+      # published without it (scripts/check-authors.mjs). Runs after a failed
+      # type check or build too, to report everything at once.
+      - name: Page authors
+        if: ${{ !cancelled() }}
+        run: npm run check:authors
 
   deploy:
     # Also a manual run publishes only from production: the github-pages
