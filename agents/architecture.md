@@ -133,7 +133,16 @@ releases.
 
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
-  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`).
+  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`). The
+  example has room around it (`p-800` on the body), except for the components listed in
+  `EDGE_TO_EDGE` there, which run from one edge of the page to the other
+  (`mds-horizontal-scroll`): their content slides under the edges of the frame.
+- the images of the example point at files of a product (`/logo.svg`, `/img/copertina.jpg`) or
+  at `example.com`, which the site does not serve: the page swaps each `src` or `poster` of an
+  image for one of the site's. A logo becomes Magma's logo, the photo of a person
+  (`mds-author`, `mds-avatar`, `mds-entity`) Magma's avatar, any other image the cover
+  `public/covers/og-1200x630.png`. A square image does not stand in for an illustration:
+  `mds-img` takes the whole width it has (`mds-zero`). Videos stay broken: no package has one.
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
@@ -145,10 +154,17 @@ releases.
   gave back (`role="status"`). Methods that take a function or an object stay on the API page.
 - the iframe mirrors `data-theme-name` and `data-magma-pref` from the page: without
   `data-magma-pref`, Magma follows the system's mode instead of the site's.
-- the stage can be narrowed with the handle at its right, and made shorter or taller than the
-  example with the one under it (`role="separator"`, mouse and keys); once the height is set
-  by hand, the frame stops following the example, which scrolls inside it. Reset reloads it at
-  full width and at the example's height.
+- the stage (`PreviewStage.astro`: the frame, its handles, its height and Reset) can be
+  narrowed with the handle at its right, and made shorter or taller than the example with the
+  one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
+  stops following the example, which scrolls inside it. Under it, on component pages, a picker
+  puts the example on each of Magma's five surfaces: a pill with a circle painted with the
+  current one and an `mds-input-select` of the levels by name ("Surface default"), without ring
+  or shadow at rest (the pill draws the edge). A level sets `data-surface` on the body of the
+  example's page, whose `data-[surface=...]:` classes paint it (default: `surface-raised`), and
+  on the stage, which takes `wash-base` while the example is on `surface-sunken` (nothing is
+  below it: the frame would blend in). Reset reloads it at full width, at the example's height
+  and on `surface-raised`.
 
 ## Other routes
 

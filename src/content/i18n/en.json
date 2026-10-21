@@ -40,10 +40,12 @@
 
   "component.generatedFrom": "Generated from",
   "component.encapsulation": "Encapsulation",
-  "component.preview.intro": "The first example of the Pattern page, live: the handles at its right and under it give it less or more room.",
+  "component.preview.intro": "The first example of the Pattern page, live: the handles at its right and under it give it less or more room, and the surfaces under it change the ground it stands on.",
   "component.preview.controls": "Change its props below and the preview follows; Reset brings the example back as it was.",
   "component.preview.title": "Preview of {{tag}}",
   "component.preview.reset": "Reset",
+  "component.preview.surface": "Surface",
+  "component.preview.surfaceLevel": "Surface {{surface}}",
   "component.preview.resize": "Width of the preview",
   "component.preview.resizeHeight": "Height of the preview",
   "component.preview.example": "E.g. {{value}}",

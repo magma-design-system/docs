@@ -1,12 +1,9 @@
 ---
 // The preview at the top of a component's overview: its first Pattern
 // example running in an iframe (src/pages/example/[tag].astro), away from the styles of the site,
-// on a stage where a handle at its right narrows it, to see the component in
-// less room (as in the layout mockups), and a handle under it makes it shorter
-// or taller than the example, to see what depends on the height of the
-// viewport (overlays that open where there is room, what is fixed to the
-// viewport or follows its scroll); then, in two tabs of an mds-tab (Props
-// and Methods, no heading over them), a control for each prop that
+// on a stage whose handles make it narrower, shorter or taller and whose
+// picker puts it on each surface (PreviewStage.astro); then, in two tabs of
+// an mds-tab (Props and Methods, no heading over them), a control for each prop that
 // takes a value to type or pick, in a grid of compact fields: the control,
 // the prop's name, its kind and its description in an mds-help; a text or
 // number field shows, while empty, an example of what the prop takes, when
@@ -18,18 +15,19 @@
 // In the second tab, a button for each method whose parameters take a value to type or
 // pick, with a field for each of them: it calls the method on the element of
 // the example, and a line under the buttons says what the call gave back. Some
-// components are all in their methods (mds-emoji). Reset loads the example
-// again at full width and at its own height. The buttons of the methods wait,
-// disabled, until the preview is ready; a control changed before is let go,
-// and shows the value of its prop once it is. A pattern
-// (src/components/PatternPreview.astro) runs its own page on the same stage,
-// with its own texts and without controls; the buttons of the `actions` slot
-// go next to Reset.
+// components are all in their methods (mds-emoji). The buttons of the
+// methods wait, disabled, until the preview is ready, again after each load
+// (Reset); a control changed before is let go, and shows the value of its prop
+// once it is. A pattern (src/components/PatternPreview.astro) runs its own
+// page on the same stage, with its own texts and without controls or
+// surfaces: a page paints its own; the buttons of the `actions` slot go next
+// to Reset.
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
 import PlaygroundField from './PlaygroundField.astro';
+import PreviewStage from './PreviewStage.astro';
 
 interface Props {
   tag: string;
@@ -85,66 +83,21 @@ const placeholder = (value: string | undefined) =>
   {intro ?? t('component.preview.intro')}
   {fields.length > 0 && ` ${t('component.preview.controls')}`}
 </mds-text>
-{/*
-  The stage, sunken, and on it the frame, raised, as wide as the stage and as
-  tall as the example until a handle is dragged or moved with the arrow keys:
-  the one at its right sets the width, the one under it the height (window
-  splitters: focusable separators with their value). Magma has no resize
-  handle.
-*/}
-<div class="flex rounded-3xl bg-surface-sunken p-400">
-  <div
-    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto] overflow-hidden rounded-xl bg-surface-raised shadow-sm"
-    data-playground-viewport={tag}
-  >
-    <iframe
-      src={src}
-      title={
-        title ??
-        t('component.preview.title', {
-          tag: `<${tag}>`,
-          // Astro escapes the attribute: i18next does not need to.
-          interpolation: { escapeValue: false },
-        })
-      }
-      class="block h-5000 w-full min-w-0 border-0"
-      data-playground-frame={tag}
-    ></iframe>
-    <div
-      role="separator"
-      aria-orientation="vertical"
-      aria-label={t('component.preview.resize')}
-      tabindex="0"
-      class="group mt-0 flex w-600 cursor-ew-resize touch-none items-center justify-center outline-none"
-      data-playground-handle={tag}
-    >
-      {/* Magma's focus ring on the bar, not on the strip that holds it. */}
-      <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
-    </div>
-    <div
-      role="separator"
-      aria-orientation="horizontal"
-      aria-label={t('component.preview.resizeHeight')}
-      tabindex="0"
-      class="group mt-0 flex h-600 cursor-ns-resize touch-none items-center justify-center outline-none"
-      data-playground-height-handle={tag}
-    >
-      <span class="focus-bounce group-focus-visible:focus-bounce--focused w-1600 group-hover:w-1800 h-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
-    </div>
-  </div>
-</div>
-<div class="flex justify-end gap-200">
-  <slot name="actions" />
-  <mds-button
-    label={t('component.preview.reset')}
-    icon="mi/baseline/refresh"
-    variant="dark"
-    tone="text"
-    size="sm"
-    type="button"
-    data-playground-reset={tag}
-  ></mds-button>
-</div>
+<PreviewStage
+  tag={tag}
+  src={src}
+  surfaces={Astro.props.src === undefined}
+  title={
+    title ??
+    t('component.preview.title', {
+      tag: `<${tag}>`,
+      // Astro escapes the attribute: i18next does not need to.
+      interpolation: { escapeValue: false },
+    })
+  }
+>
+  <slot name="actions" slot="actions" />
+</PreviewStage>
 
 {/*
   The props and the methods of the example, each in a tab of its own (the
@@ -300,8 +253,6 @@ const placeholder = (value: string | undefined) =>
     shown: Map<string, unknown>;
     /** Counts the loads of the preview: a newer one stops the setup of an older one. */
     load: number;
-    /** The height set with the handle, in px; `undefined`: as tall as the example. */
-    height?: number;
     /** Counts the calls of methods: only the last one reports how it went. */
     calls: number;
     stop?: () => void;
@@ -524,7 +475,10 @@ const placeholder = (value: string | undefined) =>
     }
   };
 
-  /** A load of the preview: its height, its mode, then the controls on its element. */
+  /**
+   * A load of the preview: its mode, then the controls on its element. Its
+   * size is PreviewStage.astro's.
+   */
   const connect = async (playground: Playground) => {
     playground.stop?.();
     playground.stop = undefined;
@@ -538,15 +492,6 @@ const placeholder = (value: string | undefined) =>
     const win = frame.contentWindow as (Window & typeof globalThis) | null;
     if (!doc || !win || !doc.body?.hasAttribute('data-preview')) return;
 
-    // As tall as the example, now and when it changes, unless the handle set
-    // a height; the observers of the preview's own window.
-    const fit = () => {
-      if (playground.height !== undefined) return;
-      frame.style.height = `${Math.ceil(doc.body.getBoundingClientRect().height)}px`;
-    };
-    fit();
-    const resize = new win.ResizeObserver(fit);
-    resize.observe(doc.body);
     const mode = new MutationObserver(() => syncMode(doc));
     mode.observe(document.documentElement, {
       attributes: true,
@@ -555,7 +500,6 @@ const placeholder = (value: string | undefined) =>
     syncMode(doc);
     let changes: MutationObserver | undefined;
     playground.stop = () => {
-      resize.disconnect();
       mode.disconnect();
       changes?.disconnect();
     };
@@ -574,190 +518,6 @@ const placeholder = (value: string | undefined) =>
     changes = new win.MutationObserver(() => show(playground));
     changes.observe(element, { attributes: true });
     enable(playground, true);
-  };
-
-  /** The narrowest the example gets, in pixels: a small phone. */
-  const MIN_WIDTH = 320;
-  /** The shortest the example gets, in pixels: a strip of it. */
-  const MIN_HEIGHT = 120;
-  /** How far an arrow key moves a handle, with Shift for a longer step. */
-  const STEP = 16;
-  const LONG_STEP = 80;
-
-  /** One size of the frame, its width or its height, and the handle that sets it. */
-  interface Axis {
-    handle: HTMLElement;
-    /** Where the pointer is along the axis. */
-    position: (event: PointerEvent) => number;
-    /** The keys that make the frame smaller and bigger. */
-    smaller: string;
-    bigger: string;
-    current: () => number;
-    limits: () => { min: number; max: number };
-    /** The frame this big, within the limits; `undefined`: as it is by default. */
-    set: (size: number | undefined) => void;
-  }
-
-  /**
-   * A handle of the frame: dragged, or moved with the arrow keys, Home and
-   * End, it sets one size of the example. Returns what writes its value, and
-   * what sets the size.
-   */
-  const resizeHandle = (frame: HTMLIFrameElement, axis: Axis) => {
-    const { handle, current, limits } = axis;
-    /** The separator's value: the size of the example. */
-    const update = () => {
-      const { min, max } = limits();
-      handle.setAttribute('aria-valuemin', String(Math.round(min)));
-      handle.setAttribute('aria-valuemax', String(Math.round(max)));
-      handle.setAttribute('aria-valuenow', String(current()));
-      handle.setAttribute('aria-valuetext', `${current()} px`);
-    };
-    const set = (size: number | undefined) => {
-      axis.set(size);
-      update();
-    };
-
-    /** Ends the drag in progress, if there is one. */
-    let endDrag: (() => void) | undefined;
-
-    handle.addEventListener('pointerdown', (event) => {
-      if (event.button !== 0) return;
-      event.preventDefault();
-      endDrag?.();
-      // The moves over the frame would go to the example's page.
-      frame.style.pointerEvents = 'none';
-      // Where on the handle it was taken, so it does not jump.
-      const offset = axis.position(event) - current();
-      const drag = new AbortController();
-      const { signal } = drag;
-      const end = () => {
-        drag.abort();
-        endDrag = undefined;
-        frame.style.removeProperty('pointer-events');
-        if (handle.hasPointerCapture(event.pointerId))
-          handle.releasePointerCapture(event.pointerId);
-      };
-      endDrag = end;
-      const ours = (other: PointerEvent) => other.pointerId === event.pointerId;
-      // Read on the window: a release outside the page, or outside the
-      // browser, does not always reach the handle, even with the pointer
-      // captured. A move with the button up means it went missing: the drag
-      // ends there instead of following the pointer back in.
-      addEventListener(
-        'pointermove',
-        (moved) => {
-          if (!ours(moved)) return;
-          if ((moved.buttons & 1) === 0) end();
-          else set(axis.position(moved) - offset);
-        },
-        { signal },
-      );
-      for (const type of ['pointerup', 'pointercancel'] as const) {
-        addEventListener(type, (released) => ours(released) && end(), { signal });
-      }
-      handle.addEventListener('lostpointercapture', end, { signal });
-      // Another window or app took over in the middle of it.
-      addEventListener('blur', end, { signal });
-      handle.setPointerCapture(event.pointerId);
-    });
-    handle.addEventListener('keydown', (event) => {
-      const step = event.shiftKey ? LONG_STEP : STEP;
-      const size = {
-        [axis.smaller]: current() - step,
-        [axis.bigger]: current() + step,
-        Home: limits().min,
-        End: limits().max,
-      }[event.key];
-      if (size === undefined) return;
-      event.preventDefault();
-      set(size);
-    });
-    return { update, set };
-  };
-
-  /**
-   * The two handles of the frame: the one at its right sets how wide the
-   * example is, up to the whole stage; the one under it how tall, from a
-   * strip of it to the height of the example or of the window, whichever is
-   * more. Returns what gives the example the whole stage and its own height
-   * again.
-   */
-  const resizable = (playground: Playground) => {
-    const { frame, tag } = playground;
-    const viewport = document.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
-    const widthHandle = document.querySelector<HTMLElement>(`[data-playground-handle="${tag}"]`);
-    const heightHandle = document.querySelector<HTMLElement>(
-      `[data-playground-height-handle="${tag}"]`,
-    );
-    const stage = viewport?.parentElement;
-    if (!viewport || !widthHandle || !heightHandle || !stage) return () => {};
-
-    /** How wide the example can be: the stage without its padding and the handle. */
-    const widthLimits = () => {
-      const style = getComputedStyle(stage);
-      const max =
-        stage.clientWidth -
-        parseFloat(style.paddingLeft) -
-        parseFloat(style.paddingRight) -
-        widthHandle.offsetWidth;
-      return { min: Math.min(MIN_WIDTH, max), max };
-    };
-    const width = resizeHandle(frame, {
-      handle: widthHandle,
-      position: (event) => event.clientX,
-      smaller: 'ArrowLeft',
-      bigger: 'ArrowRight',
-      current: () => Math.round(frame.getBoundingClientRect().width),
-      limits: widthLimits,
-      // The whole stage when `undefined` or wider.
-      set: (size) => {
-        const { min, max } = widthLimits();
-        if (size === undefined || size >= max) viewport.style.removeProperty('width');
-        else viewport.style.width = `${Math.max(min, size) + widthHandle.offsetWidth}px`;
-      },
-    });
-
-    /** How tall the example is on its page: its body, which the frame does not stretch. */
-    const exampleHeight = () =>
-      Math.ceil(frame.contentDocument?.body?.getBoundingClientRect().height ?? 0);
-    const heightLimits = () => ({
-      min: MIN_HEIGHT,
-      max: Math.max(MIN_HEIGHT, exampleHeight(), innerHeight),
-    });
-    const height = resizeHandle(frame, {
-      handle: heightHandle,
-      position: (event) => event.clientY,
-      smaller: 'ArrowUp',
-      bigger: 'ArrowDown',
-      current: () => Math.round(frame.getBoundingClientRect().height),
-      limits: heightLimits,
-      // `undefined`: as tall as the example again, from its next load.
-      set: (size) => {
-        if (size === undefined) {
-          playground.height = undefined;
-          return;
-        }
-        const { min, max } = heightLimits();
-        playground.height = Math.round(Math.min(max, Math.max(min, size)));
-        frame.style.height = `${playground.height}px`;
-      },
-    });
-
-    // The page gets narrower or wider, and the example taller or shorter: the
-    // room the handles have, and their values, follow.
-    const update = () => {
-      width.update();
-      height.update();
-    };
-    const sizes = new ResizeObserver(update);
-    sizes.observe(stage);
-    sizes.observe(frame);
-    update();
-    return () => {
-      width.set(undefined);
-      height.set(undefined);
-    };
   };
 
   /**
@@ -798,12 +558,6 @@ const placeholder = (value: string | undefined) =>
         const button =
           event.target instanceof Element ? event.target.closest<Field>('[data-call]') : null;
         if (button && !button.disabled) call(playground, button);
-      });
-      const fullSize = resizable(playground);
-      document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
-        fullSize();
-        // Setting `src` loads it again, wherever the example led the frame.
-        frame.src = frame.getAttribute('src') ?? '';
       });
       frame.addEventListener('load', () => connect(playground));
       // Already loaded before this script ran.
