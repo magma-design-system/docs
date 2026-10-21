@@ -145,6 +145,12 @@ that other sites can point to; an image under `src/assets/` gets a hash in its n
   the avatar of `identity` (`avatar/avatar-magma.svg`) at the sizes the profiles ask for,
   `/covers/icons/avatar-<size>x<size>.png`. The icons of the site itself (iOS home screen,
   Android, browsers) are the favicons (Other routes).
+- `screenshots/` holds full-page screenshots of the home (desktop and mobile, light and dark),
+  kept as backups to build covers from. `npm run screenshots` takes them again from a production
+  build served by `npm run preview -- --port 4322` (options in
+  [`scripts/screenshots.mjs`](../scripts/screenshots.mjs)): reduced motion keeps the scenes
+  still, the KPI figures are made static, and a mobile page taller than Chrome's largest surface
+  is taken in blocks and stitched.
 
 ## Browser storage keys
 
