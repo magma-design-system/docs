@@ -33,10 +33,7 @@ const { t } = Astro.locals;
   padding only at the top and at the left, their strips make the other two.
 */}
 <div class="flex rounded-3xl bg-surface-sunken pl-600 pt-600">
-  <div
-    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto] overflow-hidden"
-    data-playground-viewport={tag}
-  >
+  <div class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]" data-playground-viewport={tag}>
     <iframe
       src={src}
       title={title}
