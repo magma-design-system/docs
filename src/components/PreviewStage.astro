@@ -46,10 +46,12 @@ const SURFACE = 'raised';
   padding only at the top and at the left, their strips make the other two.
   With the example on surface-sunken too, the stage takes wash-base, so that
   the frame does not blend into it: a step darker in light, lighter in dark,
-  where nothing is below sunken (the script sets `data-surface` on it).
+  where nothing is below sunken (the script sets `data-surface` on it). The
+  grounds of the stage, of the example and of the circle of the picker fade
+  from one level to the next.
 */}
 <div
-  class="flex rounded-3xl bg-surface-sunken pl-600 pt-600 data-[surface=sunken]:bg-wash-base"
+  class="flex rounded-3xl bg-surface-sunken pl-600 pt-600 transition-cosmetic duration-(--duration-300) data-[surface=sunken]:bg-wash-base"
   data-playground-stage={tag}
 >
   <div class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]" data-playground-viewport={tag}>
@@ -101,7 +103,7 @@ const SURFACE = 'raised';
     >
       <span
         aria-hidden="true"
-        class="size-600 shrink-0 rounded-full border border-border-default bg-surface-raised data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken"
+        class="size-600 shrink-0 rounded-full border border-border-default bg-surface-raised transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken"
         data-surface-swatch
       ></span>
       <mds-input-select

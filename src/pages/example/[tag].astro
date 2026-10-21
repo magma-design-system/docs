@@ -61,12 +61,12 @@ const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|web
     </script>
   </head>
   {/*
-    On surface-raised, a card of the stage; on another level once a swatch of
-    the stage sets data-surface (PreviewStage.astro).
+    On surface-raised, a card of the stage; on another level, fading to it,
+    once the picker of the stage sets data-surface (PreviewStage.astro).
   */}
   <body
     data-preview
-    class="m-0 flex min-h-5000 flex-col justify-start bg-surface-raised p-800 data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken [&>astro-dev-toolbar]:hidden"
+    class="m-0 flex min-h-5000 flex-col justify-start bg-surface-raised p-800 transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken [&>astro-dev-toolbar]:hidden"
   >
     <div class="space-y-400" set:html={html} />
   </body>
