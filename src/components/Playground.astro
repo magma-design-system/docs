@@ -336,16 +336,10 @@ const placeholder = (value: string | undefined) =>
     ...(playground.methods?.querySelectorAll<Field>('[data-call]') ?? []),
   ];
 
-  // Only the buttons: a Magma field disabled, then enabled again, can keep its
-  // "Disabled" tip (see agents/magma.md). The attribute goes with the prop: an
-  // mds-button rendered `disabled` keeps the attribute when its prop turns
-  // false, and the browser keeps a form-associated element with it disabled,
-  // so no click reaches the button (not filed yet, see agents/magma.md).
+  // Only the buttons: the controls stay enabled, a change made before the
+  // preview is ready is let go.
   const enable = (playground: Playground, enabled: boolean) => {
-    for (const button of callers(playground)) {
-      button.disabled = !enabled;
-      button.toggleAttribute('disabled', !enabled);
-    }
+    for (const button of callers(playground)) button.disabled = !enabled;
   };
 
   /** The longest a value is shown, in characters. */
