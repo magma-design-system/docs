@@ -29,17 +29,18 @@ const { t } = Astro.locals;
   tall as the example until a handle is dragged or moved with the arrow keys:
   the one at its right sets the width, the one under it the height (window
   splitters: focusable separators with their value). Magma has no resize
-  handle.
+  handle. The handles sit on the stage, not on the frame: the stage has its
+  padding only at the top and at the left, their strips make the other two.
 */}
-<div class="flex rounded-3xl bg-surface-sunken p-400">
+<div class="flex rounded-3xl bg-surface-sunken pl-600 pt-600">
   <div
-    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto] overflow-hidden rounded-xl bg-surface-raised shadow-sm"
+    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto] overflow-hidden"
     data-playground-viewport={tag}
   >
     <iframe
       src={src}
       title={title}
-      class="block h-5000 w-full min-w-0 border-0"
+      class="block h-5000 w-full min-w-0 border-0 bg-surface-overlay rounded-xl shadow-sm"
       data-playground-frame={tag}
     ></iframe>
     <div
@@ -51,7 +52,7 @@ const { t } = Astro.locals;
       data-playground-handle={tag}
     >
       {/* Magma's focus ring on the bar, not on the strip that holds it. */}
-      <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-strong group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
     </div>
     <div
       role="separator"
@@ -61,7 +62,7 @@ const { t } = Astro.locals;
       class="group mt-0 flex h-600 cursor-ns-resize touch-none items-center justify-center outline-none"
       data-playground-height-handle={tag}
     >
-      <span class="focus-bounce group-focus-visible:focus-bounce--focused w-1600 group-hover:w-1800 h-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused w-1600 group-hover:w-1800 h-150 rounded-full bg-border-strong group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
     </div>
   </div>
 </div>
