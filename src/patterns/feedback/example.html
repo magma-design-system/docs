@@ -20,7 +20,10 @@
   </header>
 
   <!-- Demo only: not part of the screen. -->
-  <aside aria-labelledby="demo-title" class="flex flex-col gap-400 rounded-xl bg-surface-sunken p-500">
+  <aside
+    aria-labelledby="demo-title"
+    class="flex flex-col gap-400 rounded-xl bg-surface-sunken p-500"
+  >
     <mds-text id="demo-title" typography="h6" tag="h2">Try the cases</mds-text>
     <ol class="m-0 grid list-decimal gap-100 ps-600">
       <li>
@@ -37,14 +40,14 @@
       </li>
       <li>
         <mds-text typography="detail"
-          >An action whose place is still open: the server fails, Save in the dialog. A banner
-          in the dialog; what you wrote stays.</mds-text
+          >An action whose place is still open: the server fails, Save in the dialog. A banner in
+          the dialog; what you wrote stays.</mds-text
         >
       </li>
       <li>
         <mds-text typography="detail"
-          >An action whose place is gone: Save, Delete, Resend invitation. A toast that leaves
-          after 5 seconds.</mds-text
+          >An action whose place is gone: Save, Delete, Resend invitation. A toast that leaves after
+          5 seconds.</mds-text
         >
       </li>
       <li>
@@ -93,7 +96,13 @@
     headline="The users could not be loaded"
   >
     <mds-text typography="detail">Check the connection, then try again.</mds-text>
-    <mds-button slot="action" id="retry" type="button" label="Try again" variant="error"></mds-button>
+    <mds-button
+      slot="action"
+      id="retry"
+      type="button"
+      label="Try again"
+      variant="error"
+    ></mds-button>
   </mds-banner>
 
   <mds-table id="users" class="w-full [&_mds-text]:text-nowrap">
@@ -118,7 +127,9 @@
         icon="mi/baseline/error"
         headline="The user could not be saved"
       >
-        <mds-text typography="detail">What you wrote is still here: try again in a moment.</mds-text>
+        <mds-text typography="detail"
+          >What you wrote is still here: try again in a moment.</mds-text
+        >
       </mds-banner>
       <!-- 1. A field: the message is under it. -->
       <mds-input-field id="name-field" label="Name">
@@ -201,23 +212,14 @@
 </main>
 
 <!--
-  The toasts, in a container at the bottom edge: the one proposed in
-  https://github.com/magma-design-system/magma/issues/951, here by hand. A
-  popover, so it is above the page; a dialog opened later goes above it. That is
+  The toasts, in Magma's region at the bottom edge: it lines them up, three at
+  most, and reads each one out. A dialog opened later goes above it. That is
   wanted: mds-modal opens a modal <dialog>, which leaves everything outside it
-  inert, top layer included, so a toast over an open dialog could be seen but
-  not used, and a click on it would reach the backdrop and close the dialog.
-  It also holds the two live regions that read the messages out: mds-toast is
-  not, yet (https://github.com/magma-design-system/magma/issues/821).
+  inert, so a toast over an open dialog could be seen but not used. Next to it,
+  the live region of the urgent messages that are not toasts.
 -->
-<div
-  id="toasts"
-  popover="manual"
-  class="pointer-events-none inset-x-0 top-auto bottom-0 m-0 flex w-full flex-col items-center gap-200 overflow-visible border-0 bg-transparent p-0 pb-400"
->
-  <mds-text id="polite" role="status" class="sr-only"></mds-text>
-  <mds-text id="assertive" role="alert" class="sr-only"></mds-text>
-</div>
+<mds-toast-region id="toasts"></mds-toast-region>
+<mds-text id="assertive" role="alert" class="sr-only"></mds-text>
 
 <!-- One row of the table, filled by render() for each user. -->
 <template id="row">
@@ -281,30 +283,24 @@
 
   // ---- The messages ---------------------------------------------------------
 
-  /** Reads a message out, also when it is the same as the last one. */
-  function announce(message, urgent) {
-    const region = $(urgent ? 'assertive' : 'polite');
+  /** Reads an urgent message out, also when it is the same as the last one. */
+  function announce(message) {
+    const region = $('assertive');
     region.textContent = '';
     // A moment later, so that the change is read out; not on the next frame,
     // which a hidden tab never paints.
     setTimeout(() => (region.textContent = message), 100);
   }
 
-  /** Hides a toast and removes it once its animation is over. */
-  function dismiss(toast) {
-    // Its buttons go with it: the focus goes to the title of the page.
+  /** Its buttons go with a toast: the focus goes to the title of the page. */
+  function leave(toast) {
     if (toast.contains(document.activeElement)) title.focus();
-    // Hidden from code it emits no mdsToastClose
-    // (https://github.com/magma-design-system/magma/issues/952).
-    toast.visible = false;
-    setTimeout(() => toast.remove(), 400);
   }
 
   /**
-   * A toast. With no actions it leaves after 5 s; with actions it stays until
-   * one is used, and Dismiss stands in for the close control it lacks
-   * (https://github.com/magma-design-system/magma/issues/952). Three at most:
-   * a new one pushes out the oldest.
+   * A toast, in the region. With no actions it leaves after 5 s; with actions
+   * it stays until one is used, or its hide button sends it away. The region
+   * keeps three at most: a new one sends the oldest with a timer away.
    */
   function toast(message, { variant = 'success', actions = [] } = {}) {
     const element = document.createElement('mds-toast');
@@ -312,37 +308,40 @@
     element.textContent = message;
     if (actions.length) {
       element.duration = 0;
-      for (const action of [...actions, { label: 'Dismiss' }]) {
+      element.deletable = true;
+      for (const action of actions) {
         const button = document.createElement('mds-button');
         button.slot = 'action';
         button.type = 'button';
         button.label = action.label;
         button.variant = 'dark';
-        button.tone = action.run ? 'strong' : 'text';
         button.size = 'sm';
         button.addEventListener('click', async () => {
-          if (action.run) {
-            button.await = true;
-            const done = await action.run();
-            button.await = false;
-            if (!done) return;
-          }
-          dismiss(element);
+          button.await = true;
+          const done = await action.run();
+          button.await = false;
+          if (!done) return;
+          leave(element);
+          element.visible = false;
         });
         element.append(button);
       }
-    } else {
-      // The timer emits it again every 5 s after the first time
-      // (https://github.com/magma-design-system/magma/issues/823): once.
-      element.addEventListener('mdsToastClose', () => element.remove(), { once: true });
     }
-    // In flow inside the container, not fixed each on its own.
-    element.classList.add('static');
+    // However it hides (its timer, its hide button, an action, the region
+    // making room), it goes once its exit is over. Its hide button had the
+    // focus, which fell to the body as the toast hid: back to the title.
+    element.addEventListener(
+      'mdsToastClose',
+      (event) => {
+        if (event.detail.reason === 'close' && document.activeElement === document.body) {
+          title.focus();
+        }
+        element.remove();
+      },
+      { once: true },
+    );
     element.visible = true;
-    const shown = toasts.querySelectorAll('mds-toast');
-    if (shown.length >= 3) shown[0].remove();
     toasts.append(element);
-    announce(message, variant === 'error' || variant === 'warning');
   }
 
   // ---- The list -------------------------------------------------------------
@@ -411,7 +410,7 @@
         {
           label: 'Try again',
           // Failed again: the same toast stays, and says it again.
-          run: async () => (await sendInvitation(user)) || (announce(message, true), false),
+          run: async () => (await sendInvitation(user)) || (announce(message), false),
         },
       ],
     });
@@ -492,7 +491,11 @@
         : [...users, user];
       render();
       edit.close();
-      toast(editing ? `Changes to ${user.name} saved.` : `${user.name} added. The invitation is on its way.`);
+      toast(
+        editing
+          ? `Changes to ${user.name} saved.`
+          : `${user.name} added. The invitation is on its way.`,
+      );
     } catch (reason) {
       console.error(reason);
       $('edit-error').hidden = false;
@@ -565,7 +568,7 @@
     } catch (reason) {
       // The dialog stays: the person can try again before the deadline.
       console.error(reason);
-      announce('The session could not be extended. Try again.', true);
+      announce('The session could not be extended. Try again.');
     } finally {
       button.await = false;
     }
@@ -624,8 +627,5 @@
     status,
   }));
 
-  // Open from the start, so that the live regions are there before the first
-  // message.
-  toasts.showPopover();
   load();
 </script>
