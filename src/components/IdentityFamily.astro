@@ -1,21 +1,11 @@
 ---
 // A family of brand assets (src/lib/identity.mjs): its heading, a description
-// and one mds-card per artwork, with the artwork on the background it is
-// drawn for (dark or white, whatever the mode of the page) as a checkerboard,
-// since the files are transparent, and a Download split button
-// (mds-button-dropdown): its action downloads the SVG, its menu
-// every format and the file name, whose button copies the path of the SVG in
-// the package (CopyExample.astro; CopyToClipboard.astro once per page). The
-// artwork is a background image, `contain`, so the preview fills
-// mds-card-media whatever the shape of the logo.
+// and one card per artwork (DownloadCard.astro), with the artwork on the
+// background it is drawn for, since the files are transparent: Download saves
+// the SVG, its menu lists every format and the file name, whose button copies
+// the path of the SVG in the package (CopyToClipboard.astro once per page).
 // The descriptions are this site's defaults: identity publishes none.
-// The cards are surface-overlay: mds-card's parts paint --mds-card-background,
-// not the background of the card, so both are set.
-// The footer is `self-end`: with no mds-card-content, a card wide enough to
-// put the media beside the title gives the footer the row that stretches, and
-// the Download button rises under the title
-// (https://github.com/magma-design-system/magma/issues/1040).
-import CopyExample from './CopyExample.astro';
+import DownloadCard from './DownloadCard.astro';
 import Heading from './Heading.astro';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import { IDENTITY_PACKAGE, type IdentityFamily, type IdentityFile } from '../lib/identity.mjs';
@@ -97,148 +87,15 @@ const tiles = family.assets.map((asset) => {
      which mds-card lays out with the media beside the content. -->
 <div class="not-content mt-400 mb-800 grid grid-cols-[repeat(auto-fit,minmax(14rem,1fr))] gap-400">
   {tiles.map(({ asset, label, alt, dark, src, rows }) => (
-    <mds-card class="bg-surface-overlay [--mds-card-background:rgb(var(--magma-surface-overlay))]">
-      <mds-card-media class="p-200">
-        <div
-          class:list={[
-            'relative size-full min-h-3200 overflow-hidden rounded-md inset-shadow-xs',
-            // The classic checkerboard, to show that the files are transparent.
-            'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
-            dark
-              ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
-              : 'bg-white [--checker:color-mix(in_oklab,var(--color-neutral-100),var(--color-neutral-200))]',
-          ]}
-        >
-          <span
-            role="img"
-            aria-label={alt}
-            class="absolute inset-600 bg-contain bg-center bg-no-repeat"
-            style={`background-image: url('${src}')`}
-          ></span>
-        </div>
-      </mds-card-media>
-      <mds-card-header>
-        <mds-text typography="h6" tag={`h${level + 1}`}>
-          {label}
-        </mds-text>
-      </mds-card-header>
-      <mds-card-footer class="self-end">
-        <mds-button-dropdown
-          label={t('brand.download.action')}
-          icon="mi/outline/file-download"
-          variant="primary"
-          tone="strong"
-          data-download={src}
-          data-file={asset.svg.file}
-        >
-          <div
-            role="group"
-            aria-label={t('brand.download.group', { name: alt, ...raw })}
-            data-pagefind-ignore
-            data-download-menu
-            class="flex flex-col gap-400 p-400"
-          >
-            <div class="grid items-center">
-              {rows.map(({ format, description, links }) => (
-                <div class="hover:bg-surface-raised p-200 pl-400 transition-colors rounded-md grid grid-cols-[1fr_auto] items-center gap-600">
-                  <div class="flex flex-col">
-                    <mds-text typography="h6" tag="span">
-                      {format}
-                    </mds-text>
-                    <mds-text typography="caption" tag="span" class="text-fg-muted">
-                      {description}
-                    </mds-text>
-                  </div>
-                  <div class="flex justify-center gap-300">
-                    {links.map((item) => (
-                      <div
-                        class="inline-flex cursor-pointer flex-col items-center justify-center"
-                        data-download={item.href}
-                        data-file={item.file}
-                      >
-                        <mds-button
-                          icon="mi/outline/file-download"
-                          variant="dark"
-                          tone="text"
-                          class="self-center justify-self-center"
-                          aria-label={item.label}
-                          class="hover:bg-surface-overlay hover:shadow-sm"
-                        ></mds-button>
-                        <mds-text typography="tip" tag="span" aria-hidden="true">
-                          {item.text}
-                        </mds-text>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <mds-hr></mds-hr>
-            <CopyExample text={asset.svg.file} copy={`${IDENTITY_PACKAGE}/dist/${asset.svg.path}`}>
-              {asset.svg.file}
-            </CopyExample>
-          </div>
-        </mds-button-dropdown>
-      </mds-card-footer>
-    </mds-card>
+    <DownloadCard
+      label={label}
+      tag={`h${level + 1}` as 'h3' | 'h4'}
+      alt={alt}
+      src={src}
+      preview={{ kind: 'artwork', dark }}
+      download={{ href: src, file: asset.svg.file }}
+      rows={rows}
+      copy={{ text: asset.svg.file, value: `${IDENTITY_PACKAGE}/dist/${asset.svg.path}` }}
+    />
   ))}
 </div>
-
-<script>
-  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
-
-  // mds-button follows its `href` with `location.href` and has no `download`:
-  // a link made for the click downloads the file of `data-download`.
-  const download = (element: Element | null) => {
-    const href = element?.getAttribute('data-download');
-    if (!element || !href) return;
-    const link = document.createElement('a');
-    link.href = href;
-    link.download = element.getAttribute('data-file') ?? '';
-    link.click();
-  };
-
-  // The action of the split button: the SVG.
-  document.addEventListener('mdsButtonDropdownClick', (event) =>
-    download(event.target instanceof Element ? event.target : null),
-  );
-
-  // magma 2.2.0, fixes to the menu of each split button:
-  // - mds-button-dropdown passes no placement to its mds-dropdown, whose
-  //   autoPlacement opens the menu on the side with the most room, beside the
-  //   button most of the time. Below it, aligned to its end, above it when
-  //   there is no room below.
-  // - mds-dropdown tells what is in it with `contains`, which does not see
-  //   what mds-button-dropdown slots into it: any click in the menu closed
-  //   it, the copy before its check showed, and Escape from the menu dropped
-  //   the focus on the page. The clicks stop in the menu, which Escape and a
-  //   click outside still close, and Escape gives the focus back to the arrow.
-  const setup = async () => {
-    await customElements.whenDefined('mds-button-dropdown');
-    for (const split of document.querySelectorAll<MagmaElement>(
-      'mds-button-dropdown[data-download]',
-    )) {
-      if (split.dataset.ready !== undefined) continue;
-      split.dataset.ready = '';
-      await split.componentOnReady?.();
-      const menu = split.shadowRoot?.querySelector('mds-dropdown');
-      if (menu) {
-        Object.assign(menu, { placement: 'bottom-end', disableAutoPlacement: true, flip: true });
-      }
-      const files = split.querySelector('[data-download-menu]');
-      files?.addEventListener('click', (event) => {
-        event.stopPropagation();
-        const file =
-          event.target instanceof Element ? event.target.closest('[data-download]') : null;
-        if (file && files.contains(file)) download(file);
-      });
-      files?.addEventListener('keydown', (event) => {
-        if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') return;
-        split.shadowRoot?.querySelector<HTMLElement>('.dropdown-action')?.focus();
-      });
-    }
-  };
-  // Every page the router shows, the first one included.
-  document.addEventListener('astro:page-load', setup);
-  setup();
-</script>

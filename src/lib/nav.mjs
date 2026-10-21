@@ -141,6 +141,7 @@ export const sections = [
       { slug: 'community' },
       { slug: 'community/contributing' },
       { slug: 'community/code-of-conduct' },
+      { slug: 'community/media-kit' },
       { slug: 'community/about' },
     ],
   },
