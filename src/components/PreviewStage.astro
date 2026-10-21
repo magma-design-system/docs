@@ -7,8 +7,8 @@
 // see what depends on the height of the viewport (overlays that open where
 // there is room, what is fixed to the viewport or follows its scroll). Once
 // the height is set by hand, the frame stops following the example, which
-// scrolls inside it. With `surfaces`, chips under it put the example on each
-// of Magma's surface levels, to see how it stands on each ground. Reset loads
+// scrolls inside it. With `surfaces`, swatches under it put the example on
+// each of Magma's surface levels, to see how it stands on each ground. Reset loads
 // the example again, at full width, at its own height and on its surface; the
 // buttons of the `actions` slot go next to it. The props, methods and theme
 // of the example are Playground.astro's, which finds the frame by
@@ -21,7 +21,7 @@ interface Props {
   /** The title of the frame. */
   title: string;
   /**
-   * The chips of the surfaces, for a page that paints its body by
+   * The swatches of the surfaces, for a page that paints its body by
    * `data-surface` (src/pages/example/[tag].astro).
    */
   surfaces?: boolean;
@@ -29,11 +29,18 @@ interface Props {
 
 const { tag, src, title, surfaces = false } = Astro.props;
 const { t } = Astro.locals;
-// Magma's five levels, from the one sunk into the page to the floating one.
-// The token names, in every language, as the Color page writes them.
-const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
-// The level of the example until a chip is picked: the body of its page has it
-// without `data-surface`.
+// Magma's five levels, from the one sunk into the page to the floating one,
+// each a button painted with it. The token names, in every language, as the
+// Color page writes them.
+const SURFACES = [
+  { name: 'sunken', paint: '[--mds-button-background:rgb(var(--magma-surface-sunken))]' },
+  { name: 'muted', paint: '[--mds-button-background:rgb(var(--magma-surface-muted))]' },
+  { name: 'default', paint: '[--mds-button-background:rgb(var(--magma-surface-default))]' },
+  { name: 'raised', paint: '[--mds-button-background:rgb(var(--magma-surface-raised))]' },
+  { name: 'overlay', paint: '[--mds-button-background:rgb(var(--magma-surface-overlay))]' },
+];
+// The level of the example until a swatch is pressed: the body of its page
+// has it without `data-surface`.
 const SURFACE = 'raised';
 ---
 
@@ -77,23 +84,40 @@ const SURFACE = 'raised';
   </div>
 </div>
 {/*
-  The surfaces at the left, a single choice that always keeps one (the
-  script), and the buttons at the right; on a phone the buttons go under
-  them, and the chips scroll when they do not fit. `not-content`: Starlight
-  would put 1rem above each chip that follows another.
+  The surfaces at the left, one pressed at a time (the script), and the
+  buttons at the right; on a phone the buttons go under them. `not-content`:
+  Starlight would put 1rem above each element that follows another.
+  Each surface is a swatch: a button without a label, its ground the level it
+  stands for (a class on the host beats the tone's own), a thin outline that
+  tells the light levels apart, and its name as a title. All of them carry the
+  check, visible only on the pressed one, so they keep one size.
 */}
 <div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
   {surfaces && (
-    <mds-filter
-      label={t('component.preview.surface')}
-      class="min-w-0 max-w-full"
+    <mds-button-group
+      role="group"
+      aria-label={t('component.preview.surface')}
       data-playground-surface={tag}
       data-default={SURFACE}
+      class="p-200"
     >
-      {SURFACES.map((surface) => (
-        <mds-filter-item label={surface} value={surface} selected={surface === SURFACE} />
+      {SURFACES.map(({ name, paint }) => (
+        <mds-button
+          title={name}
+          aria-pressed={String(name === SURFACE)}
+          icon="mi/baseline/check"
+          variant="dark"
+          tone="weak"
+          size="sm"
+          type="button"
+          class:list={[
+            paint,
+            'fill-transparent aria-pressed:fill-fg-default [--mds-button-border-color-rgb:var(--magma-border-default)] [--mds-button-border-width:--spacing(25)]',
+          ]}
+          data-surface={name}
+        ></mds-button>
       ))}
-    </mds-filter>
+    </mds-button-group>
   )}
   <div class="ml-auto flex gap-200">
     <slot name="actions" />
@@ -110,12 +134,12 @@ const SURFACE = 'raised';
 </div>
 
 <script>
-  /** A frame of the page, with what its handles and its chips set. */
+  /** A frame of the page, with what its handles and its swatches set. */
   interface Stage {
     frame: HTMLIFrameElement;
     /** The height set with the handle, in px; `undefined`: as tall as the example. */
     height?: number;
-    /** The surface picked with the chips; `undefined`: the page's own. */
+    /** The surface pressed among the swatches; `undefined`: the page's own. */
     surface?: string;
     /** Stops following the height of the example that is loaded. */
     stop?: () => void;
@@ -123,7 +147,7 @@ const SURFACE = 'raised';
 
   const stages = new WeakMap<HTMLIFrameElement, Stage>();
 
-  /** The example of the frame on the surface of its chips. */
+  /** The example of the frame on the surface of its swatches. */
   const paint = (stage: Stage) => {
     const body = stage.frame.contentDocument?.body;
     if (!body?.hasAttribute('data-preview') || stage.surface === undefined) return;
@@ -132,7 +156,7 @@ const SURFACE = 'raised';
 
   /**
    * A load of the frame: as tall as the example, now and when it changes,
-   * unless the handle set a height, and on the surface of its chips; the
+   * unless the handle set a height, and on the surface of its swatches; the
    * observer of the preview's own window.
    */
   const fit = (stage: Stage) => {
@@ -338,29 +362,28 @@ const SURFACE = 'raised';
     };
   };
 
-  type Item = HTMLElement & { selected?: boolean; value?: string };
-
   /**
-   * The chips of the surfaces: a pick paints the example. A click on the chip
-   * already picked would leave none: it stays picked, as a radio button does.
-   * Returns what picks the page's own surface again.
+   * The swatches of the surfaces: a press paints the example on its level,
+   * and only that swatch shows as pressed. Returns what picks the page's own
+   * surface again.
    */
   const surfaces = (stage: Stage, tag: string) => {
-    const filter = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
-    if (!filter) return () => {};
-    const initial = filter.dataset.default;
-    const items = () => [...filter.querySelectorAll<Item>('mds-filter-item')];
-    // Setting `selected` is taken in as a click, without mdsFilterChange.
+    const group = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
+    if (!group) return () => {};
+    const initial = group.dataset.default;
     const pick = (surface: string | undefined) => {
-      for (const item of items()) item.selected = item.value === surface;
-    };
-    filter.addEventListener('mdsFilterChange', (event) => {
-      const { value } = (event as CustomEvent<{ value: string }>).detail;
-      if (!value) {
-        pick(stage.surface ?? initial);
-        return;
+      for (const swatch of group.querySelectorAll<HTMLElement>('[data-surface]')) {
+        swatch.setAttribute('aria-pressed', String(swatch.dataset.surface === surface));
       }
-      stage.surface = value;
+    };
+    group.addEventListener('click', (event) => {
+      const swatch =
+        event.target instanceof Element
+          ? event.target.closest<HTMLElement>('[data-surface]')
+          : null;
+      if (!swatch) return;
+      stage.surface = swatch.dataset.surface;
+      pick(stage.surface);
       paint(stage);
     });
     return () => {
