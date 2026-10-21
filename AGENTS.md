@@ -86,6 +86,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/patterns/<id>/`                                 | Pattern code: `example.html`, `react.tsx`, `angular.ts`                                 |
 | `src/content/docs/`                                  | Pages: English at the root, Italian under `it/`                                         |
 | `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login              |
+| `public/covers/`                                     | Covers of the site for other sites and link previews (`og:image`), stable URLs          |
 | `plan/`                                              | Decision records and open work                                                          |
 
 ## Guides
