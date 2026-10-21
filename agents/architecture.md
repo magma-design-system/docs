@@ -126,12 +126,12 @@ sidebar items. The structure and its reasons are in
   one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
   stops following the example, which scrolls inside it. Under it, on component pages, a picker
   puts the example on each of Magma's five surfaces: a pill with a circle painted with the
-  current one and an `mds-input-select` of the levels by name, without ring or shadow at rest
-  (the pill draws the edge). A level sets `data-surface` on the body of the example's page,
-  whose `data-[surface=...]:` classes paint it (default: `surface-raised`), and on the stage,
-  which takes `wash-base` while the example is on `surface-sunken` (nothing is below it: the
-  frame would blend in). Reset reloads it at full width, at the example's height and on
-  `surface-raised`.
+  current one and an `mds-input-select` of the levels by name ("Surface default"), without ring
+  or shadow at rest (the pill draws the edge). A level sets `data-surface` on the body of the
+  example's page, whose `data-[surface=...]:` classes paint it (default: `surface-raised`), and
+  on the stage, which takes `wash-base` while the example is on `surface-sunken` (nothing is
+  below it: the frame would blend in). Reset reloads it at full width, at the example's height
+  and on `surface-raised`.
 
 ## Other routes
 

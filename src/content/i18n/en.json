@@ -45,6 +45,7 @@
   "component.preview.title": "Preview of {{tag}}",
   "component.preview.reset": "Reset",
   "component.preview.surface": "Surface",
+  "component.preview.surfaceLevel": "Surface {{surface}}",
   "component.preview.resize": "Width of the preview",
   "component.preview.resizeHeight": "Height of the preview",
   "component.preview.example": "E.g. {{value}}",

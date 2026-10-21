@@ -30,7 +30,9 @@ interface Props {
 const { tag, src, title, surfaces = false } = Astro.props;
 const { t } = Astro.locals;
 // Magma's five levels, from the one sunk into the page to the floating one.
-// The token names, in every language, as the Color page writes them.
+// The token names, in every language, as the Color page writes them; each
+// option of the picker puts the family before them ("Surface sunken"), so it
+// says what the colors are.
 const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
 // The level of the example until another is picked: the body of its page has
 // it without `data-surface`.
@@ -89,10 +91,11 @@ const SURFACE = 'raised';
   phone the buttons go under it. `not-content`: Starlight would put 1rem above
   each element that follows another.
   The picker is a pill: a circle painted with the surface of the example, then
-  a select of the five levels by name. The pill draws the edge: the select has
-  no ring or shadow at rest, only its focus ring on hover and focus. Both are
-  transparent shadows, not `none`: the select lists them in one box-shadow,
-  where a `none` would void the focus ring too.
+  a select of the five levels by name, after the family ("Surface default").
+  The pill draws the edge: the select has no ring or shadow at rest, only its
+  focus ring on hover and focus. Both are transparent shadows, not `none`: the
+  select lists them in one box-shadow, where a `none` would void the focus
+  ring too.
 */}
 <div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
   {surfaces && (
@@ -115,7 +118,11 @@ const SURFACE = 'raised';
       >
         {SURFACES.map((surface) => (
           <option value={surface} selected={surface === SURFACE}>
-            {surface}
+            {t('component.preview.surfaceLevel', {
+              surface,
+              // Astro escapes the text: i18next does not need to.
+              interpolation: { escapeValue: false },
+            })}
           </option>
         ))}
       </mds-input-select>

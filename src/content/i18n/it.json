@@ -45,6 +45,7 @@
   "component.preview.title": "Anteprima di {{tag}}",
   "component.preview.reset": "Ripristina",
   "component.preview.surface": "Superficie",
+  "component.preview.surfaceLevel": "Superficie {{surface}}",
   "component.preview.resize": "Larghezza dell'anteprima",
   "component.preview.resizeHeight": "Altezza dell'anteprima",
   "component.preview.example": "Es: {{value}}",
