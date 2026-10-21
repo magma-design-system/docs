@@ -35,8 +35,10 @@ vengono da `--spacing: 0.0025rem`: `gap-400` è `400 x 0.0025rem`, 1rem.
 ## Classi che leggono un altro token
 
 Dove due namespace hanno la stessa chiave, alcune classi leggono l'altro. Le utility di
-larghezza leggono prima la spaziatura: `max-w-xs` è `--spacing-xs`, non `--container-xs`.
-Per il token dell'ultima colonna scrivi il suo valore arbitrario: `max-w-(--container-xs)`.
+larghezza leggono il container: `max-w-xs` è `--container-xs`, non `--spacing-xs`; le
+dimensioni logiche leggono la spaziatura: `max-inline-xs` è `--spacing-xs`, non
+`--container-xs`. Per il token dell'ultima colonna scrivi il suo valore arbitrario:
+`max-w-(--spacing-xs)`, `max-inline-(--container-xs)`.
 
 <TailwindMap part="shadowed" />
 

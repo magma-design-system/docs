@@ -25,10 +25,11 @@ spaziatura.
 
 ## Container
 
-Larghezze per i blocchi di contenuto e per le container query. Nel tema di Magma le
-utility di larghezza leggono la spaziatura con lo stesso nome prima del container:
-`max-w-xs` è `--spacing-xs`, quindi per il container scrivi `max-w-(--container-xs)`. Le
-varianti delle container query (`@md:`) leggono i container.
+Larghezze per i blocchi di contenuto e per le container query. Le utility di larghezza
+le leggono per nome: `max-w-xs` è `--container-xs`, e così `w-xs`, `min-w-xs` e `basis-xs`.
+Le dimensioni logiche leggono invece la spaziatura con lo stesso nome: per il container
+scrivi `max-inline-(--container-xs)`. Le varianti delle container query (`@md:`) leggono i
+container.
 
 <TokenTable tokens="container" />
 

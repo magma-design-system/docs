@@ -1,0 +1,52 @@
+---
+title: Changelog
+description: What changed in each release of the Magma packages since Magma 2.0.0, read from the CHANGELOG.md every package ships.
+---
+
+import Changelog from '../../components/Changelog.astro';
+
+Every Magma package ships a `CHANGELOG.md` with its releases. This page shows them from Magma
+2.0.0 on, newest first: each version holds the same entries as its release on GitHub, grouped
+by kind of change. An entry marked **Breaking** may ask for a change in your project: read it
+before you update, together with [Versions and migrations](../development/versions/).
+
+## Magma
+
+The components, `@maggioli-design-system/magma`. `magma-react` and `magma-angular` are released
+together with it, at the same version, with the same entries.
+
+<Changelog pkg="magma" />
+
+## Styles
+
+The CSS of Magma, `@maggioli-design-system/styles`: the semantic tokens, the Tailwind theme and
+the utilities.
+
+<Changelog pkg="styles" />
+
+## Design tokens
+
+The raw values of the design decisions, `@maggioli-design-system/design-tokens`: color ramps,
+type scale, spacing, shadows, motion.
+
+<Changelog pkg="design-tokens" />
+
+## Identity
+
+Logos, avatars and the other brand assets, `@maggioli-design-system/identity`.
+
+<Changelog pkg="identity" />
+
+## Icons
+
+The icon font, `@maggioli-design-system/icons`, a legacy package: see
+[Icons package (legacy)](../icons/icons-package/).
+
+<Changelog pkg="icons" />
+
+## SVG icons
+
+The Maggioli icons as SVG files, `@maggioli-design-system/svg-icons`, the set iconsauce draws
+them from.
+
+<Changelog pkg="svg-icons" />

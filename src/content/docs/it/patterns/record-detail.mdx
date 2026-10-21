@@ -73,15 +73,15 @@ toast, letto anche dai lettori di schermo).
 - L'oggetto è il titolo della pagina; il numero sopra e la riga sotto sono testo.
 - Dopo un'azione il pulsante che l'ha eseguita può sparire, perché le azioni seguono lo stato: il
   focus passa al titolo, che ha `tabindex="-1"`, invece di ricadere in cima alla pagina.
-- L'esito di un'azione viene letto attraverso una regione `role="status"`, oltre a comparire in un
-  toast.
+- L'esito di un'azione è un toast in un `mds-toast-region`, che lo legge senza spostare il
+  focus.
 - Il dialogo ha un nome, il suo titolo, e prende il focus quando si apre; il campo obbligatorio
   dice a parole cosa manca.
 - I dati sono un elenco descrittivo (`dl`, `dt`, `dd`), così ogni valore viene letto con la sua
   etichetta. Magma non ha ancora un componente per questo: il codice usa gli elementi nativi, con
   `mds-text` dentro.
-- I documenti si aprono dalla tastiera e vengono annunciati come pulsanti: il codice aggiunge il
-  ruolo e i tasti che `mds-file` non dà ancora.
+- I documenti sono pulsanti, annunciati come tali e aperti dalla tastiera: `mds-file` dà loro il
+  ruolo e i tasti.
 
 ## Contenuti
 

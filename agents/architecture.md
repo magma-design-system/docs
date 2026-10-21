@@ -56,8 +56,10 @@ Starlight's components listed in `astro.config.mjs` are replaced by
 **Page changes** use Astro's ClientRouter (added in `Head.astro`). The rail, the section column
 and the right column are `transition:persist`: they stay mounted while their links are the same,
 and keep their scroll. `PageFrame`'s script carries the attributes of `<html>` over (mode,
-theme, rail state), and hands `mds-button[href]` navigation to the router through Magma's
-`NavigationService.setHandler`. Changing language is a full page load.
+theme, rail state), and hands the navigation of `mds-button[href]` and `mds-link` to the router
+through Magma's `NavigationService.setHandler`: their anchors are in their shadow roots, which
+the router does not see. Astro's hover prefetch does not see them either
+([plan/BACKLOG.md](../plan/BACKLOG.md), "Layout"). Changing language is a full page load.
 
 **Page footer** (`Footer`): who modified the page last and who created it, with the button to
 edit it on GitHub. Git history is the only source (layout decision 2 in
@@ -102,6 +104,28 @@ sidebar items. The structure and its reasons are in
 | Brand assets    | `src/lib/identity.mjs` reads `identity/dist/identity.json` (names, owners, variants). Generated pages `src/pages/[...locale]/brand/[group]/[...owner].astro`, files served by `src/pages/downloads/identity/[...path].ts`, cards in `IdentityFamily.astro`, each a `DownloadCard.astro` (shared with the Media kit).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Development     | Installation (`FrameworkTabs.astro`, choice kept in `magma-docs:framework`; `MagmaVersions.astro`), Agentic development, Versions and migrations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Community       | Channels (`Channel.astro`), Contributing, Code of conduct, About.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+## Changelog
+
+`changelog.mdx` (Home section) shows the releases of the Magma packages from Magma 2.0.0 on: an
+`h2` per package written in the page, with a line about it, then `Changelog.astro` with the
+releases.
+
+- [`src/lib/changelog.mjs`](../src/lib/changelog.mjs) reads the `CHANGELOG.md` of each package
+  through `resolveMagma()`: magma and its wrappers export it since 2.4.0 (magma#981), `styles`,
+  `design-tokens`, `identity`, `icons` and `svg-icons` have no `exports` map and resolve it from
+  their folder. Each section of the file is the body of the GitHub release with the same tag
+  (git-cliff). The page keeps every package's releases from the day of `magma@2.0.0`.
+- `magma-react` and `magma-angular` are not on the page: they are released with magma, at its
+  version, and their files hold the same sections.
+- A line the parser does not know (not a release heading, a group heading, an entry or an
+  indented line under an entry) fails the build, so a change of format is seen and handled.
+- `Changelog.astro`: a heading per version (id `<package>-<version>`, with its anchor), the date
+  and the link to the GitHub release; the groups in the order of the release, their names from
+  `changelog.group.*` (a group not in the map keeps its English name); entries as `mds-list`,
+  scopes as code, linked to the component page when they are a component tag, `(#n)` linked to
+  the pull request. Entries marked `[**breaking**]` get a warning `mds-badge`, and so does their
+  release. The entries stay in English on every locale: the Italian page says so.
 
 ## Component preview
 

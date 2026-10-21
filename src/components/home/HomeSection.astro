@@ -29,8 +29,8 @@ const aside = Astro.slots.has('aside');
       class:list={[
         'flex flex-col gap-300',
         aside
-          ? 'mx-auto max-w-(--container-3xl) items-center text-center @5xl:mx-0 @5xl:items-start @5xl:text-start'
-          : 'mx-auto mb-1000 max-w-(--container-3xl) items-center text-center',
+          ? 'mx-auto max-w-3xl items-center text-center @5xl:mx-0 @5xl:items-start @5xl:text-start'
+          : 'mx-auto mb-1000 max-w-3xl items-center text-center',
       ]}
     >
       <slot name="before" />

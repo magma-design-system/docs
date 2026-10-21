@@ -19,7 +19,7 @@ const { locale } = Astro.locals.starlightRoute;
 <mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(4000),1fr))]">
   {patternComponents(id).map((tag) => (
     <mds-list-item typography="detail" class={TEXT.listItem}>
-      <a href={componentHref(locale, tag)}>{componentName(tag)}</a>
+      <mds-link href={componentHref(locale, tag)}>{componentName(tag)}</mds-link>
     </mds-list-item>
   ))}
 </mds-list>

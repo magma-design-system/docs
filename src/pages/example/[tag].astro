@@ -26,11 +26,10 @@ const { tag, example } = Astro.props.entry.data;
 
 // The usage files point their images at files of a product the site does not
 // have (/logo.svg, ./logo.svg, /img/copertina.jpg) or at example.com, a domain
-// reserved for documentation that serves none: the image would show its error
-// (mds-img its file name on a red ground) and the avatar of mds-avatar would
-// start on its load error, which it never leaves (magma#956). The preview
-// loads an image of the site instead: a logo is Magma's logo, the photo of a
-// person Magma's avatar, both from the identity package
+// reserved for documentation that serves none: mds-avatar would show its
+// fallback, the other examples their error (mds-img its file name on a red
+// ground). The preview loads an image of the site instead: a logo is Magma's
+// logo, the photo of a person Magma's avatar, both from the identity package
 // (src/pages/downloads/identity), any other image the cover of the site
 // (public/covers), whose proportions suit an illustration too (mds-img takes
 // the whole width it has: a square logo would be as tall as the frame).

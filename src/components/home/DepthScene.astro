@@ -95,17 +95,12 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
     data-depth
     role="img"
     aria-label={t('home.scene.label')}
-    class="relative mx-auto h-13000 max-w-(--container-6xl) @max-3xl:h-12000"
+    class="relative mx-auto h-13000 max-w-6xl @max-3xl:h-12000"
     style={STAGE}
   >
     {/* The page: what lies on it. */}
     <div class={PLANE} style={plane(0)}>
-      <div
-        class:list={[
-          FRAGMENT,
-          'top-0 right-0 hidden w-(--container-md) origin-top-right @3xl:block',
-        ]}
-      >
+      <div class:list={[FRAGMENT, 'top-0 right-0 hidden w-md origin-top-right @3xl:block']}>
         <mds-table inert class="w-full shadow-md-sharp">
           <mds-table-header>
             <mds-table-header-cell label={t('home.scene.number')} />
@@ -143,12 +138,7 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
           start-date="2026-11-12"
         />
       </div>
-      <div
-        class:list={[
-          FRAGMENT,
-          'right-1/12 bottom-0 hidden w-(--container-xs) origin-bottom @3xl:block',
-        ]}
-      >
+      <div class:list={[FRAGMENT, 'right-1/12 bottom-0 hidden w-xs origin-bottom @3xl:block']}>
         <mds-card inert>
           <mds-card-content>
             <mds-tab size="sm">
@@ -175,7 +165,7 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
       <div
         class:list={[
           FRAGMENT,
-          'top-1/12 left-1/2 w-(--container-xs) origin-top -translate-x-1/2 @3xl:left-1/4 @3xl:translate-x-0',
+          'top-1/12 left-1/2 w-xs origin-top -translate-x-1/2 @3xl:left-1/4 @3xl:translate-x-0',
         ]}
       >
         <mds-card inert class="shadow-lg">
@@ -218,12 +208,7 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
 
     {/* Floating above: what the person is doing now. */}
     <div class={PLANE} style={plane(2)}>
-      <div
-        class:list={[
-          FRAGMENT,
-          'bottom-1/4 left-0 w-(--container-2xs) @3xl:bottom-1/6 @3xl:left-1/12',
-        ]}
-      >
+      <div class:list={[FRAGMENT, 'bottom-1/4 left-0 w-2xs @3xl:bottom-1/6 @3xl:left-1/12']}>
         <mds-card inert class:list={['shadow-2xl', OVERLAY]}>
           <mds-card-content>
             <mds-input-field label={t('home.scene.applicant')}>
@@ -233,10 +218,7 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
         </mds-card>
       </div>
       <div
-        class:list={[
-          FRAGMENT,
-          'right-0 bottom-0 w-full @3xl:right-auto @3xl:left-1/3 @3xl:w-(--container-md)',
-        ]}
+        class:list={[FRAGMENT, 'right-0 bottom-0 w-full @3xl:right-auto @3xl:left-1/3 @3xl:w-md']}
       >
         <mds-card inert class:list={['shadow-2xl', OVERLAY]}>
           <mds-card-content class="flex items-center justify-between gap-600">
@@ -257,12 +239,7 @@ const OVERLAY = '[--mds-card-background:rgb(var(--magma-surface-overlay))]';
 
     {/* Above them all: the request is sent. */}
     <div class={PLANE} style={plane(3)}>
-      <div
-        class:list={[
-          FRAGMENT,
-          'top-1/4 right-0 hidden w-(--container-xs) @3xl:block @3xl:right-1/5',
-        ]}
-      >
+      <div class:list={[FRAGMENT, 'top-1/4 right-0 hidden w-xs @3xl:block @3xl:right-1/5']}>
         <mds-banner
           inert
           class="shadow-2xl"

@@ -36,8 +36,7 @@ const SHOTS = [
   { name: 'mobile', width: 390, height: 844, dpr: 3, mobile: true },
 ];
 const SCHEMES = ['light', 'dark'];
-// Not Safari: Magma 2.3.0 keeps mds-pref-mode on light there, whatever the
-// system says (agents/magma.md). https://github.com/magma-design-system/magma/issues/960
+// The user agent of a phone, with the mobile viewport.
 const MOBILE_UA =
   'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36';
 /** Chrome's largest surface is 16384 px: past it a capture repeats the top of the page. */

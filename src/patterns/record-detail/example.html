@@ -101,8 +101,8 @@
     </form>
   </mds-modal>
 
-  <!-- Read out by screen readers after an action: mds-toast is not, yet. -->
-  <mds-text id="announcer" role="status" class="sr-only"></mds-text>
+  <!-- The toasts of the actions, lined up at the bottom edge and read out. -->
+  <mds-toast-region id="toasts"></mds-toast-region>
 </main>
 
 <template id="fact">
@@ -297,18 +297,8 @@
     );
   }
 
-  /**
-   * mds-file emits mdsFileDownload on a click only, and has no role: a role
-   * and the keyboard of a button, until Magma gives them
-   * (https://github.com/magma-design-system/magma/issues/820).
-   */
+  /** mds-file is a button, of the pointer and of the keyboard: its download. */
   function downloadable(file) {
-    file.setAttribute('role', 'button');
-    file.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
-      file.click();
-    });
     file.addEventListener('mdsFileDownload', (event) => {
       // In an application: the address of the file, opened to download it.
       show(`Demo: ${event.detail.filename} is not a real file.`, 'info');
@@ -337,7 +327,7 @@
   }
 
   /**
-   * The feedback of an action: on screen, and read out by screen readers.
+   * The feedback of an action: a toast in the region, which reads it out.
    * One toast per message: mds-toast shows a text only when it has one as it
    * loads.
    */
@@ -347,8 +337,7 @@
     toast.textContent = message;
     toast.visible = true;
     toast.addEventListener('mdsToastClose', () => toast.remove(), { once: true });
-    document.body.append(toast);
-    $('announcer').textContent = message;
+    $('toasts').append(toast);
   }
 
   // The dialog of an action that asks for a note.

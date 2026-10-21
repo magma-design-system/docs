@@ -16,9 +16,8 @@
   // After a reaction it rests for REST: what the pointer or a click reaches
   // meanwhile is let go, a mascot that reacts to every move is tiring to use
   // (the thinking ends when the pointer leaves, rest or not). With reduced
-  // motion (the system's, under Magma's `pref-animation-system`, or
-  // `pref-animation-reduce`) it does not react: mds-emoji keeps the pointer
-  // and the blinking still by itself, not its expressions.
+  // motion mds-emoji holds itself still: no pointer tracking, no blinking, and
+  // expressions that change the face without moving it.
   type Emoji = HTMLElement & {
     componentOnReady?: () => Promise<unknown>;
     agree: () => Promise<void>;
@@ -48,12 +47,6 @@
   /** The rest after a reaction, in ms: a new one each time, between the two. */
   const REST = { min: 10_000, max: 15_000 };
 
-  const root = document.documentElement;
-  const systemReduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const reduced = () =>
-    root.classList.contains('pref-animation-reduce') ||
-    (!root.classList.contains('pref-animation-no-preference') && systemReduce.matches);
-
   /** The element of the band an event is about, and what it does. */
   const match = (rules: [string, Reaction][], target: EventTarget | null, band: Element) => {
     if (!(target instanceof Element)) return undefined;
@@ -79,7 +72,7 @@
 
     const react = (reaction: Reaction) => {
       const now = performance.now();
-      if (reduced() || now < rested) return;
+      if (now < rested) return;
       rested = now + REST.min + Math.random() * (REST.max - REST.min);
       if (reaction === 'think') emoji.startThinking(HAND);
       else emoji[reaction]();

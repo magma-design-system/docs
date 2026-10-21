@@ -37,6 +37,7 @@ import {
   MdsTabItem,
   MdsText,
   MdsToast,
+  MdsToastRegion,
   MdsZero,
 } from '@maggioli-design-system/magma-angular';
 
@@ -127,6 +128,7 @@ interface Toast {
     MdsTabItem,
     MdsText,
     MdsToast,
+    MdsToastRegion,
     MdsZero,
   ],
   template: `
@@ -249,17 +251,7 @@ interface Toast {
             <section slot="content" class="pt-600">
               <div class="grid gap-400 md:grid-cols-2">
                 @for (filename of record.documents; track filename) {
-                  <!--
-                    mds-file emits mdsFileDownload on a click only, and has no role: a role
-                    and the keyboard of a button, until Magma gives them
-                    (https://github.com/magma-design-system/magma/issues/820).
-                  -->
-                  <mds-file
-                    [filename]="filename"
-                    role="button"
-                    (keydown)="onFileKey($event)"
-                    (mdsFileDownload)="download($event)"
-                  ></mds-file>
+                  <mds-file [filename]="filename" (mdsFileDownload)="download($event)"></mds-file>
                 }
               </div>
             </section>
@@ -328,13 +320,18 @@ interface Toast {
         }
       </mds-modal>
 
-      @for (toast of toasts(); track toast.key) {
-        <mds-toast [variant]="toast.variant" [visible]="true" (mdsToastClose)="dismiss(toast.key)">
-          {{ toast.message }}
-        </mds-toast>
-      }
-      <!-- Read out by screen readers after an action: mds-toast is not, yet. -->
-      <mds-text role="status" class="sr-only">{{ announcement() }}</mds-text>
+      <!-- The toasts of the actions, lined up at the bottom edge and read out. -->
+      <mds-toast-region>
+        @for (toast of toasts(); track toast.key) {
+          <mds-toast
+            [variant]="toast.variant"
+            [visible]="true"
+            (mdsToastClose)="dismiss(toast.key)"
+          >
+            {{ toast.message }}
+          </mds-toast>
+        }
+      </mds-toast-region>
     </main>
   `,
 })
@@ -365,7 +362,6 @@ export class RecordDetailComponent {
   readonly note = signal('');
   readonly noteError = signal(false);
   readonly toasts = signal<Toast[]>([]);
-  readonly announcement = signal('');
 
   readonly actions = computed(() => {
     const record = this.record();
@@ -442,12 +438,6 @@ export class RecordDetailComponent {
     });
   }
 
-  onFileKey(event: KeyboardEvent) {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    (event.currentTarget as HTMLElement).click();
-  }
-
   download(event: MdsFileCustomEvent<MdsFileEventDetail>) {
     // In an application: the address of the file, opened to download it.
     this.show(`Demo: ${event.detail.filename} is not a real file.`, 'info');
@@ -457,12 +447,11 @@ export class RecordDetailComponent {
     this.attempt.update((count) => count + 1);
   }
 
-  /** The feedback of an action: on screen, and read out by screen readers. */
+  /** The feedback of an action: a toast in the region, which reads it out. */
   private show(message: string, variant: Toast['variant']) {
     // One toast per message: mds-toast shows a text only when it has one as it loads.
     const key = ++this.nextToast;
     this.toasts.update((toasts) => [...toasts, { key, message, variant }]);
-    this.announcement.set(message);
   }
 
   dismiss(key: number) {
