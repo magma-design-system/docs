@@ -1,0 +1,223 @@
+---
+// A card of files to download, the pattern of the Brand assets section
+// (IdentityFamily.astro) and of the Media kit (MediaKit.astro): a preview, a
+// title and a Download split button (mds-button-dropdown), whose action
+// downloads the main file and whose menu lists every format with its files
+// and, under them, a line whose button copies a value (CopyExample.astro;
+// CopyToClipboard.astro once per page): the path of a file in a package, the
+// full URL of an image.
+// The preview is a background image, so it fills mds-card-media whatever the
+// shape of the file: an artwork, transparent, `contain` on the background it
+// is drawn for (dark or white, whatever the mode of the page) as a
+// checkerboard; an image, opaque, `contain` on a soft ground, in a 4:3 box.
+// The cards are surface-overlay: mds-card's parts paint --mds-card-background,
+// not the background of the card, so both are set.
+// The footer is `self-end`: with no mds-card-content, a card wide enough to
+// put the media beside the title gives the footer the row that stretches, and
+// the Download button rises under the title
+// (https://github.com/magma-design-system/magma/issues/1040).
+import CopyExample from './CopyExample.astro';
+
+export interface DownloadLink {
+  /** What the button shows under it: a size in kB, a width. */
+  text: string;
+  href: string;
+  /** The name the file is saved with. */
+  file: string;
+  /** The accessible name of the button. */
+  label: string;
+}
+
+export interface DownloadRow {
+  format: string;
+  description: string;
+  links: DownloadLink[];
+}
+
+interface Props {
+  /** The title of the card. */
+  label: string;
+  /** A line under the title. */
+  detail?: string;
+  /** The tag of the title, one level under the heading of the cards. */
+  tag: 'h3' | 'h4';
+  /** The accessible name of the preview, and of the menu. */
+  alt: string;
+  /** The URL of the preview. */
+  src: string;
+  /** An artwork on the background it is drawn for, or an opaque image. */
+  preview: { kind: 'artwork'; dark: boolean } | { kind: 'image' };
+  /** The file the action of the split button downloads. */
+  download: { href: string; file: string };
+  rows: DownloadRow[];
+  /** The line under the formats: the text it shows, the value its button copies. */
+  copy: { text: string; value: string };
+}
+
+const { label, detail, tag, alt, src, preview, download, rows, copy } = Astro.props;
+const { t } = Astro.locals;
+const raw = { interpolation: { escapeValue: false } };
+---
+
+<mds-card class="bg-surface-overlay [--mds-card-background:rgb(var(--magma-surface-overlay))]">
+  <mds-card-media class="p-200">
+    <div
+      class:list={[
+        'relative size-full min-h-3200 overflow-hidden rounded-md inset-shadow-xs',
+        // An image gets a 4:3 box: in the height of a logo a cover is a thumbnail.
+        preview.kind === 'image'
+          ? 'aspect-[4/3] bg-wash-soft'
+          : [
+              // The classic checkerboard, to show that the files are transparent.
+              'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
+              preview.dark
+                ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
+                : 'bg-white [--checker:color-mix(in_oklab,var(--color-neutral-100),var(--color-neutral-200))]',
+            ],
+      ]}
+    >
+      <span
+        role="img"
+        aria-label={alt}
+        class:list={[
+          'absolute bg-contain bg-center bg-no-repeat',
+          preview.kind === 'image' ? 'inset-300' : 'inset-600',
+        ]}
+        style={`background-image: url('${src}')`}
+      ></span>
+    </div>
+  </mds-card-media>
+  <mds-card-header>
+    {detail ? (
+      <div class="flex flex-col">
+        <mds-text typography="h6" tag={tag}>
+          {label}
+        </mds-text>
+        <mds-text typography="caption" tag="p" class="text-fg-muted">
+          {detail}
+        </mds-text>
+      </div>
+    ) : (
+      <mds-text typography="h6" tag={tag}>
+        {label}
+      </mds-text>
+    )}
+  </mds-card-header>
+  <mds-card-footer class="self-end">
+    <mds-button-dropdown
+      label={t('brand.download.action')}
+      icon="mi/outline/file-download"
+      variant="primary"
+      tone="strong"
+      data-download={download.href}
+      data-file={download.file}
+    >
+      <div
+        role="group"
+        aria-label={t('brand.download.group', { name: alt, ...raw })}
+        data-pagefind-ignore
+        data-download-menu
+        class="flex flex-col gap-400 p-400"
+      >
+        <div class="grid items-center">
+          {rows.map(({ format, description, links }) => (
+            <div class="hover:bg-surface-raised p-200 pl-400 transition-colors rounded-md grid grid-cols-[1fr_auto] items-center gap-600">
+              <div class="flex flex-col">
+                <mds-text typography="h6" tag="span">
+                  {format}
+                </mds-text>
+                <mds-text typography="caption" tag="span" class="text-fg-muted">
+                  {description}
+                </mds-text>
+              </div>
+              <div class="flex justify-center gap-300">
+                {links.map((item) => (
+                  <div
+                    class="inline-flex cursor-pointer flex-col items-center justify-center"
+                    data-download={item.href}
+                    data-file={item.file}
+                  >
+                    <mds-button
+                      icon="mi/outline/file-download"
+                      variant="dark"
+                      tone="text"
+                      class="self-center justify-self-center"
+                      aria-label={item.label}
+                      class="hover:bg-surface-overlay hover:shadow-sm"
+                    />
+                    <mds-text typography="tip" tag="span" aria-hidden="true">
+                      {item.text}
+                    </mds-text>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <mds-hr></mds-hr>
+        <CopyExample text={copy.text} copy={copy.value}>
+          {copy.text}
+        </CopyExample>
+      </div>
+    </mds-button-dropdown>
+  </mds-card-footer>
+</mds-card>
+
+<script>
+  type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
+
+  // mds-button follows its `href` with `location.href` and has no `download`:
+  // a link made for the click downloads the file of `data-download`.
+  const download = (element: Element | null) => {
+    const href = element?.getAttribute('data-download');
+    if (!element || !href) return;
+    const link = document.createElement('a');
+    link.href = href;
+    link.download = element.getAttribute('data-file') ?? '';
+    link.click();
+  };
+
+  // The action of the split button: the main file.
+  document.addEventListener('mdsButtonDropdownClick', (event) =>
+    download(event.target instanceof Element ? event.target : null),
+  );
+
+  // magma 2.2.0, fixes to the menu of each split button:
+  // - mds-button-dropdown passes no placement to its mds-dropdown, whose
+  //   autoPlacement opens the menu on the side with the most room, beside the
+  //   button most of the time. Below it, aligned to its end, above it when
+  //   there is no room below.
+  // - mds-dropdown tells what is in it with `contains`, which does not see
+  //   what mds-button-dropdown slots into it: any click in the menu closed
+  //   it, the copy before its check showed, and Escape from the menu dropped
+  //   the focus on the page. The clicks stop in the menu, which Escape and a
+  //   click outside still close, and Escape gives the focus back to the arrow.
+  const setup = async () => {
+    await customElements.whenDefined('mds-button-dropdown');
+    for (const split of document.querySelectorAll<MagmaElement>(
+      'mds-button-dropdown[data-download]',
+    )) {
+      if (split.dataset.ready !== undefined) continue;
+      split.dataset.ready = '';
+      await split.componentOnReady?.();
+      const menu = split.shadowRoot?.querySelector('mds-dropdown');
+      if (menu) {
+        Object.assign(menu, { placement: 'bottom-end', disableAutoPlacement: true, flip: true });
+      }
+      const files = split.querySelector('[data-download-menu]');
+      files?.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const file =
+          event.target instanceof Element ? event.target.closest('[data-download]') : null;
+        if (file && files.contains(file)) download(file);
+      });
+      files?.addEventListener('keydown', (event) => {
+        if (!(event instanceof KeyboardEvent) || event.key !== 'Escape') return;
+        split.shadowRoot?.querySelector<HTMLElement>('.dropdown-action')?.focus();
+      });
+    }
+  };
+  // Every page the router shows, the first one included.
+  document.addEventListener('astro:page-load', setup);
+  setup();
+</script>

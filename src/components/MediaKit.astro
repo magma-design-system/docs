@@ -1,0 +1,98 @@
+---
+// The covers of a group of the Media kit page (src/lib/covers.mjs), as the
+// cards of the Brand assets section (DownloadCard.astro): a light preview,
+// what the image is for, its size, and Download, whose menu has the file and
+// its full URL to copy, for the forms that ask for the address of an image.
+// The title comes from the name of the file: media.use.<use> for a preview,
+// the shape for a post, the profiles for an avatar, page, device and mode for
+// a screenshot; a cover with a use the dictionaries do not know shows its name,
+// so a new file needs no code, only its line in the dictionaries.
+import DownloadCard from './DownloadCard.astro';
+import { covers, previewPath, type Cover, type CoverGroup } from '../lib/covers.mjs';
+
+interface Props {
+  group: CoverGroup;
+}
+
+const { group } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const raw = { interpolation: { escapeValue: false } };
+
+const known = (key: string) => t.exists(key);
+const shape = ({ width, height }: Cover) =>
+  width === height
+    ? 'square'
+    : height > width * 1.6
+      ? 'story'
+      : height > width
+        ? 'portrait'
+        : 'landscape';
+
+const title = (cover: Cover) => {
+  if (group === 'avatars') return t(`media.avatar.${cover.width}` as never);
+  if (group === 'posts') return t(`media.post.${shape(cover)}` as never);
+  if (group === 'screenshots') {
+    // <page>-<device>-<mode>.png, as scripts/screenshots.mjs names them.
+    const [page = '', device = '', mode = ''] = cover.use.split('-');
+    const parts = [`media.page.${page}`, `media.device.${device}`, `media.mode.${mode}`];
+    return parts.every(known)
+      ? t('media.screenshot', {
+          page: t(parts[0] as never),
+          device: t(parts[1] as never),
+          mode: t(parts[2] as never),
+          ...raw,
+        })
+      : cover.file;
+  }
+  return known(`media.use.${cover.use}`) ? t(`media.use.${cover.use}` as never) : cover.file;
+};
+
+const kb = (bytes: number) =>
+  t('brand.kb', { size: Math.max(1, Math.round(bytes / 1024)).toLocaleString(lang) });
+
+const cards = (await covers(group)).map((cover) => {
+  const href = `${base}covers/${cover.path}`;
+  const size = t('media.size', { width: cover.width, height: cover.height, ...raw });
+  const label = title(cover);
+  return {
+    label,
+    detail: `${size}, ${kb(cover.bytes)}`,
+    alt: `${label}, ${size}`,
+    src: cover.generated ? href : `${base}covers/${previewPath(cover.path)}`,
+    download: { href, file: cover.file },
+    rows: [
+      {
+        format: 'PNG',
+        description: t('brand.format.png'),
+        links: [
+          {
+            text: kb(cover.bytes),
+            href,
+            file: cover.file,
+            label: t('brand.download', { file: cover.file, size: kb(cover.bytes), ...raw }),
+          },
+        ],
+      },
+    ],
+    copy: new URL(href, Astro.site).href,
+  };
+});
+---
+
+<div class="not-content mt-400 mb-800 grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] gap-400">
+  {cards.map(({ label, detail, alt, src, download, rows, copy }) => (
+    <DownloadCard
+      label={label}
+      detail={detail}
+      tag="h3"
+      alt={alt}
+      src={src}
+      preview={{ kind: 'image' }}
+      download={download}
+      rows={rows}
+      copy={{ text: copy, value: copy }}
+    />
+  ))}
+</div>
