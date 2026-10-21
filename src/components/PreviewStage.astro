@@ -7,7 +7,7 @@
 // see what depends on the height of the viewport (overlays that open where
 // there is room, what is fixed to the viewport or follows its scroll). Once
 // the height is set by hand, the frame stops following the example, which
-// scrolls inside it. With `surfaces`, swatches under it put the example on
+// scrolls inside it. With `surfaces`, a picker under it puts the example on
 // each of Magma's surface levels, to see how it stands on each ground. Reset loads
 // the example again, at full width, at its own height and on its surface; the
 // buttons of the `actions` slot go next to it. The props, methods and theme
@@ -21,7 +21,7 @@ interface Props {
   /** The title of the frame. */
   title: string;
   /**
-   * The swatches of the surfaces, for a page that paints its body by
+   * The picker of the surfaces, for a page that paints its body by
    * `data-surface` (src/pages/example/[tag].astro).
    */
   surfaces?: boolean;
@@ -29,18 +29,11 @@ interface Props {
 
 const { tag, src, title, surfaces = false } = Astro.props;
 const { t } = Astro.locals;
-// Magma's five levels, from the one sunk into the page to the floating one,
-// each a button painted with it. The token names, in every language, as the
-// Color page writes them.
-const SURFACES = [
-  { name: 'sunken', paint: '[--mds-button-background:rgb(var(--magma-surface-sunken))]' },
-  { name: 'muted', paint: '[--mds-button-background:rgb(var(--magma-surface-muted))]' },
-  { name: 'default', paint: '[--mds-button-background:rgb(var(--magma-surface-default))]' },
-  { name: 'raised', paint: '[--mds-button-background:rgb(var(--magma-surface-raised))]' },
-  { name: 'overlay', paint: '[--mds-button-background:rgb(var(--magma-surface-overlay))]' },
-];
-// The level of the example until a swatch is pressed: the body of its page
-// has it without `data-surface`.
+// Magma's five levels, from the one sunk into the page to the floating one.
+// The token names, in every language, as the Color page writes them.
+const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
+// The level of the example until another is picked: the body of its page has
+// it without `data-surface`.
 const SURFACE = 'raised';
 ---
 
@@ -84,40 +77,39 @@ const SURFACE = 'raised';
   </div>
 </div>
 {/*
-  The surfaces at the left, one pressed at a time (the script), and the
-  buttons at the right; on a phone the buttons go under them. `not-content`:
-  Starlight would put 1rem above each element that follows another.
-  Each surface is a swatch: a button without a label, its ground the level it
-  stands for (a class on the host beats the tone's own), a thin outline that
-  tells the light levels apart, and its name as a title. All of them carry the
-  check, visible only on the pressed one, so they keep one size.
+  The picker of the surfaces at the left, and the buttons at the right; on a
+  phone the buttons go under it. `not-content`: Starlight would put 1rem above
+  each element that follows another.
+  The picker is a pill: a circle painted with the surface of the example, then
+  a select of the five levels by name. The pill draws the edge: the select has
+  no ring or shadow at rest, only its own on hover and focus.
 */}
 <div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
   {surfaces && (
-    <mds-button-group
-      role="group"
-      aria-label={t('component.preview.surface')}
+    <div
+      class="flex items-center gap-100 rounded-full border border-border-muted bg-surface-overlay p-100"
       data-playground-surface={tag}
       data-default={SURFACE}
-      class="p-200"
     >
-      {SURFACES.map(({ name, paint }) => (
-        <mds-button
-          title={name}
-          aria-pressed={String(name === SURFACE)}
-          icon="mi/baseline/check"
-          variant="dark"
-          tone="weak"
-          size="sm"
-          type="button"
-          class:list={[
-            paint,
-            'fill-transparent aria-pressed:fill-fg-default [--mds-button-border-color-rgb:var(--magma-border-default)] [--mds-button-border-width:--spacing(25)]',
-          ]}
-          data-surface={name}
-        ></mds-button>
-      ))}
-    </mds-button-group>
+      <span
+        aria-hidden="true"
+        class="size-600 shrink-0 rounded-full border border-border-default bg-surface-raised data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken"
+        data-surface-swatch
+      ></span>
+      <mds-input-select
+        aria-label={t('component.preview.surface')}
+        size="sm"
+        value={SURFACE}
+        class="[--mds-input-select-ring:0_0_0_0_transparent] [--mds-input-select-shadow:none]"
+        data-surface-select
+      >
+        {SURFACES.map((surface) => (
+          <option value={surface} selected={surface === SURFACE}>
+            {surface}
+          </option>
+        ))}
+      </mds-input-select>
+    </div>
   )}
   <div class="ml-auto flex gap-200">
     <slot name="actions" />
@@ -362,28 +354,29 @@ const SURFACE = 'raised';
     };
   };
 
+  type Select = HTMLElement & { value?: string };
+
   /**
-   * The swatches of the surfaces: a press paints the example on its level,
-   * and only that swatch shows as pressed. Returns what picks the page's own
+   * The picker of the surfaces: a level picked in its select paints the
+   * example and the circle of the pill. Returns what picks the page's own
    * surface again.
    */
   const surfaces = (stage: Stage, tag: string) => {
-    const group = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
-    if (!group) return () => {};
-    const initial = group.dataset.default;
+    const picker = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
+    const select = picker?.querySelector<Select>('[data-surface-select]');
+    const swatch = picker?.querySelector<HTMLElement>('[data-surface-swatch]');
+    if (!picker || !select || !swatch) return () => {};
+    const initial = picker.dataset.default;
     const pick = (surface: string | undefined) => {
-      for (const swatch of group.querySelectorAll<HTMLElement>('[data-surface]')) {
-        swatch.setAttribute('aria-pressed', String(swatch.dataset.surface === surface));
-      }
+      if (surface === undefined) return;
+      swatch.dataset.surface = surface;
+      if (select.value !== surface) select.value = surface;
     };
-    group.addEventListener('click', (event) => {
-      const swatch =
-        event.target instanceof Element
-          ? event.target.closest<HTMLElement>('[data-surface]')
-          : null;
-      if (!swatch) return;
-      stage.surface = swatch.dataset.surface;
-      pick(stage.surface);
+    select.addEventListener('mdsInputSelectChange', (event) => {
+      const { value } = (event as CustomEvent<{ value?: unknown }>).detail ?? {};
+      if (typeof value !== 'string' || !value || value === stage.surface) return;
+      stage.surface = value;
+      pick(value);
       paint(stage);
     });
     return () => {

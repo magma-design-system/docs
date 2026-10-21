@@ -122,13 +122,12 @@ sidebar items. The structure and its reasons are in
 - the stage (`PreviewStage.astro`: the frame, its handles, its height and Reset) can be
   narrowed with the handle at its right, and made shorter or taller than the example with the
   one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
-  stops following the example, which scrolls inside it. Under it, on component pages, an
-  `mds-button-group` of swatches puts the example on each of Magma's five surfaces: buttons
-  without a label, each painted with its level (`--mds-button-background` set by a class on the
-  host, which beats the tone's own), named by a `title`, the pressed one (`aria-pressed`) with a
-  check. A swatch sets `data-surface` on the body of the example's page, whose
-  `data-[surface=...]:` classes paint it (default: `surface-raised`). Reset reloads it at full
-  width, at the example's height and on `surface-raised`.
+  stops following the example, which scrolls inside it. Under it, on component pages, a picker
+  puts the example on each of Magma's five surfaces: a pill with a circle painted with the
+  current one and an `mds-input-select` of the levels by name, without ring or shadow at rest
+  (the pill draws the edge). A level sets `data-surface` on the body of the example's page,
+  whose `data-[surface=...]:` classes paint it (default: `surface-raised`). Reset reloads it at
+  full width, at the example's height and on `surface-raised`.
 
 ## Other routes
 
