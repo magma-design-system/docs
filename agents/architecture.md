@@ -141,6 +141,10 @@ that other sites can point to; an image under `src/assets/` gets a hash in its n
 - `og-1200x630.png` is the `og:image` of every page (`Head.astro`, alt text `frame.cover.alt`):
   Starlight sets `twitter:card` to `summary_large_image` but has no image. A page can set its
   own with `og:image` in the `head` of its frontmatter.
+- Starlight writes `<title>` as `<page title> | <site title>` and `og:title` as the page title.
+  The home, whose title is the site title, sets both in the `head` of its frontmatter
+  (`Magma Design System | Maggioli`, `Magma Design System`) instead of `Magma | Magma`; its
+  `title` stays `Magma`, the name in the hero.
 - GitHub does not read a URL: the social preview of the repository is uploaded by hand
   (Settings, General, Social preview), from the file here.
 - The profile pictures are generated, not kept here: `src/pages/covers/icons/[file].ts` draws
