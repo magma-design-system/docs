@@ -120,6 +120,8 @@ sidebar items. The structure and its reasons are in
 
 - `src/pages/favicons/[file].ts`: every favicon and the web manifest, generated with `sharp`
   from the Magma logo of `identity`.
+- `src/pages/covers/icons/[file].ts`: the avatar of Magma at the sizes of the social and chat
+  profiles (Covers).
 - `src/pages/lab/[name].astro`: pages to check a detail by eye (heading anchors). Dev only: a
   build has none.
 - `src/pages/downloads/`: files of the packages served for download (Figma tokens, brand
@@ -139,6 +141,10 @@ that other sites can point to; an image under `src/assets/` gets a hash in its n
   own with `og:image` in the `head` of its frontmatter.
 - GitHub does not read a URL: the social preview of the repository is uploaded by hand
   (Settings, General, Social preview), from the file here.
+- The profile pictures are generated, not kept here: `src/pages/covers/icons/[file].ts` draws
+  the avatar of `identity` (`avatar/avatar-magma.svg`) at the sizes the profiles ask for,
+  `/covers/icons/avatar-<size>x<size>.png`. The icons of the site itself (iOS home screen,
+  Android, browsers) are the favicons (Other routes).
 
 ## Browser storage keys
 
