@@ -84,7 +84,7 @@ const hasHero = Boolean(entry.data.hero);
 
   const PERSIST = 'data-astro-transition-persist';
 
-  // The links of the components (mds-button, mds-tab-item) are anchors in
+  // The links of the components (mds-button, mds-link, mds-tab-item) are anchors in
   // their shadow roots, which the router does not see: Magma hands it their
   // plain clicks within the site. Anchors of this page stay with the browser.
   NavigationService.setHandler((href) => {

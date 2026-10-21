@@ -1,7 +1,8 @@
 ---
 // The Figma files of design-tokens to download (src/pages/downloads/[file].ts):
-// what each one holds, how many variables, its size. Links with `download`:
-// mds-button[href] has no way to ask for a download.
+// what each one holds, how many variables, its size. Native links with
+// `download`: neither mds-link nor mds-button[href] can ask for a download
+// (agents/magma.md).
 import Code from './Code.astro';
 import { FIGMA_FILES, figmaFileInfo } from '../lib/tokens.mjs';
 import { magmaVersion } from '../lib/magma.mjs';

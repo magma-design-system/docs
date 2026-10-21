@@ -87,7 +87,9 @@ const headings = [
   </mds-text>
   <mds-text {...READING} tag="p" class={TEXT.paragraph}>
     <UiText reading text={t('brand.howTo')} />{' '}
-    <a href={`${localePrefix(locale)}/brand/identity-package/`}>{t('brand.howTo.link')}</a>
+    <mds-link href={`${localePrefix(locale)}/brand/identity-package/`}>
+      {t('brand.howTo.link')}
+    </mds-link>
     {t('brand.howTo.after')}
   </mds-text>
 

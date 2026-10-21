@@ -70,9 +70,11 @@ against open issues before filing.
   its 8px gap before the label, and an `aria-label` on the host is not passed on (2.3.0, still
   in 2.5.0).
 - `mds-breadcrumb` has no links; Magma has no description list, no ordered list and no code
-  block component. `mds-link`, the inline link, is new in 2.5.0: the site does not use it yet
-  ([plan/BACKLOG.md](../plan/BACKLOG.md)).
-- `mds-button[href]` has no `download`, nor has `mds-link` (2.5.0).
+  block component.
+- `mds-button[href]` has no `download`, nor has `mds-link` (2.5.0): the Figma files of
+  `FigmaDownloads.astro` stay native `<a download>`.
+- `mds-link` takes text only in its slot (2.5.0, by design): a link around inline code goes
+  inside the code instead ([writing.md](writing.md), "Links").
 - `--mds-elevation-*` and `--depth` break the naming convention (`--magma-*` for globals) and
   come from `styles/dist/css/theme.css`, which is not in the documented import order (2.2.0,
   still in styles 17.3.0).

@@ -56,8 +56,10 @@ Starlight's components listed in `astro.config.mjs` are replaced by
 **Page changes** use Astro's ClientRouter (added in `Head.astro`). The rail, the section column
 and the right column are `transition:persist`: they stay mounted while their links are the same,
 and keep their scroll. `PageFrame`'s script carries the attributes of `<html>` over (mode,
-theme, rail state), and hands `mds-button[href]` navigation to the router through Magma's
-`NavigationService.setHandler`. Changing language is a full page load.
+theme, rail state), and hands the navigation of `mds-button[href]` and `mds-link` to the router
+through Magma's `NavigationService.setHandler`: their anchors are in their shadow roots, which
+the router does not see. Astro's hover prefetch does not see them either
+([plan/BACKLOG.md](../plan/BACKLOG.md), "Layout"). Changing language is a full page load.
 
 **Page footer** (`Footer`): who modified the page last and who created it, with the button to
 edit it on GitHub. Git history is the only source (layout decision 2 in

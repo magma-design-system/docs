@@ -21,8 +21,8 @@ links or personal data.
 2. **Never `npm link`.** Symlinks hide the packaging bugs this site is meant to catch. Test
    unreleased Magma with a prerelease or a packed tarball (README).
 3. **Magma components for everything on the page**, text included: `mds-text`, `mds-list`,
-   `mds-table`, `mds-banner`, `mds-button`, ... Markdown is converted for you; in `.astro`
-   files write them by hand. Where Magma has no component (link, `ol`, code block, `dl`), use
+   `mds-table`, `mds-banner`, `mds-button`, `mds-link`, ... Markdown is converted for you; in
+   `.astro` files write them by hand. Where Magma has no component (`ol`, code block, `dl`), use
    the native element and record the gap: never build a lookalike. See
    [agents/writing.md](agents/writing.md).
 4. **Tailwind utilities and Magma tokens** for everything the site styles: no literal colors or
