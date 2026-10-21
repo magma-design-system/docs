@@ -115,12 +115,7 @@ const at = (index: number, depth: number) => ({
     class="flex justify-center perspective-distant py-1000 @xl:pr-3200 @xl:pl-4400"
     style={STAGE}
   >
-    <div
-      data-layers-scene
-      inert
-      class="grid w-4/5 max-w-(--container-sm) transform-3d @xl:w-full"
-      style={SCENE}
-    >
+    <div data-layers-scene inert class="grid w-4/5 max-w-sm transform-3d @xl:w-full" style={SCENE}>
       {PLANES.map(({ flag }, index) => (
         <div
           class="relative [grid-area:1/1] transform-3d [&_[data-depth]]:outline-1 [&_[data-depth]]:outline-offset-2 [&_[data-depth]]:outline-(color:--ring) [&_[data-depth]]:outline-dashed"

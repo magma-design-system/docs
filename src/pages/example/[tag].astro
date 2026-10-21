@@ -25,9 +25,9 @@ interface Props {
 const { tag, example } = Astro.props.entry.data;
 
 // The usage files point their images at example.com, a domain reserved for
-// documentation that serves none: the avatar of mds-avatar would start on its
-// load error, which it never leaves (magma#956). The preview loads Magma's own
-// avatar from the identity package instead (src/pages/downloads/identity).
+// documentation that serves none: mds-avatar would show its fallback, the
+// other examples a broken image. The preview loads Magma's own avatar from the
+// identity package instead (src/pages/downloads/identity).
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const image = `${base}downloads/identity/avatar/avatar-magma-256w.png`;
 const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|webp|gif)/g, image);

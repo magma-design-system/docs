@@ -24,22 +24,20 @@ the `magma` package); this file covers what is specific to the site.
 
 ## Traps
 
-| Symptom                                                    | Cause and fix                                                                                                                                                          |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `w-72` is about 3px                                        | Magma's `--spacing` is `0.0025rem`: numbers are Magma steps (`gap-400` = 1rem). Use the steps, container sizes (`w-2xs` = 240px) or `--spacing(n)`.                    |
-| `max-w-3xl` is 64px                                        | Size names resolve to Magma's spacing (`--spacing-3xl`) first. Use `max-w-(--container-3xl)`.                                                                          |
-| `max-w-none` is 0                                          | Magma defines `--spacing-none: 0px`. Use `max-w-[none]`.                                                                                                               |
-| `invisible` does nothing on a Magma component              | Stencil's unlayered `[hydrated] { visibility: inherit }` beats any layer. Use `hidden`, or an inline style.                                                            |
-| A component has a gap above it inside page content         | Starlight's content styles put a margin between siblings (`* + *`). Use `not-content` on the site's own blocks, or `mt-0` / `my-0`.                                    |
-| Text wraps in a table cell despite `whitespace-nowrap`     | Magma's reset gives `p` `text-wrap: pretty` and a max width, and `mds-text` hosts set it too: put `whitespace-nowrap` on the `mds-text` itself.                        |
-| Text in an `mds-entity` stays on one line with an ellipsis | `mds-entity` truncates everything in its slots (`::slotted(*)`, `white-space: nowrap`). A page class beats `::slotted`: `whitespace-normal` on the slotted `mds-text`. |
-| A label color looks wrong in dark mode                     | Magma inverts the label palette in dark mode itself: remove your `dark:` variant.                                                                                      |
-| An `mds-card` is 0px wide                                  | It is a size container (`container-type: inline-size`): shrink-to-fit sizing (absolute position, `w-max`) gives it no width. Give it one.                              |
-| An `mds-card` keeps its default ground                     | Its parts paint `--mds-card-background` (undocumented): set it next to the class, `[--mds-card-background:rgb(var(--magma-surface-overlay))]`.                         |
-| The buttons of an `mds-card-footer` sit under the header   | With no `mds-card-content`, the footer gets the row that stretches (magma#1040): `self-end` on the `mds-card-footer`.                                                  |
-| A dropdown or tooltip of the rail hides behind the card    | A sticky element is a stacking context: the rail sits on Magma's header layer (`desktop:z-(--magma-header-z-index)`). Keep it when you touch the frame.                |
-| A sticky element jumps when it sticks                      | Use `top-(--frame-sticky-top)`, which knows the mobile header and the card border.                                                                                     |
-| `h1`-`h6` in Roboto                                        | Magma's `base.css` sets no font on headings; `magma.css` maps the title tokens to them. Headings written by the site are `mds-text` anyway.                            |
+| Symptom                                                    | Cause and fix                                                                                                                                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `w-72` is about 3px                                        | Magma's `--spacing` is `0.0025rem`: numbers are Magma steps (`gap-400` = 1rem). Use the steps, container sizes (`w-2xs` = 240px) or `--spacing(n)`.                                |
+| `max-inline-xs` is 4px                                     | The width utilities with a size name read the container (`max-w-xs` = 320px), the logical ones still read the spacing of that name (styles 17.3.0): `max-inline-(--container-xs)`. |
+| `invisible` does nothing on a Magma component              | Stencil's unlayered `[hydrated] { visibility: inherit }` beats any layer. Use `hidden`, or an inline style.                                                                        |
+| A component has a gap above it inside page content         | Starlight's content styles put a margin between siblings (`* + *`). Use `not-content` on the site's own blocks, or `mt-0` / `my-0`.                                                |
+| Text wraps in a table cell despite `whitespace-nowrap`     | Magma's reset gives `p` `text-wrap: pretty` and a max width, and `mds-text` hosts set it too: put `whitespace-nowrap` on the `mds-text` itself.                                    |
+| Text in an `mds-entity` stays on one line with an ellipsis | `mds-entity` truncates everything in its slots (`::slotted(*)`, `white-space: nowrap`). A page class beats `::slotted`: `whitespace-normal` on the slotted `mds-text`.             |
+| A label color looks wrong in dark mode                     | Magma inverts the label palette in dark mode itself: remove your `dark:` variant.                                                                                                  |
+| An `mds-card` is 0px wide                                  | It is a size container (`container-type: inline-size`): shrink-to-fit sizing (absolute position, `w-max`) gives it no width. Give it one.                                          |
+| An `mds-card` keeps its default ground                     | Set `--mds-card-background`, which paints the card and its parts (2.4.0): `[--mds-card-background:rgb(var(--magma-surface-overlay))]`.                                             |
+| A dropdown or tooltip of the rail hides behind the card    | A sticky element is a stacking context: the rail sits on Magma's header layer (`desktop:z-(--magma-header-z-index)`). Keep it when you touch the frame.                            |
+| A sticky element jumps when it sticks                      | Use `top-(--frame-sticky-top)`, which knows the mobile header and the card border.                                                                                                 |
+| `h1`-`h6` in Roboto                                        | Magma's `base.css` sets no font on headings; `magma.css` maps the title tokens to them. Headings written by the site are `mds-text` anyway.                                        |
 
 ## Colors and surfaces
 
@@ -47,5 +45,5 @@ the `magma` package); this file covers what is specific to the site.
   never palette steps for interface roles and never literal values.
 - The label palette (`bg-label-<color>-10`, `text-label-<color>-03`, ...) is for categories,
   such as the type tints of the API tables.
-- The site's default ground for cards, chips and neutral banners is `surface-overlay`. Magma
-  draws some of them on other grounds (magma#944, magma#955): see [magma.md](magma.md).
+- The site's default ground for cards, chips and neutral banners is `surface-overlay`, as Magma
+  draws them since 2.4.0.
