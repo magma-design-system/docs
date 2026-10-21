@@ -7,10 +7,12 @@
 // see what depends on the height of the viewport (overlays that open where
 // there is room, what is fixed to the viewport or follows its scroll). Once
 // the height is set by hand, the frame stops following the example, which
-// scrolls inside it. Reset loads the example again, at full width and at its
-// own height; the buttons of the `actions` slot go next to it. The props,
-// methods and theme of the example are Playground.astro's, which finds the
-// frame by `data-playground-frame`.
+// scrolls inside it. With `surfaces`, chips under it put the example on each
+// of Magma's surface levels, to see how it stands on each ground. Reset loads
+// the example again, at full width, at its own height and on its surface; the
+// buttons of the `actions` slot go next to it. The props, methods and theme
+// of the example are Playground.astro's, which finds the frame by
+// `data-playground-frame`.
 
 interface Props {
   tag: string;
@@ -18,10 +20,21 @@ interface Props {
   src: string;
   /** The title of the frame. */
   title: string;
+  /**
+   * The chips of the surfaces, for a page that paints its body by
+   * `data-surface` (src/pages/example/[tag].astro).
+   */
+  surfaces?: boolean;
 }
 
-const { tag, src, title } = Astro.props;
+const { tag, src, title, surfaces = false } = Astro.props;
 const { t } = Astro.locals;
+// Magma's five levels, from the one sunk into the page to the floating one.
+// The token names, in every language, as the Color page writes them.
+const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
+// The level of the example until a chip is picked: the body of its page has it
+// without `data-surface`.
+const SURFACE = 'raised';
 ---
 
 {/*
@@ -63,34 +76,64 @@ const { t } = Astro.locals;
     </div>
   </div>
 </div>
-<div class="flex justify-end gap-200">
-  <slot name="actions" />
-  <mds-button
-    label={t('component.preview.reset')}
-    icon="mi/baseline/refresh"
-    variant="dark"
-    tone="text"
-    size="sm"
-    type="button"
-    data-playground-reset={tag}
-  ></mds-button>
+{/*
+  The surfaces at the left, a single choice that always keeps one (the
+  script), and the buttons at the right; on a phone the buttons go under
+  them, and the chips scroll when they do not fit. `not-content`: Starlight
+  would put 1rem above each chip that follows another.
+*/}
+<div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
+  {surfaces && (
+    <mds-filter
+      label={t('component.preview.surface')}
+      class="min-w-0 max-w-full"
+      data-playground-surface={tag}
+      data-default={SURFACE}
+    >
+      {SURFACES.map((surface) => (
+        <mds-filter-item label={surface} value={surface} selected={surface === SURFACE} />
+      ))}
+    </mds-filter>
+  )}
+  <div class="ml-auto flex gap-200">
+    <slot name="actions" />
+    <mds-button
+      label={t('component.preview.reset')}
+      icon="mi/baseline/refresh"
+      variant="dark"
+      tone="text"
+      size="sm"
+      type="button"
+      data-playground-reset={tag}
+    ></mds-button>
+  </div>
 </div>
 
 <script>
-  /** A frame of the page, with what its handles set. */
+  /** A frame of the page, with what its handles and its chips set. */
   interface Stage {
     frame: HTMLIFrameElement;
     /** The height set with the handle, in px; `undefined`: as tall as the example. */
     height?: number;
+    /** The surface picked with the chips; `undefined`: the page's own. */
+    surface?: string;
     /** Stops following the height of the example that is loaded. */
     stop?: () => void;
   }
 
   const stages = new WeakMap<HTMLIFrameElement, Stage>();
 
+  /** The example of the frame on the surface of its chips. */
+  const paint = (stage: Stage) => {
+    const body = stage.frame.contentDocument?.body;
+    if (!body?.hasAttribute('data-preview') || stage.surface === undefined) return;
+    body.dataset.surface = stage.surface;
+  };
+
   /**
    * A load of the frame: as tall as the example, now and when it changes,
-   * unless the handle set a height; the observer of the preview's own window.
+   * unless the handle set a height, and on the surface of its chips; the
+   * observer of the preview's own window.
    */
   const fit = (stage: Stage) => {
     stage.stop?.();
@@ -100,6 +143,7 @@ const { t } = Astro.locals;
     const doc = frame.contentDocument;
     const win = frame.contentWindow as (Window & typeof globalThis) | null;
     if (!doc || !win || !doc.body?.hasAttribute('data-preview')) return;
+    paint(stage);
     const follow = () => {
       if (stage.height !== undefined) return;
       frame.style.height = `${Math.ceil(doc.body.getBoundingClientRect().height)}px`;
@@ -294,6 +338,38 @@ const { t } = Astro.locals;
     };
   };
 
+  type Item = HTMLElement & { selected?: boolean; value?: string };
+
+  /**
+   * The chips of the surfaces: a pick paints the example. A click on the chip
+   * already picked would leave none: it stays picked, as a radio button does.
+   * Returns what picks the page's own surface again.
+   */
+  const surfaces = (stage: Stage, tag: string) => {
+    const filter = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
+    if (!filter) return () => {};
+    const initial = filter.dataset.default;
+    const items = () => [...filter.querySelectorAll<Item>('mds-filter-item')];
+    // Setting `selected` is taken in as a click, without mdsFilterChange.
+    const pick = (surface: string | undefined) => {
+      for (const item of items()) item.selected = item.value === surface;
+    };
+    filter.addEventListener('mdsFilterChange', (event) => {
+      const { value } = (event as CustomEvent<{ value: string }>).detail;
+      if (!value) {
+        pick(stage.surface ?? initial);
+        return;
+      }
+      stage.surface = value;
+      paint(stage);
+    });
+    return () => {
+      stage.surface = initial;
+      pick(initial);
+      paint(stage);
+    };
+  };
+
   /** The stages of the page, again on every page of the router. */
   const init = () => {
     for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
@@ -302,8 +378,10 @@ const { t } = Astro.locals;
       const stage: Stage = { frame };
       stages.set(frame, stage);
       const fullSize = resizable(stage, tag);
+      const ownSurface = surfaces(stage, tag);
       document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
         fullSize();
+        ownSurface();
         // Setting `src` loads it again, wherever the example led the frame.
         frame.src = frame.getAttribute('src') ?? '';
       });

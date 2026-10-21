@@ -122,8 +122,11 @@ sidebar items. The structure and its reasons are in
 - the stage (`PreviewStage.astro`: the frame, its handles, its height and Reset) can be
   narrowed with the handle at its right, and made shorter or taller than the example with the
   one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
-  stops following the example, which scrolls inside it. Reset reloads it at full width and at
-  the example's height.
+  stops following the example, which scrolls inside it. Under it, on component pages, an
+  `mds-filter` puts the example on each of Magma's five surfaces: the chip sets `data-surface`
+  on the body of the example's page, whose `data-[surface=...]:` classes paint it (default:
+  `surface-raised`); a click on the chip already picked keeps it, as a radio button. Reset
+  reloads it at full width, at the example's height and on `surface-raised`.
 
 ## Other routes
 

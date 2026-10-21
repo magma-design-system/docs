@@ -1,8 +1,8 @@
 ---
 // The preview at the top of a component's overview: its first Pattern
 // example running in an iframe (src/pages/example/[tag].astro), away from the styles of the site,
-// on a stage whose handles make it narrower, shorter or taller
-// (PreviewStage.astro); then a control for each prop that
+// on a stage whose handles make it narrower, shorter or taller and whose
+// chips put it on each surface (PreviewStage.astro); then a control for each prop that
 // takes a value to type or pick, in a grid of compact fields: the control,
 // the prop's name, its kind and its description in an mds-help; a text or
 // number field shows, while empty, an example of what the prop takes, when
@@ -17,8 +17,8 @@
 // components are all in their methods (mds-emoji). Controls and buttons
 // wait, disabled, until the preview is ready, again after each load (Reset).
 // A pattern (src/components/PatternPreview.astro) runs its own page on the
-// same stage, with its own texts and without controls; the buttons of the
-// `actions` slot go next to Reset.
+// same stage, with its own texts and without controls or surfaces: a page
+// paints its own; the buttons of the `actions` slot go next to Reset.
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
@@ -84,6 +84,7 @@ const placeholder = (value: string | undefined) =>
 <PreviewStage
   tag={tag}
   src={src}
+  surfaces={Astro.props.src === undefined}
   title={
     title ??
     t('component.preview.title', {
