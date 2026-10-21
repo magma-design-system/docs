@@ -6,8 +6,8 @@
 // component for every language: the examples are in Italian only.
 // The example flows as on any page, so each component takes the width it has
 // there (a badge its own, a field or a table the whole line; in a flex row
-// fields shrink to nothing), in the middle of the frame's height and without
-// Astro's dev toolbar, which would cover it in dev.
+// fields shrink to nothing), from the top of the frame, as a page starts, and
+// without Astro's dev toolbar, which would cover it in dev.
 import { getCollection, type CollectionEntry } from 'astro:content';
 import '../../styles/magma.css';
 
@@ -62,7 +62,7 @@ const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|web
   </head>
   <body
     data-preview
-    class="m-0 flex min-h-5000 flex-col justify-center bg-surface-raised p-800 [&>astro-dev-toolbar]:hidden"
+    class="m-0 flex min-h-5000 flex-col justify-start bg-surface-raised p-800 [&>astro-dev-toolbar]:hidden"
   >
     <div class="space-y-400" set:html={html} />
   </body>
