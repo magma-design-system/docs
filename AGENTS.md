@@ -75,6 +75,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/lib/nav.mjs`                                    | The 10 rail sections and their navigation (Starlight's sidebar), `soon`, drafts         |
 | `src/lib/magma.mjs`                                  | The only door to the Magma packages                                                     |
 | `src/lib/tokens.mjs`, `icons.mjs`, `identity.mjs`    | Data of the Tokens, Icons and Brand assets sections, read from the packages             |
+| `src/lib/covers.mjs`                                 | The covers of `public/covers/` and the generated avatars, for the Media kit             |
 | `src/lib/markdown-text.mjs`, `markdown-tables.mjs`   | Markdown rendered as Magma components; `KIND`, `TEXT`, `READING` for `.astro` pages too |
 | `src/integrations/magma.mjs`                         | Client script on every page, iconsauce icon dump, the Markdown plugins                  |
 | `src/styles/magma.css`                               | Magma's CSS in cascade layer order, Tailwind with Magma's theme, the few site rules     |
