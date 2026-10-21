@@ -14,11 +14,13 @@
 // Then a button for each method whose parameters take a value to type or
 // pick, with a field for each of them: it calls the method on the element of
 // the example, and a line under the buttons says what the call gave back. Some
-// components are all in their methods (mds-emoji). Controls and buttons
-// wait, disabled, until the preview is ready, again after each load (Reset).
-// A pattern (src/components/PatternPreview.astro) runs its own page on the
-// same stage, with its own texts and without controls or surfaces: a page
-// paints its own; the buttons of the `actions` slot go next to Reset.
+// components are all in their methods (mds-emoji). The buttons of the
+// methods wait, disabled, until the preview is ready, again after each load
+// (Reset); a control changed before is let go, and shows the value of its prop
+// once it is. A pattern (src/components/PatternPreview.astro) runs its own
+// page on the same stage, with its own texts and without controls or
+// surfaces: a page paints its own; the buttons of the `actions` slot go next
+// to Reset.
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
@@ -280,19 +282,20 @@ const placeholder = (value: string | undefined) =>
     }
   };
 
-  /** The buttons of the methods and the fields of their parameters. */
+  /** The buttons of the methods. */
   const callers = (playground: Playground) => [
-    ...(playground.methods?.querySelectorAll<Field>('[data-param], [data-call]') ?? []),
+    ...(playground.methods?.querySelectorAll<Field>('[data-call]') ?? []),
   ];
 
-  // The attribute goes with the prop: an mds-button rendered `disabled` keeps
-  // the attribute when its prop turns false, and the browser keeps a
-  // form-associated element with it disabled, so no click reaches the button
-  // (not filed yet, see agents/magma.md).
+  // Only the buttons: a Magma field disabled, then enabled again, can keep its
+  // "Disabled" tip (see agents/magma.md). The attribute goes with the prop: an
+  // mds-button rendered `disabled` keeps the attribute when its prop turns
+  // false, and the browser keeps a form-associated element with it disabled,
+  // so no click reaches the button (not filed yet, see agents/magma.md).
   const enable = (playground: Playground, enabled: boolean) => {
-    for (const field of [...fields(playground), ...callers(playground)]) {
-      field.disabled = !enabled;
-      field.toggleAttribute('disabled', !enabled);
+    for (const button of callers(playground)) {
+      button.disabled = !enabled;
+      button.toggleAttribute('disabled', !enabled);
     }
   };
 
