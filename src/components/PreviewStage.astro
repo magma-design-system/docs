@@ -1,0 +1,441 @@
+---
+// The stage of a preview (Playground.astro, and through it
+// PatternPreview.astro): the frame that runs the example, as wide as the
+// stage and as tall as the example, its two handles and Reset. The handle at
+// its right narrows it, to see the example in less room (as in the layout
+// mockups); the one under it makes it shorter or taller than the example, to
+// see what depends on the height of the viewport (overlays that open where
+// there is room, what is fixed to the viewport or follows its scroll). Once
+// the height is set by hand, the frame stops following the example, which
+// scrolls inside it. With `surfaces`, a picker under it puts the example on
+// each of Magma's surface levels, to see how it stands on each ground. Reset loads
+// the example again, at full width, at its own height and on its surface; the
+// buttons of the `actions` slot go next to it. The props, methods and theme
+// of the example are Playground.astro's, which finds the frame by
+// `data-playground-frame`.
+
+interface Props {
+  tag: string;
+  /** The page the frame runs. */
+  src: string;
+  /** The title of the frame. */
+  title: string;
+  /**
+   * The picker of the surfaces, for a page that paints its body by
+   * `data-surface` (src/pages/example/[tag].astro).
+   */
+  surfaces?: boolean;
+}
+
+const { tag, src, title, surfaces = false } = Astro.props;
+const { t } = Astro.locals;
+// Magma's five levels, from the one sunk into the page to the floating one.
+// The token names, in every language, as the Color page writes them; each
+// option of the picker puts the family before them ("Surface sunken"), so it
+// says what the colors are.
+const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
+// The level of the example until another is picked: the body of its page has
+// it without `data-surface`.
+const SURFACE = 'raised';
+---
+
+{/*
+  The stage, sunken, and on it the frame, raised, as wide as the stage and as
+  tall as the example until a handle is dragged or moved with the arrow keys:
+  the one at its right sets the width, the one under it the height (window
+  splitters: focusable separators with their value). Magma has no resize
+  handle. The handles sit on the stage, not on the frame: the stage has its
+  padding only at the top and at the left, their strips make the other two.
+  With the example on surface-sunken too, the stage takes wash-base, so that
+  the frame does not blend into it: a step darker in light, lighter in dark,
+  where nothing is below sunken (the script sets `data-surface` on it). The
+  grounds of the stage, of the example and of the circle of the picker fade
+  from one level to the next.
+*/}
+<div
+  class="flex rounded-3xl bg-surface-sunken pl-600 pt-600 transition-cosmetic duration-(--duration-300) data-[surface=sunken]:bg-wash-base"
+  data-playground-stage={tag}
+>
+  <div class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]" data-playground-viewport={tag}>
+    <iframe
+      src={src}
+      title={title}
+      class="block h-5000 w-full min-w-0 border-0 bg-surface-overlay rounded-xl shadow-sm"
+      data-playground-frame={tag}
+    ></iframe>
+    <div
+      role="separator"
+      aria-orientation="vertical"
+      aria-label={t('component.preview.resize')}
+      tabindex="0"
+      class="group mt-0 flex w-600 cursor-ew-resize touch-none items-center justify-center outline-none"
+      data-playground-handle={tag}
+    >
+      {/* Magma's focus ring on the bar, not on the strip that holds it. */}
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-strong group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+    </div>
+    <div
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label={t('component.preview.resizeHeight')}
+      tabindex="0"
+      class="group mt-0 flex h-600 cursor-ns-resize touch-none items-center justify-center outline-none"
+      data-playground-height-handle={tag}
+    >
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused w-1600 group-hover:w-1800 h-150 rounded-full bg-border-strong group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+    </div>
+  </div>
+</div>
+{/*
+  The picker of the surfaces at the left, and the buttons at the right; on a
+  phone the buttons go under it. `not-content`: Starlight would put 1rem above
+  each element that follows another.
+  The picker is a pill: a circle painted with the surface of the example, then
+  a select of the five levels by name, after the family ("Surface default").
+  The pill draws the edge: the select has no ring or shadow at rest, only its
+  focus ring on hover and focus. Both are transparent shadows, not `none`: the
+  select lists them in one box-shadow, where a `none` would void the focus
+  ring too.
+*/}
+<div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
+  {surfaces && (
+    <div
+      class="flex items-center gap-100 rounded-full border border-border-muted bg-surface-overlay p-100"
+      data-playground-surface={tag}
+      data-default={SURFACE}
+    >
+      <span
+        aria-hidden="true"
+        class="size-600 shrink-0 rounded-full border border-border-default bg-surface-raised transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken"
+        data-surface-swatch
+      ></span>
+      <mds-input-select
+        aria-label={t('component.preview.surface')}
+        size="sm"
+        value={SURFACE}
+        class="[--mds-input-select-ring:0_0_0_0_transparent] [--mds-input-select-shadow:0_0_0_0_transparent]"
+        data-surface-select
+      >
+        {SURFACES.map((surface) => (
+          <option value={surface} selected={surface === SURFACE}>
+            {t('component.preview.surfaceLevel', {
+              surface,
+              // Astro escapes the text: i18next does not need to.
+              interpolation: { escapeValue: false },
+            })}
+          </option>
+        ))}
+      </mds-input-select>
+    </div>
+  )}
+  <div class="ml-auto flex gap-200">
+    <slot name="actions" />
+    <mds-button
+      label={t('component.preview.reset')}
+      icon="mi/baseline/refresh"
+      variant="dark"
+      tone="text"
+      size="sm"
+      type="button"
+      data-playground-reset={tag}
+    ></mds-button>
+  </div>
+</div>
+
+<script>
+  /** A frame of the page, with what its handles and its picker set. */
+  interface Stage {
+    frame: HTMLIFrameElement;
+    /** The height set with the handle, in px; `undefined`: as tall as the example. */
+    height?: number;
+    /** The surface picked for the example; `undefined`: the page's own. */
+    surface?: string;
+    /** The stage around the frame, which follows the surface of the example. */
+    ground: HTMLElement | null;
+    /** Stops following the height of the example that is loaded. */
+    stop?: () => void;
+  }
+
+  const stages = new WeakMap<HTMLIFrameElement, Stage>();
+
+  /** The example of the frame on the surface of its picker, and its stage. */
+  const paint = (stage: Stage) => {
+    if (stage.surface === undefined) return;
+    if (stage.ground) stage.ground.dataset.surface = stage.surface;
+    const body = stage.frame.contentDocument?.body;
+    if (body?.hasAttribute('data-preview')) body.dataset.surface = stage.surface;
+  };
+
+  /**
+   * A load of the frame: as tall as the example, now and when it changes,
+   * unless the handle set a height, and on the surface of its picker; the
+   * observer of the preview's own window.
+   */
+  const fit = (stage: Stage) => {
+    stage.stop?.();
+    stage.stop = undefined;
+    const { frame } = stage;
+    // `null` once a link of the example led to another site.
+    const doc = frame.contentDocument;
+    const win = frame.contentWindow as (Window & typeof globalThis) | null;
+    if (!doc || !win || !doc.body?.hasAttribute('data-preview')) return;
+    paint(stage);
+    const follow = () => {
+      if (stage.height !== undefined) return;
+      frame.style.height = `${Math.ceil(doc.body.getBoundingClientRect().height)}px`;
+    };
+    follow();
+    const resize = new win.ResizeObserver(follow);
+    resize.observe(doc.body);
+    stage.stop = () => resize.disconnect();
+  };
+
+  /** The narrowest the example gets, in pixels: a small phone. */
+  const MIN_WIDTH = 320;
+  /** The shortest the example gets, in pixels: a strip of it. */
+  const MIN_HEIGHT = 120;
+  /** How far an arrow key moves a handle, with Shift for a longer step. */
+  const STEP = 16;
+  const LONG_STEP = 80;
+
+  /** One size of the frame, its width or its height, and the handle that sets it. */
+  interface Axis {
+    handle: HTMLElement;
+    /** Where the pointer is along the axis. */
+    position: (event: PointerEvent) => number;
+    /** The keys that make the frame smaller and bigger. */
+    smaller: string;
+    bigger: string;
+    current: () => number;
+    limits: () => { min: number; max: number };
+    /** The frame this big, within the limits; `undefined`: as it is by default. */
+    set: (size: number | undefined) => void;
+  }
+
+  /**
+   * A handle of the frame: dragged, or moved with the arrow keys, Home and
+   * End, it sets one size of the example. Returns what writes its value, and
+   * what sets the size.
+   */
+  const resizeHandle = (frame: HTMLIFrameElement, axis: Axis) => {
+    const { handle, current, limits } = axis;
+    /** The separator's value: the size of the example. */
+    const update = () => {
+      const { min, max } = limits();
+      handle.setAttribute('aria-valuemin', String(Math.round(min)));
+      handle.setAttribute('aria-valuemax', String(Math.round(max)));
+      handle.setAttribute('aria-valuenow', String(current()));
+      handle.setAttribute('aria-valuetext', `${current()} px`);
+    };
+    const set = (size: number | undefined) => {
+      axis.set(size);
+      update();
+    };
+
+    /** Ends the drag in progress, if there is one. */
+    let endDrag: (() => void) | undefined;
+
+    handle.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      event.preventDefault();
+      endDrag?.();
+      // The moves over the frame would go to the example's page.
+      frame.style.pointerEvents = 'none';
+      // Where on the handle it was taken, so it does not jump.
+      const offset = axis.position(event) - current();
+      const drag = new AbortController();
+      const { signal } = drag;
+      const end = () => {
+        drag.abort();
+        endDrag = undefined;
+        frame.style.removeProperty('pointer-events');
+        if (handle.hasPointerCapture(event.pointerId))
+          handle.releasePointerCapture(event.pointerId);
+      };
+      endDrag = end;
+      const ours = (other: PointerEvent) => other.pointerId === event.pointerId;
+      // Read on the window: a release outside the page, or outside the
+      // browser, does not always reach the handle, even with the pointer
+      // captured. A move with the button up means it went missing: the drag
+      // ends there instead of following the pointer back in.
+      addEventListener(
+        'pointermove',
+        (moved) => {
+          if (!ours(moved)) return;
+          if ((moved.buttons & 1) === 0) end();
+          else set(axis.position(moved) - offset);
+        },
+        { signal },
+      );
+      for (const type of ['pointerup', 'pointercancel'] as const) {
+        addEventListener(type, (released) => ours(released) && end(), { signal });
+      }
+      handle.addEventListener('lostpointercapture', end, { signal });
+      // Another window or app took over in the middle of it.
+      addEventListener('blur', end, { signal });
+      handle.setPointerCapture(event.pointerId);
+    });
+    handle.addEventListener('keydown', (event) => {
+      const step = event.shiftKey ? LONG_STEP : STEP;
+      const size = {
+        [axis.smaller]: current() - step,
+        [axis.bigger]: current() + step,
+        Home: limits().min,
+        End: limits().max,
+      }[event.key];
+      if (size === undefined) return;
+      event.preventDefault();
+      set(size);
+    });
+    return { update, set };
+  };
+
+  /**
+   * The two handles of the frame: the one at its right sets how wide the
+   * example is, up to the whole stage; the one under it how tall, from a
+   * strip of it to the height of the example or of the window, whichever is
+   * more. Returns what gives the example the whole stage and its own height
+   * again.
+   */
+  const resizable = (stage: Stage, tag: string) => {
+    const { frame } = stage;
+    const viewport = document.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
+    const widthHandle = document.querySelector<HTMLElement>(`[data-playground-handle="${tag}"]`);
+    const heightHandle = document.querySelector<HTMLElement>(
+      `[data-playground-height-handle="${tag}"]`,
+    );
+    const sunken = viewport?.parentElement;
+    if (!viewport || !widthHandle || !heightHandle || !sunken) return () => {};
+
+    /** How wide the example can be: the stage without its padding and the handle. */
+    const widthLimits = () => {
+      const style = getComputedStyle(sunken);
+      const max =
+        sunken.clientWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight) -
+        widthHandle.offsetWidth;
+      return { min: Math.min(MIN_WIDTH, max), max };
+    };
+    const width = resizeHandle(frame, {
+      handle: widthHandle,
+      position: (event) => event.clientX,
+      smaller: 'ArrowLeft',
+      bigger: 'ArrowRight',
+      current: () => Math.round(frame.getBoundingClientRect().width),
+      limits: widthLimits,
+      // The whole stage when `undefined` or wider.
+      set: (size) => {
+        const { min, max } = widthLimits();
+        if (size === undefined || size >= max) viewport.style.removeProperty('width');
+        else viewport.style.width = `${Math.max(min, size) + widthHandle.offsetWidth}px`;
+      },
+    });
+
+    /** How tall the example is on its page: its body, which the frame does not stretch. */
+    const exampleHeight = () =>
+      Math.ceil(frame.contentDocument?.body?.getBoundingClientRect().height ?? 0);
+    const heightLimits = () => ({
+      min: MIN_HEIGHT,
+      max: Math.max(MIN_HEIGHT, exampleHeight(), innerHeight),
+    });
+    const height = resizeHandle(frame, {
+      handle: heightHandle,
+      position: (event) => event.clientY,
+      smaller: 'ArrowUp',
+      bigger: 'ArrowDown',
+      current: () => Math.round(frame.getBoundingClientRect().height),
+      limits: heightLimits,
+      // `undefined`: as tall as the example again, from its next load.
+      set: (size) => {
+        if (size === undefined) {
+          stage.height = undefined;
+          return;
+        }
+        const { min, max } = heightLimits();
+        stage.height = Math.round(Math.min(max, Math.max(min, size)));
+        frame.style.height = `${stage.height}px`;
+      },
+    });
+
+    // The page gets narrower or wider, and the example taller or shorter: the
+    // room the handles have, and their values, follow.
+    const update = () => {
+      width.update();
+      height.update();
+    };
+    const sizes = new ResizeObserver(update);
+    sizes.observe(sunken);
+    sizes.observe(frame);
+    update();
+    return () => {
+      width.set(undefined);
+      height.set(undefined);
+    };
+  };
+
+  type Select = HTMLElement & { value?: string };
+
+  /**
+   * The picker of the surfaces: a level picked in its select paints the
+   * example and the circle of the pill. Returns what picks the page's own
+   * surface again.
+   */
+  const surfaces = (stage: Stage, tag: string) => {
+    const picker = document.querySelector<HTMLElement>(`[data-playground-surface="${tag}"]`);
+    const select = picker?.querySelector<Select>('[data-surface-select]');
+    const swatch = picker?.querySelector<HTMLElement>('[data-surface-swatch]');
+    if (!picker || !select || !swatch) return () => {};
+    const initial = picker.dataset.default;
+    const pick = (surface: string | undefined) => {
+      if (surface === undefined) return;
+      swatch.dataset.surface = surface;
+      if (select.value !== surface) select.value = surface;
+    };
+    select.addEventListener('mdsInputSelectChange', (event) => {
+      const { value } = (event as CustomEvent<{ value?: unknown }>).detail ?? {};
+      if (typeof value !== 'string' || !value || value === stage.surface) return;
+      stage.surface = value;
+      pick(value);
+      paint(stage);
+    });
+    return () => {
+      stage.surface = initial;
+      pick(initial);
+      paint(stage);
+    };
+  };
+
+  /** The stages of the page, again on every page of the router. */
+  const init = () => {
+    for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
+      if (stages.has(frame)) continue;
+      const tag = frame.dataset.playgroundFrame!;
+      const stage: Stage = {
+        frame,
+        ground: document.querySelector(`[data-playground-stage="${tag}"]`),
+      };
+      stages.set(frame, stage);
+      const fullSize = resizable(stage, tag);
+      const ownSurface = surfaces(stage, tag);
+      document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
+        fullSize();
+        ownSurface();
+        // Setting `src` loads it again, wherever the example led the frame.
+        frame.src = frame.getAttribute('src') ?? '';
+      });
+      frame.addEventListener('load', () => fit(stage));
+      // Already loaded before this script ran.
+      if (frame.contentDocument?.readyState === 'complete') fit(stage);
+    }
+  };
+
+  // The frame goes with the page it is on.
+  document.addEventListener('astro:before-swap', () => {
+    for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
+      stages.get(frame)?.stop?.();
+    }
+  });
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>

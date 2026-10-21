@@ -73,14 +73,14 @@ read out by screen readers).
 - After an action the button that ran it may be gone, since the actions follow the status: the
   focus moves to the heading, which has `tabindex="-1"`, instead of falling back to the top of
   the page.
-- The outcome of an action is read out through a `role="status"` region, as well as shown in a
-  toast.
+- The outcome of an action is a toast in an `mds-toast-region`, which reads it out without
+  moving the focus.
 - The dialog has a name, its title, and takes the focus when it opens; the required field says
   in words what is missing.
 - The data is a description list (`dl`, `dt`, `dd`), so every value is read with its label.
   Magma has no component for it yet: the code uses the native elements, with `mds-text` inside.
-- The documents can be opened from the keyboard and are announced as buttons: the code adds the
-  role and the keys that `mds-file` does not give yet.
+- The documents are buttons, announced as such and opened from the keyboard: `mds-file` gives
+  them the role and the keys.
 
 ## Content
 

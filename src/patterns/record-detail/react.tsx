@@ -18,6 +18,7 @@ import {
   MdsTabItem,
   MdsText,
   MdsToast,
+  MdsToastRegion,
   MdsZero,
 } from '@maggioli-design-system/magma-react';
 
@@ -125,7 +126,6 @@ export function RecordDetail({ id }: { id: number }) {
   const [note, setNote] = useState('');
   const [noteError, setNoteError] = useState(false);
   const [toasts, setToasts] = useState<Toast[]>([]);
-  const [announcement, setAnnouncement] = useState('');
   const [focusRequest, setFocusRequest] = useState(0);
   const nextToast = useRef(0);
   const title = useRef<HTMLMdsTextElement>(null);
@@ -160,12 +160,11 @@ export function RecordDetail({ id }: { id: number }) {
     if (focusRequest) title.current?.focus();
   }, [focusRequest]);
 
-  /** The feedback of an action: on screen, and read out by screen readers. */
+  /** The feedback of an action: a toast in the region, which reads it out. */
   const show = (message: string, variant: Toast['variant']) => {
     // One toast per message: mds-toast shows a text only when it has one as it loads.
     const key = ++nextToast.current;
     setToasts((current) => [...current, { key, message, variant }]);
-    setAnnouncement(message);
   };
 
   /** Runs an action, then shows the record as it is now. True when it ran. */
@@ -343,18 +342,9 @@ export function RecordDetail({ id }: { id: number }) {
             <section slot="content" className="pt-600">
               <div className="grid gap-400 md:grid-cols-2">
                 {record.documents.map((filename) => (
-                  // mds-file emits mdsFileDownload on a click only, and has no
-                  // role: a role and the keyboard of a button, until Magma
-                  // gives them (https://github.com/magma-design-system/magma/issues/820).
                   <MdsFile
                     key={filename}
                     filename={filename}
-                    role="button"
-                    onKeyDown={(event) => {
-                      if (event.key !== 'Enter' && event.key !== ' ') return;
-                      event.preventDefault();
-                      event.currentTarget.click();
-                    }}
                     onMdsFileDownload={(event) =>
                       // In an application: the address of the file, opened to download it.
                       show(`Demo: ${event.detail.filename} is not a real file.`, 'info')
@@ -434,22 +424,21 @@ export function RecordDetail({ id }: { id: number }) {
         )}
       </MdsModal>
 
-      {toasts.map((toast) => (
-        <MdsToast
-          key={toast.key}
-          variant={toast.variant}
-          visible
-          onMdsToastClose={() =>
-            setToasts((current) => current.filter((other) => other.key !== toast.key))
-          }
-        >
-          {toast.message}
-        </MdsToast>
-      ))}
-      {/* Read out by screen readers after an action: mds-toast is not, yet. */}
-      <MdsText role="status" className="sr-only">
-        {announcement}
-      </MdsText>
+      {/* The toasts of the actions, lined up at the bottom edge and read out. */}
+      <MdsToastRegion>
+        {toasts.map((toast) => (
+          <MdsToast
+            key={toast.key}
+            variant={toast.variant}
+            visible
+            onMdsToastClose={() =>
+              setToasts((current) => current.filter((other) => other.key !== toast.key))
+            }
+          >
+            {toast.message}
+          </MdsToast>
+        ))}
+      </MdsToastRegion>
     </main>
   );
 }

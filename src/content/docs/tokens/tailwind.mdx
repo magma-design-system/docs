@@ -34,8 +34,10 @@ from `--spacing: 0.0025rem`: `gap-400` is `400 x 0.0025rem`, 1rem.
 ## Classes that read another token
 
 Where two namespaces share a key, some classes read the other one. The width utilities
-read the spacing first: `max-w-xs` is `--spacing-xs`, not `--container-xs`. For the token
-in the last column, write its arbitrary value: `max-w-(--container-xs)`.
+read the container: `max-w-xs` is `--container-xs`, not `--spacing-xs`; the logical sizes
+read the spacing: `max-inline-xs` is `--spacing-xs`, not `--container-xs`. For the token in
+the last column, write its arbitrary value: `max-w-(--spacing-xs)`,
+`max-inline-(--container-xs)`.
 
 <TailwindMap part="shadowed" />
 

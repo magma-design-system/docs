@@ -1,0 +1,116 @@
+---
+// The releases of one Magma package since Magma 2.0.0, for the Changelog page
+// (src/lib/changelog.mjs): a heading per version with its date and its GitHub
+// release, then the groups of the release as git-cliff writes them, with
+// their names translated. Breaking entries carry a badge, and so does the
+// release that has them. A scope that is a component links to its page, a
+// pull request number to the pull request; a scope never breaks across lines.
+// The entries stay in English, as the packages write them.
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+import { changelog } from '../lib/changelog.mjs';
+import { localePrefix } from '../lib/frame';
+import { componentTags } from '../lib/magma.mjs';
+import { KIND, TEXT } from '../lib/markdown-text.mjs';
+import { REPOSITORY } from '../lib/nav.mjs';
+
+interface Props {
+  pkg: string;
+}
+
+const { pkg } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { lang, locale } = starlightRoute;
+
+/** The groups git-cliff writes, to their UI string; any other keeps its name. */
+const GROUPS: Record<string, string> = {
+  Features: 'features',
+  'Bug Fixes': 'bugFixes',
+  Performance: 'performance',
+  Changes: 'changes',
+  Refactor: 'refactor',
+  Styling: 'styling',
+  Documentation: 'documentation',
+  Build: 'build',
+};
+const groupName = (name: string) =>
+  GROUPS[name] ? t(`changelog.group.${GROUPS[name]}` as never) : name;
+
+const components = new Set(componentTags());
+const dates = new Intl.DateTimeFormat(lang, { dateStyle: 'long', timeZone: 'UTC' });
+const releases = changelog(pkg).map((release) => ({
+  ...release,
+  id: `${pkg}-${release.version}`,
+  day: dates.format(new Date(release.date)),
+  href: `${REPOSITORY}/releases/tag/${encodeURIComponent(release.tag)}`,
+}));
+
+/** The text of an entry, with its pull request numbers, `(#834)`, apart. */
+const parts = (text: string) => text.split(/\(#(\d+)\)/);
+---
+
+{releases.map(({ id, tag, version, date, day, href, breaking, groups }) => (
+  <>
+    <Heading id={id} text={version} level={3} />
+    <div class="not-content mt-200 flex flex-wrap items-center gap-x-400 gap-y-200">
+      <mds-text typography="detail" class="text-fg-muted">
+        <time datetime={date}>{day}</time>
+      </mds-text>
+      <mds-text typography="detail">
+        <a href={href}>{t('changelog.release', { tag, interpolation: { escapeValue: false } })}</a>
+      </mds-text>
+      {breaking && (
+        <mds-badge
+          label={t('changelog.breakingRelease')}
+          variant="warning"
+          tone="strong"
+          typography="label"
+        />
+      )}
+    </div>
+    {groups.map(({ name, entries }) => (
+      <>
+        <mds-text typography="h5" tag="h4" class={TEXT.heading.h4}>
+          {groupName(name)}
+        </mds-text>
+        <mds-list>
+          {entries.map(({ scopes, breaking, text, notes }) => (
+            <mds-list-item {...KIND.table.text} class={TEXT.listItem}>
+              {breaking && (
+                <mds-badge
+                  label={t('changelog.breaking')}
+                  variant="warning"
+                  tone="strong"
+                  class="me-200 align-middle"
+                />
+              )}
+              {scopes.map((scope) =>
+                components.has(scope) ? (
+                  <a href={`${localePrefix(locale)}/components/${scope}/`} class="me-100">
+                    <Code class="whitespace-nowrap">{scope}</Code>
+                  </a>
+                ) : (
+                  <Code class="me-100 whitespace-nowrap">{scope}</Code>
+                ),
+              )}{' '}
+              {parts(text).map((part, i) =>
+                i % 2 === 1 ? (
+                  <>
+                    (<a href={`${REPOSITORY}/pull/${part}`}>#{part}</a>)
+                  </>
+                ) : (
+                  part
+                ),
+              )}
+              {notes.map((note) => (
+                <mds-text {...KIND.table.text} tag="p" class:list={[TEXT.block, 'mt-100']}>
+                  {note}
+                </mds-text>
+              ))}
+            </mds-list-item>
+          ))}
+        </mds-list>
+      </>
+    ))}
+  </>
+))}

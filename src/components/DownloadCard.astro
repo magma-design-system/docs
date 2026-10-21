@@ -10,12 +10,8 @@
 // shape of the file: an artwork, transparent, `contain` on the background it
 // is drawn for (dark or white, whatever the mode of the page) as a
 // checkerboard; an image, opaque, `contain` on a soft ground, in a 4:3 box.
-// The cards are surface-overlay: mds-card's parts paint --mds-card-background,
-// not the background of the card, so both are set.
-// The footer is `self-end`: with no mds-card-content, a card wide enough to
-// put the media beside the title gives the footer the row that stretches, and
-// the Download button rises under the title
-// (https://github.com/magma-design-system/magma/issues/1040).
+// The cards are surface-overlay: --mds-card-background paints the card and
+// its parts.
 import CopyExample from './CopyExample.astro';
 
 export interface DownloadLink {
@@ -59,7 +55,7 @@ const { t } = Astro.locals;
 const raw = { interpolation: { escapeValue: false } };
 ---
 
-<mds-card class="bg-surface-overlay [--mds-card-background:rgb(var(--magma-surface-overlay))]">
+<mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
   <mds-card-media class="p-200">
     <div
       class:list={[
@@ -103,7 +99,7 @@ const raw = { interpolation: { escapeValue: false } };
       </mds-text>
     )}
   </mds-card-header>
-  <mds-card-footer class="self-end">
+  <mds-card-footer>
     <mds-button-dropdown
       label={t('brand.download.action')}
       icon="mi/outline/file-download"
@@ -182,16 +178,16 @@ const raw = { interpolation: { escapeValue: false } };
     download(event.target instanceof Element ? event.target : null),
   );
 
-  // magma 2.2.0, fixes to the menu of each split button:
-  // - mds-button-dropdown passes no placement to its mds-dropdown, whose
-  //   autoPlacement opens the menu on the side with the most room, beside the
-  //   button most of the time. Below it, aligned to its end, above it when
+  // The menu of each split button:
+  // - below the button and aligned to its end, which mds-button-dropdown has
+  //   no prop for: on its mds-dropdown, which flips it above the button when
   //   there is no room below.
-  // - mds-dropdown tells what is in it with `contains`, which does not see
-  //   what mds-button-dropdown slots into it: any click in the menu closed
-  //   it, the copy before its check showed, and Escape from the menu dropped
-  //   the focus on the page. The clicks stop in the menu, which Escape and a
-  //   click outside still close, and Escape gives the focus back to the arrow.
+  // - magma 2.5.0: mds-dropdown tells what is in it with `contains`, which
+  //   does not see what mds-button-dropdown slots into it: any click in the
+  //   menu closed it, the copy before its check showed, and Escape from the
+  //   menu dropped the focus on the page. The clicks stop in the menu, which
+  //   Escape and a click outside still close, and Escape gives the focus back
+  //   to the arrow.
   const setup = async () => {
     await customElements.whenDefined('mds-button-dropdown');
     for (const split of document.querySelectorAll<MagmaElement>(
@@ -202,7 +198,7 @@ const raw = { interpolation: { escapeValue: false } };
       await split.componentOnReady?.();
       const menu = split.shadowRoot?.querySelector('mds-dropdown');
       if (menu) {
-        Object.assign(menu, { placement: 'bottom-end', disableAutoPlacement: true, flip: true });
+        Object.assign(menu, { placement: 'bottom-end' });
       }
       const files = split.querySelector('[data-download-menu]');
       files?.addEventListener('click', (event) => {

@@ -42,6 +42,13 @@ In a browser driven by an agent (a hidden or embedded pane):
 - Clipboard writes may be denied: stub `navigator.clipboard.writeText` to test copy buttons.
 - A hidden pane throttles `requestAnimationFrame` and transitions: animations look stuck and
   computed colors stale. Sample over time, or read the custom property values.
+- It can stop `requestAnimationFrame` altogether, the tab in front included: Stencil then never
+  re-renders, so a prop set from JavaScript reaches neither the attribute nor the shadow DOM (an
+  element enabled with `disabled = false` stays disabled, a tip stays). Count a few
+  `requestAnimationFrame` callbacks before trusting what a re-render should change, and check
+  it in headless Chrome over the DevTools Protocol (as `scripts/screenshots.mjs` drives it) or
+  in a browser on screen. Two findings of October 2026 (`mds-button` and `mds-input` that stay
+  disabled) came from such a pane and did not reproduce in Chrome.
 - Lazy `mds-img` never loads in a hidden pane.
 - Clicks on `mds-modal` content can miss while it animates: click from JavaScript.
 - `InvalidStateError` from the router in the console means a view transition was skipped in a

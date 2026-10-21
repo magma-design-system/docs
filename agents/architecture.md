@@ -56,8 +56,10 @@ Starlight's components listed in `astro.config.mjs` are replaced by
 **Page changes** use Astro's ClientRouter (added in `Head.astro`). The rail, the section column
 and the right column are `transition:persist`: they stay mounted while their links are the same,
 and keep their scroll. `PageFrame`'s script carries the attributes of `<html>` over (mode,
-theme, rail state), and hands `mds-button[href]` navigation to the router through Magma's
-`NavigationService.setHandler`. Changing language is a full page load.
+theme, rail state), and hands the navigation of `mds-button[href]` and `mds-link` to the router
+through Magma's `NavigationService.setHandler`: their anchors are in their shadow roots, which
+the router does not see. Astro's hover prefetch does not see them either
+([plan/BACKLOG.md](../plan/BACKLOG.md), "Layout"). Changing language is a full page load.
 
 **Page footer** (`Footer`): who modified the page last and who created it, with the button to
 edit it on GitHub. Git history is the only source (layout decision 2 in
@@ -103,22 +105,66 @@ sidebar items. The structure and its reasons are in
 | Development     | Installation (`FrameworkTabs.astro`, choice kept in `magma-docs:framework`; `MagmaVersions.astro`), Agentic development, Versions and migrations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Community       | Channels (`Channel.astro`), Contributing, Code of conduct, About.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
+## Changelog
+
+`changelog.mdx` (Home section) shows the releases of the Magma packages from Magma 2.0.0 on: an
+`h2` per package written in the page, with a line about it, then `Changelog.astro` with the
+releases.
+
+- [`src/lib/changelog.mjs`](../src/lib/changelog.mjs) reads the `CHANGELOG.md` of each package
+  through `resolveMagma()`: magma and its wrappers export it since 2.4.0 (magma#981), `styles`,
+  `design-tokens`, `identity`, `icons` and `svg-icons` have no `exports` map and resolve it from
+  their folder. Each section of the file is the body of the GitHub release with the same tag
+  (git-cliff). The page keeps every package's releases from the day of `magma@2.0.0`.
+- `magma-react` and `magma-angular` are not on the page: they are released with magma, at its
+  version, and their files hold the same sections.
+- A line the parser does not know (not a release heading, a group heading, an entry or an
+  indented line under an entry) fails the build, so a change of format is seen and handled.
+- `Changelog.astro`: a heading per version (id `<package>-<version>`, with its anchor), the date
+  and the link to the GitHub release; the groups in the order of the release, their names from
+  `changelog.group.*` (a group not in the map keeps its English name); entries as `mds-list`,
+  scopes as code, linked to the component page when they are a component tag, `(#n)` linked to
+  the pull request. Entries marked `[**breaking**]` get a warning `mds-badge`, and so does their
+  release. The entries stay in English on every locale: the Italian page says so.
+
 ## Component preview
 
 `Playground.astro`, on every component's main page and on pattern pages:
 
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
-  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`).
-- the controls are Magma inputs built from the props in `documentation.json`
-  (`src/lib/controls.ts`); they set the props on the element in the iframe (same origin) and a
-  `MutationObserver` reads changes back.
+  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`). The
+  example has room around it (`p-800` on the body), except for the components listed in
+  `EDGE_TO_EDGE` there, which run from one edge of the page to the other
+  (`mds-horizontal-scroll`): their content slides under the edges of the frame.
+- the images of the example point at files of a product (`/logo.svg`, `/img/copertina.jpg`) or
+  at `example.com`, which the site does not serve: the page swaps each `src` or `poster` of an
+  image for one of the site's. A logo becomes Magma's logo, the photo of a person
+  (`mds-author`, `mds-avatar`, `mds-entity`) Magma's avatar, any other image the cover
+  `public/covers/og-1200x630.png`. A square image does not stand in for an illustration:
+  `mds-img` takes the whole width it has (`mds-zero`). Videos stay broken: no package has one.
+- under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
+  them, the first one open; both are always there, the one with nothing to show disabled.
+- the controls are Magma inputs in the small size (`size="sm"`) built from the props in
+  `documentation.json` (`src/lib/controls.ts`); they set the props on the element in the iframe
+  (same origin) and a `MutationObserver` reads changes back.
+- the methods whose parameters take a value to type or pick (`methodCalls()` in
+  `src/lib/controls.ts`) get a play button each, with a field per parameter
+  (`PlaygroundField.astro`, shared with the props); a line under them says what the last call
+  gave back (`role="status"`). Methods that take a function or an object stay on the API page.
 - the iframe mirrors `data-theme-name` and `data-magma-pref` from the page: without
   `data-magma-pref`, Magma follows the system's mode instead of the site's.
-- the stage can be narrowed with the handle at its right, and made shorter or taller than the
-  example with the one under it (`role="separator"`, mouse and keys); once the height is set
-  by hand, the frame stops following the example, which scrolls inside it. Reset reloads it at
-  full width and at the example's height.
+- the stage (`PreviewStage.astro`: the frame, its handles, its height and Reset) can be
+  narrowed with the handle at its right, and made shorter or taller than the example with the
+  one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
+  stops following the example, which scrolls inside it. Under it, on component pages, a picker
+  puts the example on each of Magma's five surfaces: a pill with a circle painted with the
+  current one and an `mds-input-select` of the levels by name ("Surface default"), without ring
+  or shadow at rest (the pill draws the edge). A level sets `data-surface` on the body of the
+  example's page, whose `data-[surface=...]:` classes paint it (default: `surface-raised`), and
+  on the stage, which takes `wash-base` while the example is on `surface-sunken` (nothing is
+  below it: the frame would blend in). Reset reloads it at full width, at the example's height
+  and on `surface-raised`.
 
 ## Other routes
 

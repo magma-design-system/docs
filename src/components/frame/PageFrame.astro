@@ -84,7 +84,7 @@ const hasHero = Boolean(entry.data.hero);
 
   const PERSIST = 'data-astro-transition-persist';
 
-  // The links of the components (mds-button, mds-tab-item) are anchors in
+  // The links of the components (mds-button, mds-link, mds-tab-item) are anchors in
   // their shadow roots, which the router does not see: Magma hands it their
   // plain clicks within the site. Anchors of this page stay with the browser.
   NavigationService.setHandler((href) => {
@@ -173,8 +173,8 @@ const hasHero = Boolean(entry.data.hero);
 
     // The router puts the new page in, then the kept columns in place of
     // their copies: for that moment the copies are on the page, and their
-    // components start loading for nothing. mds-tooltip and mds-dropdown
-    // (magma 2.2.0) then throw, taken off the page before they have loaded
+    // components start loading for nothing. mds-dropdown (magma 2.5.0; no
+    // longer mds-tooltip) then throws, taken off the page before it has loaded
     // (https://github.com/magma-design-system/magma/issues/527). Emptied once
     // every listener has read the new page, right before the swap.
     const swap = (event as TransitionBeforeSwapEvent).swap;

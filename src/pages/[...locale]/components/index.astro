@@ -141,7 +141,7 @@ const headings = [
   <mds-list class="grid-cols-[repeat(auto-fill,minmax(--spacing(4000),1fr))]">
     {components.map(({ id }) => (
       <mds-list-item typography="detail" class={TEXT.listItem}>
-        <a href={componentHref(locale, id)}>{componentName(id)}</a>
+        <mds-link href={componentHref(locale, id)}>{componentName(id)}</mds-link>
       </mds-list-item>
     ))}
   </mds-list>

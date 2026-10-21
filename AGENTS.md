@@ -21,8 +21,8 @@ links or personal data.
 2. **Never `npm link`.** Symlinks hide the packaging bugs this site is meant to catch. Test
    unreleased Magma with a prerelease or a packed tarball (README).
 3. **Magma components for everything on the page**, text included: `mds-text`, `mds-list`,
-   `mds-table`, `mds-banner`, `mds-button`, ... Markdown is converted for you; in `.astro`
-   files write them by hand. Where Magma has no component (link, `ol`, code block, `dl`), use
+   `mds-table`, `mds-banner`, `mds-button`, `mds-link`, ... Markdown is converted for you; in
+   `.astro` files write them by hand. Where Magma has no component (`ol`, code block, `dl`), use
    the native element and record the gap: never build a lookalike. See
    [agents/writing.md](agents/writing.md).
 4. **Tailwind utilities and Magma tokens** for everything the site styles: no literal colors or
@@ -75,6 +75,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/lib/nav.mjs`                                    | The 10 rail sections and their navigation (Starlight's sidebar), `soon`, drafts         |
 | `src/lib/magma.mjs`                                  | The only door to the Magma packages                                                     |
 | `src/lib/tokens.mjs`, `icons.mjs`, `identity.mjs`    | Data of the Tokens, Icons and Brand assets sections, read from the packages             |
+| `src/lib/changelog.mjs`                              | The releases of the Changelog page, from the CHANGELOG.md of the packages               |
 | `src/lib/covers.mjs`                                 | The covers of `public/covers/` and the generated avatars, for the Media kit             |
 | `src/lib/markdown-text.mjs`, `markdown-tables.mjs`   | Markdown rendered as Magma components; `KIND`, `TEXT`, `READING` for `.astro` pages too |
 | `src/integrations/magma.mjs`                         | Client script on every page, iconsauce icon dump, the Markdown plugins                  |

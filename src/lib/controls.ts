@@ -89,3 +89,80 @@ export function plainText(markdown: string | undefined): string {
     .replace(/\s+/g, ' ')
     .trim();
 }
+
+/** A method as documentation.json describes it, as far as the preview goes. */
+interface DocumentedMethod {
+  name: string;
+  signature: string;
+  docs?: string;
+  parameters: { name: string; type: string; docs?: string }[];
+}
+
+/** A parameter of a method the preview calls, with the control that gives its value. */
+export interface CallParameter {
+  name: string;
+  docs: string;
+  control: Control;
+  /** A value it takes, for the placeholder of its field. */
+  example?: string;
+}
+
+/** A method the preview can call, and its parameters in order. */
+export interface MethodCall {
+  name: string;
+  docs: string;
+  parameters: CallParameter[];
+}
+
+/**
+ * The members of a type as written in a signature (`string | number | null`,
+ * `"open" | "closed"`), in the shape of the values of a prop. Optional when the
+ * signature says so (`duration?: number`).
+ */
+const typeValues = (type: string, optional: boolean) =>
+  type
+    .split('|')
+    .map((member) => member.trim())
+    .map((member) =>
+      /^(["']).*\1$/.test(member) ? { type: 'string', value: unquote(member) } : { type: member },
+    )
+    .concat(optional ? [{ type: 'undefined' }] : []);
+
+/** What a method acts on, to sort `startThinking` next to `stopThinking`. */
+const subject = (name: string) => name.replace(/^(start|stop)(?=[A-Z])/, '').toLowerCase();
+
+/**
+ * The methods the preview calls (Playground.astro): those whose parameters
+ * all take a value to type or pick, with the controls of the props. A method
+ * that takes a function or an object (a validator, an event) is left to the
+ * API page. Sorted by what they act on, a `start` before its `stop`.
+ */
+export function methodCalls(methods: DocumentedMethod[]): MethodCall[] {
+  return methods
+    .flatMap((method) => {
+      const parameters = method.parameters.map((parameter) => {
+        const optional = new RegExp(`\\b${parameter.name}\\?:`).test(method.signature);
+        const control = propControl({
+          name: parameter.name,
+          values: typeValues(parameter.type, optional),
+        });
+        return (
+          control && {
+            name: parameter.name,
+            docs: plainText(parameter.docs),
+            control,
+            example: propExample({ name: parameter.name, docs: parameter.docs }),
+          }
+        );
+      });
+      if (parameters.some((parameter) => parameter === undefined)) return [];
+      return [
+        {
+          name: method.name,
+          docs: plainText(method.docs),
+          parameters: parameters as CallParameter[],
+        },
+      ];
+    })
+    .sort((a, b) => subject(a.name).localeCompare(subject(b.name)) || a.name.localeCompare(b.name));
+}
