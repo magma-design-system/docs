@@ -115,7 +115,10 @@ sidebar items. The structure and its reasons are in
   `MutationObserver` reads changes back.
 - the iframe mirrors `data-theme-name` and `data-magma-pref` from the page: without
   `data-magma-pref`, Magma follows the system's mode instead of the site's.
-- the stage can be narrowed with a handle (`role="separator"`, mouse and keys); Reset reloads it.
+- the stage can be narrowed with the handle at its right, and made shorter or taller than the
+  example with the one under it (`role="separator"`, mouse and keys); once the height is set
+  by hand, the frame stops following the example, which scrolls inside it. Reset reloads it at
+  full width and at the example's height.
 
 ## Other routes
 
