@@ -113,6 +113,10 @@ sidebar items. The structure and its reasons are in
 - the controls are Magma inputs built from the props in `documentation.json`
   (`src/lib/controls.ts`); they set the props on the element in the iframe (same origin) and a
   `MutationObserver` reads changes back.
+- the methods whose parameters take a value to type or pick (`methodCalls()` in
+  `src/lib/controls.ts`) get a play button each, with a field per parameter
+  (`PlaygroundField.astro`, shared with the props); a line under them says what the last call
+  gave back (`role="status"`). Methods that take a function or an object stay on the API page.
 - the iframe mirrors `data-theme-name` and `data-magma-pref` from the page: without
   `data-magma-pref`, Magma follows the system's mode instead of the site's.
 - the stage can be narrowed with the handle at its right, and made shorter or taller than the

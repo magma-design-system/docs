@@ -14,20 +14,27 @@
 // the ones of the example, or none. A control
 // sets the prop on the element of the example; when the component changes a
 // prop itself (an accordion item opened by a click), its control follows.
-// Reset loads the example again at full width and at its own height. Controls wait, disabled, until
-// the preview is ready. A pattern (src/components/PatternPreview.astro) runs
-// its own page on the same stage, with its own texts and without controls;
-// the buttons of the `actions` slot go next to Reset.
-import { plainText, propControl, propExample, type Control } from '../lib/controls';
+// Then a button for each method whose parameters take a value to type or
+// pick, with a field for each of them: it calls the method on the element of
+// the example, and a line under the buttons says what the call gave back. Some
+// components are all in their methods (mds-emoji). Reset loads the example
+// again at full width and at its own height. Controls and buttons wait,
+// disabled, until the preview is ready. A pattern
+// (src/components/PatternPreview.astro) runs its own page on the same stage,
+// with its own texts and without controls; the buttons of the `actions` slot
+// go next to Reset.
+import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
-import TypeValue from './TypeValue.astro';
+import PlaygroundField from './PlaygroundField.astro';
 
 interface Props {
   tag: string;
   props: any[];
+  /** The methods of the component, as documentation.json lists them. */
+  methods?: any[];
   /** The markup the preview runs. */
   example: string;
   /** The page the preview runs, when it is not the component's example. */
@@ -38,7 +45,7 @@ interface Props {
   title?: string;
 }
 
-const { tag, props, example, intro, title } = Astro.props;
+const { tag, props, methods = [], example, intro, title } = Astro.props;
 const { t } = Astro.locals;
 const src = Astro.props.src ?? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${tag}/`;
 
@@ -65,6 +72,12 @@ const fields = props
     (a, b) =>
       ORDER.indexOf(a.control.kind) - ORDER.indexOf(b.control.kind) || a.name.localeCompare(b.name),
   );
+const calls = methodCalls(methods);
+/** What a text or number field shows while empty: an example of its value. */
+const placeholder = (value: string | undefined) =>
+  value &&
+  // Astro escapes the attribute: i18next does not need to.
+  t('component.preview.example', { value, interpolation: { escapeValue: false } });
 ---
 
 <mds-text {...READING} tag="p" class={TEXT.paragraph}>
@@ -145,72 +158,91 @@ const fields = props
       data-playground-controls={tag}
     >
       {fields.map(({ name, docs, control, icon, example }) => (
-        <div class="flex min-w-0 flex-col gap-200">
-          {control.kind === 'boolean' && (
-            <mds-input-switch
-              type="switch"
-              disabled
-              data-prop={name}
-              data-kind={control.kind}
-              data-optional={control.optional}
-            >
-              <span class="sr-only">{name}</span>
-            </mds-input-switch>
-          )}
-          {control.kind === 'enum' && (
-            <mds-input-select
-              aria-label={name}
-              placeholder={control.optional ? '-' : undefined}
-              disabled
-              data-prop={name}
-              data-kind={control.kind}
-              data-optional={control.optional}
-            >
-              {control.options?.map((option) => (
-                <option value={option}>{option}</option>
-              ))}
-            </mds-input-select>
-          )}
-          {icon && (
-            <mds-input-select
-              aria-label={name}
-              placeholder="-"
-              disabled
-              data-prop={name}
-              data-kind={control.kind}
-              data-optional={control.optional}
-            >
-              {icons.map((slug) => (
-                <option value={slug}>{slug}</option>
-              ))}
-            </mds-input-select>
-          )}
-          {((control.kind === 'string' && !icon) || control.kind === 'number') && (
-            <mds-input
-              type={control.kind === 'number' ? 'number' : 'text'}
-              aria-label={name}
-              placeholder={
-                example &&
-                // Astro escapes the attribute: i18next does not need to.
-                t('component.preview.example', {
-                  value: example,
-                  interpolation: { escapeValue: false },
-                })
-              }
-              disabled
-              data-prop={name}
-              data-kind={control.kind}
-              data-optional={control.optional}
-            />
-          )}
+        <PlaygroundField
+          name={name}
+          docs={docs}
+          control={control}
+          placeholder={placeholder(example)}
+          icons={icon ? icons : undefined}
+          hook="data-prop"
+        />
+      ))}
+    </div>
+  </>
+)}
+
+{calls.length > 0 && (
+  <>
+    <Heading id="methods" typography="h3" text={t('component.methods')} />
+    <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+      {t('component.preview.methods')}
+    </mds-text>
+    {/* Shown while the system asks for reduced motion (script below). */}
+    <mds-text {...READING} tag="p" class:list={[TEXT.paragraph, 'hidden']} data-playground-motion>
+      {t('component.preview.motion')}
+    </mds-text>
+    {/*
+      The grid of the props, at the top of its cells: each method, a play
+      button and its name in code (mds-button capitalizes the first letter
+      of a label), then the fields of its parameters.
+    */}
+    <div
+      class="not-content grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-start gap-800"
+      data-playground-methods={tag}
+    >
+      {calls.map((call) => (
+        <div class="flex min-w-0 flex-col gap-400" data-method={call.name}>
           <span class="flex min-w-0 items-center gap-200">
-            <Code name>{name}</Code>
-            <TypeValue text={control.kind} kind={control.kind} copy={false} />
-            {docs && <mds-help>{docs}</mds-help>}
+            <mds-button
+              icon="mi/baseline/play-arrow"
+              aria-label={t('component.preview.call', {
+                method: call.name,
+                // Astro escapes the attribute: i18next does not need to.
+                interpolation: { escapeValue: false },
+              })}
+              variant="primary"
+              tone="weak"
+              size="sm"
+              type="button"
+              disabled
+              data-call={call.name}
+            ></mds-button>
+            <Code name>{call.name}</Code>
+            {call.docs && <mds-help>{call.docs}</mds-help>}
           </span>
+          {call.parameters.map((parameter) => (
+            <PlaygroundField
+              name={parameter.name}
+              docs={parameter.docs}
+              control={parameter.control}
+              placeholder={placeholder(parameter.example)}
+              hook="data-param"
+            />
+          ))}
         </div>
       ))}
     </div>
+    {/*
+      What the last call gave back, announced. The words come from the
+      dictionaries, the call and its value are code (the template).
+    */}
+    <mds-text
+      typography="detail"
+      tag="p"
+      role="status"
+      class="not-content text-fg-muted"
+      data-playground-result={tag}
+      data-idle={t('component.preview.idle')}
+      data-running={t('component.preview.running')}
+      data-done={t('component.preview.done')}
+      data-returned={t('component.preview.returned')}
+      data-failed={t('component.preview.failed')}
+    >
+      {t('component.preview.idle')}
+    </mds-text>
+    <template data-playground-code={tag}>
+      <Code>-</Code>
+    </template>
   </>
 )}
 
@@ -224,6 +256,10 @@ const fields = props
     tag: string;
     frame: HTMLIFrameElement;
     controls: HTMLElement | null;
+    /** The buttons of the methods and the fields of their parameters. */
+    methods: HTMLElement | null;
+    /** The line that says what the last call gave back. */
+    result: HTMLElement | null;
     /** The element of the example the controls set, once the preview is ready. */
     element?: HTMLElement;
     /** What each control shows: the value its prop had last. */
@@ -232,6 +268,8 @@ const fields = props
     load: number;
     /** The height set with the handle, in px; `undefined`: as tall as the example. */
     height?: number;
+    /** Counts the calls of methods: only the last one reports how it went. */
+    calls: number;
     stop?: () => void;
   }
 
@@ -292,8 +330,134 @@ const fields = props
     }
   };
 
+  /** The buttons of the methods and the fields of their parameters. */
+  const callers = (playground: Playground) => [
+    ...(playground.methods?.querySelectorAll<Field>('[data-param], [data-call]') ?? []),
+  ];
+
+  // The attribute goes with the prop: an mds-button rendered `disabled` keeps
+  // the attribute when its prop turns false, and the browser keeps a
+  // form-associated element with it disabled, so no click reaches the button
+  // (not filed yet, see agents/magma.md).
   const enable = (playground: Playground, enabled: boolean) => {
-    for (const field of fields(playground)) field.disabled = !enabled;
+    for (const field of [...fields(playground), ...callers(playground)]) {
+      field.disabled = !enabled;
+      field.toggleAttribute('disabled', !enabled);
+    }
+  };
+
+  /** The longest a value is shown, in characters. */
+  const MAX_VALUE = 300;
+
+  /**
+   * What a call gave back, as short text: elements by their tag, files by
+   * their name, lists of files as arrays, the rest as JSON. The values come
+   * from the window of the preview, where `instanceof` does not see the
+   * classes of this one.
+   */
+  const describe = (value: unknown) => {
+    const plain = (item: unknown, depth: number): unknown => {
+      if (typeof item !== 'object' || item === null) return item;
+      if (depth > 3) return '...';
+      const node = item as { nodeType?: number; localName?: string };
+      if (node.nodeType === 1) return `<${node.localName}>`;
+      const file = item as { name?: unknown; lastModified?: unknown };
+      if (typeof file.name === 'string' && typeof file.lastModified === 'number') {
+        return `File ${file.name}`;
+      }
+      const list = item as { length?: unknown; item?: unknown };
+      if (
+        Array.isArray(item) ||
+        (typeof list.length === 'number' && typeof list.item === 'function')
+      ) {
+        return Array.from(item as ArrayLike<unknown>, (member) => plain(member, depth + 1));
+      }
+      return Object.fromEntries(
+        Object.entries(item).map(([key, member]) => [key, plain(member, depth + 1)]),
+      );
+    };
+    const shown = plain(value, 0);
+    // An element or a file as it is, not as a JSON string in quotes.
+    const text =
+      typeof shown === 'string' && shown !== value
+        ? shown
+        : (JSON.stringify(shown) ?? String(value));
+    return text.length > MAX_VALUE ? `${text.slice(0, MAX_VALUE - 3)}...` : text;
+  };
+
+  /**
+   * The line under the buttons: the call, what happened to it
+   * (`data-running`, `data-done`, `data-returned`, `data-failed`) and the
+   * value, if any. Without a call, the text it has while nothing was called.
+   */
+  const report = (
+    playground: Playground,
+    outcome?: { call: string; word: 'running' | 'done' | 'returned' | 'failed'; value?: string },
+  ) => {
+    const { result, tag } = playground;
+    if (!result) return;
+    if (!outcome) {
+      result.textContent = result.dataset.idle ?? '';
+      return;
+    }
+    const template = document.querySelector<HTMLTemplateElement>(`[data-playground-code="${tag}"]`);
+    const code = (text: string) => {
+      const element = template?.content.firstElementChild?.cloneNode(true) as
+        HTMLElement | undefined;
+      if (!element) return text;
+      element.textContent = text;
+      return element;
+    };
+    const parts: (string | Node)[] = [code(outcome.call), ` ${result.dataset[outcome.word] ?? ''}`];
+    if (outcome.value !== undefined) parts.push(' ', code(outcome.value));
+    result.replaceChildren(...parts);
+  };
+
+  /** A method's button was pressed: the call, with the values of its fields. */
+  const call = async (playground: Playground, button: HTMLElement) => {
+    const { element } = playground;
+    const name = button.dataset.call;
+    if (!element || !name) return;
+    const args = [
+      ...(button.closest('[data-method]')?.querySelectorAll<Field>('[data-param]') ?? []),
+    ].map((field) => {
+      const kind = field.dataset.kind as Kind;
+      const value = fromField(
+        kind,
+        field.dataset.optional === 'true',
+        kind === 'boolean' ? field.checked : field.value,
+      );
+      return value === INVALID ? undefined : value;
+    });
+    // The optional parameters left empty at the end stay out of the call.
+    while (args.length > 0 && args[args.length - 1] === undefined) args.pop();
+    const shown = `${name}(${args.map((arg) => JSON.stringify(arg) ?? 'undefined').join(', ')})`;
+    // Methods that animate resolve when the animation ends, seconds later:
+    // the line says the call is running, and a newer call, or a new load of
+    // the preview, takes its place.
+    const count = ++playground.calls;
+    const load = playground.load;
+    const last = () => count === playground.calls && load === playground.load;
+    report(playground, { call: shown, word: 'running' });
+    try {
+      const method = prop(element, name) as (...args: unknown[]) => unknown;
+      const value = await method.apply(element, args);
+      if (!last()) return;
+      report(
+        playground,
+        value === undefined
+          ? { call: shown, word: 'done' }
+          : { call: shown, word: 'returned', value: describe(value) },
+      );
+    } catch (error) {
+      if (!last()) return;
+      const message = (error as { message?: unknown } | null)?.message;
+      report(playground, {
+        call: shown,
+        word: 'failed',
+        value: typeof message === 'string' ? message : String(error),
+      });
+    }
   };
 
   /** A control changed: its prop takes the new value. */
@@ -367,8 +531,9 @@ const fields = props
       changes?.disconnect();
     };
 
-    // No controls (a pattern): nothing to set on an element.
-    if (!playground.controls) return;
+    report(playground);
+    // No controls and no methods (a pattern): nothing to set on an element.
+    if (!playground.controls && !playground.methods) return;
     const element = doc.querySelector<MagmaElement>(tag);
     if (!element) return;
     await win.customElements.whenDefined(tag);
@@ -566,8 +731,22 @@ const fields = props
     };
   };
 
+  /**
+   * The note over the methods while the system asks for reduced motion: the
+   * preview follows the system there, and some components keep their
+   * animations still (mds-emoji its blinking and the pointer).
+   */
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const showMotion = () => {
+    for (const note of document.querySelectorAll('[data-playground-motion]')) {
+      note.classList.toggle('hidden', !motion.matches);
+    }
+  };
+  motion.addEventListener('change', showMotion);
+
   /** The playgrounds of the page, again on every page of the router. */
   const init = () => {
+    showMotion();
     for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
       if (playgrounds.has(frame)) continue;
       const tag = frame.dataset.playgroundFrame!;
@@ -575,14 +754,22 @@ const fields = props
         tag,
         frame,
         controls: document.querySelector(`[data-playground-controls="${tag}"]`),
+        methods: document.querySelector(`[data-playground-methods="${tag}"]`),
+        result: document.querySelector(`[data-playground-result="${tag}"]`),
         shown: new Map(),
         load: 0,
+        calls: 0,
       };
       playgrounds.set(frame, playground);
 
       for (const type of ['mdsInputSwitchChange', 'mdsInputSelectChange', 'mdsInputChange']) {
         playground.controls?.addEventListener(type, (event) => change(playground, event));
       }
+      playground.methods?.addEventListener('click', (event) => {
+        const button =
+          event.target instanceof Element ? event.target.closest<Field>('[data-call]') : null;
+        if (button && !button.disabled) call(playground, button);
+      });
       const fullSize = resizable(playground);
       document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
         fullSize();

@@ -29,6 +29,7 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 | [magma#1040](https://github.com/magma-design-system/magma/issues/1040) | `src/components/IdentityFamily.astro`               | `self-end` on `mds-card-footer`: with no `mds-card-content`, the footer gets the row that stretches and the Download button rises under the title                                |
 | [magma#1065](https://github.com/magma-design-system/magma/issues/1065) | `src/scripts/magma.ts`                              | A sheet with `svg { transform-style: flat }` in the shadow root of every `mds-emoji`: with `preserve-3d` on that `svg`, Firefox draws nothing                                    |
 | not filed                                                              | `src/components/IdentityFamily.astro`               | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
+| not filed                                                              | `src/components/Playground.astro`                   | Removes the `disabled` attribute of the controls and method buttons along with the prop: `mds-button` keeps the one it was rendered with (see below)                             |
 | not filed                                                              | `src/components/home/ComponentLayers.astro`         | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
 | not filed, listed in docs#1                                            | `src/styles/magma.css`                              | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
 | #820, #821, #823, #951, #952                                           | `src/patterns/` (pattern code, the feedback sketch) | Keyboard and roles for `mds-file`, `sr-only` live regions for toasts, a hand-made toast stack and close button                                                                   |
@@ -71,6 +72,11 @@ against open issues before filing.
   is read once from `host.textContent` at load, so a later text never reaches the name. A
   switch can only be named by its slot: with a visually hidden slot (`sr-only`) the host keeps
   its 8px gap before the label, and an `aria-label` on the host is not passed on (2.3.0).
+- `mds-button` rendered with `disabled` and enabled later from JavaScript (`disabled = false`)
+  keeps the `disabled` attribute: `disabledChanged` sets the prop to `undefined`, which does
+  not remove an attribute that came from the markup, and the browser keeps a form-associated
+  element with that attribute disabled, so no click reaches it, not even `click()`. The prop
+  reads back `undefined` (2.3.0, same code in 2.4.0).
 - `mds-breadcrumb` has no links; Magma has no description list, no ordered list, no link and
   no code block component.
 - `mds-button[href]` has no `download`.
