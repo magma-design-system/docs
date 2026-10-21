@@ -3,8 +3,9 @@
 // example or for a parameter of one of its methods: a switch, a select or a
 // field, then its name, its kind and its description in an mds-help. `icons`:
 // the icons a prop that takes one picks from, in a select instead of a field.
-// `hook` tells the preview's script what the control sets. Never disabled: a
-// change made before the preview is ready is let go, and the control then
+// `hook` tells the preview's script what the control sets. All of them in
+// Magma's small size (`sm`, 28px), the one for compact forms. Never disabled:
+// a change made before the preview is ready is let go, and the control then
 // takes the value of its prop (Playground.astro).
 import type { Control } from '../lib/controls';
 import Code from './Code.astro';
@@ -30,19 +31,24 @@ const data = {
 
 <div class="flex min-w-0 flex-col gap-200">
   {control.kind === 'boolean' && (
-    <mds-input-switch type="switch" {...data}>
+    <mds-input-switch type="switch" size="sm" {...data}>
       <span class="sr-only">{name}</span>
     </mds-input-switch>
   )}
   {control.kind === 'enum' && (
-    <mds-input-select aria-label={name} placeholder={control.optional ? '-' : undefined} {...data}>
+    <mds-input-select
+      aria-label={name}
+      placeholder={control.optional ? '-' : undefined}
+      size="sm"
+      {...data}
+    >
       {control.options?.map((option) => (
         <option value={option}>{option}</option>
       ))}
     </mds-input-select>
   )}
   {icons && (
-    <mds-input-select aria-label={name} placeholder="-" {...data}>
+    <mds-input-select aria-label={name} placeholder="-" size="sm" {...data}>
       {icons.map((slug) => (
         <option value={slug}>{slug}</option>
       ))}
@@ -53,6 +59,7 @@ const data = {
       type={control.kind === 'number' ? 'number' : 'text'}
       aria-label={name}
       placeholder={placeholder}
+      size="sm"
       {...data}
     />
   )}
