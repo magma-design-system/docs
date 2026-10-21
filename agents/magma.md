@@ -44,7 +44,7 @@ invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
 on the props that take a format: the preview placeholders), #960, #981 (`CHANGELOG.md` in
-`exports`: the Changelog page can be built), #983, #984, #1037 (`mds-entity` has 2px between
+`exports`: the Changelog page reads it), #983, #984, #1037 (`mds-entity` has 2px between
 the name and the detail, and an `infos` part), #1040.
 
 ## Seen, not filed yet
