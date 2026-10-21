@@ -2,7 +2,10 @@
 // The preview at the top of a component's overview: its first Pattern
 // example running in an iframe (src/pages/example/[tag].astro), away from the styles of the site,
 // on a stage where a handle at its right narrows it, to see the component in
-// less room (as in the layout mockups); then a control for each prop that
+// less room (as in the layout mockups), and a handle under it makes it shorter
+// or taller than the example, to see what depends on the height of the
+// viewport (overlays that open where there is room, what is fixed to the
+// viewport or follows its scroll); then a control for each prop that
 // takes a value to type or pick, in a grid of compact fields: the control,
 // the prop's name, its kind and its description in an mds-help; a text or
 // number field shows, while empty, an example of what the prop takes, when
@@ -11,7 +14,7 @@
 // the ones of the example, or none. A control
 // sets the prop on the element of the example; when the component changes a
 // prop itself (an accordion item opened by a click), its control follows.
-// Reset loads the example again at full width. Controls wait, disabled, until
+// Reset loads the example again at full width and at its own height. Controls wait, disabled, until
 // the preview is ready. A pattern (src/components/PatternPreview.astro) runs
 // its own page on the same stage, with its own texts and without controls;
 // the buttons of the `actions` slot go next to Reset.
@@ -56,9 +59,7 @@ const fields = props
     if (!control) return [];
     const name = prop.name as string;
     const icon = control.kind === 'string' && ICON_PROP.test(name);
-    return [
-      { name, docs: plainText(prop.docs), control, icon, example: propExample(prop) },
-    ];
+    return [{ name, docs: plainText(prop.docs), control, icon, example: propExample(prop) }];
   })
   .sort(
     (a, b) =>
@@ -71,13 +72,15 @@ const fields = props
   {fields.length > 0 && ` ${t('component.preview.controls')}`}
 </mds-text>
 {/*
-  The stage, sunken, and on it the frame, raised, as wide as the stage until
-  its handle is dragged or moved with the arrow keys (a window splitter: a
-  focusable separator with its value). Magma has no resize handle.
+  The stage, sunken, and on it the frame, raised, as wide as the stage and as
+  tall as the example until a handle is dragged or moved with the arrow keys:
+  the one at its right sets the width, the one under it the height (window
+  splitters: focusable separators with their value). Magma has no resize
+  handle.
 */}
 <div class="flex rounded-3xl bg-surface-sunken p-400">
   <div
-    class="flex w-full max-w-full overflow-hidden rounded-xl bg-surface-raised shadow-sm"
+    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto] overflow-hidden rounded-xl bg-surface-raised shadow-sm"
     data-playground-viewport={tag}
   >
     <iframe
@@ -90,7 +93,7 @@ const fields = props
           interpolation: { escapeValue: false },
         })
       }
-      class="block h-5000 min-w-0 flex-1 border-0"
+      class="block h-5000 w-full min-w-0 border-0"
       data-playground-frame={tag}
     ></iframe>
     <div
@@ -98,11 +101,21 @@ const fields = props
       aria-orientation="vertical"
       aria-label={t('component.preview.resize')}
       tabindex="0"
-      class="group mt-0 flex w-600 shrink-0 cursor-ew-resize touch-none items-center justify-center outline-none"
+      class="group mt-0 flex w-600 cursor-ew-resize touch-none items-center justify-center outline-none"
       data-playground-handle={tag}
     >
       {/* Magma's focus ring on the bar, not on the strip that holds it. */}
       <span class="focus-bounce group-focus-visible:focus-bounce--focused h-1600 group-hover:h-1800 w-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
+    </div>
+    <div
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label={t('component.preview.resizeHeight')}
+      tabindex="0"
+      class="group mt-0 flex h-600 cursor-ns-resize touch-none items-center justify-center outline-none"
+      data-playground-height-handle={tag}
+    >
+      <span class="focus-bounce group-focus-visible:focus-bounce--focused w-1600 group-hover:w-1800 h-150 rounded-full bg-border-muted group-hover:bg-surface-inverse-muted group-focus-visible:bg-surface-inverse-muted transition-cosmetic"></span>
     </div>
   </div>
 </div>
@@ -217,6 +230,8 @@ const fields = props
     shown: Map<string, unknown>;
     /** Counts the loads of the preview: a newer one stops the setup of an older one. */
     load: number;
+    /** The height set with the handle, in px; `undefined`: as tall as the example. */
+    height?: number;
     stop?: () => void;
   }
 
@@ -330,9 +345,10 @@ const fields = props
     const win = frame.contentWindow as (Window & typeof globalThis) | null;
     if (!doc || !win || !doc.body?.hasAttribute('data-preview')) return;
 
-    // As tall as the example, now and when it changes; the observers of the
-    // preview's own window.
+    // As tall as the example, now and when it changes, unless the handle set
+    // a height; the observers of the preview's own window.
     const fit = () => {
+      if (playground.height !== undefined) return;
       frame.style.height = `${Math.ceil(doc.body.getBoundingClientRect().height)}px`;
     };
     fit();
@@ -368,33 +384,34 @@ const fields = props
 
   /** The narrowest the example gets, in pixels: a small phone. */
   const MIN_WIDTH = 320;
-  /** How far an arrow key moves the handle, with Shift for a longer step. */
+  /** The shortest the example gets, in pixels: a strip of it. */
+  const MIN_HEIGHT = 120;
+  /** How far an arrow key moves a handle, with Shift for a longer step. */
   const STEP = 16;
   const LONG_STEP = 80;
 
-  /**
-   * The handle of the frame: dragged, or moved with the arrow keys, Home and
-   * End, it sets how wide the example is. Returns what gives the example the
-   * whole stage again.
-   */
-  const resizable = (frame: HTMLIFrameElement, tag: string) => {
-    const viewport = document.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
-    const handle = document.querySelector<HTMLElement>(`[data-playground-handle="${tag}"]`);
-    const stage = viewport?.parentElement;
-    if (!viewport || !handle || !stage) return () => {};
+  /** One size of the frame, its width or its height, and the handle that sets it. */
+  interface Axis {
+    handle: HTMLElement;
+    /** Where the pointer is along the axis. */
+    position: (event: PointerEvent) => number;
+    /** The keys that make the frame smaller and bigger. */
+    smaller: string;
+    bigger: string;
+    current: () => number;
+    limits: () => { min: number; max: number };
+    /** The frame this big, within the limits; `undefined`: as it is by default. */
+    set: (size: number | undefined) => void;
+  }
 
-    /** How wide the example can be: the stage without its padding and the handle. */
-    const limits = () => {
-      const style = getComputedStyle(stage);
-      const max =
-        stage.clientWidth -
-        parseFloat(style.paddingLeft) -
-        parseFloat(style.paddingRight) -
-        handle.offsetWidth;
-      return { min: Math.min(MIN_WIDTH, max), max };
-    };
-    const current = () => Math.round(frame.getBoundingClientRect().width);
-    /** The separator's value: the width of the example. */
+  /**
+   * A handle of the frame: dragged, or moved with the arrow keys, Home and
+   * End, it sets one size of the example. Returns what writes its value, and
+   * what sets the size.
+   */
+  const resizeHandle = (frame: HTMLIFrameElement, axis: Axis) => {
+    const { handle, current, limits } = axis;
+    /** The separator's value: the size of the example. */
     const update = () => {
       const { min, max } = limits();
       handle.setAttribute('aria-valuemin', String(Math.round(min)));
@@ -402,11 +419,8 @@ const fields = props
       handle.setAttribute('aria-valuenow', String(current()));
       handle.setAttribute('aria-valuetext', `${current()} px`);
     };
-    /** The example this wide; the whole stage when `undefined` or wider. */
-    const set = (width: number | undefined) => {
-      const { min, max } = limits();
-      if (width === undefined || width >= max) viewport.style.removeProperty('width');
-      else viewport.style.width = `${Math.max(min, width) + handle.offsetWidth}px`;
+    const set = (size: number | undefined) => {
+      axis.set(size);
       update();
     };
 
@@ -420,7 +434,7 @@ const fields = props
       // The moves over the frame would go to the example's page.
       frame.style.pointerEvents = 'none';
       // Where on the handle it was taken, so it does not jump.
-      const offset = event.clientX - current();
+      const offset = axis.position(event) - current();
       const drag = new AbortController();
       const { signal } = drag;
       const end = () => {
@@ -441,7 +455,7 @@ const fields = props
         (moved) => {
           if (!ours(moved)) return;
           if ((moved.buttons & 1) === 0) end();
-          else set(moved.clientX - offset);
+          else set(axis.position(moved) - offset);
         },
         { signal },
       );
@@ -455,20 +469,101 @@ const fields = props
     });
     handle.addEventListener('keydown', (event) => {
       const step = event.shiftKey ? LONG_STEP : STEP;
-      const width = {
-        ArrowLeft: current() - step,
-        ArrowRight: current() + step,
+      const size = {
+        [axis.smaller]: current() - step,
+        [axis.bigger]: current() + step,
         Home: limits().min,
         End: limits().max,
       }[event.key];
-      if (width === undefined) return;
+      if (size === undefined) return;
       event.preventDefault();
-      set(width);
+      set(size);
     });
-    // The page gets narrower or wider: the stage, and the room it has, too.
-    new ResizeObserver(update).observe(stage);
+    return { update, set };
+  };
+
+  /**
+   * The two handles of the frame: the one at its right sets how wide the
+   * example is, up to the whole stage; the one under it how tall, from a
+   * strip of it to the height of the example or of the window, whichever is
+   * more. Returns what gives the example the whole stage and its own height
+   * again.
+   */
+  const resizable = (playground: Playground) => {
+    const { frame, tag } = playground;
+    const viewport = document.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
+    const widthHandle = document.querySelector<HTMLElement>(`[data-playground-handle="${tag}"]`);
+    const heightHandle = document.querySelector<HTMLElement>(
+      `[data-playground-height-handle="${tag}"]`,
+    );
+    const stage = viewport?.parentElement;
+    if (!viewport || !widthHandle || !heightHandle || !stage) return () => {};
+
+    /** How wide the example can be: the stage without its padding and the handle. */
+    const widthLimits = () => {
+      const style = getComputedStyle(stage);
+      const max =
+        stage.clientWidth -
+        parseFloat(style.paddingLeft) -
+        parseFloat(style.paddingRight) -
+        widthHandle.offsetWidth;
+      return { min: Math.min(MIN_WIDTH, max), max };
+    };
+    const width = resizeHandle(frame, {
+      handle: widthHandle,
+      position: (event) => event.clientX,
+      smaller: 'ArrowLeft',
+      bigger: 'ArrowRight',
+      current: () => Math.round(frame.getBoundingClientRect().width),
+      limits: widthLimits,
+      // The whole stage when `undefined` or wider.
+      set: (size) => {
+        const { min, max } = widthLimits();
+        if (size === undefined || size >= max) viewport.style.removeProperty('width');
+        else viewport.style.width = `${Math.max(min, size) + widthHandle.offsetWidth}px`;
+      },
+    });
+
+    /** How tall the example is on its page: its body, which the frame does not stretch. */
+    const exampleHeight = () =>
+      Math.ceil(frame.contentDocument?.body?.getBoundingClientRect().height ?? 0);
+    const heightLimits = () => ({
+      min: MIN_HEIGHT,
+      max: Math.max(MIN_HEIGHT, exampleHeight(), innerHeight),
+    });
+    const height = resizeHandle(frame, {
+      handle: heightHandle,
+      position: (event) => event.clientY,
+      smaller: 'ArrowUp',
+      bigger: 'ArrowDown',
+      current: () => Math.round(frame.getBoundingClientRect().height),
+      limits: heightLimits,
+      // `undefined`: as tall as the example again, from its next load.
+      set: (size) => {
+        if (size === undefined) {
+          playground.height = undefined;
+          return;
+        }
+        const { min, max } = heightLimits();
+        playground.height = Math.round(Math.min(max, Math.max(min, size)));
+        frame.style.height = `${playground.height}px`;
+      },
+    });
+
+    // The page gets narrower or wider, and the example taller or shorter: the
+    // room the handles have, and their values, follow.
+    const update = () => {
+      width.update();
+      height.update();
+    };
+    const sizes = new ResizeObserver(update);
+    sizes.observe(stage);
+    sizes.observe(frame);
     update();
-    return () => set(undefined);
+    return () => {
+      width.set(undefined);
+      height.set(undefined);
+    };
   };
 
   /** The playgrounds of the page, again on every page of the router. */
@@ -488,9 +583,9 @@ const fields = props
       for (const type of ['mdsInputSwitchChange', 'mdsInputSelectChange', 'mdsInputChange']) {
         playground.controls?.addEventListener(type, (event) => change(playground, event));
       }
-      const fullWidth = resizable(frame, tag);
+      const fullSize = resizable(playground);
       document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
-        fullWidth();
+        fullSize();
         // Setting `src` loads it again, wherever the example led the frame.
         frame.src = frame.getAttribute('src') ?? '';
       });
