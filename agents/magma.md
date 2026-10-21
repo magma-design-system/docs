@@ -32,10 +32,14 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.5.0: #527 (still in `mds-dropdown`: its `disconnectedCallback` calls the floating
-controller that only `componentDidLoad` creates), #1065 (`mds-emoji` is invisible in Firefox:
-`transform-style: preserve-3d` on the `svg` of its shadow root), and the epic #693 (theme
-studio, for the Themes and preferences page).
+As of Magma 2.5.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
+`disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
+dropdown inserted and removed at once no longer throws in Chromium), #1065 (`mds-emoji` is
+invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root), #1061
+(next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
+`inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
+`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
+(theme studio, for the Themes and preferences page).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -58,11 +62,6 @@ against open issues before filing.
   #786); the email validator returns a hard-coded Italian message; `mds-input-field` overwrites
   the `message` and `variant` set by the application on `mdsInputValidation`, and marks every
   valid field as success (2.3.0, still in 2.5.0).
-- `mds-input` disabled from JavaScript, then enabled again (`disabled = false`, the attribute
-  removed too), keeps its "disabled" tip above the field (2.5.0). On 2.3.0 the Playground fields,
-  disabled in the markup and enabled once the preview was ready, kept it now and then,
-  `mds-input-select` included; a fresh field toggled the same way did not. The Playground no
-  longer disables its fields.
 - `mds-input-switch` names its input "Select <label>" while unchecked and "Deselect <label>"
   while checked (`aria-label`, localized), on every type: the name of a switch changes with its
   state, and adds a verb to what `role="switch"` and the checked state already say. The label
@@ -77,9 +76,6 @@ against open issues before filing.
 - `--mds-elevation-*` and `--depth` break the naming convention (`--magma-*` for globals) and
   come from `styles/dist/css/theme.css`, which is not in the documented import order (2.2.0,
   still in styles 17.3.0).
-- styles 17.3.0: the width utilities with a size name (`w-xs`, `min-w-xs`, `max-w-xs`,
-  `basis-xs`, `xs` to `4xl`) read the container, but the logical ones (`inline-xs`,
-  `min-inline-xs`, `max-inline-xs`) still read the spacing of the same name.
 - Data: the DTCG globals of `styles` have no `$description`; `identity.json` has no
   descriptions or usage rules (#901 was closed with names and variants); the Figma color export
   has only the neutral tone (2.3.0).
