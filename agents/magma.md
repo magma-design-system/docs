@@ -58,10 +58,11 @@ against open issues before filing.
   #786); the email validator returns a hard-coded Italian message; `mds-input-field` overwrites
   the `message` and `variant` set by the application on `mdsInputValidation`, and marks every
   valid field as success (2.3.0, still in 2.5.0).
-- `mds-input` disabled, then enabled again (`disabled = false`, the attribute removed too),
-  keeps its "disabled" tip above the field (2.3.0, still in 2.5.0; `mds-input-select` did it in
-  2.3.0). The Playground disables its fields until the preview is ready, so they can read
-  "Disabled" once they work.
+- `mds-input` disabled from JavaScript, then enabled again (`disabled = false`, the attribute
+  removed too), keeps its "disabled" tip above the field (2.5.0). On 2.3.0 the Playground fields,
+  disabled in the markup and enabled once the preview was ready, kept it now and then,
+  `mds-input-select` included; a fresh field toggled the same way did not. The Playground no
+  longer disables its fields.
 - `mds-input-switch` names its input "Select <label>" while unchecked and "Deselect <label>"
   while checked (`aria-label`, localized), on every type: the name of a switch changes with its
   state, and adds a verb to what `role="switch"` and the checked state already say. The label
