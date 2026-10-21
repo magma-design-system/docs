@@ -31,6 +31,12 @@ const { tag, example } = Astro.props.entry.data;
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const image = `${base}downloads/identity/avatar/avatar-magma-256w.png`;
 const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|webp|gif)/g, image);
+
+// The components that run from one edge of the page to the other, as a strip
+// of cards that scrolls sideways: their example has no room around it, and
+// its content slides under the edges of the frame.
+const EDGE_TO_EDGE = new Set(['mds-horizontal-scroll']);
+const padding = EDGE_TO_EDGE.has(tag) ? 'p-0' : 'p-800';
 ---
 
 <!doctype html>
@@ -66,7 +72,10 @@ const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|web
   */}
   <body
     data-preview
-    class="m-0 flex min-h-5000 flex-col justify-start bg-surface-raised p-800 transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken [&>astro-dev-toolbar]:hidden"
+    class:list={[
+      'm-0 flex min-h-5000 flex-col justify-start bg-surface-raised transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken [&>astro-dev-toolbar]:hidden',
+      padding,
+    ]}
   >
     <div class="space-y-400" set:html={html} />
   </body>

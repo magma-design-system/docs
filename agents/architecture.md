@@ -109,7 +109,10 @@ sidebar items. The structure and its reasons are in
 
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
-  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`).
+  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`). The
+  example has room around it (`p-800` on the body), except for the components listed in
+  `EDGE_TO_EDGE` there, which run from one edge of the page to the other
+  (`mds-horizontal-scroll`): their content slides under the edges of the frame.
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; a component with only one of them shows that tab alone.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
