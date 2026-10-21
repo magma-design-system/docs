@@ -23,7 +23,8 @@ Loaded the way a consumer loads it, never from the monorepo:
   cascade layer order of Magma's install guide (`magma/agents/assets.md`), Starlight's layer
   between Magma's base and the site's components, then Tailwind's utilities.
 - [`src/scripts/magma.ts`](../src/scripts/magma.ts): the lazy loader, the icon path
-  (`IconsSetService`), Starlight's `data-theme` kept on the mode chosen with `mds-pref-mode`.
+  (`IconsSetService`), Starlight's `data-theme` kept on the mode chosen with `mds-pref-mode`,
+  and the `mds-emoji` sheet that lets Firefox draw it (magma#1065).
 - [`src/integrations/magma.mjs`](../src/integrations/magma.mjs): adds that script to every page,
   dumps every icon of the iconsauce plugins into `public/svg/` (gitignored; a stamp file skips
   the copy when the icon sets did not change), and registers the Markdown plugins.

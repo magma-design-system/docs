@@ -27,6 +27,7 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 | [magma#944](https://github.com/magma-design-system/magma/issues/944)   | `src/components/home/AgentNames.astro`              | `bg-surface-overlay` on `mds-chip`, whose default ground is grey                                                                                                                 |
 | [magma#955](https://github.com/magma-design-system/magma/issues/955)   | `src/styles/magma.css`                              | Neutral `mds-banner` on `surface-overlay` instead of the card's color                                                                                                            |
 | [magma#1040](https://github.com/magma-design-system/magma/issues/1040) | `src/components/IdentityFamily.astro`               | `self-end` on `mds-card-footer`: with no `mds-card-content`, the footer gets the row that stretches and the Download button rises under the title                                |
+| [magma#1065](https://github.com/magma-design-system/magma/issues/1065) | `src/scripts/magma.ts`                              | A sheet with `svg { transform-style: flat }` in the shadow root of every `mds-emoji`: with `preserve-3d` on that `svg`, Firefox draws nothing                                    |
 | not filed                                                              | `src/components/IdentityFamily.astro`               | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
 | not filed                                                              | `src/components/home/ComponentLayers.astro`         | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
 | not filed, listed in docs#1                                            | `src/styles/magma.css`                              | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
@@ -46,7 +47,9 @@ its Italian `steps`, so the home page bar is announced "Fine"), #984 (`mds-text`
 home page bar reads "PROPRIETA"), #1037 (`mds-entity`: no gap between the name and the
 `detail` slot, where the home page cards put the Under construction badge, and no part on that
 column to change it), #1040 (`mds-card` with a footer and no content: the footer gets the `1fr`
-row and its buttons, `align-self: flex-start`, rise under the header), and the epic #693 (theme studio, for the Themes and
+row and its buttons, `align-self: flex-start`, rise under the header), #1065 (`mds-emoji` is
+invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root; still in
+2.4.0), and the epic #693 (theme studio, for the Themes and
 preferences page).
 
 ## Seen, not filed yet
