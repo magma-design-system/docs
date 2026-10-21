@@ -44,8 +44,14 @@ const SURFACE = 'raised';
   splitters: focusable separators with their value). Magma has no resize
   handle. The handles sit on the stage, not on the frame: the stage has its
   padding only at the top and at the left, their strips make the other two.
+  With the example on surface-sunken too, the stage takes wash-base, so that
+  the frame does not blend into it: a step darker in light, lighter in dark,
+  where nothing is below sunken (the script sets `data-surface` on it).
 */}
-<div class="flex rounded-3xl bg-surface-sunken pl-600 pt-600">
+<div
+  class="flex rounded-3xl bg-surface-sunken pl-600 pt-600 data-[surface=sunken]:bg-wash-base"
+  data-playground-stage={tag}
+>
   <div class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]" data-playground-viewport={tag}>
     <iframe
       src={src}
@@ -82,7 +88,9 @@ const SURFACE = 'raised';
   each element that follows another.
   The picker is a pill: a circle painted with the surface of the example, then
   a select of the five levels by name. The pill draws the edge: the select has
-  no ring or shadow at rest, only its own on hover and focus.
+  no ring or shadow at rest, only its focus ring on hover and focus. Both are
+  transparent shadows, not `none`: the select lists them in one box-shadow,
+  where a `none` would void the focus ring too.
 */}
 <div class="not-content flex flex-wrap items-center gap-x-400 gap-y-200">
   {surfaces && (
@@ -100,7 +108,7 @@ const SURFACE = 'raised';
         aria-label={t('component.preview.surface')}
         size="sm"
         value={SURFACE}
-        class="[--mds-input-select-ring:0_0_0_0_transparent] [--mds-input-select-shadow:none]"
+        class="[--mds-input-select-ring:0_0_0_0_transparent] [--mds-input-select-shadow:0_0_0_0_transparent]"
         data-surface-select
       >
         {SURFACES.map((surface) => (
@@ -126,29 +134,32 @@ const SURFACE = 'raised';
 </div>
 
 <script>
-  /** A frame of the page, with what its handles and its swatches set. */
+  /** A frame of the page, with what its handles and its picker set. */
   interface Stage {
     frame: HTMLIFrameElement;
     /** The height set with the handle, in px; `undefined`: as tall as the example. */
     height?: number;
-    /** The surface pressed among the swatches; `undefined`: the page's own. */
+    /** The surface picked for the example; `undefined`: the page's own. */
     surface?: string;
+    /** The stage around the frame, which follows the surface of the example. */
+    ground: HTMLElement | null;
     /** Stops following the height of the example that is loaded. */
     stop?: () => void;
   }
 
   const stages = new WeakMap<HTMLIFrameElement, Stage>();
 
-  /** The example of the frame on the surface of its swatches. */
+  /** The example of the frame on the surface of its picker, and its stage. */
   const paint = (stage: Stage) => {
+    if (stage.surface === undefined) return;
+    if (stage.ground) stage.ground.dataset.surface = stage.surface;
     const body = stage.frame.contentDocument?.body;
-    if (!body?.hasAttribute('data-preview') || stage.surface === undefined) return;
-    body.dataset.surface = stage.surface;
+    if (body?.hasAttribute('data-preview')) body.dataset.surface = stage.surface;
   };
 
   /**
    * A load of the frame: as tall as the example, now and when it changes,
-   * unless the handle set a height, and on the surface of its swatches; the
+   * unless the handle set a height, and on the surface of its picker; the
    * observer of the preview's own window.
    */
   const fit = (stage: Stage) => {
@@ -391,7 +402,10 @@ const SURFACE = 'raised';
     for (const frame of document.querySelectorAll<HTMLIFrameElement>('[data-playground-frame]')) {
       if (stages.has(frame)) continue;
       const tag = frame.dataset.playgroundFrame!;
-      const stage: Stage = { frame };
+      const stage: Stage = {
+        frame,
+        ground: document.querySelector(`[data-playground-stage="${tag}"]`),
+      };
       stages.set(frame, stage);
       const fullSize = resizable(stage, tag);
       const ownSurface = surfaces(stage, tag);
