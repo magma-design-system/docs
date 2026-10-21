@@ -21,15 +21,16 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                | Where                                               | What the site does                                                                                                                                                               |
-| -------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`              | Empties the copies of the kept columns before the router swaps them, or `mds-tooltip` / `mds-dropdown` throw                                                                     |
-| [magma#944](https://github.com/magma-design-system/magma/issues/944) | `src/components/home/AgentNames.astro`              | `bg-surface-overlay` on `mds-chip`, whose default ground is grey                                                                                                                 |
-| [magma#955](https://github.com/magma-design-system/magma/issues/955) | `src/styles/magma.css`                              | Neutral `mds-banner` on `surface-overlay` instead of the card's color                                                                                                            |
-| not filed                                                            | `src/components/IdentityFamily.astro`               | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
-| not filed                                                            | `src/components/home/ComponentLayers.astro`         | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
-| not filed, listed in docs#1                                          | `src/styles/magma.css`                              | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
-| #820, #821, #823, #951, #952                                         | `src/patterns/` (pattern code, the feedback sketch) | Keyboard and roles for `mds-file`, `sr-only` live regions for toasts, a hand-made toast stack and close button                                                                   |
+| Issue                                                                  | Where                                               | What the site does                                                                                                                                                               |
+| ---------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`              | Empties the copies of the kept columns before the router swaps them, or `mds-tooltip` / `mds-dropdown` throw                                                                     |
+| [magma#944](https://github.com/magma-design-system/magma/issues/944)   | `src/components/home/AgentNames.astro`              | `bg-surface-overlay` on `mds-chip`, whose default ground is grey                                                                                                                 |
+| [magma#955](https://github.com/magma-design-system/magma/issues/955)   | `src/styles/magma.css`                              | Neutral `mds-banner` on `surface-overlay` instead of the card's color                                                                                                            |
+| [magma#1040](https://github.com/magma-design-system/magma/issues/1040) | `src/components/IdentityFamily.astro`               | `self-end` on `mds-card-footer`: with no `mds-card-content`, the footer gets the row that stretches and the Download button rises under the title                                |
+| not filed                                                              | `src/components/IdentityFamily.astro`               | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
+| not filed                                                              | `src/components/home/ComponentLayers.astro`         | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
+| not filed, listed in docs#1                                            | `src/styles/magma.css`                              | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
+| #820, #821, #823, #951, #952                                           | `src/patterns/` (pattern code, the feedback sketch) | Keyboard and roles for `mds-file`, `sr-only` live regions for toasts, a hand-made toast stack and close button                                                                   |
 
 ## Open Magma issues that concern the site
 
@@ -44,7 +45,8 @@ its Italian `steps`, so the home page bar is announced "Fine"), #984 (`mds-text`
 `truncate` and the `label` or `option` typography clips the accents of capitals: the Italian
 home page bar reads "PROPRIETA"), #1037 (`mds-entity`: no gap between the name and the
 `detail` slot, where the home page cards put the Under construction badge, and no part on that
-column to change it), and the epic #693 (theme studio, for the Themes and
+column to change it), #1040 (`mds-card` with a footer and no content: the footer gets the `1fr`
+row and its buttons, `align-self: flex-start`, rise under the header), and the epic #693 (theme studio, for the Themes and
 preferences page).
 
 ## Seen, not filed yet
