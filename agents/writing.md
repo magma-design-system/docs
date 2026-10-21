@@ -52,16 +52,37 @@
 
 The site shows Magma, so its text is Magma: headings and paragraphs are `mds-text`, lists
 `mds-list` / `mds-list-item`, rules `mds-hr`, notices `mds-banner`, tables `mds-table`, even
-when they hold code, links or bold.
+when they hold code, links or bold; links are `mds-link`.
 
 - **Markdown** is converted by [`src/lib/markdown-text.mjs`](../src/lib/markdown-text.mjs) and
   [`src/lib/markdown-tables.mjs`](../src/lib/markdown-tables.mjs): write plain Markdown.
 - **By hand** in `.astro`: use the same classes and props, exported by `markdown-text.mjs`
   (`TEXT`, `KIND`, `READING`), `Heading.astro` for a section heading with its anchor,
   `Code.astro` for inline code, `UiText.astro` for a UI string with code in it.
-- Magma has no component for links, `strong` / `em`, numbered lists, code blocks, block quotes
-  or description lists: these stay native (code blocks are Starlight's). Do not imitate a
+- Magma has no component for `strong` / `em`, numbered lists, code blocks, block quotes or
+  description lists: these stay native (code blocks are Starlight's). Do not imitate a
   component with another one; note the gap instead ([magma.md](magma.md)).
+
+### Links
+
+A link in running text (a paragraph, a list item, a table cell) is `mds-link`, with its text
+in the default slot: `<mds-link href="...">text</mds-link>`. Markdown links become one for
+you.
+
+- **Around inline code** (``[`mds-text`](...)``, most links of the component docs): the
+  slot of `mds-link` takes text only, so the link goes inside the code, not around it. Markdown
+  does it for you; by hand, `<Code><mds-link href="...">mds-text</mds-link></Code>`. The code
+  keeps its look and its font, the link its color, underline and focus.
+- **Navigation is not running text**: the rail, the section navigation, the right column, the
+  page cards and the lists of the site footer keep `mds-button` or their own links. `mds-link`
+  is a word of a sentence.
+- **Same tab**: Markdown links open in the same tab, external ones too, as they did as `<a>`.
+  With `target="blank"` the component adds the "opens in a new tab" notice itself: never write
+  it in the text.
+- **Downloads** stay a native `<a download>`: `mds-link` has no `download`
+  ([magma.md](magma.md)).
+- Plain clicks go through Astro's router (`NavigationService`, in `PageFrame.astro`); a click
+  with a modifier, or the middle button, stays with the browser and opens a new tab.
 
 ### Kinds of text
 

@@ -129,9 +129,9 @@ const DESCRIPTION = 'min-w-phrase';
               {data.dependencies.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
-                  <a href={link(tag)}>
-                    <Code reading>{tag}</Code>
-                  </a>
+                  <Code reading>
+                    <mds-link href={link(tag)}>{tag}</mds-link>
+                  </Code>
                 </>
               ))}
             </mds-text>
@@ -142,9 +142,9 @@ const DESCRIPTION = 'min-w-phrase';
               {data.dependents.map((tag, i) => (
                 <>
                   {i > 0 && ', '}
-                  <a href={link(tag)}>
-                    <Code reading>{tag}</Code>
-                  </a>
+                  <Code reading>
+                    <mds-link href={link(tag)}>{tag}</mds-link>
+                  </Code>
                 </>
               ))}
             </mds-text>

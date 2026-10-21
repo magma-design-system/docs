@@ -6,7 +6,8 @@
 // background. `copy`: the text copied when it is clicked
 // (CopyToClipboard.astro). `class`: overrides, such as `my-0` where the
 // code sits next to other code in a flex row (Starlight's content styles
-// give every sibling after the first a top margin).
+// give every sibling after the first a top margin). A link to the code goes
+// inside it, as the Markdown pages do: `<Code><mds-link href>...</mds-link></Code>`.
 import { KIND, TEXT } from '../lib/markdown-text.mjs';
 
 interface Props {

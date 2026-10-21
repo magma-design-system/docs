@@ -5,7 +5,8 @@
 // Headings become mds-text with their typography and tag, paragraphs mds-text
 // and inline code mds-text in the typography of their kind of text (KIND),
 // but code in headings, where it is plain text (code blocks stay as they are),
-// lists mds-list and mds-list-item, rules mds-hr. Ordered lists stay <ol>:
+// lists mds-list and mds-list-item, rules mds-hr, links mds-link (inside the
+// code, for a link around inline code). Ordered lists stay <ol>:
 // mds-list has no numbered form. Section headings (h2, h3) get an anchor in
 // front of them, an mds-button that links to them (`anchoredHeading`), in
 // place of Starlight's, which the deeper ones lose.
@@ -248,14 +249,7 @@ function convert(node, heading, kind = KIND.reading) {
       children(),
     );
   }
-  if (tag === 'code') {
-    return element(
-      'mds-text',
-      { ...own(node), typography: kind.code, tag: 'code' },
-      TEXT.code,
-      node.children ?? [],
-    );
-  }
+  if (tag === 'code') return inlineCode(node, kind, node.children ?? []);
   if (tag === 'ul') {
     const items = (node.children ?? []).filter(
       (/** @type {any} */ child) => child.type === 'element' && child.tagName === 'li',
@@ -279,7 +273,38 @@ function convert(node, heading, kind = KIND.reading) {
     return element('ol', own(node), classes, children());
   }
   if (tag === 'hr') return element('mds-hr', own(node), '', []);
+  if (tag === 'a') return convertLink(node, kind);
   return { ...node, children: children() };
+}
+
+/**
+ * Inline code as mds-text in the code typography of its kind of text.
+ * @param {any} node
+ * @param {typeof KIND[keyof typeof KIND]} kind
+ * @param {any[]} children
+ */
+const inlineCode = (node, kind, children) =>
+  element('mds-text', { ...own(node), typography: kind.code, tag: 'code' }, TEXT.code, children);
+
+/**
+ * A link of the text as mds-link, which takes the font of the text around it.
+ * Its default slot takes text only: markup inside the link (bold, emphasis) is
+ * dropped. A link around inline code (`[`mds-text`](...)`, most links of the
+ * component docs) goes inside the code instead, so it keeps the look of code.
+ * External links open where they did as <a>, in the same tab.
+ * @param {any} node
+ * @param {typeof KIND[keyof typeof KIND]} kind
+ */
+function convertLink(node, kind) {
+  const inner = (node.children ?? []).filter(
+    (/** @type {any} */ child) => child.type !== 'text' || child.value.trim() !== '',
+  );
+  const link = (/** @type {any} */ text) =>
+    element('mds-link', own(node), '', [{ type: 'text', value: textOf(text) }]);
+  if (inner.length === 1 && inner[0].type === 'element' && inner[0].tagName === 'code') {
+    return inlineCode(inner[0], kind, [link(inner[0])]);
+  }
+  return link(node);
 }
 
 /**

@@ -38,15 +38,6 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 - The Anatomy sub-page: what goes into it is still to be defined. Features and Installation
   sub-pages wait for data.
 
-## Links
-
-- `mds-link` (Magma 2.5.0) for the links in running text: the Markdown links
-  (`src/lib/markdown-text.mjs`), the links written in `.astro` pages, the client router through
-  `NavigationService.setHandler()` (`@maggioli-design-system/magma/services`). Open: a link
-  around inline code (the slot of `mds-link` takes text only), links of the frame and the
-  navigation (`mds-link` is a word of a sentence, not a navigation item). Then rule 3 of
-  `AGENTS.md` and `agents/writing.md` take the link out of the gaps.
-
 ## Building blocks and Patterns
 
 See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Feedback
@@ -74,6 +65,10 @@ sketch to turn into a page.
 ## Layout
 
 - At 1024px with the rail open the section column is narrow (about 150px): open decision.
+- Hover prefetch for the links in shadow roots: Astro's ClientRouter prefetches every `<a>` of
+  the document on hover (`prefetchAll`), but only finds anchors in the light DOM, so `mds-link`
+  and `mds-button[href]` are not prefetched. `prefetch()` from `astro:prefetch` on the
+  `pointerover` and `focusin` of those hosts would bring it back.
 
 ## Languages
 
