@@ -119,10 +119,11 @@ sidebar items. The structure and its reasons are in
   gave back (`role="status"`). Methods that take a function or an object stay on the API page.
 - the iframe mirrors `data-theme-name` and `data-magma-pref` from the page: without
   `data-magma-pref`, Magma follows the system's mode instead of the site's.
-- the stage can be narrowed with the handle at its right, and made shorter or taller than the
-  example with the one under it (`role="separator"`, mouse and keys); once the height is set
-  by hand, the frame stops following the example, which scrolls inside it. Reset reloads it at
-  full width and at the example's height.
+- the stage (`PreviewStage.astro`: the frame, its handles, its height and Reset) can be
+  narrowed with the handle at its right, and made shorter or taller than the example with the
+  one under it (`role="separator"`, mouse and keys); once the height is set by hand, the frame
+  stops following the example, which scrolls inside it. Reset reloads it at full width and at
+  the example's height.
 
 ## Other routes
 
