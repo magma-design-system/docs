@@ -114,7 +114,7 @@ sidebar items. The structure and its reasons are in
   `EDGE_TO_EDGE` there, which run from one edge of the page to the other
   (`mds-horizontal-scroll`): their content slides under the edges of the frame.
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
-  them, the first one open; a component with only one of them shows that tab alone.
+  them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
   `documentation.json` (`src/lib/controls.ts`); they set the props on the element in the iframe
   (same origin) and a `MutationObserver` reads changes back.

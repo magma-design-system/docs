@@ -102,124 +102,134 @@ const placeholder = (value: string | undefined) =>
 {/*
   The props and the methods of the example, each in a tab of its own (the
   first one open), instead of a heading over each: the controls stay close to
-  the preview. A component with only one of them shows that tab alone, its
-  name in place of the heading. `not-content`: Starlight would put 1rem above
-  each element that follows another, in the panels too.
+  the preview. Both tabs are always there: the one with nothing to show, a
+  component without methods or without props to set, is disabled and its
+  panel empty (mds-tab pairs the panels with the tabs in their order).
+  `not-content`: Starlight would put 1rem above each element that follows
+  another, in the panels too.
 */}
 {(fields.length > 0 || calls.length > 0) && (
   <mds-tab size="sm" class="not-content mt-800">
-    {fields.length > 0 && (
-      <mds-tab-item type="button" value="props" label={t('component.props')} selected />
-    )}
-    {calls.length > 0 && (
-      <mds-tab-item
-        type="button"
-        value="methods"
-        label={t('component.methods')}
-        selected={fields.length === 0 || undefined}
-      />
-    )}
-    {fields.length > 0 && (
-      <div slot="content" class="pt-600">
-        {/*
-          As many columns of at least 13rem as the page has room for: 3 on
-          desktop, 1 on phones.
+    <mds-tab-item
+      type="button"
+      value="props"
+      label={t('component.props')}
+      selected={fields.length > 0 || undefined}
+      disabled={fields.length === 0 || undefined}
+    />
+    <mds-tab-item
+      type="button"
+      value="methods"
+      label={t('component.methods')}
+      selected={fields.length === 0 || undefined}
+      disabled={calls.length === 0 || undefined}
+    />
+    <div slot="content" class="pt-600">
+      {fields.length > 0 && (
+        <>
+          {/*
+            As many columns of at least 13rem as the page has room for: 3 on
+            desktop, 1 on phones. A little padding: the panel of mds-tab clips
+            what goes past it, the shadows of the fields too.
+          */}
+          <div
+            class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800 p-100"
+            data-playground-controls={tag}
+          >
+            {fields.map(({ name, docs, control, icon, example }) => (
+              <PlaygroundField
+                name={name}
+                docs={docs}
+                control={control}
+                placeholder={placeholder(example)}
+                icons={icon ? icons : undefined}
+                hook="data-prop"
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+    <div slot="content" class="flex flex-col gap-600 pt-600">
+      {calls.length > 0 && (
+        <>
+          <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+            {t('component.preview.methods')}
+          </mds-text>
+          {/* Shown while the system asks for reduced motion (script below). */}
+          <mds-text
+            {...READING}
+            tag="p"
+            class:list={[TEXT.paragraph, 'hidden']}
+            data-playground-motion
+          >
+            {t('component.preview.motion')}
+          </mds-text>
+          {/*
+          The grid of the props, at the top of its cells, and its padding: each
+          method, a play button and its name in code (mds-button capitalizes
+          the first letter of a label), then the fields of its parameters.
         */}
-        <div
-          class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800"
-          data-playground-controls={tag}
-        >
-          {fields.map(({ name, docs, control, icon, example }) => (
-            <PlaygroundField
-              name={name}
-              docs={docs}
-              control={control}
-              placeholder={placeholder(example)}
-              icons={icon ? icons : undefined}
-              hook="data-prop"
-            />
-          ))}
-        </div>
-      </div>
-    )}
-    {calls.length > 0 && (
-      <div slot="content" class="flex flex-col gap-600 pt-600">
-        <mds-text {...READING} tag="p" class={TEXT.paragraph}>
-          {t('component.preview.methods')}
-        </mds-text>
-        {/* Shown while the system asks for reduced motion (script below). */}
-        <mds-text
-          {...READING}
-          tag="p"
-          class:list={[TEXT.paragraph, 'hidden']}
-          data-playground-motion
-        >
-          {t('component.preview.motion')}
-        </mds-text>
-        {/*
-          The grid of the props, at the top of its cells: each method, a play
-          button and its name in code (mds-button capitalizes the first letter
-          of a label), then the fields of its parameters.
-        */}
-        <div
-          class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-start gap-800"
-          data-playground-methods={tag}
-        >
-          {calls.map((call) => (
-            <div class="flex min-w-0 flex-col gap-400" data-method={call.name}>
-              <span class="flex min-w-0 items-center gap-200">
-                <mds-button
-                  icon="mi/baseline/play-arrow"
-                  aria-label={t('component.preview.call', {
-                    method: call.name,
-                    // Astro escapes the attribute: i18next does not need to.
-                    interpolation: { escapeValue: false },
-                  })}
-                  variant="primary"
-                  tone="weak"
-                  size="sm"
-                  type="button"
-                  disabled
-                  data-call={call.name}
-                ></mds-button>
-                <Code name>{call.name}</Code>
-                {call.docs && <mds-help>{call.docs}</mds-help>}
-              </span>
-              {call.parameters.map((parameter) => (
-                <PlaygroundField
-                  name={parameter.name}
-                  docs={parameter.docs}
-                  control={parameter.control}
-                  placeholder={placeholder(parameter.example)}
-                  hook="data-param"
-                />
-              ))}
-            </div>
-          ))}
-        </div>
-        {/*
+          <div
+            class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-start gap-800 p-100"
+            data-playground-methods={tag}
+          >
+            {calls.map((call) => (
+              <div class="flex min-w-0 flex-col gap-400" data-method={call.name}>
+                <span class="flex min-w-0 items-center gap-200">
+                  <mds-button
+                    icon="mi/baseline/play-arrow"
+                    aria-label={t('component.preview.call', {
+                      method: call.name,
+                      // Astro escapes the attribute: i18next does not need to.
+                      interpolation: { escapeValue: false },
+                    })}
+                    variant="primary"
+                    tone="weak"
+                    size="sm"
+                    type="button"
+                    disabled
+                    data-call={call.name}
+                  ></mds-button>
+                  <Code name>{call.name}</Code>
+                  {call.docs && <mds-help>{call.docs}</mds-help>}
+                </span>
+                {call.parameters.map((parameter) => (
+                  <PlaygroundField
+                    name={parameter.name}
+                    docs={parameter.docs}
+                    control={parameter.control}
+                    placeholder={placeholder(parameter.example)}
+                    hook="data-param"
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+          {/*
           What the last call gave back, announced. The words come from the
           dictionaries, the call and its value are code (the template).
         */}
-        <mds-text
-          typography="detail"
-          tag="p"
-          role="status"
-          class="text-fg-muted"
-          data-playground-result={tag}
-          data-idle={t('component.preview.idle')}
-          data-running={t('component.preview.running')}
-          data-done={t('component.preview.done')}
-          data-returned={t('component.preview.returned')}
-          data-failed={t('component.preview.failed')}
-        >
-          {t('component.preview.idle')}
-        </mds-text>
-        <template data-playground-code={tag}>
-          <Code>-</Code>
-        </template>
-      </div>
-    )}
+          <mds-text
+            typography="detail"
+            tag="p"
+            role="status"
+            class="text-fg-muted"
+            data-playground-result={tag}
+            data-idle={t('component.preview.idle')}
+            data-running={t('component.preview.running')}
+            data-done={t('component.preview.done')}
+            data-returned={t('component.preview.returned')}
+            data-failed={t('component.preview.failed')}
+          >
+            {t('component.preview.idle')}
+          </mds-text>
+          <template data-playground-code={tag}>
+            <Code>-</Code>
+          </template>
+        </>
+      )}
+    </div>
   </mds-tab>
 )}
 
