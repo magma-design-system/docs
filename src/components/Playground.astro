@@ -5,7 +5,8 @@
 // less room (as in the layout mockups), and a handle under it makes it shorter
 // or taller than the example, to see what depends on the height of the
 // viewport (overlays that open where there is room, what is fixed to the
-// viewport or follows its scroll); then a control for each prop that
+// viewport or follows its scroll); then, in two tabs of an mds-tab (Props
+// and Methods, no heading over them), a control for each prop that
 // takes a value to type or pick, in a grid of compact fields: the control,
 // the prop's name, its kind and its description in an mds-help; a text or
 // number field shows, while empty, an example of what the prop takes, when
@@ -14,7 +15,7 @@
 // the ones of the example, or none. A control
 // sets the prop on the element of the example; when the component changes a
 // prop itself (an accordion item opened by a click), its control follows.
-// Then a button for each method whose parameters take a value to type or
+// In the second tab, a button for each method whose parameters take a value to type or
 // pick, with a field for each of them: it calls the method on the element of
 // the example, and a line under the buttons says what the call gave back. Some
 // components are all in their methods (mds-emoji). Reset loads the example
@@ -28,7 +29,6 @@ import { methodCalls, plainText, propControl, propExample, type Control } from '
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Code from './Code.astro';
-import Heading from './Heading.astro';
 import PlaygroundField from './PlaygroundField.astro';
 
 interface Props {
@@ -146,105 +146,128 @@ const placeholder = (value: string | undefined) =>
   ></mds-button>
 </div>
 
-{fields.length > 0 && (
-  <>
-    <Heading id="props" typography="h3" text={t('component.props')} />
-    {/*
-      As many columns of at least 13rem as the page has room for: 3 on
-      desktop, 1 on phones. `not-content`: Starlight would put 1rem above
-      each element that follows another, the kind after the name included.
-    */}
-    <div
-      class="not-content grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800"
-      data-playground-controls={tag}
-    >
-      {fields.map(({ name, docs, control, icon, example }) => (
-        <PlaygroundField
-          name={name}
-          docs={docs}
-          control={control}
-          placeholder={placeholder(example)}
-          icons={icon ? icons : undefined}
-          hook="data-prop"
-        />
-      ))}
-    </div>
-  </>
-)}
-
-{calls.length > 0 && (
-  <>
-    <Heading id="methods" typography="h3" text={t('component.methods')} />
-    <mds-text {...READING} tag="p" class={TEXT.paragraph}>
-      {t('component.preview.methods')}
-    </mds-text>
-    {/* Shown while the system asks for reduced motion (script below). */}
-    <mds-text {...READING} tag="p" class:list={[TEXT.paragraph, 'hidden']} data-playground-motion>
-      {t('component.preview.motion')}
-    </mds-text>
-    {/*
-      The grid of the props, at the top of its cells: each method, a play
-      button and its name in code (mds-button capitalizes the first letter
-      of a label), then the fields of its parameters.
-    */}
-    <div
-      class="not-content grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-start gap-800"
-      data-playground-methods={tag}
-    >
-      {calls.map((call) => (
-        <div class="flex min-w-0 flex-col gap-400" data-method={call.name}>
-          <span class="flex min-w-0 items-center gap-200">
-            <mds-button
-              icon="mi/baseline/play-arrow"
-              aria-label={t('component.preview.call', {
-                method: call.name,
-                // Astro escapes the attribute: i18next does not need to.
-                interpolation: { escapeValue: false },
-              })}
-              variant="primary"
-              tone="weak"
-              size="sm"
-              type="button"
-              disabled
-              data-call={call.name}
-            ></mds-button>
-            <Code name>{call.name}</Code>
-            {call.docs && <mds-help>{call.docs}</mds-help>}
-          </span>
-          {call.parameters.map((parameter) => (
+{/*
+  The props and the methods of the example, each in a tab of its own (the
+  first one open), instead of a heading over each: the controls stay close to
+  the preview. A component with only one of them shows that tab alone, its
+  name in place of the heading. `not-content`: Starlight would put 1rem above
+  each element that follows another, in the panels too.
+*/}
+{(fields.length > 0 || calls.length > 0) && (
+  <mds-tab size="sm" class="not-content mt-800">
+    {fields.length > 0 && (
+      <mds-tab-item type="button" value="props" label={t('component.props')} selected />
+    )}
+    {calls.length > 0 && (
+      <mds-tab-item
+        type="button"
+        value="methods"
+        label={t('component.methods')}
+        selected={fields.length === 0 || undefined}
+      />
+    )}
+    {fields.length > 0 && (
+      <div slot="content" class="pt-600">
+        {/*
+          As many columns of at least 13rem as the page has room for: 3 on
+          desktop, 1 on phones.
+        */}
+        <div
+          class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-end gap-800"
+          data-playground-controls={tag}
+        >
+          {fields.map(({ name, docs, control, icon, example }) => (
             <PlaygroundField
-              name={parameter.name}
-              docs={parameter.docs}
-              control={parameter.control}
-              placeholder={placeholder(parameter.example)}
-              hook="data-param"
+              name={name}
+              docs={docs}
+              control={control}
+              placeholder={placeholder(example)}
+              icons={icon ? icons : undefined}
+              hook="data-prop"
             />
           ))}
         </div>
-      ))}
-    </div>
-    {/*
-      What the last call gave back, announced. The words come from the
-      dictionaries, the call and its value are code (the template).
-    */}
-    <mds-text
-      typography="detail"
-      tag="p"
-      role="status"
-      class="not-content text-fg-muted"
-      data-playground-result={tag}
-      data-idle={t('component.preview.idle')}
-      data-running={t('component.preview.running')}
-      data-done={t('component.preview.done')}
-      data-returned={t('component.preview.returned')}
-      data-failed={t('component.preview.failed')}
-    >
-      {t('component.preview.idle')}
-    </mds-text>
-    <template data-playground-code={tag}>
-      <Code>-</Code>
-    </template>
-  </>
+      </div>
+    )}
+    {calls.length > 0 && (
+      <div slot="content" class="flex flex-col gap-600 pt-600">
+        <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+          {t('component.preview.methods')}
+        </mds-text>
+        {/* Shown while the system asks for reduced motion (script below). */}
+        <mds-text
+          {...READING}
+          tag="p"
+          class:list={[TEXT.paragraph, 'hidden']}
+          data-playground-motion
+        >
+          {t('component.preview.motion')}
+        </mds-text>
+        {/*
+          The grid of the props, at the top of its cells: each method, a play
+          button and its name in code (mds-button capitalizes the first letter
+          of a label), then the fields of its parameters.
+        */}
+        <div
+          class="grid grid-cols-[repeat(auto-fill,minmax(--spacing(5200),1fr))] items-start gap-800"
+          data-playground-methods={tag}
+        >
+          {calls.map((call) => (
+            <div class="flex min-w-0 flex-col gap-400" data-method={call.name}>
+              <span class="flex min-w-0 items-center gap-200">
+                <mds-button
+                  icon="mi/baseline/play-arrow"
+                  aria-label={t('component.preview.call', {
+                    method: call.name,
+                    // Astro escapes the attribute: i18next does not need to.
+                    interpolation: { escapeValue: false },
+                  })}
+                  variant="primary"
+                  tone="weak"
+                  size="sm"
+                  type="button"
+                  disabled
+                  data-call={call.name}
+                ></mds-button>
+                <Code name>{call.name}</Code>
+                {call.docs && <mds-help>{call.docs}</mds-help>}
+              </span>
+              {call.parameters.map((parameter) => (
+                <PlaygroundField
+                  name={parameter.name}
+                  docs={parameter.docs}
+                  control={parameter.control}
+                  placeholder={placeholder(parameter.example)}
+                  hook="data-param"
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+        {/*
+          What the last call gave back, announced. The words come from the
+          dictionaries, the call and its value are code (the template).
+        */}
+        <mds-text
+          typography="detail"
+          tag="p"
+          role="status"
+          class="text-fg-muted"
+          data-playground-result={tag}
+          data-idle={t('component.preview.idle')}
+          data-running={t('component.preview.running')}
+          data-done={t('component.preview.done')}
+          data-returned={t('component.preview.returned')}
+          data-failed={t('component.preview.failed')}
+        >
+          {t('component.preview.idle')}
+        </mds-text>
+        <template data-playground-code={tag}>
+          <Code>-</Code>
+        </template>
+      </div>
+    )}
+  </mds-tab>
 )}
 
 <script>

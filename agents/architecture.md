@@ -110,6 +110,8 @@ sidebar items. The structure and its reasons are in
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
   page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`).
+- under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
+  them, the first one open; a component with only one of them shows that tab alone.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
   `documentation.json` (`src/lib/controls.ts`); they set the props on the element in the iframe
   (same origin) and a `MutationObserver` reads changes back.
