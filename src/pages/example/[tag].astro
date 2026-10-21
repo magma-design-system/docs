@@ -24,13 +24,27 @@ interface Props {
 
 const { tag, example } = Astro.props.entry.data;
 
-// The usage files point their images at example.com, a domain reserved for
-// documentation that serves none: the avatar of mds-avatar would start on its
-// load error, which it never leaves (magma#956). The preview loads Magma's own
-// avatar from the identity package instead (src/pages/downloads/identity).
+// The usage files point their images at files of a product the site does not
+// have (/logo.svg, ./logo.svg, /img/copertina.jpg) or at example.com, a domain
+// reserved for documentation that serves none: the image would show its error
+// (mds-img its file name on a red ground) and the avatar of mds-avatar would
+// start on its load error, which it never leaves (magma#956). The preview
+// loads an image of the site instead: a logo is Magma's logo, the photo of a
+// person Magma's avatar, both from the identity package
+// (src/pages/downloads/identity), any other image the cover of the site
+// (public/covers), whose proportions suit an illustration too (mds-img takes
+// the whole width it has: a square logo would be as tall as the frame).
+// Videos are left as they are: no package has one.
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
-const image = `${base}downloads/identity/avatar/avatar-magma-256w.png`;
-const html = example.replace(/https:\/\/example\.com\/[^"'\s]+\.(?:jpe?g|png|webp|gif)/g, image);
+const LOGO = `${base}downloads/identity/internal/magma-design-system/logo-magma.svg`;
+const AVATAR = `${base}downloads/identity/avatar/avatar-magma-256w.png`;
+const COVER = `${base}covers/og-1200x630.png`;
+// The components whose image is the photo of a person.
+const PEOPLE = new Set(['mds-author', 'mds-avatar', 'mds-entity']);
+const IMAGE = /(?<=\b(?:src|poster)=")[^"]+\.(?:jpe?g|png|webp|gif|svg)(?=")/g;
+const html = example.replace(IMAGE, (url) =>
+  /(?:^|\/)logo[^/]*$/.test(url) ? LOGO : PEOPLE.has(tag) ? AVATAR : COVER,
+);
 
 // The components that run from one edge of the page to the other, as a strip
 // of cards that scrolls sideways: their example has no room around it, and

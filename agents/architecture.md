@@ -113,6 +113,12 @@ sidebar items. The structure and its reasons are in
   example has room around it (`p-800` on the body), except for the components listed in
   `EDGE_TO_EDGE` there, which run from one edge of the page to the other
   (`mds-horizontal-scroll`): their content slides under the edges of the frame.
+- the images of the example point at files of a product (`/logo.svg`, `/img/copertina.jpg`) or
+  at `example.com`, which the site does not serve: the page swaps each `src` or `poster` of an
+  image for one of the site's. A logo becomes Magma's logo, the photo of a person
+  (`mds-author`, `mds-avatar`, `mds-entity`) Magma's avatar, any other image the cover
+  `public/covers/og-1200x630.png`. A square image does not stand in for an illustration:
+  `mds-img` takes the whole width it has (`mds-zero`). Videos stay broken: no package has one.
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
