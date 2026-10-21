@@ -7,10 +7,10 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 ## Home
 
 - **Changelog** sub-page, Magma 2.x only, from the `CHANGELOG.md` the packages ship since 2.3.0
-  (magma#892). Waits for magma#981: `magma` and its wrappers do not export the file (`styles`,
-  `design-tokens` and `identity` resolve); `svg-icons` and `icons` ship it with their next
-  release. Each section equals its GitHub release body; breaking entries are marked
-  `[**breaking**]`.
+  (magma#892). Unblocked: since 2.4.0 (magma#981) `magma`, `magma-react` and `magma-angular`
+  export the file too (`./CHANGELOG.md`), as `styles`, `design-tokens` and `identity` do; check
+  `svg-icons` and `icons`. Each section equals its GitHub release body; breaking entries are
+  marked `[**breaking**]`.
 - The page footer (modified, created, edit link) also shows on the home page: decide whether it
   belongs there.
 
@@ -37,8 +37,15 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 - The Anatomy sub-page: what goes into it is still to be defined. Features and Installation
   sub-pages wait for data.
-- Preview placeholders from `@example` (magma#957) and a working image for the `mds-avatar`
-  example (magma#956).
+
+## Links
+
+- `mds-link` (Magma 2.5.0) for the links in running text: the Markdown links
+  (`src/lib/markdown-text.mjs`), the links written in `.astro` pages, the client router through
+  `NavigationService.setHandler()` (`@maggioli-design-system/magma/services`). Open: a link
+  around inline code (the slot of `mds-link` takes text only), links of the frame and the
+  navigation (`mds-link` is a word of a sentence, not a navigation item). Then rule 3 of
+  `AGENTS.md` and `agents/writing.md` take the link out of the gaps.
 
 ## Building blocks and Patterns
 

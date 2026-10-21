@@ -173,8 +173,8 @@ const hasHero = Boolean(entry.data.hero);
 
     // The router puts the new page in, then the kept columns in place of
     // their copies: for that moment the copies are on the page, and their
-    // components start loading for nothing. mds-tooltip and mds-dropdown
-    // (magma 2.2.0) then throw, taken off the page before they have loaded
+    // components start loading for nothing. mds-dropdown (magma 2.5.0; no
+    // longer mds-tooltip) then throws, taken off the page before it has loaded
     // (https://github.com/magma-design-system/magma/issues/527). Emptied once
     // every listener has read the new page, right before the swap.
     const swap = (event as TransitionBeforeSwapEvent).swap;

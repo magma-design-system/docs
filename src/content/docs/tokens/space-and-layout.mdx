@@ -24,10 +24,10 @@ no custom property of their own: in Tailwind each one is a step of every spacing
 
 ## Containers
 
-Widths for content blocks and container queries. In Magma's theme the width utilities
-read the spacing of the same name before the container: `max-w-xs` is `--spacing-xs`, so
-write `max-w-(--container-xs)` for the container. The container query variants (`@md:`)
-read the containers.
+Widths for content blocks and container queries. The width utilities read them by name:
+`max-w-xs` is `--container-xs`, and so are `w-xs`, `min-w-xs` and `basis-xs`. The logical
+sizes read the spacing of the same name instead: for the container write
+`max-inline-(--container-xs)`. The container query variants (`@md:`) read the containers.
 
 <TokenTable tokens="container" />
 
