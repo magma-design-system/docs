@@ -11,6 +11,10 @@
 // The descriptions are this site's defaults: identity publishes none.
 // The cards are surface-overlay: mds-card's parts paint --mds-card-background,
 // not the background of the card, so both are set.
+// The footer is `self-end`: with no mds-card-content, a card wide enough to
+// put the media beside the title gives the footer the row that stretches, and
+// the Download button rises under the title
+// (https://github.com/magma-design-system/magma/issues/1040).
 import CopyExample from './CopyExample.astro';
 import Heading from './Heading.astro';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
@@ -118,7 +122,7 @@ const tiles = family.assets.map((asset) => {
           {label}
         </mds-text>
       </mds-card-header>
-      <mds-card-footer>
+      <mds-card-footer class="self-end">
         <mds-button-dropdown
           label={t('brand.download.action')}
           icon="mi/outline/file-download"
