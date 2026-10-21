@@ -125,6 +125,21 @@ sidebar items. The structure and its reasons are in
 - `src/pages/downloads/`: files of the packages served for download (Figma tokens, brand
   assets).
 
+## Covers
+
+`public/covers/` holds the covers of the site: images that present Magma on other sites (link
+previews, the social preview of the GitHub repository, posts). Astro copies `public/` as it is,
+so every file keeps a stable URL, `https://magma-design-system.github.io/docs/covers/<file>`,
+that other sites can point to; an image under `src/assets/` gets a hash in its name instead.
+
+- Names: `<use>-<width>x<height>.png` (`og-1200x630.png`, `github-1280x640.png`), with the
+  language when a cover has one per language (`og-it-1200x630.png`). Only the exported images.
+- `og-1200x630.png` is the `og:image` of every page (`Head.astro`, alt text `frame.cover.alt`):
+  Starlight sets `twitter:card` to `summary_large_image` but has no image. A page can set its
+  own with `og:image` in the `head` of its frontmatter.
+- GitHub does not read a URL: the social preview of the repository is uploaded by hand
+  (Settings, General, Social preview), from the file here.
+
 ## Browser storage keys
 
 The site's: `magma-docs:rail`, `magma-docs:framework`, `magma-docs:icon-style`,

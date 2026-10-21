@@ -36,6 +36,7 @@
   "frame.preferences": "Preferenze",
   "frame.footer.modified": "Modificato {{date}}",
   "frame.footer.created": "Creato {{date}}",
+  "frame.cover.alt": "Magma, il design system del Gruppo Maggioli",
 
   "component.generatedFrom": "Generato da",
   "component.encapsulation": "Incapsulamento",
