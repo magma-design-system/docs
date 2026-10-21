@@ -20,7 +20,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "0.4.4",
+    "@astrojs/markdown-satteri": "0.4.5",
     "@astrojs/starlight": "0.42.6",
     "@fontsource/karla": "5.3.0",
     "@fontsource/merriweather": "5.3.0",
@@ -40,13 +40,13 @@
     "@maggioli-design-system/styles": "17.3.0",
     "@maggioli-design-system/svg-icons": "4.6.0",
     "@tailwindcss/vite": "4.3.3",
-    "astro": "7.4.1",
+    "astro": "7.4.2",
     "normalize.css": "8.0.1",
     "sharp": "0.35.5",
     "tailwindcss": "4.3.3"
   },
   "devDependencies": {
-    "@astrojs/check": "0.9.11",
+    "@astrojs/check": "0.9.12",
     "prettier": "3.9.10",
     "prettier-plugin-astro": "1.1.1",
     "typescript": "6.0.3"
