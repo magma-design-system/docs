@@ -21,8 +21,9 @@ export const sections = [
   {
     id: 'home',
     icon: 'mi/outline/home',
-    // One page, without the section navigation (`template: splash`).
-    items: () => [{ slug: 'index', ...sidebarLabel('nav.overview') }],
+    // The home page has no section navigation (`template: splash`); the
+    // Changelog has, with the home page as Overview.
+    items: () => [{ slug: 'index', ...sidebarLabel('nav.overview') }, { slug: 'changelog' }],
   },
   {
     id: 'foundation',
