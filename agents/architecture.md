@@ -110,9 +110,9 @@ sidebar items. The structure and its reasons are in
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
   page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`).
-- the controls are Magma inputs in the small size (`size="sm"`) built from the props in `documentation.json`
-  (`src/lib/controls.ts`); they set the props on the element in the iframe (same origin) and a
-  `MutationObserver` reads changes back.
+- the controls are Magma inputs in the small size (`size="sm"`) built from the props in
+  `documentation.json` (`src/lib/controls.ts`); they set the props on the element in the iframe
+  (same origin) and a `MutationObserver` reads changes back.
 - the methods whose parameters take a value to type or pick (`methodCalls()` in
   `src/lib/controls.ts`) get a play button each, with a field per parameter
   (`PlaygroundField.astro`, shared with the props); a line under them says what the last call
