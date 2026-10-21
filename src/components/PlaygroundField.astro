@@ -1,0 +1,71 @@
+---
+// One control of a component's preview (Playground.astro), for a prop of its
+// example or for a parameter of one of its methods: a switch, a select or a
+// field, then its name, its kind and its description in an mds-help. `icons`:
+// the icons a prop that takes one picks from, in a select instead of a field.
+// `hook` tells the preview's script what the control sets. All of them in
+// Magma's small size (`sm`, 28px), the one for compact forms. Never disabled:
+// a change made before the preview is ready is let go, and the control then
+// takes the value of its prop (Playground.astro).
+import type { Control } from '../lib/controls';
+import Code from './Code.astro';
+import TypeValue from './TypeValue.astro';
+
+interface Props {
+  name: string;
+  docs: string;
+  control: Control;
+  /** What a text or number field shows while empty. */
+  placeholder?: string;
+  icons?: string[];
+  hook: 'data-prop' | 'data-param';
+}
+
+const { name, docs, control, placeholder, icons, hook } = Astro.props;
+const data = {
+  [hook]: name,
+  'data-kind': control.kind,
+  'data-optional': control.optional,
+};
+---
+
+<div class="flex min-w-0 flex-col gap-200">
+  {control.kind === 'boolean' && (
+    <mds-input-switch type="switch" size="sm" {...data}>
+      <span class="sr-only">{name}</span>
+    </mds-input-switch>
+  )}
+  {control.kind === 'enum' && (
+    <mds-input-select
+      aria-label={name}
+      placeholder={control.optional ? '-' : undefined}
+      size="sm"
+      {...data}
+    >
+      {control.options?.map((option) => (
+        <option value={option}>{option}</option>
+      ))}
+    </mds-input-select>
+  )}
+  {icons && (
+    <mds-input-select aria-label={name} placeholder="-" size="sm" {...data}>
+      {icons.map((slug) => (
+        <option value={slug}>{slug}</option>
+      ))}
+    </mds-input-select>
+  )}
+  {((control.kind === 'string' && !icons) || control.kind === 'number') && (
+    <mds-input
+      type={control.kind === 'number' ? 'number' : 'text'}
+      aria-label={name}
+      placeholder={placeholder}
+      size="sm"
+      {...data}
+    />
+  )}
+  <span class="flex min-w-0 items-center gap-200">
+    <Code name>{name}</Code>
+    <TypeValue text={control.kind} kind={control.kind} copy={false} />
+    {docs && <mds-help>{docs}</mds-help>}
+  </span>
+</div>

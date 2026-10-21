@@ -9,7 +9,7 @@ import Playground from '../../../../components/Playground.astro';
 import TypeLabels from '../../../../components/TypeLabels.astro';
 import UiText from '../../../../components/UiText.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
-import { propControl } from '../../../../lib/controls';
+import { methodCalls, propControl } from '../../../../lib/controls';
 import { localeParams } from '../../../../lib/i18n.mjs';
 import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
 import { componentName } from '../../../../lib/nav.mjs';
@@ -58,6 +58,12 @@ const sections = {
       id: 'props',
       label: t('component.props'),
       show: data.example !== '' && data.props.some((prop) => propControl(prop) !== undefined),
+    },
+    // The methods the preview calls (Playground.astro).
+    {
+      id: 'methods',
+      label: t('component.methods'),
+      show: data.example !== '' && methodCalls(data.methods as any[]).length > 0,
     },
     { id: 'overview', label: t('component.overview'), show: true },
     {
@@ -112,7 +118,7 @@ const DESCRIPTION = 'min-w-phrase';
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
   {page.id === 'overview' && data.example !== '' && (
-    <Playground tag={data.tag} props={data.props} example={data.example} />
+    <Playground tag={data.tag} props={data.props} methods={data.methods} example={data.example} />
   )}
 
   {page.id === 'overview' && (
