@@ -6,11 +6,6 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 ## Home
 
-- **Changelog** sub-page, Magma 2.x only, from the `CHANGELOG.md` the packages ship since 2.3.0
-  (magma#892). Unblocked: since 2.4.0 (magma#981) `magma`, `magma-react` and `magma-angular`
-  export the file too (`./CHANGELOG.md`), as `styles`, `design-tokens` and `identity` do; check
-  `svg-icons` and `icons`. Each section equals its GitHub release body; breaking entries are
-  marked `[**breaking**]`.
 - The page footer (modified, created, edit link) also shows on the home page: decide whether it
   belongs there.
 

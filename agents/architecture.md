@@ -103,6 +103,28 @@ sidebar items. The structure and its reasons are in
 | Development     | Installation (`FrameworkTabs.astro`, choice kept in `magma-docs:framework`; `MagmaVersions.astro`), Agentic development, Versions and migrations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Community       | Channels (`Channel.astro`), Contributing, Code of conduct, About.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
+## Changelog
+
+`changelog.mdx` (Home section) shows the releases of the Magma packages from Magma 2.0.0 on: an
+`h2` per package written in the page, with a line about it, then `Changelog.astro` with the
+releases.
+
+- [`src/lib/changelog.mjs`](../src/lib/changelog.mjs) reads the `CHANGELOG.md` of each package
+  through `resolveMagma()`: magma and its wrappers export it since 2.4.0 (magma#981), `styles`,
+  `design-tokens`, `identity`, `icons` and `svg-icons` have no `exports` map and resolve it from
+  their folder. Each section of the file is the body of the GitHub release with the same tag
+  (git-cliff). The page keeps every package's releases from the day of `magma@2.0.0`.
+- `magma-react` and `magma-angular` are not on the page: they are released with magma, at its
+  version, and their files hold the same sections.
+- A line the parser does not know (not a release heading, a group heading, an entry or an
+  indented line under an entry) fails the build, so a change of format is seen and handled.
+- `Changelog.astro`: a heading per version (id `<package>-<version>`, with its anchor), the date
+  and the link to the GitHub release; the groups in the order of the release, their names from
+  `changelog.group.*` (a group not in the map keeps its English name); entries as `mds-list`,
+  scopes as code, linked to the component page when they are a component tag, `(#n)` linked to
+  the pull request. Entries marked `[**breaking**]` get a warning `mds-badge`, and so does their
+  release. The entries stay in English on every locale: the Italian page says so.
+
 ## Component preview
 
 `Playground.astro`, on every component's main page and on pattern pages:
