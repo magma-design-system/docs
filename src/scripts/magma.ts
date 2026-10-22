@@ -27,26 +27,3 @@ const syncScheme = () => {
 syncScheme();
 new MutationObserver(syncScheme).observe(root, { attributes: true, attributeFilter: ['class'] });
 systemDark.addEventListener('change', syncScheme);
-
-// mds-emoji draws nothing in Firefox: its shadow root gives the svg
-// `transform-style: preserve-3d`, with nothing in 3D inside it to preserve
-// (https://github.com/magma-design-system/magma/issues/1065). Every emoji of
-// the page, the home page mascot and the component preview, gets a sheet that
-// makes it flat again; Chromium draws it the same either way. On every page
-// the router shows, and once on the pages without the router (the previews).
-type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
-const flatEmoji = new CSSStyleSheet();
-flatEmoji.replaceSync('svg { transform-style: flat; }');
-const flatten = async (emoji: MagmaElement) => {
-  await emoji.componentOnReady?.();
-  const shadow = emoji.shadowRoot;
-  if (shadow && !shadow.adoptedStyleSheets.includes(flatEmoji)) {
-    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, flatEmoji];
-  }
-};
-const flattenEmojis = async () => {
-  await customElements.whenDefined('mds-emoji');
-  document.querySelectorAll<MagmaElement>('mds-emoji').forEach(flatten);
-};
-flattenEmojis();
-document.addEventListener('astro:page-load', flattenEmojis);
