@@ -22,20 +22,18 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                  | Where                                       | What the site does                                                                                                                                                               |
-| ---------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                         |
-| [magma#1065](https://github.com/magma-design-system/magma/issues/1065) | `src/scripts/magma.ts`                      | A sheet with `svg { transform-style: flat }` in the shadow root of every `mds-emoji`: with `preserve-3d` on that `svg`, Firefox draws nothing                                    |
-| not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
-| not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
-| not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
+| Issue                                                                | Where                                       | What the site does                                                                                                                                                               |
+| -------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                         |
+| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
+| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
+| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.5.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
+As of Magma 2.5.1: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
 `disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
-dropdown inserted and removed at once no longer throws in Chromium), #1065 (`mds-emoji` is
-invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root), #1061
+dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
@@ -45,7 +43,9 @@ Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
 on the props that take a format: the preview placeholders), #960, #981 (`CHANGELOG.md` in
 `exports`: the Changelog page reads it), #983, #984, #1037 (`mds-entity` has 2px between
-the name and the detail, and an `infos` part), #1040.
+the name and the detail, and an `infos` part), #1040. Closed by 2.5.1: #1065 (`mds-emoji` was
+invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root; the site
+added a flat sheet to every emoji until then).
 
 ## Seen, not filed yet
 
@@ -59,9 +59,10 @@ against open issues before filing.
   2.5.0).
 - `mds-toast` reads its text once at load: text set later never shows (2.2.0, still in 2.5.0).
 - `mds-input`: the required tip stays green after the value is cleared from JavaScript (near
-  #786); the email validator returns a hard-coded Italian message; `mds-input-field` overwrites
-  the `message` and `variant` set by the application on `mdsInputValidation`, and marks every
-  valid field as success (2.3.0, still in 2.5.0).
+  #786); `mds-input-field` overwrites the `message` and `variant` set by the application on
+  `mdsInputValidation`, and marks every valid field as success (2.3.0, still in 2.5.0). The
+  email message hard-coded in Italian is gone since 2.5.1 (#1072: every validation message in
+  the language of the page).
 - `mds-input-switch` names its input "Select <label>" while unchecked and "Deselect <label>"
   while checked (`aria-label`, localized), on every type: the name of a switch changes with its
   state, and adds a verb to what `role="switch"` and the checked state already say. The label
