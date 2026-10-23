@@ -95,7 +95,7 @@ against open issues before filing.
   for download.
 - `documentation.json` sorts no component into a category: only `mds-pref` has a `@category`
   (`Patterns`), and `agents/components.md` is one flat list (2.5.1). The site reads `@category`
-  and `@parent` as proposed to Magma (ten categories, the 36 parts under their compound) and
+  and `@parent` as proposed to Magma (ten categories, the 38 parts under their compound) and
   stays a flat list of 116 entries until every component has one of them: it does not invent
   the categories. To preview the grouped navigation, add the tags to a copy of
   `documentation.json` in a scratch worktree, never in the repository.
