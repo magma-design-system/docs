@@ -660,3 +660,51 @@ export function figmaFileInfo(file) {
   }
   return { variables, bytes: Buffer.byteLength(text) };
 }
+
+// --- Native platforms ----------------------------------------------------
+
+/**
+ * The files design-tokens publishes for the native platforms that an app can
+ * use as they are: the colors of both modes, with no other token. Left out:
+ * the Objective-C files of `dist/ios/` and `dist/flutter/fonts.dart`, which do
+ * not compile (agents/magma.md), and the `colors-*.dart` files, which split
+ * `colors.dart` by group under the same class names.
+ */
+export const PLATFORM_FILES = /** @type {const} */ ([
+  { platform: 'android', dir: 'android', file: 'colors.xml', content: 'androidColors' },
+  { platform: 'ios', dir: 'ios-swift', file: 'StyleDictionary.swift', content: 'swiftClass' },
+  { platform: 'ios', dir: 'ios-swift', file: 'StyleDictionaryColor.swift', content: 'swiftEnum' },
+  { platform: 'flutter', dir: 'flutter', file: 'colors.dart', content: 'flutterColors' },
+]);
+
+/** One color of a platform file, by platform. */
+const PLATFORM_COLOR = {
+  android: /<color name="/g,
+  ios: /static let \w+ = UIColor\(/g,
+  flutter: /static const Color \w+ =/g,
+};
+
+/**
+ * Path of a native platform file of design-tokens.
+ * @param {string} platform
+ * @param {string} file
+ */
+export function platformFile(platform, file) {
+  const entry = PLATFORM_FILES.find((f) => f.platform === platform && f.file === file);
+  if (!entry) throw new Error(`Not a platform file: ${platform}/${file}`);
+  return resolveMagma(`design-tokens/dist/${entry.dir}/${file}`);
+}
+
+/**
+ * How many colors a native platform file holds, both modes together, and its
+ * size in bytes.
+ * @param {keyof typeof PLATFORM_COLOR} platform
+ * @param {string} file
+ */
+export function platformFileInfo(platform, file) {
+  const text = readFileSync(platformFile(platform, file), 'utf8');
+  return {
+    colors: text.match(PLATFORM_COLOR[platform])?.length ?? 0,
+    bytes: Buffer.byteLength(text),
+  };
+}

@@ -1,13 +1,16 @@
 ---
-// Links of a section, nested groups shown as sub-headings.
+// Links of a section, nested groups shown as sub-headings, each under its
+// icon (GROUP_ICONS in src/lib/nav.mjs).
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 
 interface Props {
   entries: StarlightRouteData['sidebar'];
   currentHref: string | undefined;
+  /** The icon of each group, by its label. */
+  icons: Map<string, string>;
 }
 
-const { entries, currentHref } = Astro.props;
+const { entries, currentHref, icons } = Astro.props;
 ---
 
 {/*
@@ -15,8 +18,10 @@ const { entries, currentHref } = Astro.props;
   text, whose line height adds space below it to the gap. They are pulled left
   by the padding of the button, so that its label lines up with the headings
   and the background of the selected or hovered one stands out of the column.
+  The labels are page titles, written as they must read: mds-button would
+  uppercase their first letter (iOS).
 */}
-<ul class="m-0 flex list-none flex-col gap-100 p-0">
+<ul class="m-0 flex list-none flex-col gap-100 p-0 [--mds-button-label-transform:none]">
   {entries.map((entry) =>
     entry.type === 'link' ? (
       <li class="-ml-300 flex">
@@ -34,10 +39,13 @@ const { entries, currentHref } = Astro.props;
       </li>
     ) : (
       <li class="mt-600">
+        {icons.has(entry.label) && (
+          <mds-icon class="mb-200 block w-600" name={icons.get(entry.label)} />
+        )}
         <mds-text class="mb-200 block" typography="h6" tag="h3">
           {entry.label}
         </mds-text>
-        <Astro.self entries={entry.entries} currentHref={currentHref} />
+        <Astro.self entries={entry.entries} currentHref={currentHref} icons={icons} />
       </li>
     ),
   )}

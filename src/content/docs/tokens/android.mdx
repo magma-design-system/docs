@@ -1,0 +1,64 @@
+---
+title: Android
+description: The colors of Magma as Android color resources - the file to add to an app, how its names are built and how to follow dark mode.
+---
+
+import PlatformFiles from '../../../components/PlatformFiles.astro';
+
+`@maggioli-design-system/design-tokens` publishes the colors of Magma as Android color
+resources, generated with every release from the same sources as the stylesheets. The file
+below comes from the version this site is built with: an app needs neither npm nor the
+package to use it.
+
+## Files
+
+<PlatformFiles platform="android" />
+
+Copy `colors.xml` into `res/values/` of your module, under another name, such as
+`magma_colors.xml`, if the module has a `colors.xml` of its own. Read a color as any other
+resource: `@color/color_surface_neutral_light_default` in XML,
+`R.color.color_surface_neutral_light_default` in code.
+
+## Names
+
+Every color is `color_<group>_<family>_<mode>_<step>`:
+
+- **Palettes**: `tone`, `label`, `status`, `brand` and `variant`, with the steps `1` to `10`
+  of [Color](../color/). A tone adds `seed`, the paper of its mode; the other families add
+  `color`, their own color.
+- **Roles of a family**: `surface` (`sunken`, `muted`, `default`, `raised`, `overlay`),
+  `border` (`muted`, `default`, `strong`) and `text` (`default`, `muted`, `subtle`,
+  `disabled`), for the families `neutral`, `porcelain`, `bisque`, `info`, `success`,
+  `warning` and `error`.
+- **Mode**: `light` or `dark`. Both modes are in the same file.
+
+## Dark mode
+
+The file names the mode in each color instead of using the `night` qualifier. To follow the
+system, give the colors your app uses names of its own, pointing at the light colors in
+`res/values/` and at the dark ones in `res/values-night/`:
+
+```xml
+<!-- res/values/theme_colors.xml -->
+<resources>
+  <color name="surface_default">@color/color_surface_neutral_light_default</color>
+</resources>
+
+<!-- res/values-night/theme_colors.xml -->
+<resources>
+  <color name="surface_default">@color/color_surface_neutral_dark_default</color>
+</resources>
+```
+
+## Roles and themes
+
+On the web, the surface, border and text roles of a page read one family, chosen by the
+named theme: `neutral` by default, `porcelain` for `cool`, `bisque` for `warm`. Here the
+choice is the app's: the `neutral` colors are those of the default theme. The other
+semantic roles are not in the file: [Color](../color/) lists the step each one points at,
+in light and in dark mode.
+
+## Not in the file yet
+
+Android gets the colors only: no type styles, spacing, radii, shadows or motion, and none of
+what the higher contrast preference changes on the web.

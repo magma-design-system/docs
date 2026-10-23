@@ -1,0 +1,35 @@
+---
+title: Web
+description: Tutti i token di Magma, come custom property CSS, tema Tailwind, SCSS e JavaScript - l'unica piattaforma in cui i token seguono la modalità, il tema e le preferenze della pagina.
+---
+
+Il web è la piattaforma per cui Magma è costruito, e l'unica che riceve tutti i token: i
+ruoli semantici, gli stili di testo, spazi, forme, profondità, movimento e i token di ogni
+componente. È anche l'unica in cui i token seguono la pagina mentre è aperta: cambia la
+modalità, il tema con nome o la preferenza di contrasto, e ogni valore che ne dipende cambia
+con loro ([Temi e preferenze](../themes-and-preferences/)).
+
+Li pubblicano due pacchetti: `@maggioli-design-system/styles`, i fogli di stile che una
+pagina importa, e `@maggioli-design-system/design-tokens`, i primitivi su cui quei fogli di
+stile sono costruiti.
+
+## Formati
+
+| Formato             | File                                            | Contenuto                                          |
+| ------------------- | ----------------------------------------------- | -------------------------------------------------- |
+| Custom property CSS | `styles/dist/css/`                              | Tutti i token globali, legati a modalità e tema    |
+| Tailwind 4          | `styles/dist/tailwind/`                         | I token come tema Tailwind, e le utility di Magma  |
+| SCSS                | `design-tokens/dist/scss/variables.scss`        | I colori come variabili Sass, entrambe le modalità |
+| JavaScript          | `design-tokens/dist/js/`                        | Le parti del preset di Tailwind 3, legacy          |
+| DTCG                | `design-tokens/dist/dtcg/`, `styles/dist/dtcg/` | Tutti i token come dati, per gli strumenti         |
+
+- Il **CSS** è il modo in cui una pagina riceve i token: importa i fogli di stile
+  nell'ordine indicato in [Installazione](../../development/installation/#stili), poi leggi
+  i token come custom property o con le classi di [Tailwind](../tailwind/).
+- L'**SCSS** contiene valori esadecimali fissi, una variabile per modalità
+  (`$color-surface-neutral-light-default`): un colore preso da lì non segue la pagina.
+  Usalo solo dove una custom property non può arrivare.
+- Il **JavaScript** alimenta il preset di Tailwind 3 di styles, che funziona solo con
+  Tailwind 3.
+- I file **DTCG** sono i [dati dei token](../#dati-dei-token): descrivono i fogli di stile, non
+  li sostituiscono.

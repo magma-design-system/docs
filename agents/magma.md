@@ -36,8 +36,13 @@ As of Magma 2.5.1: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` stil
 dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
-`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
-(theme studio, for the Themes and preferences page).
+`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), #1106 (no component
+has a category: only `mds-pref` has a `@category`, `Patterns`, and `agents/components.md` is one
+flat list; the site reads `@category` and `@parent` as proposed there, ten categories and the 38
+parts under their compound, and keeps the Components navigation a flat list of 116 entries until
+every component has one of them: it does not invent the categories. To preview the grouped
+navigation, add the tags to a copy of `documentation.json` in a scratch worktree, never in the
+repository), and the epic #693 (theme studio, for the Themes and preferences page).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -84,5 +89,14 @@ against open issues before filing.
   has only the neutral tone (2.3.0).
 - `mds-icon` fills with the inherited `fill`, not `currentColor`: documented, so a feature
   request rather than a bug (2.1.0, still in 2.5.0).
+- design-tokens, native platforms (15.2.2): the Objective-C files of `dist/ios/` do not compile
+  (`typedef NS_ENUM(NSInteger, )`, `+ (UIColor *)color:()color`: the Style Dictionary
+  `className` / type is missing); `dist/flutter/fonts.dart` does not compile (`fontSize: 48px`,
+  `height` in px where Flutter wants a multiplier, the fallback fonts unquoted and
+  HTML-escaped); the `colors-*.dart` files declare the same two classes as `colors.dart`, so
+  only one of them can be imported. The native files hold colors only, both modes as separate
+  names, and the roles per family (`surface`, `border`, `text`), not the `--magma-*` layer. The
+  Android, iOS and Flutter pages say so; the Objective-C files and `fonts.dart` are not offered
+  for download.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).
