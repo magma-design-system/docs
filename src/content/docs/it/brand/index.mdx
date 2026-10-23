@@ -4,6 +4,7 @@ description: I loghi, i simboli, gli avatar e le illustrazioni del Gruppo Maggio
 ---
 
 import IdentityGroups from '../../../../components/IdentityGroups.astro';
+import PageCards from '../../../../components/PageCards.astro';
 
 I loghi, i simboli, gli avatar e le illustrazioni del Gruppo Maggioli e dei suoi prodotti
 sono pubblicati come `@maggioli-design-system/identity`, un artwork per file, ognuno in SVG,
@@ -39,3 +40,9 @@ I nomi dei brand e dei prodotti in queste pagine vengono dal pacchetto, come li 
 artwork. Il pacchetto non ha ancora le descrizioni, né le regole d'uso di ogni brand, come
 l'area di rispetto, la dimensione minima e gli sfondi: le descrizioni sono scritte da questo
 sito in base al tipo di artwork, come valori di default.
+
+## Pacchetto
+
+Gli stessi artwork come pacchetto npm, da installare in un progetto e usare dal suo codice:
+
+<PageCards pages={[{ slug: 'brand/identity-package', icon: 'mi/outline/terminal' }]} />

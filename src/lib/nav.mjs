@@ -54,13 +54,18 @@ export const sections = [
     icon: 'mi/outline/palette',
     items: () => [
       { slug: 'tokens', ...sidebarLabel('nav.overview') },
-      { slug: 'tokens/color' },
-      { slug: 'tokens/typography' },
-      { slug: 'tokens/space-and-layout' },
-      { slug: 'tokens/shape-and-depth' },
-      { slug: 'tokens/motion' },
-      { slug: 'tokens/themes-and-preferences' },
       // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.tokens.reference'),
+        items: [
+          { slug: 'tokens/color' },
+          { slug: 'tokens/typography' },
+          { slug: 'tokens/space-and-layout' },
+          { slug: 'tokens/shape-and-depth' },
+          { slug: 'tokens/motion' },
+          { slug: 'tokens/themes-and-preferences' },
+        ],
+      },
       {
         ...sidebarLabel('nav.tokens.platforms'),
         items: [
@@ -82,8 +87,10 @@ export const sections = [
     // The guides, then the packages, as on the landing page.
     items: () => [
       { slug: 'icons', ...sidebarLabel('nav.overview') },
-      { slug: 'icons/using-icons' },
-      { slug: 'icons/iconsauce' },
+      {
+        ...sidebarLabel('nav.icons.guides'),
+        items: [{ slug: 'icons/using-icons' }, { slug: 'icons/iconsauce' }],
+      },
       {
         ...sidebarLabel('nav.icons.packages'),
         items: [
@@ -129,12 +136,19 @@ export const sections = [
     icon: 'mi/outline/design-services',
     items: () => [
       { slug: 'brand', ...sidebarLabel('nav.overview') },
-      // Pages generated per folder of the identity package (src/lib/identity.mjs).
-      ...IDENTITY_GROUPS.map(({ page }) => ({
-        ...sidebarLabel(`brand.page.${page}.title`),
-        link: `/brand/${page}/`,
-      })),
-      { slug: 'brand/identity-package' },
+      // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.brand.assets'),
+        // Pages generated per folder of the identity package (src/lib/identity.mjs).
+        items: IDENTITY_GROUPS.map(({ page }) => ({
+          ...sidebarLabel(`brand.page.${page}.title`),
+          link: `/brand/${page}/`,
+        })),
+      },
+      {
+        ...sidebarLabel('nav.brand.package'),
+        items: [{ slug: 'brand/identity-package' }],
+      },
     ],
   },
   {
@@ -142,9 +156,14 @@ export const sections = [
     icon: 'mi/outline/code',
     items: () => [
       { slug: 'development', ...sidebarLabel('nav.overview') },
-      { slug: 'development/installation' },
-      { slug: 'development/agentic-development' },
-      { slug: 'development/versions' },
+      {
+        ...sidebarLabel('nav.development.guides'),
+        items: [
+          { slug: 'development/installation' },
+          { slug: 'development/agentic-development' },
+          { slug: 'development/versions' },
+        ],
+      },
     ],
   },
   {
@@ -152,10 +171,15 @@ export const sections = [
     icon: 'mi/outline/forum',
     items: () => [
       { slug: 'community' },
-      { slug: 'community/contributing' },
-      { slug: 'community/code-of-conduct' },
-      { slug: 'community/media-kit' },
-      { slug: 'community/about' },
+      // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.community.participate'),
+        items: [{ slug: 'community/contributing' }, { slug: 'community/code-of-conduct' }],
+      },
+      {
+        ...sidebarLabel('nav.community.about'),
+        items: [{ slug: 'community/media-kit' }, { slug: 'community/about' }],
+      },
     ],
   },
 ];
@@ -170,10 +194,17 @@ export const GROUP_ICONS = {
   'nav.foundation.base': 'mi/outline/foundation',
   'nav.foundation.design': 'mi/outline/style',
   'nav.foundation.content': 'mi/outline/record-voice-over',
+  'nav.tokens.reference': 'mi/outline/list-alt',
   'nav.tokens.platforms': 'mi/outline/devices',
   'nav.tokens.tools': 'mi/outline/handyman',
+  'nav.icons.guides': 'mi/outline/menu-book',
   'nav.icons.packages': 'mi/outline/inventory-2',
   'nav.patterns.data': 'mi/outline/table-chart',
+  'nav.brand.assets': 'mi/outline/collections',
+  'nav.brand.package': 'mi/outline/inventory-2',
+  'nav.development.guides': 'mi/outline/menu-book',
+  'nav.community.participate': 'mi/outline/handshake',
+  'nav.community.about': 'mi/outline/info',
 };
 
 /**

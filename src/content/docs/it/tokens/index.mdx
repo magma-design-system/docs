@@ -3,6 +3,7 @@ title: Token
 description: I token globali di Magma per livello, quale usare, le piattaforme a cui arrivano, da dove vengono i loro dati e come averli nell'editor.
 ---
 
+import PageCards from '../../../../components/PageCards.astro';
 import TokenTiers from '../../../../components/TokenTiers.astro';
 
 L'aspetto di Magma è fatto di token: custom property per ogni colore, dimensione, stile di
@@ -46,6 +47,21 @@ questo sito:
 
 Niente varianti `dark:` e niente media query per la modalità scura: i ruoli semantici
 cambiano già da soli.
+
+## Riferimento
+
+I token di ogni tipo, in tabelle, e cosa cambiano in loro i temi e le preferenze:
+
+<PageCards
+  pages={[
+    { slug: 'tokens/color', icon: 'mi/outline/palette' },
+    { slug: 'tokens/typography', icon: 'mi/outline/text-fields' },
+    { slug: 'tokens/space-and-layout', icon: 'mi/outline/space-dashboard' },
+    { slug: 'tokens/shape-and-depth', icon: 'mi/outline/layers' },
+    { slug: 'tokens/motion', icon: 'mi/outline/animation' },
+    { slug: 'tokens/themes-and-preferences', icon: 'mi/outline/contrast' },
+  ]}
+/>
 
 ## Leggere le tabelle
 

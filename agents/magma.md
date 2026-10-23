@@ -93,5 +93,8 @@ against open issues before filing.
   names, and the roles per family (`surface`, `border`, `text`), not the `--magma-*` layer. The
   Android, iOS and Flutter pages say so; the Objective-C files and `fonts.dart` are not offered
   for download.
+- `documentation.json` sorts no component into a category: only `mds-pref` has a `@category`
+  (`Patterns`), and `agents/components.md` is one flat list (2.5.1). Without it the Components
+  navigation stays a flat list of 116 entries: the site does not invent the categories.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).

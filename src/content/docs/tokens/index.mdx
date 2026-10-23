@@ -3,6 +3,7 @@ title: Tokens
 description: The global tokens of Magma by tier, which one to use, the platforms they reach, where their data comes from and how to get them in your editor.
 ---
 
+import PageCards from '../../../components/PageCards.astro';
 import TokenTiers from '../../../components/TokenTiers.astro';
 
 Magma's look is made of tokens: custom properties for every color, size, type style,
@@ -43,6 +44,21 @@ Every token belongs to one tier. The counts come from the packages this site is 
    the `--magma-*` global, set in the `overrides` layer.
 
 No `dark:` variants and no dark-mode media queries: the semantic roles already flip.
+
+## Reference
+
+The tokens of each kind, in tables, and what the themes and the preferences change in them:
+
+<PageCards
+  pages={[
+    { slug: 'tokens/color', icon: 'mi/outline/palette' },
+    { slug: 'tokens/typography', icon: 'mi/outline/text-fields' },
+    { slug: 'tokens/space-and-layout', icon: 'mi/outline/space-dashboard' },
+    { slug: 'tokens/shape-and-depth', icon: 'mi/outline/layers' },
+    { slug: 'tokens/motion', icon: 'mi/outline/animation' },
+    { slug: 'tokens/themes-and-preferences', icon: 'mi/outline/contrast' },
+  ]}
+/>
 
 ## Reading the tables
 
