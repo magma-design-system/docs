@@ -60,8 +60,7 @@ export const sections = [
       { slug: 'tokens/shape-and-depth' },
       { slug: 'tokens/motion' },
       { slug: 'tokens/themes-and-preferences' },
-      { slug: 'tokens/tailwind' },
-      { slug: 'tokens/figma' },
+      // The groups of the landing page, in its order.
       {
         ...sidebarLabel('nav.tokens.platforms'),
         items: [
@@ -70,6 +69,10 @@ export const sections = [
           { slug: 'tokens/ios' },
           { slug: 'tokens/flutter' },
         ],
+      },
+      {
+        ...sidebarLabel('nav.tokens.tools'),
+        items: [{ slug: 'tokens/tailwind' }, { slug: 'tokens/figma' }],
       },
     ],
   },
