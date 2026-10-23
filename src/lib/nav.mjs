@@ -62,6 +62,15 @@ export const sections = [
       { slug: 'tokens/themes-and-preferences' },
       { slug: 'tokens/tailwind' },
       { slug: 'tokens/figma' },
+      {
+        ...sidebarLabel('nav.tokens.platforms'),
+        items: [
+          { slug: 'tokens/web' },
+          { slug: 'tokens/android' },
+          { slug: 'tokens/ios' },
+          { slug: 'tokens/flutter' },
+        ],
+      },
     ],
   },
   {

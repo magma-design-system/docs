@@ -126,6 +126,9 @@ element` does not put a text field in the table. The usage files stay Markdown w
   title repeats the section's name. Sections whose landing page has its own title keep it
   (Community: "Channels").
 - Edits to `nav.mjs` need a dev server restart.
+- The section navigation shows the labels as written (`--mds-button-label-transform: none`
+  in `SectionEntries.astro`): `mds-button` uppercases the first letter of its label, which
+  turned the iOS page into "IOS". Write titles in sentence case.
 
 ## Under construction and drafts
 

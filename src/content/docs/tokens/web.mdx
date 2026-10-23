@@ -1,0 +1,34 @@
+---
+title: Web
+description: Every token of Magma, as CSS custom properties, a Tailwind theme, SCSS and JavaScript - the only platform where the tokens follow the mode, the theme and the preferences of the page.
+---
+
+The web is the platform Magma is built for, and the only one that gets every token: the
+semantic roles, the type styles, space, shape, depth, motion and the tokens of each
+component. It is also the only one where the tokens follow the page while it runs: switch
+the mode, the named theme or the contrast preference, and every value that depends on them
+changes with it ([Themes and preferences](../themes-and-preferences/)).
+
+Two packages publish them: `@maggioli-design-system/styles`, the stylesheets a page
+imports, and `@maggioli-design-system/design-tokens`, the primitives those stylesheets are
+built on.
+
+## Formats
+
+| Format                | Files                                           | Content                                               |
+| --------------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| CSS custom properties | `styles/dist/css/`                              | Every global token, switched by mode and theme        |
+| Tailwind 4            | `styles/dist/tailwind/`                         | The tokens as a Tailwind theme, and Magma's utilities |
+| SCSS                  | `design-tokens/dist/scss/variables.scss`        | The colors as Sass variables, both modes              |
+| JavaScript            | `design-tokens/dist/js/`                        | The parts of the Tailwind 3 preset, legacy            |
+| DTCG                  | `design-tokens/dist/dtcg/`, `styles/dist/dtcg/` | Every token as data, for tools                        |
+
+- **CSS** is how a page gets the tokens: import the stylesheets in the order given in
+  [Installation](../../development/installation/#styles), then read the tokens as custom
+  properties or through the classes of [Tailwind](../tailwind/).
+- **SCSS** holds fixed hex values, one variable per mode
+  (`$color-surface-neutral-light-default`): a color taken from it does not follow the page.
+  Use it only where a custom property cannot go.
+- **JavaScript** feeds the Tailwind 3 preset of styles, which works with Tailwind 3 only.
+- **DTCG** is the [token data](../#token-data): it describes the stylesheets, it does not
+  replace them.

@@ -15,8 +15,10 @@ const { entries, currentHref } = Astro.props;
   text, whose line height adds space below it to the gap. They are pulled left
   by the padding of the button, so that its label lines up with the headings
   and the background of the selected or hovered one stands out of the column.
+  The labels are page titles, written as they must read: mds-button would
+  uppercase their first letter (iOS).
 */}
-<ul class="m-0 flex list-none flex-col gap-100 p-0">
+<ul class="m-0 flex list-none flex-col gap-100 p-0 [--mds-button-label-transform:none]">
   {entries.map((entry) =>
     entry.type === 'link' ? (
       <li class="-ml-300 flex">

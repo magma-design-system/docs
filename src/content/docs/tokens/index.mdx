@@ -1,6 +1,6 @@
 ---
 title: Tokens
-description: The global tokens of Magma by tier, which one to use, where their data comes from and how to get them in your editor.
+description: The global tokens of Magma by tier, which one to use, the platforms they reach, where their data comes from and how to get them in your editor.
 ---
 
 import TokenTiers from '../../../components/TokenTiers.astro';
@@ -58,6 +58,22 @@ The tables of this section are generated from the token data of the installed pa
 - **Tailwind** is a class that reads the token. Every class and variant is in
   [Tailwind](tailwind/).
 - A click on a value copies it.
+
+## Platforms
+
+The tokens reach four platforms. The web gets all of them and follows the page while it
+runs; Android, iOS and Flutter get the colors, both modes side by side, in files to add to
+an app.
+
+| Platform            | Files                           | Tokens | Modes                 |
+| ------------------- | ------------------------------- | ------ | --------------------- |
+| [Web](web/)         | `styles`, `design-tokens`       | All    | Follow the page       |
+| [Android](android/) | `design-tokens/dist/android/`   | Colors | A name for each mode  |
+| [iOS](ios/)         | `design-tokens/dist/ios-swift/` | Colors | A name for each mode  |
+| [Flutter](flutter/) | `design-tokens/dist/flutter/`   | Colors | A class for each mode |
+
+For another platform, start from the token data below: it describes every token, and what
+the mode, the themes and the contrast preference change.
 
 ## Token data
 

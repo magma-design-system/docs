@@ -1,0 +1,62 @@
+---
+title: Flutter
+description: I colori di Magma come costanti Dart, una classe per modalità - il file da aggiungere a un'app, come sono costruiti i nomi e come seguire la modalità scura.
+---
+
+import PlatformFiles from '../../../../components/PlatformFiles.astro';
+
+`@maggioli-design-system/design-tokens` pubblica i colori di Magma per Flutter come file
+Dart, generato a ogni rilascio dalle stesse sorgenti dei fogli di stile. Il file qui sotto
+viene dalla versione con cui è costruito questo sito: per usarlo un'app non ha bisogno né di
+npm né del pacchetto.
+
+## File
+
+<PlatformFiles platform="flutter" />
+
+Copia `colors.dart` in `lib/` e importalo. Contiene due classi con gli stessi membri, una
+per modalità: `MagmaColorPaletteLight.surfaceNeutralDefault` e
+`MagmaColorPaletteDark.surfaceNeutralDefault`.
+
+Il pacchetto divide anche gli stessi colori per gruppo (`colors-tones.dart`,
+`colors-label.dart`, ...) con gli stessi due nomi di classe: importa un solo file. Il suo
+`fonts.dart`, con gli stili di testo, in questa versione non compila: scrive le dimensioni
+come lunghezze CSS (`fontSize: 48px`) e i font di riserva senza virgolette.
+
+## Nomi
+
+Un colore prende il nome da gruppo, famiglia e passo, in camel case; la classe dà la
+modalità.
+
+- **Palette**: `tone`, `label`, `status`, `brand` e `variant`, con i passi da `01` a `10`
+  di [Colore](../color/): `toneNeutral08`. Un tono aggiunge `Seed`, la carta della sua
+  modalità; le altre famiglie hanno il loro colore sotto il solo nome: `statusError`.
+- **Ruoli di una famiglia**: `surface` (`Sunken`, `Muted`, `Default`, `Raised`,
+  `Overlay`), `border` (`Muted`, `Default`, `Strong`) e `text` (`Default`, `Muted`,
+  `Subtle`, `Disabled`), per le famiglie `Neutral`, `Porcelain`, `Bisque`, `Info`,
+  `Success`, `Warning` ed `Error`.
+
+## Modalità scura
+
+Scegli la classe in base alla luminosità del tema:
+
+```dart
+final dark = Theme.of(context).brightness == Brightness.dark;
+final surface = dark
+    ? MagmaColorPaletteDark.surfaceNeutralDefault
+    : MagmaColorPaletteLight.surfaceNeutralDefault;
+```
+
+## Ruoli e temi
+
+Sul web i ruoli di superficie, bordo e testo di una pagina leggono una famiglia, scelta dal
+tema con nome: `neutral` di default, `porcelain` per `cool`, `bisque` per `warm`. Qui la
+scelta è dell'app: i colori `Neutral` sono quelli del tema predefinito. Gli altri ruoli
+semantici non sono nel file: [Colore](../color/) indica il passo a cui punta ognuno, in
+modalità chiara e scura.
+
+## Cosa non c'è ancora
+
+Flutter riceve solo i colori: niente stili di testo funzionanti, niente spaziature, raggi,
+ombre o movimento, e niente di quello che sul web cambia con la preferenza di contrasto più
+alto.

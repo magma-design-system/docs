@@ -84,5 +84,14 @@ against open issues before filing.
   has only the neutral tone (2.3.0).
 - `mds-icon` fills with the inherited `fill`, not `currentColor`: documented, so a feature
   request rather than a bug (2.1.0, still in 2.5.0).
+- design-tokens, native platforms (15.2.2): the Objective-C files of `dist/ios/` do not compile
+  (`typedef NS_ENUM(NSInteger, )`, `+ (UIColor *)color:()color`: the Style Dictionary
+  `className` / type is missing); `dist/flutter/fonts.dart` does not compile (`fontSize: 48px`,
+  `height` in px where Flutter wants a multiplier, the fallback fonts unquoted and
+  HTML-escaped); the `colors-*.dart` files declare the same two classes as `colors.dart`, so
+  only one of them can be imported. The native files hold colors only, both modes as separate
+  names, and the roles per family (`surface`, `border`, `text`), not the `--magma-*` layer. The
+  Android, iOS and Flutter pages say so; the Objective-C files and `fonts.dart` are not offered
+  for download.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).

@@ -1,0 +1,64 @@
+---
+title: iOS
+description: The colors of Magma as UIColor constants for Swift - the files to add to an app, how their names are built and how to follow dark mode.
+---
+
+import PlatformFiles from '../../../components/PlatformFiles.astro';
+
+`@maggioli-design-system/design-tokens` publishes the colors of Magma for iOS as Swift
+files, generated with every release from the same sources as the stylesheets. The files
+below come from the version this site is built with: an app needs neither npm nor the
+package to use them.
+
+## Files
+
+<PlatformFiles platform="ios" />
+
+The two files hold the same colors as `UIColor` constants (UIKit) and differ in their names
+only: add one of them to your target. `StyleDictionary.swift` keeps the group in each name,
+`StyleDictionary.colorSurfaceNeutralLightDefault`; `StyleDictionaryColor.swift` drops it,
+`StyleDictionaryColor.surfaceNeutralLightDefault`.
+
+The package also has an Objective-C version in `dist/ios/`, which does not compile in this
+version: the enumeration of its colors has no name.
+
+## Names
+
+A color is named by its group, family, mode and step, in camel case:
+`surfaceNeutralLightDefault`, `toneNeutralDark10`.
+
+- **Palettes**: `tone`, `label`, `status`, `brand` and `variant`, with the steps `1` to `10`
+  of [Color](../color/). A tone adds `Seed`, the paper of its mode; the other families add
+  `Color`, their own color: `statusErrorLightColor`.
+- **Roles of a family**: `surface` (`Sunken`, `Muted`, `Default`, `Raised`, `Overlay`),
+  `border` (`Muted`, `Default`, `Strong`) and `text` (`Default`, `Muted`, `Subtle`,
+  `Disabled`), for the families `Neutral`, `Porcelain`, `Bisque`, `Info`, `Success`,
+  `Warning` and `Error`.
+- **Mode**: `Light` or `Dark`. Both modes are in the same file.
+
+## Dark mode
+
+Each mode is a constant of its own. To follow the system, make a dynamic color of the two:
+
+```swift
+let surfaceDefault = UIColor { traits in
+  traits.userInterfaceStyle == .dark
+    ? StyleDictionaryColor.surfaceNeutralDarkDefault
+    : StyleDictionaryColor.surfaceNeutralLightDefault
+}
+```
+
+In SwiftUI, wrap it: `Color(uiColor: surfaceDefault)`.
+
+## Roles and themes
+
+On the web, the surface, border and text roles of a page read one family, chosen by the
+named theme: `neutral` by default, `porcelain` for `cool`, `bisque` for `warm`. Here the
+choice is the app's: the `Neutral` colors are those of the default theme. The other
+semantic roles are not in the files: [Color](../color/) lists the step each one points at,
+in light and in dark mode.
+
+## Not in the files yet
+
+iOS gets the colors only: no type styles, spacing, radii, shadows or motion, and none of
+what the higher contrast preference changes on the web.

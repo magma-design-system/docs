@@ -1,6 +1,6 @@
 ---
 title: Token
-description: I token globali di Magma per livello, quale usare, da dove vengono i loro dati e come averli nell'editor.
+description: I token globali di Magma per livello, quale usare, le piattaforme a cui arrivano, da dove vengono i loro dati e come averli nell'editor.
 ---
 
 import TokenTiers from '../../../../components/TokenTiers.astro';
@@ -61,6 +61,22 @@ Le tabelle di questa sezione sono generate dai dati dei token dei pacchetti inst
 - **Tailwind** è una classe che legge il token. Tutte le classi e le varianti sono in
   [Tailwind](tailwind/).
 - Un clic su un valore lo copia.
+
+## Piattaforme
+
+I token arrivano su quattro piattaforme. Il web li riceve tutti e segue la pagina mentre è
+aperta; Android, iOS e Flutter ricevono i colori, con le due modalità affiancate, in file da
+aggiungere a un'app.
+
+| Piattaforma         | File                            | Token  | Modalità                |
+| ------------------- | ------------------------------- | ------ | ----------------------- |
+| [Web](web/)         | `styles`, `design-tokens`       | Tutti  | Seguono la pagina       |
+| [Android](android/) | `design-tokens/dist/android/`   | Colori | Un nome per modalità    |
+| [iOS](ios/)         | `design-tokens/dist/ios-swift/` | Colori | Un nome per modalità    |
+| [Flutter](flutter/) | `design-tokens/dist/flutter/`   | Colori | Una classe per modalità |
+
+Per un'altra piattaforma parti dai dati dei token qui sotto: descrivono ogni token e cosa
+cambiano la modalità, i temi e la preferenza di contrasto.
 
 ## Dati dei token
 
