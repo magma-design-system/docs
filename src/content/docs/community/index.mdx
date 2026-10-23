@@ -5,6 +5,7 @@ description: Where to ask about Magma, follow how it changes and try its compone
 
 import Channel from '../../../components/Channel.astro';
 import Channels from '../../../components/Channels.astro';
+import PageCards from '../../../components/PageCards.astro';
 
 Where to ask about Magma, follow how it changes and try its components:
 
@@ -55,3 +56,25 @@ in light and dark mode.
 
 </Channel>
 </Channels>
+
+## Take part
+
+How to contribute, and the rules everyone here follows:
+
+<PageCards
+  pages={[
+    { slug: 'community/contributing', icon: 'mi/outline/merge' },
+    { slug: 'community/code-of-conduct', icon: 'mi/outline/rule' },
+  ]}
+/>
+
+## About
+
+The images that present Magma on other sites, and how this documentation is built:
+
+<PageCards
+  pages={[
+    { slug: 'community/media-kit', icon: 'mi/outline/perm-media' },
+    { slug: 'community/about', icon: 'mi/outline/article' },
+  ]}
+/>

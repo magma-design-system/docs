@@ -3,7 +3,7 @@
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here.
 import { existsSync, readFileSync } from 'node:fs';
-import { componentTags } from './magma.mjs';
+import { componentTags, componentTaxonomy } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
@@ -54,14 +54,31 @@ export const sections = [
     icon: 'mi/outline/palette',
     items: () => [
       { slug: 'tokens', ...sidebarLabel('nav.overview') },
-      { slug: 'tokens/color' },
-      { slug: 'tokens/typography' },
-      { slug: 'tokens/space-and-layout' },
-      { slug: 'tokens/shape-and-depth' },
-      { slug: 'tokens/motion' },
-      { slug: 'tokens/themes-and-preferences' },
-      { slug: 'tokens/tailwind' },
-      { slug: 'tokens/figma' },
+      // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.tokens.reference'),
+        items: [
+          { slug: 'tokens/color' },
+          { slug: 'tokens/typography' },
+          { slug: 'tokens/space-and-layout' },
+          { slug: 'tokens/shape-and-depth' },
+          { slug: 'tokens/motion' },
+          { slug: 'tokens/themes-and-preferences' },
+        ],
+      },
+      {
+        ...sidebarLabel('nav.tokens.platforms'),
+        items: [
+          { slug: 'tokens/web' },
+          { slug: 'tokens/android' },
+          { slug: 'tokens/ios' },
+          { slug: 'tokens/flutter' },
+        ],
+      },
+      {
+        ...sidebarLabel('nav.tokens.tools'),
+        items: [{ slug: 'tokens/tailwind' }, { slug: 'tokens/figma' }],
+      },
     ],
   },
   {
@@ -70,8 +87,10 @@ export const sections = [
     // The guides, then the packages, as on the landing page.
     items: () => [
       { slug: 'icons', ...sidebarLabel('nav.overview') },
-      { slug: 'icons/using-icons' },
-      { slug: 'icons/iconsauce' },
+      {
+        ...sidebarLabel('nav.icons.guides'),
+        items: [{ slug: 'icons/using-icons' }, { slug: 'icons/iconsauce' }],
+      },
       {
         ...sidebarLabel('nav.icons.packages'),
         items: [
@@ -89,7 +108,7 @@ export const sections = [
     icon: 'mi/outline/widgets',
     items: () => [
       { ...sidebarLabel('nav.components.overview'), link: '/components/' },
-      ...componentTags().map((tag) => ({ label: componentName(tag), link: `/components/${tag}/` })),
+      ...componentItems(),
     ],
   },
   {
@@ -117,12 +136,19 @@ export const sections = [
     icon: 'mi/outline/design-services',
     items: () => [
       { slug: 'brand', ...sidebarLabel('nav.overview') },
-      // Pages generated per folder of the identity package (src/lib/identity.mjs).
-      ...IDENTITY_GROUPS.map(({ page }) => ({
-        ...sidebarLabel(`brand.page.${page}.title`),
-        link: `/brand/${page}/`,
-      })),
-      { slug: 'brand/identity-package' },
+      // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.brand.assets'),
+        // Pages generated per folder of the identity package (src/lib/identity.mjs).
+        items: IDENTITY_GROUPS.map(({ page }) => ({
+          ...sidebarLabel(`brand.page.${page}.title`),
+          link: `/brand/${page}/`,
+        })),
+      },
+      {
+        ...sidebarLabel('nav.brand.package'),
+        items: [{ slug: 'brand/identity-package' }],
+      },
     ],
   },
   {
@@ -130,9 +156,14 @@ export const sections = [
     icon: 'mi/outline/code',
     items: () => [
       { slug: 'development', ...sidebarLabel('nav.overview') },
-      { slug: 'development/installation' },
-      { slug: 'development/agentic-development' },
-      { slug: 'development/versions' },
+      {
+        ...sidebarLabel('nav.development.guides'),
+        items: [
+          { slug: 'development/installation' },
+          { slug: 'development/agentic-development' },
+          { slug: 'development/versions' },
+        ],
+      },
     ],
   },
   {
@@ -140,13 +171,91 @@ export const sections = [
     icon: 'mi/outline/forum',
     items: () => [
       { slug: 'community' },
-      { slug: 'community/contributing' },
-      { slug: 'community/code-of-conduct' },
-      { slug: 'community/media-kit' },
-      { slug: 'community/about' },
+      // The groups of the landing page, in its order.
+      {
+        ...sidebarLabel('nav.community.participate'),
+        items: [{ slug: 'community/contributing' }, { slug: 'community/code-of-conduct' }],
+      },
+      {
+        ...sidebarLabel('nav.community.about'),
+        items: [{ slug: 'community/media-kit' }, { slug: 'community/about' }],
+      },
     ],
   },
 ];
+
+/**
+ * The categories of the components (`@category` in documentation.json), as
+ * proposed in https://github.com/magma-design-system/magma/issues/1106, in the order
+ * of the section navigation, each labelled `nav.components.<id>`.
+ */
+export const COMPONENT_CATEGORIES = [
+  'actions',
+  'forms',
+  'navigation',
+  'feedback',
+  'overlays',
+  'data',
+  'tags',
+  'structure',
+  'content',
+  'preferences',
+];
+
+/**
+ * The component pages of the section navigation: a group per category, with
+ * the components that stand alone; their parts (`@parent`) are listed in the
+ * right column of their pages (DocsNav.astro). A flat list of every tag while
+ * a component has neither a category of the list nor a parent: Magma does not
+ * sort its components yet, https://github.com/magma-design-system/magma/issues/1106.
+ */
+function componentItems() {
+  const tags = componentTags();
+  const { categories, parents } = componentTaxonomy();
+  /** @param {string} tag */
+  const link = (tag) => ({ label: componentName(tag), link: `/components/${tag}/` });
+  const sorted = tags.every(
+    (tag) => parents.has(tag) || COMPONENT_CATEGORIES.includes(categories.get(tag) ?? ''),
+  );
+  if (!sorted) return tags.map(link);
+  return COMPONENT_CATEGORIES.map((id) => ({
+    ...sidebarLabel(`nav.components.${id}`),
+    items: tags.filter((tag) => !parents.has(tag) && categories.get(tag) === id).map(link),
+  }));
+}
+
+/**
+ * The icon of each group of a section navigation, drawn above its label
+ * (src/components/frame/SectionEntries.astro), by the UI string of the label:
+ * Starlight's schema of a group has no room for it, and `items()` cannot run
+ * once bundled (it reads the dictionaries from src/).
+ */
+export const GROUP_ICONS = {
+  'nav.foundation.base': 'mi/outline/foundation',
+  'nav.foundation.design': 'mi/outline/style',
+  'nav.foundation.content': 'mi/outline/record-voice-over',
+  'nav.tokens.reference': 'mi/outline/list-alt',
+  'nav.tokens.platforms': 'mi/outline/devices',
+  'nav.tokens.tools': 'mi/outline/handyman',
+  'nav.icons.guides': 'mi/outline/menu-book',
+  'nav.icons.packages': 'mi/outline/inventory-2',
+  'nav.patterns.data': 'mi/outline/table-chart',
+  'nav.brand.assets': 'mi/outline/collections',
+  'nav.brand.package': 'mi/outline/inventory-2',
+  'nav.development.guides': 'mi/outline/menu-book',
+  'nav.community.participate': 'mi/outline/handshake',
+  'nav.community.about': 'mi/outline/info',
+  'nav.components.actions': 'mdi/button-pointer',
+  'nav.components.forms': 'mdi/form-textbox',
+  'nav.components.navigation': 'mi/outline/explore',
+  'nav.components.feedback': 'mi/outline/notifications',
+  'nav.components.overlays': 'mi/outline/picture-in-picture',
+  'nav.components.data': 'mi/outline/table-chart',
+  'nav.components.tags': 'mi/outline/sell',
+  'nav.components.structure': 'mi/outline/dashboard',
+  'nav.components.content': 'mi/outline/article',
+  'nav.components.preferences': 'mi/outline/tune',
+};
 
 /**
  * Whether the page of a sidebar slug is a draft (`draft: true` in its front

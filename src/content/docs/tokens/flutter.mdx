@@ -1,0 +1,60 @@
+---
+title: Flutter
+description: The colors of Magma as Dart constants, one class per mode - the file to add to an app, how its names are built and how to follow dark mode.
+---
+
+import PlatformFiles from '../../../components/PlatformFiles.astro';
+
+`@maggioli-design-system/design-tokens` publishes the colors of Magma for Flutter as a Dart
+file, generated with every release from the same sources as the stylesheets. The file below
+comes from the version this site is built with: an app needs neither npm nor the package to
+use it.
+
+## Files
+
+<PlatformFiles platform="flutter" />
+
+Copy `colors.dart` into `lib/` and import it. It holds two classes with the same members,
+one per mode: `MagmaColorPaletteLight.surfaceNeutralDefault` and
+`MagmaColorPaletteDark.surfaceNeutralDefault`.
+
+The package also splits the same colors by group (`colors-tones.dart`, `colors-label.dart`,
+...) under the same two class names: import one file only. Its `fonts.dart`, with the type
+styles, does not compile in this version: it writes sizes as CSS lengths (`fontSize: 48px`)
+and the fallback fonts without quotes.
+
+## Names
+
+A color is named by its group, family and step, in camel case; the class gives the mode.
+
+- **Palettes**: `tone`, `label`, `status`, `brand` and `variant`, with the steps `01` to
+  `10` of [Color](../color/): `toneNeutral08`. A tone adds `Seed`, the paper of its mode;
+  the other families have their own color under their name alone: `statusError`.
+- **Roles of a family**: `surface` (`Sunken`, `Muted`, `Default`, `Raised`, `Overlay`),
+  `border` (`Muted`, `Default`, `Strong`) and `text` (`Default`, `Muted`, `Subtle`,
+  `Disabled`), for the families `Neutral`, `Porcelain`, `Bisque`, `Info`, `Success`,
+  `Warning` and `Error`.
+
+## Dark mode
+
+Pick the class from the brightness of the theme:
+
+```dart
+final dark = Theme.of(context).brightness == Brightness.dark;
+final surface = dark
+    ? MagmaColorPaletteDark.surfaceNeutralDefault
+    : MagmaColorPaletteLight.surfaceNeutralDefault;
+```
+
+## Roles and themes
+
+On the web, the surface, border and text roles of a page read one family, chosen by the
+named theme: `neutral` by default, `porcelain` for `cool`, `bisque` for `warm`. Here the
+choice is the app's: the `Neutral` colors are those of the default theme. The other
+semantic roles are not in the file: [Color](../color/) lists the step each one points at,
+in light and in dark mode.
+
+## Not in the file yet
+
+Flutter gets the colors only: no working type styles, no spacing, radii, shadows or motion,
+and none of what the higher contrast preference changes on the web.

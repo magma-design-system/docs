@@ -1,6 +1,7 @@
 // What the frame shows, read from Starlight's sidebar of the current page: the
 // rail (one item per section, src/lib/nav.mjs) and the section navigation.
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import { componentRoot } from './magma.mjs';
 import { sections as sectionConfig } from './nav.mjs';
 
 type SidebarEntry = StarlightRouteData['sidebar'][number];
@@ -28,6 +29,16 @@ export interface FrameNav {
 const links = (entries: SidebarEntry[]): SidebarLink[] =>
   entries.flatMap((entry) => (entry.type === 'link' ? [entry] : links(entry.entries)));
 
+/**
+ * The path a page has in the navigation: a part of a compound component
+ * (`@parent`), which the navigation leaves out, belongs to its component.
+ */
+function navPath(pathname: string): string {
+  const tag = pathname.match(/\/components\/(mds-[a-z0-9-]+)\//)?.[1];
+  if (!tag) return pathname;
+  return pathname.replace(`/components/${tag}/`, `/components/${componentRoot(tag)}/`);
+}
+
 export function frameNav(route: StarlightRouteData, pathname: string): FrameNav {
   const groups = route.sidebar.filter((entry): entry is SidebarGroup => entry.type === 'group');
   if (groups.length !== sectionConfig.length) {
@@ -41,10 +52,11 @@ export function frameNav(route: StarlightRouteData, pathname: string): FrameNav 
   // starts with the home page, which only matches itself (not a 404 page).
   const home = `${localePrefix(route.locale)}/`;
   const all = links(groups);
+  const path = navPath(pathname);
   const current =
     all.find((link) => link.isCurrent) ??
     all
-      .filter((link) => link.href !== home && pathname.startsWith(link.href))
+      .filter((link) => link.href !== home && path.startsWith(link.href))
       .sort((a, b) => b.href.length - a.href.length)[0];
 
   const sections = groups.map((group, i) => {

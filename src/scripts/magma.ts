@@ -1,6 +1,7 @@
 // Client-side setup of Magma, injected into every page by src/integrations/magma.mjs.
 import { defineCustomElements } from '@maggioli-design-system/magma/loader';
 import { IconsSetService } from '@maggioli-design-system/magma/services';
+import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
 // Where mds-icon fetches `<slug>.svg` from: iconsauce copies every slug the
 // site uses (`mi/...`, `mdi/...`, `mgg/...`) under `svg/`, see iconsauce.config.mjs.
@@ -11,6 +12,61 @@ IconsSetService.setSvgPath(`${import.meta.env.BASE_URL.replace(/\/?$/, '/')}svg/
 // first time its tag appears. The site documents the whole library, so the
 // tree-shakable per-component entry point would not save anything here.
 defineCustomElements();
+
+// Where a page opens: the browser scrolls to the `#fragment` of the address as
+// the page loads, the router to the fragment or, on a reload and back and
+// forward, to the position it saved in the history. Both before the components
+// have drawn: once its tag is defined, a component shows nothing of its content
+// until its code has arrived and rendered, so the page is still much shorter
+// than it will be. The scroll stops short, or at the bottom of the short page,
+// and nothing scrolls again as the page grows. Until the reader scrolls,
+// clicks or types (10 s at most), each change of size of the page scrolls
+// there again.
+const READER = ['wheel', 'touchstart', 'keydown', 'pointerdown'] as const;
+let release = () => {};
+const hold = (scroll: () => void) => {
+  release();
+  const observer = new ResizeObserver(scroll);
+  const stop = () => {
+    observer.disconnect();
+    clearTimeout(timer);
+    for (const type of READER) removeEventListener(type, stop, true);
+  };
+  const timer = setTimeout(stop, 10_000);
+  for (const type of READER) addEventListener(type, stop, { capture: true, passive: true });
+  observer.observe(document.documentElement);
+  release = stop;
+};
+/** The router's entries of the history: `{ index, scrollX, scrollY }`. */
+type Saved = { scrollX: number; scrollY: number } | null;
+const holdPosition = (saved: Saved) => {
+  if (!saved?.scrollY) return;
+  const { scrollX: left, scrollY: top } = saved;
+  hold(() => scrollTo({ left, top, behavior: 'instant' }));
+};
+const holdFragment = () => {
+  let id = '';
+  try {
+    id = decodeURIComponent(location.hash.slice(1));
+  } catch {}
+  const target = id && document.getElementById(id);
+  if (target) hold(() => target.scrollIntoView({ behavior: 'instant' }));
+};
+const [entry] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+if (entry?.type === 'navigate') holdFragment();
+else holdPosition(history.state);
+// Read before the swap: as the short page scrolls, the router saves the
+// position it ends at over the one it is putting back.
+let restore: Saved = null;
+document.addEventListener('astro:before-preparation', (event) => {
+  release();
+  const traverse = (event as TransitionBeforePreparationEvent).navigationType === 'traverse';
+  restore = traverse ? history.state : null;
+});
+document.addEventListener('astro:after-swap', () => {
+  if (restore) holdPosition(restore);
+  else holdFragment();
+});
 
 // mds-pref-mode is the light/dark picker of the site (src/components/frame/):
 // it sets `pref-mode-light|dark|system` on <html>, Magma's tokens follow it.
@@ -27,26 +83,3 @@ const syncScheme = () => {
 syncScheme();
 new MutationObserver(syncScheme).observe(root, { attributes: true, attributeFilter: ['class'] });
 systemDark.addEventListener('change', syncScheme);
-
-// mds-emoji draws nothing in Firefox: its shadow root gives the svg
-// `transform-style: preserve-3d`, with nothing in 3D inside it to preserve
-// (https://github.com/magma-design-system/magma/issues/1065). Every emoji of
-// the page, the home page mascot and the component preview, gets a sheet that
-// makes it flat again; Chromium draws it the same either way. On every page
-// the router shows, and once on the pages without the router (the previews).
-type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };
-const flatEmoji = new CSSStyleSheet();
-flatEmoji.replaceSync('svg { transform-style: flat; }');
-const flatten = async (emoji: MagmaElement) => {
-  await emoji.componentOnReady?.();
-  const shadow = emoji.shadowRoot;
-  if (shadow && !shadow.adoptedStyleSheets.includes(flatEmoji)) {
-    shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, flatEmoji];
-  }
-};
-const flattenEmojis = async () => {
-  await customElements.whenDefined('mds-emoji');
-  document.querySelectorAll<MagmaElement>('mds-emoji').forEach(flatten);
-};
-flattenEmojis();
-document.addEventListener('astro:page-load', flattenEmojis);

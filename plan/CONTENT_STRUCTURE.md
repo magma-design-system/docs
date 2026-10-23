@@ -10,7 +10,7 @@ Decided on 2026-10-08.
 | ------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                       | deck                                |
 | Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                    | deck + new writing                  |
-| Tokens              | Colors, typography, motion, spacing, editor autocomplete setup                                                  | `design-tokens`, `styles`           |
+| Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma)      | `design-tokens`, `styles`           |
 | Icons               | Library, semantic dictionary                                                                                    | `svg-icons`, `icons`                |
 | Components          | One page per component                                                                                          | `magma/dist/documentation.json`     |
 | Building blocks     | Parts of a screen made of components (page header, filter bar, ...): structure and layout, no data              | written here, see `DIRECTION.md`    |

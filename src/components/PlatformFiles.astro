@@ -1,0 +1,77 @@
+---
+// The files of design-tokens for one native platform, to download
+// (src/pages/downloads/[platform]/[file].ts): what each one holds, how many
+// colors, its size. Native links with `download`: neither mds-link nor
+// mds-button[href] can ask for a download (agents/magma.md).
+import Code from './Code.astro';
+import UiText from './UiText.astro';
+import { PLATFORM_FILES, platformFileInfo } from '../lib/tokens.mjs';
+import { magmaVersion } from '../lib/magma.mjs';
+
+interface Props {
+  platform: 'android' | 'ios' | 'flutter';
+}
+
+const { platform } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { lang } = starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const version = magmaVersion('design-tokens');
+
+const files = PLATFORM_FILES.filter((f) => f.platform === platform);
+const rows = files.map(({ file, content }) => {
+  const { colors, bytes } = platformFileInfo(platform, file);
+  return {
+    file,
+    href: `${base}downloads/${platform}/${file}`,
+    content: t(`tokens.platforms.${content}` as never),
+    colors: colors.toLocaleString(lang),
+    size: t('tokens.platforms.kb', {
+      size: (bytes / 1024).toLocaleString(lang, { maximumFractionDigits: 0 }),
+    }),
+  };
+});
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('tokens.platforms.column.file')} />
+    <mds-table-header-cell label={t('tokens.platforms.column.content')} />
+    <mds-table-header-cell label={t('tokens.platforms.column.colors')} />
+    <mds-table-header-cell label={t('tokens.platforms.column.size')} />
+  </mds-table-header>
+  <mds-table-body>
+    {rows.map((row) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            <a href={row.href} download={row.file}>
+              {row.file}
+            </a>
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            <UiText text={row.content} />
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {row.colors}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" tag="span" class="whitespace-nowrap">
+            {row.size}
+          </mds-text>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>
+
+<mds-text typography="caption" tag="p" class="mt-400 text-fg-muted">
+  {t('tokens.platforms.from')} <Code>@maggioli-design-system/design-tokens@{version}</Code>
+  <Code>dist/{files[0]?.dir}/</Code>.
+</mds-text>

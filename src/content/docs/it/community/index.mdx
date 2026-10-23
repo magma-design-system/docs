@@ -5,6 +5,7 @@ description: Dove fare domande su Magma, seguire come cambia e provare i suoi co
 
 import Channel from '../../../../components/Channel.astro';
 import Channels from '../../../../components/Channels.astro';
+import PageCards from '../../../../components/PageCards.astro';
 
 Dove fare domande su Magma, seguire come cambia e provare i suoi componenti:
 
@@ -55,3 +56,25 @@ dall'intera libreria di componenti, in modalità chiara e scura.
 
 </Channel>
 </Channels>
+
+## Partecipa
+
+Come contribuire, e le regole che tutti qui seguono:
+
+<PageCards
+  pages={[
+    { slug: 'community/contributing', icon: 'mi/outline/merge' },
+    { slug: 'community/code-of-conduct', icon: 'mi/outline/rule' },
+  ]}
+/>
+
+## Informazioni
+
+Le immagini che presentano Magma su altri siti, e come è costruita questa documentazione:
+
+<PageCards
+  pages={[
+    { slug: 'community/media-kit', icon: 'mi/outline/perm-media' },
+    { slug: 'community/about', icon: 'mi/outline/article' },
+  ]}
+/>

@@ -3,9 +3,14 @@
 // page, its sub-pages (src/lib/components.ts), the "Categories" column of an
 // icon set page, its categories with how many icons each one has
 // (src/lib/icon-pages.ts), and the "Brands" column of a Brand assets page, its
-// owners with how many artworks each one has (src/lib/brand-pages.ts).
+// owners with how many artworks each one has (src/lib/brand-pages.ts). A part
+// of a compound component, and the component itself, add the "Parts" column:
+// the parts of the component (`@parent`), which the section navigation leaves
+// out.
 import { getEntry } from 'astro:content';
 import { componentHref, pagesOf, parseComponentPath } from '../../lib/components';
+import { componentParts, componentRoot } from '../../lib/magma.mjs';
+import { componentName } from '../../lib/nav.mjs';
 import { brandOwnerHref, parseBrandPath } from '../../lib/brand-pages';
 import { iconCategoryHref, parseIconSetPath } from '../../lib/icon-pages';
 
@@ -26,6 +31,7 @@ interface Link {
 
 let heading = '';
 let links: Link[] = [];
+let parts: Link[] = [];
 
 const path = parseComponentPath(Astro.url.pathname, locale);
 const icons = parseIconSetPath(Astro.url.pathname, locale);
@@ -37,6 +43,11 @@ if (path) {
     href: componentHref(locale, path.tag, page.slug),
     label: t(page.label),
     current: page.slug === path.slug,
+  }));
+  parts = componentParts(componentRoot(path.tag)).map((part) => ({
+    href: componentHref(locale, part),
+    label: componentName(part),
+    current: part === path.tag,
   }));
 } else if (icons) {
   heading = t('icons.categories');
@@ -55,29 +66,35 @@ if (path) {
 }
 ---
 
-{links.length > 0 && (
-  <nav aria-labelledby={headingId}>
-    <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
-      {heading}
-    </mds-text>
-    {/* Labels lined up with the heading, as in SectionEntries.astro. */}
-    <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
-      {links.map((link) => (
-        <li class="-ml-300 flex max-w-[calc(100%_+_--spacing(300))]">
-          <mds-button
-            class="max-w-full"
-            href={link.href}
-            role="link"
-            type="a"
-            aria-current={link.current ? 'page' : undefined}
-            label={link.label}
-            variant="dark"
-            tone={link.current ? 'strong' : 'text'}
-            size="sm"
-            truncate="none"
-          />
-        </li>
-      ))}
-    </ul>
-  </nav>
+{[
+  { id: headingId, heading, links },
+  { id: `${headingId}-parts`, heading: t('component.parts'), links: parts },
+].map(
+  ({ id, heading, links }) =>
+    links.length > 0 && (
+      <nav class="not-first:mt-800" aria-labelledby={id}>
+        <mds-text class="mb-400 block" id={id} typography="h5" tag="h2">
+          {heading}
+        </mds-text>
+        {/* Labels lined up with the heading, as in SectionEntries.astro. */}
+        <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
+          {links.map((link) => (
+            <li class="-ml-300 flex max-w-[calc(100%_+_--spacing(300))]">
+              <mds-button
+                class="max-w-full"
+                href={link.href}
+                role="link"
+                type="a"
+                aria-current={link.current ? 'page' : undefined}
+                label={link.label}
+                variant="dark"
+                tone={link.current ? 'strong' : 'text'}
+                size="sm"
+                truncate="none"
+              />
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ),
 )}

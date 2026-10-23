@@ -1,8 +1,9 @@
 ---
 title: Token
-description: I token globali di Magma per livello, quale usare, da dove vengono i loro dati e come averli nell'editor.
+description: I token globali di Magma per livello, quale usare, le piattaforme a cui arrivano, da dove vengono i loro dati e come averli nell'editor.
 ---
 
+import PageCards from '../../../../components/PageCards.astro';
 import TokenTiers from '../../../../components/TokenTiers.astro';
 
 L'aspetto di Magma è fatto di token: custom property per ogni colore, dimensione, stile di
@@ -47,6 +48,21 @@ questo sito:
 Niente varianti `dark:` e niente media query per la modalità scura: i ruoli semantici
 cambiano già da soli.
 
+## Riferimento
+
+I token di ogni tipo, in tabelle, e cosa cambiano in loro i temi e le preferenze:
+
+<PageCards
+  pages={[
+    { slug: 'tokens/color', icon: 'mi/outline/palette' },
+    { slug: 'tokens/typography', icon: 'mi/outline/text-fields' },
+    { slug: 'tokens/space-and-layout', icon: 'mi/outline/space-dashboard' },
+    { slug: 'tokens/shape-and-depth', icon: 'mi/outline/layers' },
+    { slug: 'tokens/motion', icon: 'mi/outline/animation' },
+    { slug: 'tokens/themes-and-preferences', icon: 'mi/outline/contrast' },
+  ]}
+/>
+
 ## Leggere le tabelle
 
 Le tabelle di questa sezione sono generate dai dati dei token dei pacchetti installati.
@@ -61,6 +77,31 @@ Le tabelle di questa sezione sono generate dai dati dei token dei pacchetti inst
 - **Tailwind** è una classe che legge il token. Tutte le classi e le varianti sono in
   [Tailwind](tailwind/).
 - Un clic su un valore lo copia.
+
+## Piattaforme
+
+I token arrivano su quattro piattaforme. Il web li riceve tutti e segue la pagina mentre è
+aperta; Android, iOS e Flutter ricevono i colori, con le due modalità affiancate, in file da
+aggiungere a un'app.
+
+| Piattaforma         | File                            | Token  | Modalità                |
+| ------------------- | ------------------------------- | ------ | ----------------------- |
+| [Web](web/)         | `styles`, `design-tokens`       | Tutti  | Seguono la pagina       |
+| [Android](android/) | `design-tokens/dist/android/`   | Colori | Un nome per modalità    |
+| [iOS](ios/)         | `design-tokens/dist/ios-swift/` | Colori | Un nome per modalità    |
+| [Flutter](flutter/) | `design-tokens/dist/flutter/`   | Colori | Una classe per modalità |
+
+Per un'altra piattaforma parti dai dati dei token qui sotto: descrivono ogni token e cosa
+cambiano la modalità, i temi e la preferenza di contrasto.
+
+## Strumenti
+
+Due strumenti leggono i token da file che Magma pubblica per loro:
+
+| Strumento             | File                       | Token                                      |
+| --------------------- | -------------------------- | ------------------------------------------ |
+| [Tailwind](tailwind/) | `styles/dist/tailwind/`    | I token globali, come tema e utility       |
+| [Figma](figma/)       | `design-tokens/dist/json/` | La palette e le dimensioni, come variabili |
 
 ## Dati dei token
 
