@@ -2,6 +2,7 @@
 // Pages of the current section: the first column of the card on desktop, part
 // of the mobile menu below that.
 import { frameNav } from '../../lib/frame';
+import { GROUP_ICONS } from '../../lib/nav.mjs';
 import SectionEntries from './SectionEntries.astro';
 
 interface Props {
@@ -11,6 +12,12 @@ interface Props {
 
 const { headingId } = Astro.props;
 const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url.pathname);
+// The icons of the groups of this section, by their label in this language.
+const icons = new Map(
+  Object.entries(GROUP_ICONS)
+    .filter(([key]) => key.startsWith(`nav.${section?.id}.`))
+    .map(([key, icon]) => [Astro.locals.t(key as never), icon]),
+);
 ---
 
 {section && (
@@ -18,6 +25,6 @@ const { section, currentHref } = frameNav(Astro.locals.starlightRoute, Astro.url
     <mds-text class="mb-400 block" id={headingId} typography="h5" tag="h2">
       {section.label}
     </mds-text>
-    <SectionEntries entries={section.group.entries} currentHref={currentHref} />
+    <SectionEntries entries={section.group.entries} currentHref={currentHref} icons={icons} />
   </nav>
 )}

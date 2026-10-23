@@ -125,6 +125,9 @@ element` does not put a text field in the table. The usage files stay Markdown w
 - The landing page of a section is labelled "Overview" / "Panoramica" (`nav.overview`) when its
   title repeats the section's name. Sections whose landing page has its own title keep it
   (Community: "Channels").
+- Every group of a section has an icon, drawn above its label in the section navigation:
+  `GROUP_ICONS` in `nav.mjs`, keyed by the UI string of the label. Starlight's schema of a group
+  is strict, and `items()` cannot run in the built pages (it reads the dictionaries from `src/`).
 - Edits to `nav.mjs` need a dev server restart.
 - The section navigation shows the labels as written (`--mds-button-label-transform: none`
   in `SectionEntries.astro`): `mds-button` uppercases the first letter of its label, which

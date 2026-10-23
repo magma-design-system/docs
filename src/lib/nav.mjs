@@ -161,6 +161,22 @@ export const sections = [
 ];
 
 /**
+ * The icon of each group of a section navigation, drawn above its label
+ * (src/components/frame/SectionEntries.astro), by the UI string of the label:
+ * Starlight's schema of a group has no room for it, and `items()` cannot run
+ * once bundled (it reads the dictionaries from src/).
+ */
+export const GROUP_ICONS = {
+  'nav.foundation.base': 'mi/outline/foundation',
+  'nav.foundation.design': 'mi/outline/style',
+  'nav.foundation.content': 'mi/outline/record-voice-over',
+  'nav.tokens.platforms': 'mi/outline/devices',
+  'nav.tokens.tools': 'mi/outline/handyman',
+  'nav.icons.packages': 'mi/outline/inventory-2',
+  'nav.patterns.data': 'mi/outline/table-chart',
+};
+
+/**
  * Whether the page of a sidebar slug is a draft (`draft: true` in its front
  * matter). Read on use, from astro.config.mjs: once bundled, `import.meta.url`
  * no longer points at src/ (as in i18n.mjs).
