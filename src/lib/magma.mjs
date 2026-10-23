@@ -61,6 +61,49 @@ export function componentTags() {
 }
 
 /**
+ * The category of each component and the parent of each part of a compound,
+ * from the JSDoc of documentation.json: `@category <id>` on a component that
+ * stands alone, `@parent <tag>` on a part (its direct parent, the first one
+ * where it names several).
+ * @returns {{ categories: Map<string, string>, parents: Map<string, string> }}
+ */
+export function componentTaxonomy() {
+  if (taxonomy) return taxonomy;
+  const categories = new Map();
+  const parents = new Map();
+  for (const { tag, docsTags = [] } of loadComponentDocs().components) {
+    for (const { name, text = '' } of docsTags) {
+      if (name === 'category') categories.set(tag, text.trim());
+      if (name === 'parent') parents.set(tag, text.trim().split(/\s+/)[0]);
+    }
+  }
+  taxonomy = { categories, parents };
+  return taxonomy;
+}
+
+/** @type {ReturnType<typeof componentTaxonomy> | undefined} */
+let taxonomy;
+
+/**
+ * The component a tag is a part of, through the parents of its parents; the
+ * tag itself when it stands alone.
+ * @param {string} tag
+ * @returns {string}
+ */
+export function componentRoot(tag) {
+  const parent = componentTaxonomy().parents.get(tag);
+  return parent ? componentRoot(parent) : tag;
+}
+
+/**
+ * The parts of a compound component, at any depth, in the order of their tags.
+ * @param {string} tag
+ */
+export function componentParts(tag) {
+  return componentTags().filter((part) => part !== tag && componentRoot(part) === tag);
+}
+
+/**
  * How many components there are, how many properties they have, and how many
  * of those are also HTML attributes (a string, a number or a boolean): the
  * others, such as arrays and functions, can only be set from JavaScript.

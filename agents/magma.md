@@ -94,7 +94,10 @@ against open issues before filing.
   Android, iOS and Flutter pages say so; the Objective-C files and `fonts.dart` are not offered
   for download.
 - `documentation.json` sorts no component into a category: only `mds-pref` has a `@category`
-  (`Patterns`), and `agents/components.md` is one flat list (2.5.1). Without it the Components
-  navigation stays a flat list of 116 entries: the site does not invent the categories.
+  (`Patterns`), and `agents/components.md` is one flat list (2.5.1). The site reads `@category`
+  and `@parent` as proposed to Magma (ten categories, the 36 parts under their compound) and
+  stays a flat list of 116 entries until every component has one of them: it does not invent
+  the categories. To preview the grouped navigation, add the tags to a copy of
+  `documentation.json` in a scratch worktree, never in the repository.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).

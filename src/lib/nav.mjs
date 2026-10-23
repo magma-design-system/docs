@@ -3,7 +3,7 @@
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here.
 import { existsSync, readFileSync } from 'node:fs';
-import { componentTags } from './magma.mjs';
+import { componentTags, componentTaxonomy } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
@@ -108,7 +108,7 @@ export const sections = [
     icon: 'mi/outline/widgets',
     items: () => [
       { ...sidebarLabel('nav.components.overview'), link: '/components/' },
-      ...componentTags().map((tag) => ({ label: componentName(tag), link: `/components/${tag}/` })),
+      ...componentItems(),
     ],
   },
   {
@@ -185,6 +185,45 @@ export const sections = [
 ];
 
 /**
+ * The categories of the components (`@category` in documentation.json), in
+ * the order of the section navigation, each labelled `nav.components.<id>`.
+ */
+export const COMPONENT_CATEGORIES = [
+  'actions',
+  'forms',
+  'navigation',
+  'feedback',
+  'overlays',
+  'data',
+  'tags',
+  'structure',
+  'content',
+  'preferences',
+];
+
+/**
+ * The component pages of the section navigation: a group per category, with
+ * the components that stand alone; their parts (`@parent`) are listed in the
+ * right column of their pages (DocsNav.astro). A flat list of every tag while
+ * a component has neither a category of the list nor a parent: Magma does not
+ * sort its components yet.
+ */
+function componentItems() {
+  const tags = componentTags();
+  const { categories, parents } = componentTaxonomy();
+  /** @param {string} tag */
+  const link = (tag) => ({ label: componentName(tag), link: `/components/${tag}/` });
+  const sorted = tags.every(
+    (tag) => parents.has(tag) || COMPONENT_CATEGORIES.includes(categories.get(tag) ?? ''),
+  );
+  if (!sorted) return tags.map(link);
+  return COMPONENT_CATEGORIES.map((id) => ({
+    ...sidebarLabel(`nav.components.${id}`),
+    items: tags.filter((tag) => !parents.has(tag) && categories.get(tag) === id).map(link),
+  }));
+}
+
+/**
  * The icon of each group of a section navigation, drawn above its label
  * (src/components/frame/SectionEntries.astro), by the UI string of the label:
  * Starlight's schema of a group has no room for it, and `items()` cannot run
@@ -205,6 +244,16 @@ export const GROUP_ICONS = {
   'nav.development.guides': 'mi/outline/menu-book',
   'nav.community.participate': 'mi/outline/handshake',
   'nav.community.about': 'mi/outline/info',
+  'nav.components.actions': 'mdi/button-pointer',
+  'nav.components.forms': 'mdi/form-textbox',
+  'nav.components.navigation': 'mi/outline/explore',
+  'nav.components.feedback': 'mi/outline/notifications',
+  'nav.components.overlays': 'mi/outline/picture-in-picture',
+  'nav.components.data': 'mi/outline/table-chart',
+  'nav.components.tags': 'mi/outline/sell',
+  'nav.components.structure': 'mi/outline/dashboard',
+  'nav.components.content': 'mi/outline/article',
+  'nav.components.preferences': 'mi/outline/tune',
 };
 
 /**
