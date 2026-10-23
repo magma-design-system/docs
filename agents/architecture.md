@@ -23,8 +23,12 @@ Loaded the way a consumer loads it, never from the monorepo:
   cascade layer order of Magma's install guide (`magma/agents/assets.md`), Starlight's layer
   between Magma's base and the site's components, then Tailwind's utilities.
 - [`src/scripts/magma.ts`](../src/scripts/magma.ts): the lazy loader, the icon path
-  (`IconsSetService`) and Starlight's `data-theme` kept on the mode chosen with
-  `mds-pref-mode`.
+  (`IconsSetService`), Starlight's `data-theme` kept on the mode chosen with
+  `mds-pref-mode`, and where a page opens. Once its tag is defined, a component shows nothing
+  of its content until its code has arrived and rendered: the page is much shorter than it will
+  be when the browser scrolls to the `#fragment` and when the router scrolls to it or puts back
+  the position saved in the history, so the scroll stops short. The script scrolls there again
+  at each change of size of the page, until the reader scrolls, clicks or types (10 s at most).
 - [`src/integrations/magma.mjs`](../src/integrations/magma.mjs): adds that script to every page,
   dumps every icon of the iconsauce plugins into `public/svg/` (gitignored; a stamp file skips
   the copy when the icon sets did not change), and registers the Markdown plugins.

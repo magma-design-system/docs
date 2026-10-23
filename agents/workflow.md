@@ -50,6 +50,8 @@ In a browser driven by an agent (a hidden or embedded pane):
   in a browser on screen. Two findings of October 2026 (`mds-button` and `mds-input` that stay
   disabled) came from such a pane and did not reproduce in Chrome.
 - Lazy `mds-img` never loads in a hidden pane.
+- A hidden pane has `innerHeight` 0 until a viewport size is set, and runs no `ResizeObserver`:
+  where a page opens (`#fragment`, back and forward, reload) is measured in headless Chrome.
 - Clicks on `mds-modal` content can miss while it animates: click from JavaScript.
 - `InvalidStateError` from the router in the console means a view transition was skipped in a
   hidden tab: harmless.
