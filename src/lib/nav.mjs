@@ -1,7 +1,9 @@
 // The sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
-// of the current page from Starlight and the icon from here.
+// of the current page from Starlight and the icon from here. After Foundation
+// they go from the sections of a page down to the values: building blocks,
+// patterns, components, then tokens and icons.
 import { existsSync, readFileSync } from 'node:fs';
 import { componentTags, componentTaxonomy } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
@@ -47,6 +49,34 @@ export const sections = [
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
       },
+    ],
+  },
+  {
+    id: 'blocks',
+    icon: 'mi/outline/extension',
+    soon: true,
+    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
+  },
+  {
+    id: 'patterns',
+    icon: 'mi/outline/view-quilt',
+    soon: true,
+    // The groups of the landing page, in its order.
+    items: () =>
+      published([
+        { slug: 'patterns', ...sidebarLabel('nav.overview') },
+        {
+          ...sidebarLabel('nav.patterns.data'),
+          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
+        },
+      ]),
+  },
+  {
+    id: 'components',
+    icon: 'mi/outline/widgets',
+    items: () => [
+      { ...sidebarLabel('nav.components.overview'), link: '/components/' },
+      ...componentItems(),
     ],
   },
   {
@@ -102,34 +132,6 @@ export const sections = [
         ],
       },
     ],
-  },
-  {
-    id: 'components',
-    icon: 'mi/outline/widgets',
-    items: () => [
-      { ...sidebarLabel('nav.components.overview'), link: '/components/' },
-      ...componentItems(),
-    ],
-  },
-  {
-    id: 'blocks',
-    icon: 'mi/outline/extension',
-    soon: true,
-    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
-  },
-  {
-    id: 'patterns',
-    icon: 'mi/outline/view-quilt',
-    soon: true,
-    // The groups of the landing page, in its order.
-    items: () =>
-      published([
-        { slug: 'patterns', ...sidebarLabel('nav.overview') },
-        {
-          ...sidebarLabel('nav.patterns.data'),
-          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
-        },
-      ]),
   },
   {
     id: 'brand',
