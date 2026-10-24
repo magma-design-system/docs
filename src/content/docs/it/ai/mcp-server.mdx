@@ -3,6 +3,8 @@ title: Server MCP
 description: 'Il server MCP che esce nel pacchetto di Magma: come configurarlo in Claude Code, VS Code e Cursor, e le domande che un agente gli fa invece di leggere i file.'
 ---
 
+import McpTools from '../../../../components/McpTools.astro';
+
 Magma contiene un server MCP dentro `@maggioli-design-system/magma`, il comando `magma-mcp`.
 Il client dell'agente lo avvia nel progetto, e risponde dalla versione installata lì: i
 componenti e la loro API, i ruoli e i token, le classi del tema Tailwind di Magma, le icone
@@ -55,18 +57,44 @@ Quando il client avvia i server fuori dalla radice del progetto, aggiungi
 
 ## Gli strumenti
 
-| Strumento        | Chiedigli                                                                   | Invece di                                   |
-| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------- |
-| `find_component` | Quale componente risponde a un bisogno, descritto a parole                  | Leggere il catalogo                         |
-| `get_component`  | L'API di un componente, le sue proprietà CSS pubbliche e le sue guide       | Leggere il suo `AGENTS.md`                  |
-| `get_usage`      | Come HTML, React o Angular scrivono un componente: import, prop, eventi     | Indovinare i nomi di un framework           |
-| `list_tokens`    | Il ruolo per un bisogno, con il suo valore e la sua classe                  | Leggere la guida dei colori                 |
-| `suggest_role`   | Il ruolo che sostituisce un colore, una classe grezza o un passo di palette | Scegliere un ruolo a occhio                 |
-| `explain_class`  | Cosa fa una classe con il tema Tailwind di Magma                            | Cadere in `p-4`, che vale 0,16px            |
-| `find_icon`      | Un'icona per significato, o se uno slug esiste                              | Un'icona che non si vede                    |
-| `get_guide`      | Una sezione di una guida                                                    | Leggere tutta la guida                      |
-| `check_markup`   | Se un frammento passa il lint, prima di scriverlo                           | Un lint lanciato dopo                       |
-| `check_setup`    | Cosa manca alla configurazione di Magma nel progetto                        | Controllare a mano i passi di installazione |
+Gli strumenti della versione installata, con cosa risponde ognuno e la lettura che
+risparmia; gli argomenti che finiscono con `?` sono facoltativi:
+
+<McpTools
+  notes={{
+    find_component: [
+      'Quale componente risponde a un bisogno, descritto a parole',
+      'Leggere il catalogo',
+    ],
+    get_component: [
+      "L'API di un componente, le sue proprietà CSS pubbliche e le sue guide",
+      'Leggere il suo `AGENTS.md`',
+    ],
+    get_usage: [
+      'Come HTML, React o Angular scrivono un componente: import, prop, eventi',
+      'Indovinare i nomi di un framework',
+    ],
+    list_tokens: [
+      'Il ruolo per un bisogno, con il suo valore e la sua classe',
+      'Leggere la guida dei colori',
+    ],
+    suggest_role: [
+      'Il ruolo che sostituisce un colore, una classe grezza o un passo di palette',
+      'Scegliere un ruolo a occhio',
+    ],
+    explain_class: [
+      'Cosa fa una classe con il tema Tailwind di Magma',
+      'Cadere in `p-4`, che vale 0,16px',
+    ],
+    find_icon: ["Un'icona per significato, o se uno slug esiste", "Un'icona che non si vede"],
+    get_guide: ['Una sezione di una guida', 'Leggere tutta la guida'],
+    check_markup: ['Se un frammento passa il lint, prima di scriverlo', 'Un lint lanciato dopo'],
+    check_setup: [
+      'Cosa manca alla configurazione di Magma nel progetto',
+      'Controllare a mano i passi di installazione',
+    ],
+  }}
+/>
 
 `check_markup` lancia il [lint](../../development/lint/) con ESLint, Stylelint e i parser
 installati nel progetto: configura prima il lint.
@@ -80,4 +108,7 @@ La guida `agents/mcp.md` dice all'agente quando usare ogni strumento:
   `explain_class`;
 - prima di un'icona, `find_icon`;
 - dopo aver scritto, `check_markup`, poi il lint del progetto;
-- dopo l'installazione, o quando qualcosa non si vede, `check_setup`.
+- dopo l'installazione, o quando qualcosa non si vede, `check_setup`;
+- quando nessuno strumento risponde a ciò che serve, o una risposta dice che Magma non ha
+  nulla (`gap`), te lo dice, va avanti e alla fine propone una issue su Magma per ogni
+  risposta mancante: la apre solo se sei d'accordo.

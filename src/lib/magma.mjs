@@ -91,6 +91,23 @@ export async function lintRules() {
 }
 
 /**
+ * The tools of the installed `magma-mcp`, in its order, from the definitions
+ * magma exports as data (`dist/lint/mcp/tools.json`, what `tools/list`
+ * answers; magma#1127): each tool with its title and its arguments, the
+ * required ones flagged.
+ * @returns {{ name: string, title: string, args: { name: string, required: boolean }[] }[]}
+ */
+export function mcpTools() {
+  /** @type {{ tools: { name: string, title: string, inputSchema: { properties?: object, required?: string[] } }[] }} */
+  const { tools } = require(resolveMagma('magma/dist/lint/mcp/tools.json'));
+  return tools.map(({ name, title, inputSchema: { properties = {}, required = [] } }) => ({
+    name,
+    title,
+    args: Object.keys(properties).map((arg) => ({ name: arg, required: required.includes(arg) })),
+  }));
+}
+
+/**
  * Sorted list of component tags, used by the sidebar and the routes.
  * @returns {string[]}
  */

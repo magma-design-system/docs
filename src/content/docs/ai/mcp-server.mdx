@@ -3,6 +3,8 @@ title: MCP server
 description: 'The MCP server that ships in the Magma package: how to set it up in Claude Code, VS Code and Cursor, and the questions an agent asks it instead of reading files.'
 ---
 
+import McpTools from '../../../components/McpTools.astro';
+
 Magma ships an MCP server inside `@maggioli-design-system/magma`, the `magma-mcp` command.
 The agent's client starts it in the project, and it answers from the version installed there:
 the components and their API, the roles and the tokens, the classes of Magma's Tailwind theme,
@@ -53,18 +55,41 @@ client starts servers outside the root of the project, add `"--root", "<folder>"
 
 ## The tools
 
-| Tool             | Ask it                                                              | Instead of                          |
-| ---------------- | ------------------------------------------------------------------- | ----------------------------------- |
-| `find_component` | Which component fits a need, described in words                     | Reading the catalogue               |
-| `get_component`  | The API of one component, its public CSS properties and its guides  | Reading its `AGENTS.md`             |
-| `get_usage`      | How HTML, React or Angular write a component: import, props, events | Guessing the names of a framework   |
-| `list_tokens`    | The role for a need, with its value and its class                   | Reading the color guide             |
-| `suggest_role`   | The role that replaces a color, a raw class or a palette step       | Picking a role by eye               |
-| `explain_class`  | What a class does with Magma's Tailwind theme                       | Falling into `p-4`, which is 0.16px |
-| `find_icon`      | An icon by meaning, or whether a slug exists                        | An icon that renders nothing        |
-| `get_guide`      | One section of a guide                                              | Reading the whole guide             |
-| `check_markup`   | Whether a snippet passes the lint, before it is written             | A lint run after the fact           |
-| `check_setup`    | What the Magma setup of the project misses                          | Checking the install steps by hand  |
+The tools of the installed version, with what each one answers and the reading it saves;
+the arguments that end in `?` are optional:
+
+<McpTools
+  notes={{
+    find_component: ['Which component fits a need, described in words', 'Reading the catalogue'],
+    get_component: [
+      'The API of one component, its public CSS properties and its guides',
+      'Reading its `AGENTS.md`',
+    ],
+    get_usage: [
+      'How HTML, React or Angular write a component: import, props, events',
+      'Guessing the names of a framework',
+    ],
+    list_tokens: ['The role for a need, with its value and its class', 'Reading the color guide'],
+    suggest_role: [
+      'The role that replaces a color, a raw class or a palette step',
+      'Picking a role by eye',
+    ],
+    explain_class: [
+      "What a class does with Magma's Tailwind theme",
+      'Falling into `p-4`, which is 0.16px',
+    ],
+    find_icon: ['An icon by meaning, or whether a slug exists', 'An icon that renders nothing'],
+    get_guide: ['One section of a guide', 'Reading the whole guide'],
+    check_markup: [
+      'Whether a snippet passes the lint, before it is written',
+      'A lint run after the fact',
+    ],
+    check_setup: [
+      'What the Magma setup of the project misses',
+      'Checking the install steps by hand',
+    ],
+  }}
+/>
 
 `check_markup` runs the [lint](../../development/lint/) with the ESLint, Stylelint and
 parsers installed in the project: set the lint up first.
@@ -77,4 +102,7 @@ The guide `agents/mcp.md` tells the agent when to reach for each tool:
 - before a color, a spacing or a class, `list_tokens`, `suggest_role` or `explain_class`;
 - before an icon, `find_icon`;
 - after writing, `check_markup`, then the lint of the project;
-- after the setup, or when something does not render, `check_setup`.
+- after the setup, or when something does not render, `check_setup`;
+- when no tool answers what the task needs, or an answer says Magma has nothing for it
+  (`gap`), it tells you, carries on, and at the end proposes an issue on Magma for each
+  missing answer: it opens one only once you agree.

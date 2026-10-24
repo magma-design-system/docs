@@ -47,6 +47,10 @@
   "fonts.download": "Download",
   "lint.rules.rule": "Rule",
   "lint.rules.tool": "Tool",
+  "mcp.tools.tool": "Tool",
+  "mcp.tools.ask": "Ask it",
+  "mcp.tools.instead": "Instead of",
+  "mcp.tools.args": "Arguments",
 
   "frame.brand.description": "Design System",
   "frame.sections": "Sections",
