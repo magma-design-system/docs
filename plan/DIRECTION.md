@@ -169,3 +169,35 @@ Open questions:
   `pattern.md` / `antipattern.md`). The section is called Patterns for now; either it
   takes another name, or the sub-pages are labelled differently on the site.
 - The "Mistakes to avoid" of a pattern will link to the lint rules once they exist.
+
+## Product layers (proposal)
+
+Proposed on 2026-10-24, not decided. Products need their own blocks and patterns (the records
+of a domain, its procedures), and agents should apply them together with Magma's. Documenting
+each product inside Magma is the wrong way: the products are a catalogue of needs, not the
+solution, and a pattern is worth something because it is the same everywhere.
+
+- **Layers of the same shape.** Magma ships the default: blocks, patterns, their "Always true"
+  rules, the agent guides, the lint configuration. A product layer has the same shape and may
+  add (its own blocks and patterns) and narrow (choose among the options the default leaves
+  open: columns, filters, row actions, labels), never contradict an "Always true" rule: the lint
+  reports it.
+- **Promotion.** A block or a pattern that comes back in the layers of two or three products is
+  proposed for the default, as blocks come out of patterns.
+- **Where they live.** The default is published as a package, so that this site reads it from
+  `node_modules` like the rest (the code of `src/patterns/` moves there). Better as a project of
+  the Magma monorepo, like the lint: a change to a component that breaks a block or a pattern
+  fails in the same pull request, and they are released together. The product layers live in a
+  private repository of the organization (visibility is set per repository, and the
+  organization's repositories are public), one folder per product with its `CODEOWNERS`, each
+  published to a private registry as a package that depends on the default.
+- **Agents.** A product installs its layer: its `AGENTS.md` sits in `node_modules` next to
+  Magma's, and the agent reads the default first, then the product's choices. The `AGENTS.md`
+  of the product (Agentic development) points to both.
+- **On the site.** Only the default. Each block and pattern page separates what is always true
+  from what the product decides; one page explains the shape of a layer, with an invented
+  product, once the mechanism exists.
+
+To check: where the default lives (a project of the monorepo or a repository of its own), what
+the organization's GitHub plan allows on private repositories (branch protection, required
+reviews), the token the products' CI needs to read the private registry.
