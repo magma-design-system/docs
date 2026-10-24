@@ -1,0 +1,83 @@
+---
+title: Server MCP
+description: 'Il server MCP che esce nel pacchetto di Magma: come configurarlo in Claude Code, VS Code e Cursor, e le domande che un agente gli fa invece di leggere i file.'
+---
+
+Magma contiene un server MCP dentro `@maggioli-design-system/magma`, il comando `magma-mcp`.
+Il client dell'agente lo avvia nel progetto, e risponde dalla versione installata lì: i
+componenti e la loro API, i ruoli e i token, le classi del tema Tailwind di Magma, le icone
+che esistono, le sezioni delle guide, e il lint su un frammento di codice prima che sia
+scritto. Legge soltanto: nessuno strumento modifica un file.
+
+Una domanda al server costa una risposta breve, dove la stessa domanda alle guide costa un
+file da leggere: i valori di una prop invece della guida del componente, il ruolo per un
+"testo secondario" invece della guida dei colori. E quello che il server risponde è
+verificato sul pacchetto, non ricordato.
+
+## Configurarlo
+
+Non c'è niente da pubblicare o da installare oltre a Magma: il server gira da
+`node_modules`, sul tuo computer, attraverso l'input e l'output standard del client. Non è un
+servizio remoto, e non è uno dei connettori di un'app di chat.
+
+**Claude Code**: registra il [plugin di Magma](../claude-code/), che avvia il server e
+aggiunge le skill. Con il plugin, non scrivere anche la voce qui sotto, o il server parte due
+volte.
+
+**Claude Code senza il plugin**: `.mcp.json` alla radice del progetto, nel repository perché
+lo abbia tutto il team; Claude Code chiede una volta prima di avviare un server del progetto.
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "magma": { "command": "npx", "args": ["--no", "magma-mcp"] }
+  }
+}
+```
+
+**VS Code con GitHub Copilot**: `.vscode/mcp.json`.
+
+```json title=".vscode/mcp.json"
+{
+  "servers": {
+    "magma": { "type": "stdio", "command": "npx", "args": ["--no", "magma-mcp"] }
+  }
+}
+```
+
+**Cursor**: `.cursor/mcp.json`, con la stessa voce di Claude Code sotto `mcpServers`.
+
+Unisci la voce al file quando esiste già, non sostituirlo mai. Tieni `--no`: fa eseguire a
+`npx` il comando installato e lo ferma quando non c'è, per esempio in un clone appena fatto
+prima di `npm install`, invece di scaricare quello che il registro npm ha con quel nome.
+Quando il client avvia i server fuori dalla radice del progetto, aggiungi
+`"--root", "<cartella>"` agli `args`.
+
+## Gli strumenti
+
+| Strumento        | Chiedigli                                                                   | Invece di                                   |
+| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------- |
+| `find_component` | Quale componente risponde a un bisogno, descritto a parole                  | Leggere il catalogo                         |
+| `get_component`  | L'API di un componente, le sue proprietà CSS pubbliche e le sue guide       | Leggere il suo `AGENTS.md`                  |
+| `get_usage`      | Come HTML, React o Angular scrivono un componente: import, prop, eventi     | Indovinare i nomi di un framework           |
+| `list_tokens`    | Il ruolo per un bisogno, con il suo valore e la sua classe                  | Leggere la guida dei colori                 |
+| `suggest_role`   | Il ruolo che sostituisce un colore, una classe grezza o un passo di palette | Scegliere un ruolo a occhio                 |
+| `explain_class`  | Cosa fa una classe con il tema Tailwind di Magma                            | Cadere in `p-4`, che vale 0,16px            |
+| `find_icon`      | Un'icona per significato, o se uno slug esiste                              | Un'icona che non si vede                    |
+| `get_guide`      | Una sezione di una guida                                                    | Leggere tutta la guida                      |
+| `check_markup`   | Se un frammento passa il lint, prima di scriverlo                           | Un lint lanciato dopo                       |
+| `check_setup`    | Cosa manca alla configurazione di Magma nel progetto                        | Controllare a mano i passi di installazione |
+
+`check_markup` lancia il [lint](../../development/lint/) con ESLint, Stylelint e i parser
+installati nel progetto: configura prima il lint.
+
+## Quando l'agente li chiama
+
+La guida `agents/mcp.md` dice all'agente quando usare ogni strumento:
+
+- prima di scrivere un componente, `find_component`, poi `get_component` e `get_usage`;
+- prima di un colore, una spaziatura o una classe, `list_tokens`, `suggest_role` o
+  `explain_class`;
+- prima di un'icona, `find_icon`;
+- dopo aver scritto, `check_markup`, poi il lint del progetto;
+- dopo l'installazione, o quando qualcosa non si vede, `check_setup`.

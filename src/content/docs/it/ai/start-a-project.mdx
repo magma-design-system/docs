@@ -1,18 +1,11 @@
 ---
-title: Sviluppo agentico
-description: "Iniziare un progetto con Magma insieme a un agente AI di sviluppo, e dare all'agente il contesto che gli serve per lavorare con Magma: le guide che escono nei pacchetti."
+title: Iniziare un progetto
+description: "Installare Magma in un progetto insieme a un agente AI di sviluppo, e dare all'agente il contesto che gli serve per lavorare con la versione che hai installato."
 ---
 
 import FrameworkTabs from '../../../../components/FrameworkTabs.astro';
 
-Ogni pacchetto di Magma contiene guide scritte per gli agenti AI di sviluppo, come Claude
-Code, Codex, Cursor o Copilot: come installare Magma, quale componente usare per cosa, l'API
-di ogni componente, i modi giusti e sbagliati di usarlo. Sono file Markdown dentro il
-pacchetto, con la sua stessa versione. Un agente che li legge lavora con i componenti della
-versione che hai installato, invece che con quello che ricorda di Magma, che può essere
-un'altra versione o niente del tutto.
-
-## Iniziare un progetto
+## Installare Magma
 
 Crea l'app con lo strumento del tuo framework, poi installa il pacchetto di Magma: da quel
 momento le sue guide sono in `node_modules`, dove l'agente può leggerle.
@@ -73,14 +66,27 @@ Leggi node_modules/@maggioli-design-system/magma-angular/AGENTS.md e seguilo per
 </Fragment>
 </FrameworkTabs>
 
-La guida dice all'agente di guardare prima il progetto (framework, bundler, Tailwind,
-rendering lato server), di chiederti solo quello che non riesce a capire da solo, come da
-dove sono servite le icone o se vuoi la modalità scura, e poi di installare gli stili, i
-font e le icone e di registrare i componenti. Finisce con una build, un componente nella
-pagina e un'icona caricata.
+In Claude Code con il [plugin di Magma](../claude-code/), `/magma:setup` fa la stessa cosa,
+e installa anche il pacchetto del tuo framework.
 
-Controlla il risultato con [Installazione](../installation/): gli stessi passaggi, scritti
-per le persone.
+La guida dice all'agente di guardare prima il progetto (framework, bundler, Tailwind,
+rendering lato server, editor), di chiederti solo quello che non riesce a capire da solo,
+come da dove sono servite le icone o se vuoi la modalità scura, e poi di configurare, in
+ordine:
+
+- gli stili, i font e le icone, e la registrazione dei componenti;
+- i suggerimenti dell'editor, per i token e le classi;
+- il [lint](../../development/lint/), nelle configurazioni di ESLint e Stylelint del
+  progetto;
+- il [server MCP](../mcp-server/): il plugin di Magma in Claude Code, una voce nella
+  configurazione degli altri client.
+
+Finisce con una build, un componente nella pagina, un'icona caricata e il lint senza errori.
+Lo strumento `check_setup` del server MCP elenca poi quello che manca ancora al progetto,
+ogni voce con la guida che la risolve.
+
+Controlla il risultato con [Installazione](../../development/installation/): gli stessi
+passaggi, scritti per le persone.
 
 ## Dare il contesto all'agente
 
@@ -101,7 +107,7 @@ L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-d
 - per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
 - colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
 
-Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
 ```
 
 </Fragment>
@@ -116,7 +122,7 @@ L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-d
 - per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
 - colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
 
-Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
 ```
 
 </Fragment>
@@ -131,47 +137,10 @@ L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-d
 - per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
 - colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
 
-Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
 ```
 
 </Fragment>
 </FrameworkTabs>
 
-Le guide sono divise in modo che l'agente legga solo quello che serve al compito:
-
-| File                                            | Cosa ci trova l'agente                                                                              |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `AGENTS.md`                                     | Come installare Magma, poi la mappa degli altri file                                                |
-| `agents/components.md`                          | Il catalogo: ogni componente in una riga, con il link alla sua guida                                |
-| `<tag>/AGENTS.md`                               | L'API di un componente: proprietà e loro valori, eventi, metodi, slot, part, proprietà CSS          |
-| `<tag>/pattern.md`, `<tag>/antipattern.md`      | Come usare il componente, con esempi, e gli errori da evitare                                       |
-| `agents/conventions.md`                         | Le regole comuni a tutti i componenti: nomi, eventi, slot, icone, accessibilità, stili dall'esterno |
-| `agents/variants.md`, `agents/anti-patterns.md` | I valori di `variant` e `tone`, e gli errori da evitare con qualsiasi componente                    |
-| `agents/color.md`, `agents/typography.md`       | Colorare e comporre il testo della tua interfaccia con i token e le utility di Magma                |
-| `agents/theming.md`                             | Modalità scura e le altre preferenze, temi con nome, superfici ed elevazione, angoli                |
-
-Le guide di ogni componente sono in `@maggioli-design-system/magma/dist/collection/components/<tag>/`,
-anche quando il progetto usa un wrapper: il catalogo rimanda lì. `dist/documentation.json` di
-magma ha gli stessi dati per gli strumenti, troppo grande per darlo intero a un agente.
-
-## Lavorare con l'agente
-
-Chiedi il risultato e lascia che sia l'agente a trovare i componenti: con le istruzioni qui
-sopra, legge il catalogo e le guide dei componenti che sceglie prima di scrivere codice.
-
-```text title="Prompt" wrap
-Aggiungi una pagina con l'elenco dei documenti dell'utente: una tabella con nome, data e dimensione, un campo di ricerca sopra e un pulsante per caricare un documento.
-```
-
-Per controllare cosa ha costruito, chiedigli quali guide ha letto e confronta il codice con
-`agents/anti-patterns.md` e con l'`antipattern.md` di ogni componente. Elencano gli errori da
-evitare, come un `<button>` o un `<input>` semplice al posto di un componente Magma, colori
-scritti a mano invece dei ruoli di Magma, o `disabled="false"` per spegnere un attributo
-booleano.
-
-## Dopo un aggiornamento
-
-Le guide cambiano con il pacchetto: dopo un aggiornamento l'agente legge quelle della nuova
-versione, senza cambiare le tue istruzioni. Dopo una major, esegui prima il codemod, come
-dice [Versioni e migrazioni](../versions/), poi chiedi all'agente di rivedere quello che il
-codemod ha segnalato: legge le guide della nuova versione per sistemarlo.
+Cosa contiene ogni guida è in [Le guide nel pacchetto](../guides/).

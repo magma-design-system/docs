@@ -32,6 +32,9 @@
   "nav.brand.package": "Package",
   "nav.development": "Development",
   "nav.development.guides": "Guides",
+  "nav.ai": "AI agents",
+  "nav.ai.start": "Get started",
+  "nav.ai.tools": "Tools",
   "nav.community": "Community",
   "nav.community.participate": "Take part",
   "nav.community.about": "About",
@@ -42,6 +45,8 @@
   "fonts.weights": "Weights",
   "fonts.license": "License",
   "fonts.download": "Download",
+  "lint.rules.rule": "Rule",
+  "lint.rules.tool": "Tool",
 
   "frame.brand.description": "Design System",
   "frame.sections": "Sections",

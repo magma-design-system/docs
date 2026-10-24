@@ -1,0 +1,144 @@
+---
+title: Lint
+description: 'Le regole di ESLint e Stylelint che escono nel pacchetto di Magma e controllano un progetto rispetto alla versione installata: come configurarle, i preset, e cosa trova ogni regola.'
+---
+
+import FrameworkTabs from '../../../../components/FrameworkTabs.astro';
+import LintRules from '../../../../components/LintRules.astro';
+
+Magma contiene il suo lint dentro `@maggioli-design-system/magma`: regole di ESLint per i
+template e di Stylelint per i fogli di stile. Trasformano le regole dei
+[componenti](../../components/) e del [colore](../../foundation/color/) in controlli che
+girano in pochi secondi: un valore che una prop non accetta, un booleano spento con
+`"false"`, un pulsante con la sola icona e senza nome, un colore che non segue la modalità e
+i temi. Le regole leggono l'API e i token della versione installata nel progetto, quindi
+seguono ogni aggiornamento senza niente da tenere allineato.
+
+Il lint serve allo stesso modo alle persone, alla CI e agli [agenti AI](../../ai/). Per un
+agente è il controllo più economico che ci sia: quello che una regola trova non costa token,
+e l'agente legge solo gli errori, invece di rileggere le guide per controllare il proprio
+lavoro.
+
+## Configurarlo
+
+Le regole sono in `@maggioli-design-system/magma`, che anche `magma-react` e `magma-angular`
+installano. Il progetto ha bisogno di ESLint 9 o successivo, Stylelint 16 o successivo e del
+parser dei suoi template:
+
+```bash
+npm i -D eslint stylelint
+```
+
+Poi aggiungi i preset di Magma alle configurazioni del progetto, accanto a quello che c'è:
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```bash
+npm i -D @html-eslint/parser
+```
+
+```js title="eslint.config.js"
+import html from '@html-eslint/parser';
+import magma from '@maggioli-design-system/magma/eslint';
+
+export default [
+  { files: ['**/*.html'], languageOptions: { parser: html }, ...magma.configs.recommended },
+];
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```js title="eslint.config.js"
+import magma from '@maggioli-design-system/magma/eslint';
+
+export default [
+  // ...il blocco che già legge i file .jsx e .tsx
+  { files: ['**/*.{jsx,tsx}'], ...magma.configs.recommended },
+];
+```
+
+Le regole leggono sia `<mds-button>` sia i wrapper (`<MdsButton>`).
+
+</Fragment>
+<Fragment slot="angular">
+
+```js title="eslint.config.js"
+import angularTemplate from '@angular-eslint/template-parser';
+import magma from '@maggioli-design-system/magma/eslint';
+
+export default [
+  // ...accanto ai blocchi di angular-eslint
+  {
+    files: ['**/*.html'],
+    languageOptions: { parser: angularTemplate },
+    ...magma.configs.recommended,
+  },
+];
+```
+
+Con il processore dei template inline di angular-eslint, viene controllato anche il
+`template` di un componente.
+
+</Fragment>
+</FrameworkTabs>
+
+```js title="stylelint.config.mjs"
+export default {
+  extends: ['@maggioli-design-system/magma/stylelint/recommended'],
+};
+```
+
+Ogni preset di ESLint imposta solo regole: va nel blocco che già legge i template. Questo
+sito, costruito con Astro, controlla i suoi file `.astro` allo stesso modo con
+`astro-eslint-parser`.
+
+## Preset
+
+- `recommended`, per un prodotto che esiste già: quello che è rotto o non accessibile è un
+  errore, il resto un avviso, da correggere strada facendo.
+- `strict`, per un prodotto nuovo: ogni regola è un errore. `magma.configs.strict` per
+  ESLint, `@maggioli-design-system/magma/stylelint/strict` per Stylelint.
+
+## Lanciarlo
+
+Dopo ogni modifica, e nella CI:
+
+```bash
+npx eslint src
+npx stylelint "src/**/*.{css,scss}"
+```
+
+Quando una regola sbaglia su Magma stesso, segnalalo a
+[Magma](https://github.com/magma-design-system/magma/issues) invece di disattivarla.
+
+## Regole
+
+Le regole della versione installata, con la loro gravità in ogni preset:
+
+<LintRules />
+
+Cosa trova ognuna:
+
+- **`valid-attribute-values`**: una prop che accetta un elenco di valori riceve uno di
+  quelli, come `tone="weak"` su `mds-banner`, mai `tone="outline"`. Un valore legato a
+  un'espressione si conosce solo quando la pagina gira, e non viene controllato.
+- **`no-false-boolean`**: una prop booleana si spegne togliendo l'attributo.
+  `disabled="false"` lascia il componente disabilitato: in un framework, lega un vero
+  booleano.
+- **`accessible-name`**: un controllo che mostra solo la sua icona ha un `label` o un
+  `aria-label` che dice l'azione, e un `mds-img` ha un `alt`, vuoto quando l'immagine è
+  decorativa.
+- **`no-raw-palette-classes`**: le classi di colore nominano un ruolo, come
+  `bg-surface-raised`, mai la palette di Tailwind (`bg-white`) o un passo delle palette di
+  Magma, che seguono la modalità ma non i temi né la preferenza di contrasto.
+- **`no-internal-tokens`**: un progetto imposta solo le custom property CSS che un componente
+  promette, quelle pubbliche elencate nella sua API. Le altre possono cambiare in qualunque
+  versione.
+- **`no-color-scheme-override`**: nessuna media query `prefers-color-scheme`: segue il
+  sistema, non la modalità scelta nella pagina. I ruoli seguono entrambi; per una scelta che
+  cambia con la modalità, usa la variante `dark` del tema Tailwind di Magma.
+- **`no-raw-color`**: nessun colore scritto come valore, come `#fff` o `rgb(0 0 0)`, dove va
+  un ruolo; le ombre usano l'inchiostro delle ombre di Magma,
+  `rgb(var(--magma-shadow-ink) / <alpha>)`.

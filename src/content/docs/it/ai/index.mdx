@@ -1,0 +1,60 @@
+---
+title: Agenti AI
+description: 'Cosa dà Magma agli agenti AI di sviluppo per lavorare con la versione che hai installato, e come rende il loro lavoro economico: guide nel pacchetto, un server MCP, un lint e un plugin per Claude Code.'
+---
+
+import PageCards from '../../../../components/PageCards.astro';
+
+Magma è scritto per essere usato dagli agenti AI di sviluppo oltre che dalle persone, e per
+rendere il loro lavoro più economico. Un agente paga tutto quello che legge e su cui ragiona,
+in contesto, in tempo e in token. Per questo Magma lascia al modello solo quello che chiede
+giudizio, come scegliere il componente adatto a una schermata, e affida tutto ciò che è
+meccanico a strumenti che rispondono sempre allo stesso modo e non costano token: se una prop
+accetta un valore, quale ruolo colora un elemento, se un'icona esiste.
+
+Ogni strumento risponde dalla versione installata nel progetto: l'agente lavora con i
+componenti che hai, non con quello che ricorda di Magma, che può essere un'altra versione o
+niente del tutto.
+
+## Come funziona
+
+Uno strumento per ogni momento del lavoro:
+
+- **Leggere: le guide nel pacchetto.** Scritte per gli agenti e divise per compito: l'agente
+  legge il catalogo, poi solo le guide dei componenti che sceglie.
+- **Chiedere: il server MCP.** Una domanda precisa, come i valori di una prop o il ruolo per
+  un testo secondario, riceve una risposta breve invece di un intero file da leggere.
+- **Verificare: il lint.** Le regole di ESLint e Stylelint trovano quello che una regola può
+  vedere, come un valore che una prop non accetta o un colore scritto a mano, senza un
+  modello: l'agente legge solo gli errori.
+- **Fare un lavoro intero: le skill.** In Claude Code, il plugin di Magma trasforma
+  installazione, revisione e migrazione in comandi che seguono ogni volta la stessa procedura.
+
+Le guide funzionano con qualunque agente che legge file, il server MCP con qualunque client
+che parla MCP, il lint con o senza un agente. Il plugin è per Claude Code.
+
+## Per iniziare
+
+Come iniziare un progetto con un agente, e come lavorarci una volta installato Magma:
+
+<PageCards
+  pages={[
+    { slug: 'ai/start-a-project', icon: 'mi/outline/rocket-launch' },
+    { slug: 'ai/working-with-agents', icon: 'mi/outline/chat' },
+  ]}
+/>
+
+## Strumenti
+
+Cosa esce con Magma per gli agenti, e come configurarlo:
+
+<PageCards
+  pages={[
+    { slug: 'ai/guides', icon: 'mi/outline/menu-book' },
+    { slug: 'ai/mcp-server', icon: 'mi/outline/hub' },
+    { slug: 'ai/claude-code', icon: 'mi/outline/terminal' },
+  ]}
+/>
+
+Il lint è un controllo del progetto come gli altri, che usano anche le persone e la CI: è
+descritto in [Lint](../development/lint/).

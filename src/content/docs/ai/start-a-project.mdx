@@ -1,18 +1,11 @@
 ---
-title: Agentic development
-description: 'Start a project with Magma together with an AI coding agent, and give the agent the context it needs to build with Magma: the guides that ship in the packages.'
+title: Start a project
+description: 'Install Magma in a project together with an AI coding agent, and give the agent the context it needs to build with the version you installed.'
 ---
 
 import FrameworkTabs from '../../../components/FrameworkTabs.astro';
 
-Every Magma package ships guides written for AI coding agents, such as Claude Code, Codex,
-Cursor or Copilot: how to install Magma, which component to use for what, the API of each
-component, the right and the wrong ways to use it. They are Markdown files inside the package,
-versioned with it. An agent that reads them works with the components of the version you
-installed, instead of what it remembers of Magma, which may be another version or nothing at
-all.
-
-## Start a project
+## Install Magma
 
 Create the app with the tool of your framework, then install the Magma package: from then on
 its guides are in `node_modules`, where the agent can read them.
@@ -73,13 +66,26 @@ Read node_modules/@maggioli-design-system/magma-angular/AGENTS.md and follow it 
 </Fragment>
 </FrameworkTabs>
 
-The guide tells the agent to look at the project first (framework, bundler, Tailwind, server
-rendering), to ask you only what it cannot find out, such as where the icons are served from
-or whether you want dark mode, and then to install the styles, the fonts and the icons and to
-register the components. It ends with a build, a component on the page and an icon loaded.
+In Claude Code with the [Magma plugin](../claude-code/), `/magma:setup` does the same,
+installing the package of your framework too.
 
-Check the result against [Installation](../installation/): the same steps, written for
-people.
+The guide tells the agent to look at the project first (framework, bundler, Tailwind, server
+rendering, editor), to ask you only what it cannot find out, such as where the icons are
+served from or whether you want dark mode, and then to set up, in order:
+
+- the styles, the fonts and the icons, and the registration of the components;
+- the completions of the editor, for the tokens and the classes;
+- the [lint](../../development/lint/), in the ESLint and Stylelint configurations of the
+  project;
+- the [MCP server](../mcp-server/): the Magma plugin in Claude Code, an entry in the
+  configuration of the other clients.
+
+It ends with a build, a component on the page, an icon loaded and the lint with no errors.
+The `check_setup` tool of the MCP server then lists what the project still misses, each item
+with the guide that fixes it.
+
+Check the result against [Installation](../../development/installation/): the same steps,
+written for people.
 
 ## Give the agent the context
 
@@ -100,7 +106,7 @@ The UI is built with Magma, the Maggioli design system (`@maggioli-design-system
 - for each component you use, read its `AGENTS.md`, `pattern.md` and `antipattern.md`;
 - color, type and spacing come from Magma's tokens and utilities (`agents/color.md`, `agents/typography.md`), never from literal values.
 
-Never guess a prop, a value or an event: the guides describe the installed version.
+When the `magma` MCP server is available, ask it instead of reading files. After every change, run the lint and fix what it reports. Never guess a prop, a value or an event: the guides describe the installed version.
 ```
 
 </Fragment>
@@ -115,7 +121,7 @@ The UI is built with Magma, the Maggioli design system (`@maggioli-design-system
 - for each component you use, read its `AGENTS.md`, `pattern.md` and `antipattern.md`;
 - color, type and spacing come from Magma's tokens and utilities (`agents/color.md`, `agents/typography.md`), never from literal values.
 
-Never guess a prop, a value or an event: the guides describe the installed version.
+When the `magma` MCP server is available, ask it instead of reading files. After every change, run the lint and fix what it reports. Never guess a prop, a value or an event: the guides describe the installed version.
 ```
 
 </Fragment>
@@ -130,47 +136,10 @@ The UI is built with Magma, the Maggioli design system (`@maggioli-design-system
 - for each component you use, read its `AGENTS.md`, `pattern.md` and `antipattern.md`;
 - color, type and spacing come from Magma's tokens and utilities (`agents/color.md`, `agents/typography.md`), never from literal values.
 
-Never guess a prop, a value or an event: the guides describe the installed version.
+When the `magma` MCP server is available, ask it instead of reading files. After every change, run the lint and fix what it reports. Never guess a prop, a value or an event: the guides describe the installed version.
 ```
 
 </Fragment>
 </FrameworkTabs>
 
-The guides are split so that the agent reads only what the task needs:
-
-| File                                            | What the agent finds there                                                                      |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| `AGENTS.md`                                     | How to install Magma, then the map of the other files                                           |
-| `agents/components.md`                          | The catalogue: every component in one line, with a link to its own guide                        |
-| `<tag>/AGENTS.md`                               | The API of one component: props and their values, events, methods, slots, parts, CSS properties |
-| `<tag>/pattern.md`, `<tag>/antipattern.md`      | How to use the component, with examples, and the mistakes to avoid                              |
-| `agents/conventions.md`                         | The rules shared by every component: naming, events, slots, icons, accessibility, styling       |
-| `agents/variants.md`, `agents/anti-patterns.md` | The values of `variant` and `tone`, and the mistakes to avoid with any component                |
-| `agents/color.md`, `agents/typography.md`       | Coloring and setting text in your own interface with Magma's tokens and utilities               |
-| `agents/theming.md`                             | Dark mode and the other preferences, named themes, surfaces and elevation, corners              |
-
-The guides of each component are in `@maggioli-design-system/magma/dist/collection/components/<tag>/`,
-also when the project uses a wrapper: the catalogue links them. `dist/documentation.json` of
-magma has the same data for tools, too large to give to an agent whole.
-
-## Work with the agent
-
-Ask for the result, and let the agent find the components: with the instructions above, it
-reads the catalogue and the guides of the components it picks before writing code.
-
-```text title="Prompt" wrap
-Add a page with the list of the user's documents: a table with name, date and size, a search field above it, and a button to upload a document.
-```
-
-To check what it built, ask which guides it read, and compare the code with
-`agents/anti-patterns.md` and the `antipattern.md` of each component. They list the mistakes
-to avoid, such as a plain `<button>` or `<input>` in place of a Magma component, colors
-written by hand instead of Magma's roles, or `disabled="false"` to turn off a boolean
-attribute.
-
-## After an update
-
-The guides change with the package: after an update the agent reads those of the new version,
-with no change to your instructions. After a major release, run the codemod first, as
-[Versions and migrations](../versions/) says, then ask the agent to review what the codemod
-reported: it reads the guides of the new version to fix it.
+What each guide holds is in [Guides in the package](../guides/).

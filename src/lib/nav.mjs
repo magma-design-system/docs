@@ -160,9 +160,25 @@ export const sections = [
         ...sidebarLabel('nav.development.guides'),
         items: [
           { slug: 'development/installation' },
-          { slug: 'development/agentic-development' },
+          { slug: 'development/lint' },
           { slug: 'development/versions' },
         ],
+      },
+    ],
+  },
+  {
+    id: 'ai',
+    icon: 'mi/outline/auto-awesome',
+    // The groups of the landing page, in its order.
+    items: () => [
+      { slug: 'ai', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.ai.start'),
+        items: [{ slug: 'ai/start-a-project' }, { slug: 'ai/working-with-agents' }],
+      },
+      {
+        ...sidebarLabel('nav.ai.tools'),
+        items: [{ slug: 'ai/guides' }, { slug: 'ai/mcp-server' }, { slug: 'ai/claude-code' }],
       },
     ],
   },
@@ -243,6 +259,8 @@ export const GROUP_ICONS = {
   'nav.brand.assets': 'mi/outline/collections',
   'nav.brand.package': 'mi/outline/inventory-2',
   'nav.development.guides': 'mi/outline/menu-book',
+  'nav.ai.start': 'mi/outline/rocket-launch',
+  'nav.ai.tools': 'mi/outline/handyman',
   'nav.community.participate': 'mi/outline/handshake',
   'nav.community.about': 'mi/outline/info',
   'nav.components.actions': 'mdi/button-pointer',

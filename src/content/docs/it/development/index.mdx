@@ -5,19 +5,20 @@ description: Installare e usare Magma in progetti Vanilla, React e Angular, e le
 
 import PageCards from '../../../../components/PageCards.astro';
 
-Come installare Magma in progetti Vanilla, React e Angular, come lavorare con gli agenti AI,
-come introdurlo in prodotti esistenti e nuovi, e come cambiano le sue versioni. Le altre
-pagine di questa sezione sono in scrittura.
+Come installare Magma in progetti Vanilla, React e Angular, come controllare un progetto con
+il suo lint, come introdurlo in prodotti esistenti e nuovi, e come cambiano le sue versioni.
+Il lavoro con gli agenti AI ha una sezione sua, [Agenti AI](../ai/). Le altre pagine di
+questa sezione sono in scrittura.
 
 ## Guide
 
-Come installare Magma in un progetto, lavorarci con gli agenti AI e passare da una versione
-all'altra:
+Come installare Magma in un progetto, controllare il codice con il suo lint e passare da una
+versione all'altra:
 
 <PageCards
   pages={[
     { slug: 'development/installation', icon: 'mi/outline/download' },
-    { slug: 'development/agentic-development', icon: 'mi/outline/smart-toy' },
+    { slug: 'development/lint', icon: 'mi/outline/rule' },
     { slug: 'development/versions', icon: 'mi/outline/history' },
   ]}
 />
@@ -61,5 +62,6 @@ aggiunge le sue nelle pagine Pattern e Antipattern della sua
 - **Form come form native.** I campi di Magma funzionano dentro un `<form>` come i
   controlli nativi: con un `name` vengono inviati, azzerati e validati dalla form stessa.
 
-I pacchetti contengono le stesse regole per gli agenti AI, in `agents/conventions.md` e
-`agents/anti-patterns.md`: vedi [Sviluppo agentico](agentic-development/).
+Il [lint](lint/) ne controlla diverse a ogni modifica. I pacchetti contengono le stesse
+regole per gli agenti AI, in `agents/conventions.md` e `agents/anti-patterns.md`: vedi
+[Agenti AI](../ai/).

@@ -1,0 +1,59 @@
+---
+title: AI agents
+description: 'What Magma gives AI coding agents to build with the version you installed, and how it keeps their work cheap: guides in the package, an MCP server, a lint and a Claude Code plugin.'
+---
+
+import PageCards from '../../../components/PageCards.astro';
+
+Magma is written to be used by AI coding agents as well as by people, and to make their work
+cheaper. An agent pays for everything it reads and reasons about, in context, in time and in
+tokens. So Magma leaves to the model only what needs judgment, such as which component fits a
+screen, and gives everything mechanical to tools that answer the same way every time and cost
+no tokens: whether a prop takes a value, which role paints a color, whether an icon exists.
+
+Every piece answers from the version installed in the project: the agent works with the
+components you have, not with what it remembers of Magma, which may be another version or
+nothing at all.
+
+## How it works
+
+One piece for each moment of the work:
+
+- **Read: the guides in the package.** Written for agents and split by task: the agent reads
+  the catalogue, then only the guides of the components it picks.
+- **Ask: the MCP server.** A precise question, such as the values of a prop or the role for
+  secondary text, gets a short answer instead of a whole file to read.
+- **Check: the lint.** ESLint and Stylelint rules catch what a rule can see, such as a value
+  a prop does not take or a color written by hand, without a model: the agent reads only the
+  errors.
+- **Run a whole job: the skills.** In Claude Code, the Magma plugin turns setup, review and
+  migration into commands that follow the same procedure every time.
+
+The guides work with any agent that reads files, the MCP server with any client that speaks
+MCP, the lint with or without an agent. The plugin is for Claude Code.
+
+## Get started
+
+How to start a project with an agent, and how to work with it once Magma is installed:
+
+<PageCards
+  pages={[
+    { slug: 'ai/start-a-project', icon: 'mi/outline/rocket-launch' },
+    { slug: 'ai/working-with-agents', icon: 'mi/outline/chat' },
+  ]}
+/>
+
+## Tools
+
+What ships with Magma for agents, and how to set it up:
+
+<PageCards
+  pages={[
+    { slug: 'ai/guides', icon: 'mi/outline/menu-book' },
+    { slug: 'ai/mcp-server', icon: 'mi/outline/hub' },
+    { slug: 'ai/claude-code', icon: 'mi/outline/terminal' },
+  ]}
+/>
+
+The lint is a check of the project like any other, run by people and by CI too: it is
+described in [Lint](../development/lint/).
