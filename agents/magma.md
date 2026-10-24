@@ -31,18 +31,12 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.5.1: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
+As of Magma 2.6.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
 `disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
 dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
-`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), #1106 (no component
-has a category: only `mds-pref` has a `@category`, `Patterns`, and `agents/components.md` is one
-flat list; the site reads `@category` and `@parent` as proposed there, ten categories and the 38
-parts under their compound, and keeps the Components navigation a flat list of 116 entries until
-every component has one of them: it does not invent the categories. To preview the grouped
-navigation, add the tags to a copy of `documentation.json` in a scratch worktree, never in the
-repository), and the epic #693 (theme studio, for the Themes and preferences page).
+`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693 (theme studio, for the Themes and preferences page).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -50,7 +44,9 @@ on the props that take a format: the preview placeholders), #960, #981 (`CHANGEL
 `exports`: the Changelog page reads it), #983, #984, #1037 (`mds-entity` has 2px between
 the name and the detail, and an `infos` part), #1040. Closed by 2.5.1: #1065 (`mds-emoji` was
 invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root; the site
-added a flat sheet to every emoji until then).
+added a flat sheet to every emoji until then). Closed by 2.6.0: #1106 (`@category` on every component
+that stands alone, ten categories, and `@parent` on the 38 parts: the Components navigation is
+grouped by category).
 
 ## Seen, not filed yet
 

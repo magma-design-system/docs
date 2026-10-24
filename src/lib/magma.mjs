@@ -64,9 +64,7 @@ export function componentTags() {
  * The category of each component and the parent of each part of a compound,
  * from the JSDoc of documentation.json: `@category <id>` on a component that
  * stands alone, `@parent <tag>` on a part (its direct parent, the first one
- * where it names several). Proposed in
- * https://github.com/magma-design-system/magma/issues/1106: until Magma ships them, only
- * `mds-pref` has a category.
+ * where it names several). Shipped since Magma 2.6.0 (magma#1106).
  * @returns {{ categories: Map<string, string>, parents: Map<string, string> }}
  */
 export function componentTaxonomy() {

@@ -185,9 +185,9 @@ export const sections = [
 ];
 
 /**
- * The categories of the components (`@category` in documentation.json), as
- * proposed in https://github.com/magma-design-system/magma/issues/1106, in the order
- * of the section navigation, each labelled `nav.components.<id>`.
+ * The categories of the components (`@category` in documentation.json, since
+ * Magma 2.6.0), in the order of the section navigation, each labelled
+ * `nav.components.<id>`.
  */
 export const COMPONENT_CATEGORIES = [
   'actions',
@@ -205,9 +205,9 @@ export const COMPONENT_CATEGORIES = [
 /**
  * The component pages of the section navigation: a group per category, with
  * the components that stand alone; their parts (`@parent`) are listed in the
- * right column of their pages (DocsNav.astro). A flat list of every tag while
- * a component has neither a category of the list nor a parent: Magma does not
- * sort its components yet, https://github.com/magma-design-system/magma/issues/1106.
+ * right column of their pages (DocsNav.astro). A flat list of every tag when a
+ * component has neither a category of the list nor a parent, rather than a
+ * page missing from the navigation: a category Magma adds needs its entry here.
  */
 function componentItems() {
   const tags = componentTags();

@@ -130,8 +130,9 @@ element` does not put a text field in the table. The usage files stay Markdown w
   the splash, and Components, grouped by the `@category` of each component in
   `documentation.json` (`COMPONENT_CATEGORIES` in `nav.mjs`). The parts of a compound
   (`@parent`) are left out of the navigation and listed in the right column of their
-  component's pages (`DocsNav.astro`); a part's page highlights its component. Until Magma
-  sorts every component the navigation stays one flat list ([magma.md](magma.md)).
+  component's pages (`DocsNav.astro`); a part's page highlights its component. The
+  categories ship since Magma 2.6.0; a component with a category missing from
+  `COMPONENT_CATEGORIES` and no parent turns the navigation back into one flat list.
 - Every group of a section has an icon, drawn above its label in the section navigation:
   `GROUP_ICONS` in `nav.mjs`, keyed by the UI string of the label. Starlight's schema of a group
   is strict, and `items()` cannot run in the built pages (it reads the dictionaries from `src/`).
