@@ -38,6 +38,19 @@ dropdown inserted and removed at once no longer throws in Chromium), #1061
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693 (theme studio, for the Themes and preferences page).
 
+Found on 2.6.0 by using the lint and `magma-mcp` on the site itself (part of the epic #1083):
+#1123 (`find_icon` and the copy script of `agents/assets.md` do not turn the hyphen of a
+multi-word Material slug, `check-circle`, into the underscore of its folder, `check_circle`:
+`find_icon` calls `mi/outline/auto-awesome` missing and suggests underscore slugs), #1124
+(`check_setup` misses an icon path set with `IconsSetService.setSvgPath()`, as the site does),
+#1125 (shadow tokens read `[object Object]` in `list_tokens` and `explain_class`; `suggest_role`
+answers background roles for a `shadow-*` class), #1126 (`no-internal-tokens` does not read
+the Tailwind arbitrary properties, `[--mds-*:...]`, which is how the site sets the nine
+component custom properties it uses: all public on 2.6.0), #1127 (the tools of the MCP server
+and the descriptions of the Stylelint rules are not exported as data: the tool table of the MCP
+server page is written by hand until then). Not filed: the presets work on `.astro` templates
+through `astro-eslint-parser`, which `agents/lint.md` does not mention.
+
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
 on the props that take a format: the preview placeholders), #960, #981 (`CHANGELOG.md` in
