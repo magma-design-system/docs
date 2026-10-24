@@ -60,32 +60,23 @@
 @source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/pattern.md';
 
 /*
-  Variants of the site: `dark` follows Magma's mode classes on <html>
-  (pref-mode-*, set by mds-pref-mode), as the darkMode of Magma's Tailwind
-  preset does; `rail-collapsed` follows the state of the rail (Rail.astro).
+  The variant of the site: `rail-collapsed` follows the state of the rail
+  (Rail.astro). `dark` is Magma's (tailwind/dark-mode.css, imported by its
+  theme.css): it follows the mode set by mds-pref-mode and the named themes
+  with a scheme of their own.
 */
-@custom-variant dark {
-  &:where(.pref-mode-dark, .pref-mode-dark *) {
-    @slot;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    &:where(.pref-mode-system, .pref-mode-system *) {
-      @slot;
-    }
-  }
-}
-
 @custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
 
 /*
   Tokens of the site, with their utilities: `shadow-sticky` is the shadow of
   a sticky bar while it sticks (`data-stuck`, markStuck in
   src/scripts/icon-tiles.ts): a soft line under its bottom edge, short of
-  its corners, and nothing above it.
+  its corners, and nothing above it, in Magma's shadow ink.
 */
 @theme {
-  --shadow-sticky: 0px 13px 4px -14px rgba(0, 0, 0, 0.16), 0px 12px 6px -14px rgba(0, 0, 0, 0.1);
+  --shadow-sticky:
+    0px 13px 4px -14px rgb(var(--magma-shadow-ink) / 0.16),
+    0px 12px 6px -14px rgb(var(--magma-shadow-ink) / 0.1);
 }
 
 /*
