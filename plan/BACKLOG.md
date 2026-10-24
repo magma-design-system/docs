@@ -49,9 +49,17 @@ sketch to turn into a page.
   `disableSort`. Source: section 5 of `magma/agents/assets.md`. Then give this repository the
   same `.vscode/`.
 - **Existing vs new products** page: needs slides 31 and 44 of the Magma introduction deck.
-- Agentic development says "Every Magma package ships guides": only `magma`, `magma-react` and
-  `magma-angular` do.
-- The lint rules page, once Magma's lint exists ([DIRECTION.md](DIRECTION.md), "Lint rules").
+- Run `npm run lint` (Magma's lint on the site) in CI, next to `astro check`: today it runs
+  locally only.
+
+## AI agents
+
+- `llms.txt` at the root of the site, generated from the navigation, links only (installation,
+  the AI agents section, the packages' `AGENTS.md`): decided in the epic magma#1083, phase 6.
+- Generate the tool table of the MCP server page from the package, once magma exports the tool
+  definitions; it is written by hand until then.
+- Try the skills of the Magma plugin on this repository (`.claude/settings.json` registers it)
+  and write what they get wrong in [agents/magma.md](../agents/magma.md).
 
 ## Brand assets
 
