@@ -1,0 +1,80 @@
+---
+title: MCP server
+description: 'The MCP server that ships in the Magma package: how to set it up in Claude Code, VS Code and Cursor, and the questions an agent asks it instead of reading files.'
+---
+
+Magma ships an MCP server inside `@maggioli-design-system/magma`, the `magma-mcp` command.
+The agent's client starts it in the project, and it answers from the version installed there:
+the components and their API, the roles and the tokens, the classes of Magma's Tailwind theme,
+the icons that exist, the sections of the guides, and the lint on a snippet before it is
+written. It only reads: no tool changes a file.
+
+A question to the server costs a short answer, where the same question to the guides costs a
+file to read: the values of one prop instead of the guide of the component, the role for
+"secondary text" instead of the color guide. And what the server answers is checked against
+the package, not remembered.
+
+## Set it up
+
+There is nothing to publish or to install apart from Magma: the server runs from
+`node_modules`, on your machine, through the standard input and output of the client. It is
+not a remote service, and it is not one of the connectors of a chat app.
+
+**Claude Code**: register the [Magma plugin](../claude-code/), which starts the server and
+adds the skills. With the plugin, do not also write the entry below, or the server runs twice.
+
+**Claude Code without the plugin**: `.mcp.json` at the root of the project, committed so that
+the whole team gets it; Claude Code asks once before it starts a server of the project.
+
+```json title=".mcp.json"
+{
+  "mcpServers": {
+    "magma": { "command": "npx", "args": ["--no", "magma-mcp"] }
+  }
+}
+```
+
+**VS Code with GitHub Copilot**: `.vscode/mcp.json`.
+
+```json title=".vscode/mcp.json"
+{
+  "servers": {
+    "magma": { "type": "stdio", "command": "npx", "args": ["--no", "magma-mcp"] }
+  }
+}
+```
+
+**Cursor**: `.cursor/mcp.json`, with the same entry as Claude Code under `mcpServers`.
+
+Merge the entry into the file when it exists, never replace it. Keep `--no`: it makes `npx`
+run the installed command and stop when there is none, for instance in a fresh clone before
+`npm install`, instead of downloading whatever the npm registry has under that name. When the
+client starts servers outside the root of the project, add `"--root", "<folder>"` to `args`.
+
+## The tools
+
+| Tool             | Ask it                                                              | Instead of                          |
+| ---------------- | ------------------------------------------------------------------- | ----------------------------------- |
+| `find_component` | Which component fits a need, described in words                     | Reading the catalogue               |
+| `get_component`  | The API of one component, its public CSS properties and its guides  | Reading its `AGENTS.md`             |
+| `get_usage`      | How HTML, React or Angular write a component: import, props, events | Guessing the names of a framework   |
+| `list_tokens`    | The role for a need, with its value and its class                   | Reading the color guide             |
+| `suggest_role`   | The role that replaces a color, a raw class or a palette step       | Picking a role by eye               |
+| `explain_class`  | What a class does with Magma's Tailwind theme                       | Falling into `p-4`, which is 0.16px |
+| `find_icon`      | An icon by meaning, or whether a slug exists                        | An icon that renders nothing        |
+| `get_guide`      | One section of a guide                                              | Reading the whole guide             |
+| `check_markup`   | Whether a snippet passes the lint, before it is written             | A lint run after the fact           |
+| `check_setup`    | What the Magma setup of the project misses                          | Checking the install steps by hand  |
+
+`check_markup` runs the [lint](../../development/lint/) with the ESLint, Stylelint and
+parsers installed in the project: set the lint up first.
+
+## When the agent calls them
+
+The guide `agents/mcp.md` tells the agent when to reach for each tool:
+
+- before writing a component, `find_component`, then `get_component` and `get_usage`;
+- before a color, a spacing or a class, `list_tokens`, `suggest_role` or `explain_class`;
+- before an icon, `find_icon`;
+- after writing, `check_markup`, then the lint of the project;
+- after the setup, or when something does not render, `check_setup`.

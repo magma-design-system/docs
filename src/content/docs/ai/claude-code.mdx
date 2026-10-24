@@ -1,0 +1,58 @@
+---
+title: Claude Code plugin
+description: 'The Magma plugin for Claude Code: the MCP server and four skills that run setup, interface work, review and migration with the same procedure every time.'
+---
+
+The Magma plugin brings Magma into Claude Code in one step: it starts the
+[MCP server](../mcp-server/) of the installed version and adds four skills, procedures that
+Claude follows to run a whole job. A skill says which tools to call and in which order, and
+the facts come from the server and the guides of the project's version: the procedure is the
+same on every project, the API is always the installed one.
+
+## Register it for the team
+
+Write the plugin in the project's `.claude/settings.json`, committed with the code: everyone
+who opens the project in Claude Code gets it, in the terminal and in the desktop app, once
+they trust the folder. Merge the keys into the file when it exists.
+
+```json title=".claude/settings.json"
+{
+  "extraKnownMarketplaces": {
+    "magma": {
+      "source": { "source": "github", "repo": "magma-design-system/magma" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": { "magma@magma": true }
+}
+```
+
+The plugin is served from the Magma repository on GitHub: there is nothing else to install.
+It follows the main branch of the repository and has no version of its own, since its skills
+hold no data: what they look up comes from the Magma installed in the project.
+
+To try it on your own before the team, in a Claude Code session in the terminal:
+
+```text
+/plugin marketplace add magma-design-system/magma
+/plugin install magma@magma
+```
+
+Plugins load when a session starts: open a new session after registering it.
+
+## The skills
+
+| Skill            | Started by                               | What it does                                                                |
+| ---------------- | ---------------------------------------- | --------------------------------------------------------------------------- |
+| `/magma:setup`   | You, or Claude when asked to install     | Installs the package of the framework, follows the bootstrap of `AGENTS.md` |
+| `/magma:ui`      | Claude, on interface work in the project | Finds the component, its API, the roles and the icons, checks before saving |
+| `/magma:review`  | You, or Claude after interface work      | Runs the lint on the changed files, then what no rule sees                  |
+| `/magma:migrate` | You                                      | Moves a project from Magma 1 to Magma 2 with the codemod                    |
+
+`/magma:setup` ends with `check_setup` and a build. `/magma:review` reports each finding with
+the line, the rule or the section of the guide, and the fix, and changes the code only if you
+ask. `/magma:migrate` runs the codemod as a dry run first, writes only on a clean git tree,
+then runs the build and the lint.
+
+After a command, write what to work on: `/magma:review src/app/orders` reviews that folder
+only.

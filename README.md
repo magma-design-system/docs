@@ -59,7 +59,7 @@ built with Magma components, following the layout decisions in `plan/CONTENT_STR
 (added by [#3](https://github.com/magma-design-system/docs/pull/3)). The overrides are in
 [`src/components/frame/`](src/components/frame/), listed in `astro.config.mjs`:
 
-- **Rail** (desktop): brand, search, the 10 sections as `mds-button` links, the repository
+- **Rail** (desktop): brand, search, the 11 sections as `mds-button` links, the repository
   and Storybook links, and the preferences (`mds-pref` with mode, language and theme) in a
   dropdown. It collapses to icons with tooltips; the state is kept in `localStorage`.
 - **Section navigation**: the pages of the current section, first column of the card.

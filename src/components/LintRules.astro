@@ -1,0 +1,41 @@
+---
+// The rules of Magma's lint for the Lint page, read from the installed magma
+// (lintRules() in src/lib/magma.mjs): each rule with the tools that run it and
+// its severity in the two presets. What each rule catches is written in the
+// page.
+import Code from './Code.astro';
+import { lintRules } from '../lib/magma.mjs';
+
+const { t } = Astro.locals;
+const rules = await lintRules();
+const CELL = 'whitespace-nowrap';
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('lint.rules.rule')} />
+    <mds-table-header-cell label={t('lint.rules.tool')} />
+    <mds-table-header-cell label="recommended" />
+    <mds-table-header-cell label="strict" />
+  </mds-table-header>
+  <mds-table-body>
+    {rules.map(({ name, tools, recommended, strict }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <Code name>{name}</Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <mds-text typography="detail" class="whitespace-nowrap">
+            {tools.join(', ')}
+          </mds-text>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{recommended}</Code>
+        </mds-table-cell>
+        <mds-table-cell class={CELL}>
+          <Code>{strict}</Code>
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>
