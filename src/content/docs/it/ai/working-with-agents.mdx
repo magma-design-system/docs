@@ -1,0 +1,49 @@
+---
+title: Lavorare con un agente
+description: "Come chiedere a un agente AI lavoro sull'interfaccia in un progetto Magma, come controllare quello che ha costruito senza spendere token per ciò che può controllare una regola, e cosa cambia dopo un aggiornamento."
+---
+
+## Chiedi il risultato
+
+Chiedi quello che vuoi vedere, e lascia che sia l'agente a trovare i componenti: con le
+istruzioni di [Iniziare un progetto](../start-a-project/#dare-il-contesto-allagente), li
+cerca prima di scrivere codice, nel catalogo delle guide o con il server MCP.
+
+```text title="Prompt" wrap
+Aggiungi una pagina con l'elenco dei documenti dell'utente: una tabella con nome, data e dimensione, un campo di ricerca sopra, e un pulsante per caricare un documento.
+```
+
+Nomina un componente solo quando vuoi proprio quello: l'agente ne legge comunque l'API, e un
+nome ricordato a memoria può appartenere a un'altra versione.
+
+## Controlla quello che ha costruito
+
+Lascia agli strumenti quello che può controllare una regola. Il [lint](../../development/lint/)
+trova un valore che una prop non accetta, `disabled="false"`, un pulsante con la sola icona e
+senza nome, un colore scritto a mano o preso dalla palette di Tailwind, una regola
+`prefers-color-scheme`, una custom property che nessun componente promette. Gira in pochi
+secondi e non costa token, e l'agente legge solo quello che segnala: le guide nei pacchetti
+gli dicono di lanciare il lint dopo ogni modifica e di correggere quello che segnala prima di
+consegnare il lavoro.
+
+La revisione serve per quello che nessuna regola vede: se il componente è quello giusto per
+il compito, se gli eventi che ascolta sono quelli che il componente emette, se lo stile passa
+solo per l'API pubblica del componente. In Claude Code, `/magma:review` lancia il lint sui file
+modificati, poi controlla questi punti con il server MCP e riporta ogni problema con la sua
+correzione (vedi [Plugin per Claude Code](../claude-code/)). Con un altro agente, chiedi la
+stessa cosa:
+
+```text title="Prompt" wrap
+Rivedi il codice di interfaccia modificato su questo branch rispetto a Magma: lancia il lint e correggi quello che segnala, poi confronta ogni componente Magma con il suo pattern.md e antipattern.md.
+```
+
+## Dopo un aggiornamento
+
+Le guide, il server MCP e il lint fanno parte del pacchetto: dopo un aggiornamento l'agente
+lavora con la nuova versione, senza cambiare le tue istruzioni.
+
+Per portare un progetto da Magma 1 a Magma 2, lancia il codemod come spiega
+[Versioni e migrazioni](../../development/versions/#da-magma-1-a-magma-2), poi chiedi
+all'agente di risolvere quello che il codemod ha segnalato: per farlo legge le guide della
+nuova versione. In Claude Code, `/magma:migrate` esegue tutta la procedura: una prova a secco
+con il suo report, le modifiche su un albero git pulito, poi la build e il lint.
