@@ -22,13 +22,13 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                | Where                                       | What the site does                                                                                                                                                                                                                                                      |
-| -------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                |
-| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
-| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
-| not filed                                                            | `src/components/CopyStatus.astro`           | Reads `--mds-table-row-actions-background`, internal to `mds-table-row`, for the copy status that moves out of the actions box; the lint is off around it (see below)                                                                                                   |
-| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
+| Issue                                                                  | Where                                       | What the site does                                                                                                                                                                                                                                                      |
+| ---------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                |
+| not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
+| not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
+| [magma#1139](https://github.com/magma-design-system/magma/issues/1139) | `src/components/CopyStatus.astro`           | Reads `--mds-table-row-actions-background`, internal to `mds-table-row`, for the copy status that moves out of the actions box; the lint is off around it                                                                                                               |
+| not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
 
 ## Open Magma issues that concern the site
 
@@ -37,7 +37,10 @@ As of Magma 2.7.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` stil
 dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
-`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693 (theme studio, for the Themes and preferences page).
+`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), the epic #693 (theme
+studio, for the Themes and preferences page), and #1139 (the background of the actions box of
+`mds-table-row`, `--mds-table-row-actions-background`, is internal: `CopyStatus.astro` reads
+it, with the lint off around it).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -107,10 +110,5 @@ against open issues before filing.
   for download.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).
-- `mds-table-row` keeps the background of its actions box (hover, selected, sorted, overlay
-  actions) in `--mds-table-row-actions-background`, which is internal: content in the `action`
-  slot that leaves the box, as the copy status of `CopyStatus.astro` does to stay on screen,
-  cannot paint the same background with a public property. Ask: make it public, read-only
-  (2.7.0).
 - Lint: the presets work on `.astro` templates through `astro-eslint-parser`, which
   `agents/lint.md` does not mention (2.6.0, still in 2.7.0).

@@ -13,8 +13,9 @@
 // `position: sticky` would (script below), with the row's background under
 // it, since it moves away from the actions box mds-table-row draws. That
 // background is in --mds-table-row-actions-background, which mds-table-row
-// keeps internal: no public property gives it (not filed yet, see
-// agents/magma.md), so the lint makes an exception here.
+// keeps internal: no public property gives it
+// (https://github.com/magma-design-system/magma/issues/1139), so the lint
+// makes an exception here.
 interface Props {
   note?: string;
 }
