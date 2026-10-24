@@ -1,0 +1,9 @@
+{
+  "extraKnownMarketplaces": {
+    "magma": {
+      "source": { "source": "github", "repo": "magma-design-system/magma" },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": { "magma@magma": true }
+}

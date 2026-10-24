@@ -1,0 +1,69 @@
+---
+// The tools of Magma's MCP server for its page, read from the installed magma
+// (mcpTools() in src/lib/magma.mjs): the tools and their arguments come from
+// the package, what to ask each one and what it saves from the page, in its
+// language (`notes`: the tool's name to those two texts, `code` between
+// backticks). A tool the page has no notes for shows its title from the
+// package, in English, and the build warns: write its notes.
+import Code from './Code.astro';
+import { mcpTools } from '../lib/magma.mjs';
+
+interface Props {
+  notes: Record<string, [ask: string, instead: string]>;
+}
+
+const { notes } = Astro.props;
+const { t } = Astro.locals;
+const tools = mcpTools();
+const CELL = 'whitespace-nowrap';
+
+for (const { name } of tools) {
+  if (!notes[name])
+    console.warn(`[McpTools] ${Astro.url.pathname}: no notes for ${name}, its title shows`);
+}
+for (const name of Object.keys(notes)) {
+  if (!tools.some((tool) => tool.name === name))
+    console.warn(`[McpTools] ${Astro.url.pathname}: ${name} is not a tool of magma-mcp`);
+}
+
+/** A text of the notes, with the parts between backticks as code. */
+const parts = (text: string) => text.split('`');
+---
+
+<mds-table>
+  <mds-table-header>
+    <mds-table-header-cell label={t('mcp.tools.tool')} />
+    <mds-table-header-cell label={t('mcp.tools.ask')} />
+    <mds-table-header-cell label={t('mcp.tools.instead')} />
+    <mds-table-header-cell label={t('mcp.tools.args')} />
+  </mds-table-header>
+  <mds-table-body>
+    {tools.map(({ name, title, args }) => (
+      <mds-table-row>
+        <mds-table-cell class={CELL}>
+          <Code name>{name}</Code>
+        </mds-table-cell>
+        {notes[name] ? (
+          notes[name].map((text) => (
+            <mds-table-cell class={CELL}>
+              {parts(text).map((part, index) => (index % 2 ? <Code>{part}</Code> : part))}
+            </mds-table-cell>
+          ))
+        ) : (
+          <>
+            <mds-table-cell class={CELL} lang="en">
+              {title}
+            </mds-table-cell>
+            <mds-table-cell class={CELL} />
+          </>
+        )}
+        <mds-table-cell class={CELL}>
+          {args.map((arg, index) => [
+            index > 0 && ', ',
+            <Code>{arg.required ? arg.name : `${arg.name}?`}</Code>,
+          ])}
+        </mds-table-cell>
+      </mds-table-row>
+    ))}
+  </mds-table-body>
+</mds-table>

@@ -1,7 +1,9 @@
 // The sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
-// of the current page from Starlight and the icon from here.
+// of the current page from Starlight and the icon from here. After Foundation
+// they go from the sections of a page down to the values: building blocks,
+// patterns, components, then tokens and icons.
 import { existsSync, readFileSync } from 'node:fs';
 import { componentTags, componentTaxonomy } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
@@ -47,6 +49,34 @@ export const sections = [
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
       },
+    ],
+  },
+  {
+    id: 'blocks',
+    icon: 'mi/outline/extension',
+    soon: true,
+    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
+  },
+  {
+    id: 'patterns',
+    icon: 'mi/outline/view-quilt',
+    soon: true,
+    // The groups of the landing page, in its order.
+    items: () =>
+      published([
+        { slug: 'patterns', ...sidebarLabel('nav.overview') },
+        {
+          ...sidebarLabel('nav.patterns.data'),
+          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
+        },
+      ]),
+  },
+  {
+    id: 'components',
+    icon: 'mi/outline/widgets',
+    items: () => [
+      { ...sidebarLabel('nav.components.overview'), link: '/components/' },
+      ...componentItems(),
     ],
   },
   {
@@ -104,34 +134,6 @@ export const sections = [
     ],
   },
   {
-    id: 'components',
-    icon: 'mi/outline/widgets',
-    items: () => [
-      { ...sidebarLabel('nav.components.overview'), link: '/components/' },
-      ...componentItems(),
-    ],
-  },
-  {
-    id: 'blocks',
-    icon: 'mi/outline/extension',
-    soon: true,
-    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
-  },
-  {
-    id: 'patterns',
-    icon: 'mi/outline/view-quilt',
-    soon: true,
-    // The groups of the landing page, in its order.
-    items: () =>
-      published([
-        { slug: 'patterns', ...sidebarLabel('nav.overview') },
-        {
-          ...sidebarLabel('nav.patterns.data'),
-          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
-        },
-      ]),
-  },
-  {
     id: 'brand',
     icon: 'mi/outline/design-services',
     items: () => [
@@ -160,9 +162,25 @@ export const sections = [
         ...sidebarLabel('nav.development.guides'),
         items: [
           { slug: 'development/installation' },
-          { slug: 'development/agentic-development' },
+          { slug: 'development/lint' },
           { slug: 'development/versions' },
         ],
+      },
+    ],
+  },
+  {
+    id: 'ai',
+    icon: 'mi/outline/auto-awesome',
+    // The groups of the landing page, in its order.
+    items: () => [
+      { slug: 'ai', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.ai.start'),
+        items: [{ slug: 'ai/start-a-project' }, { slug: 'ai/working-with-agents' }],
+      },
+      {
+        ...sidebarLabel('nav.ai.tools'),
+        items: [{ slug: 'ai/guides' }, { slug: 'ai/mcp-server' }, { slug: 'ai/claude-code' }],
       },
     ],
   },
@@ -185,9 +203,9 @@ export const sections = [
 ];
 
 /**
- * The categories of the components (`@category` in documentation.json), as
- * proposed in https://github.com/magma-design-system/magma/issues/1106, in the order
- * of the section navigation, each labelled `nav.components.<id>`.
+ * The categories of the components (`@category` in documentation.json, since
+ * Magma 2.6.0), in the order of the section navigation, each labelled
+ * `nav.components.<id>`.
  */
 export const COMPONENT_CATEGORIES = [
   'actions',
@@ -205,9 +223,9 @@ export const COMPONENT_CATEGORIES = [
 /**
  * The component pages of the section navigation: a group per category, with
  * the components that stand alone; their parts (`@parent`) are listed in the
- * right column of their pages (DocsNav.astro). A flat list of every tag while
- * a component has neither a category of the list nor a parent: Magma does not
- * sort its components yet, https://github.com/magma-design-system/magma/issues/1106.
+ * right column of their pages (DocsNav.astro). A flat list of every tag when a
+ * component has neither a category of the list nor a parent, rather than a
+ * page missing from the navigation: a category Magma adds needs its entry here.
  */
 function componentItems() {
   const tags = componentTags();
@@ -243,6 +261,8 @@ export const GROUP_ICONS = {
   'nav.brand.assets': 'mi/outline/collections',
   'nav.brand.package': 'mi/outline/inventory-2',
   'nav.development.guides': 'mi/outline/menu-book',
+  'nav.ai.start': 'mi/outline/rocket-launch',
+  'nav.ai.tools': 'mi/outline/handyman',
   'nav.community.participate': 'mi/outline/handshake',
   'nav.community.about': 'mi/outline/info',
   'nav.components.actions': 'mdi/button-pointer',

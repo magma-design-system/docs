@@ -1,0 +1,40 @@
+---
+title: Guides in the package
+description: 'The Markdown guides for AI agents that ship in the Magma component packages: what each file holds, and why they are split by task.'
+---
+
+The component packages, `magma`, `magma-react` and `magma-angular`, ship guides written for
+AI coding agents: Markdown files inside the package, released with it. An agent that reads
+them works with the components of the version you installed, and any agent that reads files
+can use them, with no setup.
+
+## Split by task
+
+The guides are many small files rather than one large one, so that the agent reads only what
+the task needs: the map in `AGENTS.md`, the catalogue to choose a component, then only the
+guides of the components it picks. A page with a table and a button costs the guides of two
+components, not of a hundred.
+
+When the [MCP server](../mcp-server/) is set up, the agent asks it the same things and reads
+even less: one section of a guide, the values of one prop, the role for one need.
+
+## What each file holds
+
+| File                                            | What the agent finds there                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `AGENTS.md`                                     | How to install Magma, then the map of the other files                                           |
+| `agents/install.md`, `agents/assets.md`         | The install steps of the package, and the styles, fonts and icons every project shares          |
+| `agents/components.md`                          | The catalogue: every component in one line, by category, with a link to its own guide           |
+| `<tag>/AGENTS.md`                               | The API of one component: props and their values, events, methods, slots, parts, CSS properties |
+| `<tag>/pattern.md`, `<tag>/antipattern.md`      | How to use the component, with examples, and the mistakes to avoid                              |
+| `agents/conventions.md`                         | The rules shared by every component: naming, events, slots, icons, accessibility, styling       |
+| `agents/variants.md`, `agents/anti-patterns.md` | The values of `variant` and `tone`, and the mistakes to avoid with any component                |
+| `agents/color.md`, `agents/typography.md`       | Coloring and setting text in your own interface with Magma's tokens and utilities               |
+| `agents/theming.md`                             | Dark mode and the other preferences, named themes, surfaces and elevation, corners              |
+| `agents/lint.md`                                | Setting up the lint, and what each rule catches                                                 |
+| `agents/mcp.md`                                 | Setting up the MCP server, its tools and when to call each one                                  |
+| `agents/reporting.md`                           | How to report a problem that is Magma's and not the project's                                   |
+
+The guides of each component are in `@maggioli-design-system/magma/dist/collection/components/<tag>/`,
+also when the project uses a wrapper: the catalogue links them. `dist/documentation.json` of
+magma has the same data for tools, too large to give to an agent whole.

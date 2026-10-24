@@ -5,19 +5,20 @@ description: Installing and using Magma in Vanilla, React and Angular projects, 
 
 import PageCards from '../../../components/PageCards.astro';
 
-How to install Magma in Vanilla, React and Angular projects, how to work with AI agents, how
-to bring it into existing and new products, and how its versions change. The other pages of
-this section are being written.
+How to install Magma in Vanilla, React and Angular projects, how to check a project with its
+lint, how to bring it into existing and new products, and how its versions change. Working with
+AI agents has a section of its own, [Agentic development](../ai/). The other pages of this section are
+being written.
 
 ## Guides
 
-How to install Magma in a project, work with it through AI agents and move from one version to
+How to install Magma in a project, check the code with its lint and move from one version to
 the next:
 
 <PageCards
   pages={[
     { slug: 'development/installation', icon: 'mi/outline/download' },
-    { slug: 'development/agentic-development', icon: 'mi/outline/smart-toy' },
+    { slug: 'development/lint', icon: 'mi/outline/rule' },
     { slug: 'development/versions', icon: 'mi/outline/history' },
   ]}
 />
@@ -60,5 +61,6 @@ its own in the Pattern and Antipattern pages of its [documentation](../component
 - **Forms as native forms.** Magma's fields work inside a `<form>` like native controls:
   with a `name` they are submitted, reset and validated by the form itself.
 
-The packages hold the same rules for AI agents, in `agents/conventions.md` and
-`agents/anti-patterns.md`: see [Agentic development](agentic-development/).
+The [lint](lint/) checks several of them on every change. The packages hold the same rules
+for AI agents, in `agents/conventions.md` and `agents/anti-patterns.md`: see
+[Agentic development](../ai/).

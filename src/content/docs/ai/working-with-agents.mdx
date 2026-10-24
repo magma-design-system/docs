@@ -1,0 +1,47 @@
+---
+title: Working with an agent
+description: 'How to ask an AI agent for interface work in a Magma project, how to check what it built without spending tokens on what a rule can check, and what changes after an update.'
+---
+
+## Ask for the result
+
+Ask for what you want to see, and let the agent find the components: with the instructions
+of [Start a project](../start-a-project/#give-the-agent-the-context), it looks them up before
+writing code, in the catalogue of the guides or with the MCP server.
+
+```text title="Prompt" wrap
+Add a page with the list of the user's documents: a table with name, date and size, a search field above it, and a button to upload a document.
+```
+
+Name a component only when you want that one: the agent reads its API anyway, and a name
+from memory may belong to another version.
+
+## Check what it built
+
+Leave to the tools what a rule can check. The [lint](../../development/lint/) finds a value
+a prop does not take, `disabled="false"`, a button with only an icon and no name, a color
+written by hand or taken from Tailwind's palette, a `prefers-color-scheme` rule, a custom
+property that no component promises. It runs in seconds and costs no tokens, and the agent
+reads only what it reports: the guides in the packages tell it to run the lint after every
+change and to fix what it reports before handing the work over.
+
+The review is for what no rule can see: whether the component fits the job, whether the
+events it listens to are the ones the component emits, whether it is styled only through the
+public API of the component. In Claude Code, `/magma:review` runs the lint on the changed
+files, then checks these with the MCP server and reports each finding with its fix (see
+[Claude Code plugin](../claude-code/)). With another agent, ask for the same:
+
+```text title="Prompt" wrap
+Review the UI code changed on this branch against Magma: run the lint and fix what it reports, then compare each Magma component with its pattern.md and antipattern.md.
+```
+
+## After an update
+
+The guides, the MCP server and the lint are part of the package: after an update the agent
+works with the new version, with no change to your instructions.
+
+To move a project from Magma 1 to Magma 2, run the codemod as
+[Versions and migrations](../../development/versions/#from-magma-1-to-magma-2) says, then
+ask the agent to resolve what the codemod reported: it reads the guides of the new version to
+do it. In Claude Code, `/magma:migrate` runs the whole procedure: a dry run with its report,
+the changes on a clean git tree, then the build and the lint.

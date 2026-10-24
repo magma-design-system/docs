@@ -18,5 +18,7 @@ npm-debug.log*
 # macOS
 .DS_Store
 
-# Claude Code: local launch configs, mockups and worktrees
-.claude/
+# Claude Code: local launch configs, mockups and worktrees; the project
+# settings (the Magma plugin) are shared
+.claude/*
+!.claude/settings.json

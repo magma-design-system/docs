@@ -72,7 +72,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | Path                                                 | What                                                                                    |
 | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | `astro.config.mjs`                                   | Starlight setup, the frame overrides, `base: '/docs'`                                   |
-| `src/lib/nav.mjs`                                    | The 10 rail sections and their navigation (Starlight's sidebar), `soon`, drafts         |
+| `src/lib/nav.mjs`                                    | The 11 rail sections and their navigation (Starlight's sidebar), `soon`, drafts         |
 | `src/lib/magma.mjs`                                  | The only door to the Magma packages                                                     |
 | `src/lib/tokens.mjs`, `icons.mjs`, `identity.mjs`    | Data of the Tokens, Icons and Brand assets sections, read from the packages             |
 | `src/lib/changelog.mjs`                              | The releases of the Changelog page, from the CHANGELOG.md of the packages               |

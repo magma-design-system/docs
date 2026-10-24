@@ -30,9 +30,9 @@ guides ship in the package (`AGENTS.md`, `agents/*.md`, per-component `AGENTS.md
    component with its defaults (most cases), then semantic tokens through Tailwind for
    layout, and only last the theming of a component. Token pages open by saying when
    you do not need them.
-3. **Patterns before more tokens.** Whole screens for the applications Maggioli builds
-   (lists, details, forms, states), with code to copy in HTML, React and Angular. See
-   "Patterns section" below.
+3. **Patterns before more tokens.** Solutions to the tasks the applications Maggioli builds
+   meet again and again (lists, details, forms, states), with code to copy in HTML, React
+   and Angular. See "Patterns section" below.
 4. **Governance only where it pays, and in code.** No review boards: rules that run in
    the editor, in CI and in the agent's loop. Errors for what is broken or not
    accessible; token discipline as a warning in existing products, an error in new
@@ -89,18 +89,23 @@ First release: `valid-attribute-values`, `no-false-boolean`, `accessible-name`,
 
 ## Building blocks section
 
-A rail item between Components and Patterns, coming soon like Patterns (landing page only).
-A building block is a group of components that screens reuse in the same arrangement (page
-header, filter bar, results summary, form section, action bar, empty or error state,
-confirmation dialog): no data and no business logic, its rules are about structure and
-layout. A pattern is a whole screen or task: blocks plus behavior over time (state, what
-follows an action, loading, errors, focus). Blocks are not designed in advance: a part of a
-screen becomes a block when it comes back in two or three patterns. Candidates from list
-with filters: page header, filter bar, results summary, empty and error states.
+The rail item after Foundation, before Patterns and Components (decided 2026-10-24, see the
+order in CONTENT_STRUCTURE.md), coming soon like Patterns (landing page only). A building
+block is a section of a page that comes back in the same arrangement (page header, filter
+bar, results summary, form section, action bar): no data, no business logic and no behavior of
+its own, its rules are about structure and layout. A pattern is the solution to a task that
+people carry out again and again: behavior over time (what follows an action, state, loading,
+errors, focus) with the structure it needs. Blocks are about space, patterns about time.
+Blocks are not designed in advance: a section of a page becomes a block when it comes back in
+two or three patterns. Candidates from list with filters: page header, filter bar, results
+summary. The confirmation dialog and the empty and error states, listed as blocks before
+2026-10-24, are patterns: their parts come from a component (`mds-modal`, `mds-zero`), what
+matters is when they appear and what follows.
 
 ## Patterns section
 
-A ninth rail item, after Components. Section navigation mirrors the landing groups.
+A rail item between Building blocks and Components. Section navigation mirrors the landing
+groups.
 
 Coming soon (2026-10-15): the section is public only as its landing page, which says what is
 coming (`soon: true` in `src/lib/nav.mjs`, `ComingSoon.astro`, a badge on the home card). The
@@ -108,10 +113,11 @@ pattern pages are drafts (`draft: true`): in dev they are in the section navigat
 production build leaves them out, with their live previews (`published` in `nav.mjs`).
 Remove `draft` from a page when it is ready, and `soon` from the section with the first one.
 
-- **Overview**: what a pattern is here (a whole screen or task, not one component), how
-  to read a page.
-- **Page structure**: app shell (`mds-header`, `mds-header-bar`, `mds-pref`), page
-  header (title, `mds-breadcrumb`, actions), navigation within a page (`mds-tab`).
+- **Overview**: what a pattern is here (the solution to a task, not one component, not a
+  section of a page), how to read a page.
+- **Navigation**: moving between pages and between the views of a page (`mds-header`,
+  `mds-header-bar`, `mds-breadcrumb`, `mds-tab`); the app shell and the page header are
+  building blocks.
 - **Data**: list with filters and pagination (`mds-filter`, `mds-table`,
   `mds-paginator`), detail of a record (`mds-details`, `mds-entity`, `mds-label`,
   `mds-badge`), search, bulk actions (`mds-button-dropdown`).
@@ -163,3 +169,35 @@ Open questions:
   `pattern.md` / `antipattern.md`). The section is called Patterns for now; either it
   takes another name, or the sub-pages are labelled differently on the site.
 - The "Mistakes to avoid" of a pattern will link to the lint rules once they exist.
+
+## Product layers (proposal)
+
+Proposed on 2026-10-24, not decided. Products need their own blocks and patterns (the records
+of a domain, its procedures), and agents should apply them together with Magma's. Documenting
+each product inside Magma is the wrong way: the products are a catalogue of needs, not the
+solution, and a pattern is worth something because it is the same everywhere.
+
+- **Layers of the same shape.** Magma ships the default: blocks, patterns, their "Always true"
+  rules, the agent guides, the lint configuration. A product layer has the same shape and may
+  add (its own blocks and patterns) and narrow (choose among the options the default leaves
+  open: columns, filters, row actions, labels), never contradict an "Always true" rule: the lint
+  reports it.
+- **Promotion.** A block or a pattern that comes back in the layers of two or three products is
+  proposed for the default, as blocks come out of patterns.
+- **Where they live.** The default is published as a package, so that this site reads it from
+  `node_modules` like the rest (the code of `src/patterns/` moves there). Better as a project of
+  the Magma monorepo, like the lint: a change to a component that breaks a block or a pattern
+  fails in the same pull request, and they are released together. The product layers live in a
+  private repository of the organization (visibility is set per repository, and the
+  organization's repositories are public), one folder per product with its `CODEOWNERS`, each
+  published to a private registry as a package that depends on the default.
+- **Agents.** A product installs its layer: its `AGENTS.md` sits in `node_modules` next to
+  Magma's, and the agent reads the default first, then the product's choices. The `AGENTS.md`
+  of the product (Agentic development) points to both.
+- **On the site.** Only the default. Each block and pattern page separates what is always true
+  from what the product decides; one page explains the shape of a layer, with an invented
+  product, once the mechanism exists.
+
+To check: where the default lives (a project of the monorepo or a repository of its own), what
+the organization's GitHub plan allows on private repositories (branch protection, required
+reviews), the token the products' CI needs to read the private registry.
