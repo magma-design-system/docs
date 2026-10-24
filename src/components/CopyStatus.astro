@@ -11,7 +11,10 @@
 //
 // The div keeps the status in the part of a tall row that is on screen, as
 // `position: sticky` would (script below), with the row's background under
-// it, since it moves away from the actions box mds-table-row draws.
+// it, since it moves away from the actions box mds-table-row draws. That
+// background is in --mds-table-row-actions-background, which mds-table-row
+// keeps internal: no public property gives it (not filed yet, see
+// agents/magma.md), so the lint makes an exception here.
 interface Props {
   note?: string;
 }
@@ -20,11 +23,13 @@ const { note } = Astro.props;
 const { t } = Astro.locals;
 ---
 
+{/* eslint-disable magma/no-internal-tokens */}
 <div
   slot="action"
   class="translate-y-(--copy-status-offset) bg-(--mds-table-row-actions-background) my-0"
   data-copy-status-wrap
 >
+  {/* eslint-enable magma/no-internal-tokens */}
   {note ? (
     <mds-text
       typography="caption"

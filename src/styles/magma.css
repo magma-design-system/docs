@@ -277,9 +277,12 @@ mds-button[icon='mi/baseline/arrow-forward'] {
     the :host and ::slotted() rules of a component. mds-header-bar is centered
     by its :host margins and spaced by the ::slotted() margins of mds-header
     (the inline appearance): put them back, the spacing comes from the custom
-    property mds-header still sets.
+    property mds-header still sets. It is internal, the margin of the current
+    viewport: its public inputs would mean copying Magma's defaults and its
+    breakpoint here, so the lint makes an exception (agents/magma.md).
   */
   mds-header-bar {
+    /* stylelint-disable-next-line magma/no-internal-tokens */
     @apply mx-auto my-[var(--mds-header-inline-margin-current,0)];
   }
 

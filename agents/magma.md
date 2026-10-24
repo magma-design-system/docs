@@ -22,34 +22,22 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                | Where                                       | What the site does                                                                                                                                                               |
-| -------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                         |
-| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                      |
-| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                   |
-| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset |
+| Issue                                                                | Where                                       | What the site does                                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                |
+| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
+| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
+| not filed                                                            | `src/components/CopyStatus.astro`           | Reads `--mds-table-row-actions-background`, internal to `mds-table-row`, for the copy status that moves out of the actions box; the lint is off around it (see below)                                                                                                   |
+| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.6.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
+As of Magma 2.7.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
 `disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
 dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693 (theme studio, for the Themes and preferences page).
-
-Found on 2.6.0 by using the lint and `magma-mcp` on the site itself (part of the epic #1083):
-#1123 (`find_icon` and the copy script of `agents/assets.md` do not turn the hyphen of a
-multi-word Material slug, `check-circle`, into the underscore of its folder, `check_circle`:
-`find_icon` calls `mi/outline/auto-awesome` missing and suggests underscore slugs), #1124
-(`check_setup` misses an icon path set with `IconsSetService.setSvgPath()`, as the site does),
-#1125 (shadow tokens read `[object Object]` in `list_tokens` and `explain_class`; `suggest_role`
-answers background roles for a `shadow-*` class), #1126 (`no-internal-tokens` does not read
-the Tailwind arbitrary properties, `[--mds-*:...]`, which is how the site sets the nine
-component custom properties it uses: all public on 2.6.0), #1127 (the tools of the MCP server
-and the descriptions of the Stylelint rules are not exported as data: the tool table of the MCP
-server page is written by hand until then). Not filed: the presets work on `.astro` templates
-through `astro-eslint-parser`, which `agents/lint.md` does not mention.
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -59,7 +47,17 @@ the name and the detail, and an `infos` part), #1040. Closed by 2.5.1: #1065 (`m
 invisible in Firefox: `transform-style: preserve-3d` on the `svg` of its shadow root; the site
 added a flat sheet to every emoji until then). Closed by 2.6.0: #1106 (`@category` on every component
 that stands alone, ten categories, and `@parent` on the 38 parts: the Components navigation is
-grouped by category).
+grouped by category). Closed by 2.7.0, found on 2.6.0 by using the lint and `magma-mcp` on the
+site itself (epic #1083): #1123 (multi-word Material slugs: `find_icon` and the copy script of
+`agents/assets.md` turn the hyphen of `check-circle` into the underscore of its folder), #1124
+(`check_setup` sees the icon path set with `IconsSetService.setSvgPath()`: it answers `ok` on
+the site), #1125 (shadow tokens read as CSS in `list_tokens` and `explain_class`;
+`suggest_role` keeps the utility of the class it gets), #1126 (`no-internal-tokens` reads the
+custom properties of Tailwind classes, `[--mds-*:...]` and `bg-(--mds-*)`, and of `@apply`: it
+then found `CopyStatus.astro` reading an internal one, see the workarounds), #1127
+(`dist/lint/mcp/tools.json`, the answer of `tools/list`: the tool table of the MCP server page
+reads it; the Stylelint rules have `meta.description`, and the `url` of every rule links the
+installed release).
 
 ## Seen, not filed yet
 
@@ -109,3 +107,10 @@ against open issues before filing.
   for download.
 - `mds-emoji`: its methods report no state and fire no event, so a page that must not cut an
   expression short keeps its promises (2.3.0, still in 2.5.0).
+- `mds-table-row` keeps the background of its actions box (hover, selected, sorted, overlay
+  actions) in `--mds-table-row-actions-background`, which is internal: content in the `action`
+  slot that leaves the box, as the copy status of `CopyStatus.astro` does to stay on screen,
+  cannot paint the same background with a public property. Ask: make it public, read-only
+  (2.7.0).
+- Lint: the presets work on `.astro` templates through `astro-eslint-parser`, which
+  `agents/lint.md` does not mention (2.6.0, still in 2.7.0).
