@@ -1,20 +1,23 @@
 ---
 title: Patterns
-description: Whole screens built with Magma components - lists, details, forms - with their behavior, their accessibility and the code for HTML, React and Angular.
+description: Solutions to the tasks people carry out again and again - confirming an action, searching a list, filling in a form - with their behavior, their accessibility and the code for HTML, React and Angular.
 ---
 
 import ComingSoon from '../../../components/ComingSoon.astro';
 
 <ComingSoon text="The first patterns are being written. They will appear here once they are complete enough to copy into a product." />
 
-A component solves one part of a screen; a product is made of screens. A pattern is a screen,
-or a task, that the products of Maggioli Group build again and again - a list to search, the
-detail of a record, a form to fill in - put together from Magma components, with the
-decisions the components cannot take on their own: what the page shows when nothing matches,
-what goes into the address, what a screen reader hears.
+A component solves one part of a screen; people come to a product to get something done. A
+pattern is the solution to a task that the products of Maggioli Group meet again and again -
+confirming an action, searching a list, filling in a form - put together from Magma components
+and [building blocks](../blocks/), with the decisions the components cannot take on their own:
+what follows an action, what the page shows when nothing matches, what goes into the address,
+where the focus goes, what a screen reader hears.
 
-Between the two sit the [building blocks](../blocks/): the parts of a screen that come back in
-many patterns, such as the header of a page or a bar of filters.
+The heart of a pattern is its behavior, so its size varies. It can be as small as a button that
+opens a dialog: what the dialog asks, where the focus goes when it closes, which message follows.
+Or as large as a whole page, such as a list to search and narrow down. A component is imported
+ready to use; a pattern is applied, following its guide and its code.
 
 ## What a pattern page holds
 
@@ -32,4 +35,5 @@ project where Magma is installed, replace the demo data with your back end, and 
   went wrong.
 
 The Pattern and Antipattern pages of each [component](../components/) already show how to use
-that component on its own. This section will show how the components work together.
+that component on its own. This section will show how components and building blocks work
+together to complete a task.

@@ -1,15 +1,26 @@
 # Patterns and building blocks
 
-The two sections after Components. Why they exist and what they will hold:
-[plan/DIRECTION.md](../plan/DIRECTION.md) ("Patterns section", "Building blocks section").
+The two sections before Components: the rail goes Building blocks, Patterns, Components. Why
+they exist and what they will hold: [plan/DIRECTION.md](../plan/DIRECTION.md) ("Patterns
+section", "Building blocks section").
 
-- A **component** is one Magma element.
-- A **building block** is a group of components that screens reuse in the same arrangement (page
-  header, filter bar, empty state, confirmation dialog): structure and layout, no data, no
-  business logic. A part of a screen becomes a block when it comes back in two or three
-  patterns; blocks are not designed in advance.
-- A **pattern** is a whole screen or task: blocks plus behavior over time (state, what follows
-  an action, loading, errors, focus), with code in HTML, React and Angular.
+- A **component** is one Magma element: it is imported ready to use.
+- A **building block** is a section of a page that comes back in the same arrangement (page
+  header, filter bar, results summary, form section, action bar): structure and layout, no
+  data, no business logic, no behavior of its own. A section becomes a block when it comes back
+  in two or three patterns; blocks are not designed in advance.
+- A **pattern** is the solution to a task that people carry out again and again (confirm an
+  action, search a list, fill in a form). Its heart is behavior over time (what follows an
+  action, state, loading, errors, focus), with the structure it needs: components and blocks.
+  It can be as small as a button that opens a dialog or as large as a whole page. It is applied,
+  following its guide and its code in HTML, React and Angular, not imported.
+
+Decided on 2026-10-24: blocks are about space, patterns about time. Before, a pattern was "a
+whole screen or task", and the confirmation dialog and the empty and error states were listed
+as blocks: they are patterns, since their parts come from a component (`mds-modal`,
+`mds-zero`) and what matters is when they appear and what follows. The definition follows the
+common root of the term: a pattern is named by the recurring problem it solves, not by its
+size.
 
 ## State
 

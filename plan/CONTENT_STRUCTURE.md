@@ -6,22 +6,29 @@ Decided on 2026-10-08.
 
 ## Navigation (11 rail items)
 
-| Rail                | Pages                                                                                                      | Source                              |
-| ------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                  | deck                                |
-| Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)               | deck + new writing                  |
-| Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma) | `design-tokens`, `styles`           |
-| Icons               | Library, semantic dictionary                                                                               | `svg-icons`, `icons`                |
-| Components          | One page per component                                                                                     | `magma/dist/documentation.json`     |
-| Building blocks     | Parts of a screen made of components (page header, filter bar, ...): structure and layout, no data         | written here, see `DIRECTION.md`    |
-| Patterns            | Whole screens (list with filters, ...) with code in HTML, React and Angular                                | written here, see `DIRECTION.md`    |
-| Brands / Assets     | Logos, illustrations, avatars                                                                              | `identity`                          |
-| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations | deck + `AGENTS.md`                  |
-| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin              | `AGENTS.md`, `agents/*.md` of magma |
-| Community           | Support, feature requests, contributions, training                                                         | deck + Magma GitHub issue templates |
+| Rail                | Pages                                                                                                         | Source                              |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                     | deck                                |
+| Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                  | deck + new writing                  |
+| Building blocks     | Recurring sections of a page made of components (page header, filter bar, ...): structure and layout, no data | written here, see `DIRECTION.md`    |
+| Patterns            | Solutions to recurring tasks (confirm an action, ...): behavior first, with code in HTML, React and Angular   | written here, see `DIRECTION.md`    |
+| Components          | One page per component                                                                                        | `magma/dist/documentation.json`     |
+| Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma)    | `design-tokens`, `styles`           |
+| Icons               | Library, semantic dictionary                                                                                  | `svg-icons`, `icons`                |
+| Brands / Assets     | Logos, illustrations, avatars                                                                                 | `identity`                          |
+| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                  |
+| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin                 | `AGENTS.md`, `agents/*.md` of magma |
+| Community           | Support, feature requests, contributions, training                                                            | deck + Magma GitHub issue templates |
 
 Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes only from
 `node_modules`. Guidelines prose (principles, content design, patterns) is written here.
+
+Order (decided 2026-10-24): after Foundation the rail goes from the sections of a page down to
+the values: Building blocks, Patterns, Components, then Tokens and Icons. Building blocks are
+about space (a section of a page), patterns about time (what follows an action), components are
+the parts both are made of; tokens and icons come after, as DIRECTION.md orders by how often
+they are needed. Components keeps its place, the fifth item of the rail; Building blocks and
+Patterns stand before it even while they are coming soon.
 
 ## From the deck, kept
 

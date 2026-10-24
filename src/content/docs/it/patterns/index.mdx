@@ -1,20 +1,24 @@
 ---
 title: Pattern
-description: Schermate intere costruite con i componenti Magma - liste, dettagli, form - con il loro comportamento, la loro accessibilità e il codice per HTML, React e Angular.
+description: Soluzioni ai compiti che le persone svolgono di continuo - confermare un'azione, cercare in una lista, compilare un form - con il loro comportamento, la loro accessibilità e il codice per HTML, React e Angular.
 ---
 
 import ComingSoon from '../../../../components/ComingSoon.astro';
 
 <ComingSoon text="I primi pattern sono in scrittura. Compariranno qui quando saranno abbastanza completi da copiarli in un prodotto." />
 
-Un componente risolve una parte di una schermata; un prodotto è fatto di schermate. Un pattern è
-una schermata, o un compito, che i prodotti del Gruppo Maggioli costruiscono di continuo - una
-lista in cui cercare, il dettaglio di un record, un form da compilare - montata con i componenti
-Magma, insieme alle decisioni che i componenti da soli non possono prendere: cosa mostra la
-pagina quando non trova nulla, cosa va nell'indirizzo, cosa sente chi usa un lettore di schermo.
+Un componente risolve una parte di una schermata; chi usa un prodotto vuole portare a termine
+qualcosa. Un pattern è la soluzione a un compito che i prodotti del Gruppo Maggioli incontrano di
+continuo - confermare un'azione, cercare in una lista, compilare un form - montata con i
+componenti Magma e i [building block](../blocks/), insieme alle decisioni che i componenti da
+soli non possono prendere: cosa segue un'azione, cosa mostra la pagina quando non trova nulla,
+cosa va nell'indirizzo, dove va il focus, cosa sente chi usa un lettore di schermo.
 
-Nel mezzo ci sono i [building block](../blocks/): le parti di una schermata che tornano in molti
-pattern, come l'intestazione di una pagina o una barra di filtri.
+Il cuore di un pattern è il suo comportamento, per questo la sua misura cambia. Può essere
+piccolo come un pulsante che apre una finestra di dialogo: cosa chiede la finestra, dove torna il
+focus quando si chiude, quale messaggio segue. Oppure grande come una pagina intera, come una
+lista in cui cercare e restringere i risultati. Un componente si importa pronto; un pattern si
+applica, seguendo la sua guida e il suo codice.
 
 ## Cosa contiene la pagina di un pattern
 
@@ -33,4 +37,5 @@ funziona.
   qualcosa è andato storto.
 
 Le pagine Pattern e Antipattern di ogni [componente](../components/) mostrano già come usare quel
-componente da solo. Questa sezione mostrerà come i componenti lavorano insieme.
+componente da solo. Questa sezione mostrerà come componenti e building block lavorano insieme
+per portare a termine un compito.
