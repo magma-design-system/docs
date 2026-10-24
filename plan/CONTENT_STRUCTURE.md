@@ -17,7 +17,7 @@ Decided on 2026-10-08.
 | Patterns            | Whole screens (list with filters, ...) with code in HTML, React and Angular                                | written here, see `DIRECTION.md`    |
 | Brands / Assets     | Logos, illustrations, avatars                                                                              | `identity`                          |
 | Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations | deck + `AGENTS.md`                  |
-| AI agents           | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin              | `AGENTS.md`, `agents/*.md` of magma |
+| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin              | `AGENTS.md`, `agents/*.md` of magma |
 | Community           | Support, feature requests, contributions, training                                                         | deck + Magma GitHub issue templates |
 
 Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes only from
@@ -80,11 +80,12 @@ only until Magma publishes translations.
    still to be defined. The usage Description opens the component's main page (Overview);
    Pattern and Antipattern are separate sub-pages, so the right and the wrong forms are
    never mixed (decided 2026-10-09).
-5. AI agents is a section of its own (decided 2026-10-24), after Development: with Magma 2.6.0
+5. Agentic development is a section of its own (decided 2026-10-24, at `/ai/`), after Development: with Magma 2.6.0
    the agent tooling of the epic magma#1083 (guides in the package, MCP server, Claude Code
    plugin and skills, lint) is more than one page of Development can hold. Its message is
    that the work is optimized, not only integrated with AI: the model is kept for what needs
    judgment, and what is mechanical goes to tools that answer the same way every time and cost
-   no tokens. The lint keeps its page in Development, since people and CI use it too; the AI
-   section presents it as a step of the agent's work and links it. The old page
+   no tokens. The lint keeps its page in Development, since people and CI use it too; the
+   section presents it as a step of the agent's work and links it. The name says the practice,
+   not the tool (first "AI agents", renamed the same day); the URL stays the short `/ai/`. The old page
    `/development/agentic-development/` redirects to `/ai/start-a-project/`.

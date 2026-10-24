@@ -52,10 +52,10 @@ sketch to turn into a page.
 - Run `npm run lint` (Magma's lint on the site) in CI, next to `astro check`: today it runs
   locally only.
 
-## AI agents
+## Agentic development
 
 - `llms.txt` at the root of the site, generated from the navigation, links only (installation,
-  the AI agents section, the packages' `AGENTS.md`): decided in the epic magma#1083, phase 6.
+  the Agentic development section, the packages' `AGENTS.md`): decided in the epic magma#1083, phase 6.
 - Generate the tool table of the MCP server page from the package, once magma exports the tool
   definitions (magma#1127); it is written by hand until then.
 - Try the skills of the Magma plugin on this repository (`.claude/settings.json` registers it)
