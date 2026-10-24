@@ -132,10 +132,14 @@ Cosa trova ognuna:
   decorativa.
 - **`no-raw-palette-classes`**: le classi di colore nominano un ruolo, come
   `bg-surface-raised`, mai la palette di Tailwind (`bg-white`) o un passo delle palette di
-  Magma, che seguono la modalità ma non i temi né la preferenza di contrasto.
-- **`no-internal-tokens`**: un progetto imposta solo le custom property CSS che un componente
-  promette, quelle pubbliche elencate nella sua API. Le altre possono cambiare in qualunque
-  versione.
+  Magma, che seguono la modalità ma non i temi né la preferenza di contrasto. Una classe
+  viene letta ovunque un template la scriva, compresi `clsx()`, i ternari e `[ngClass]` di
+  Angular, e nell'`@apply` di un foglio di stile; non una classe composta a runtime
+  (`bg-${tone}-03`).
+- **`no-internal-tokens`**: un progetto imposta o legge solo le custom property CSS che un
+  componente promette, quelle pubbliche elencate nella sua API: in un foglio di stile, in uno
+  stile inline e in una classe Tailwind (`[--mds-card-background:...]`, `bg-(--mds-...)`). Le
+  altre possono cambiare in qualunque versione.
 - **`no-color-scheme-override`**: nessuna media query `prefers-color-scheme`: segue il
   sistema, non la modalità scelta nella pagina. I ruoli seguono entrambi; per una scelta che
   cambia con la modalità, usa la variante `dark` del tema Tailwind di Magma.

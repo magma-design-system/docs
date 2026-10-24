@@ -130,9 +130,13 @@ What each one catches:
   decorative.
 - **`no-raw-palette-classes`**: color classes name a role, such as `bg-surface-raised`,
   never Tailwind's palette (`bg-white`) or a step of Magma's palettes, which follow the mode
-  but not the themes or the contrast preference.
-- **`no-internal-tokens`**: a project sets only the CSS custom properties a component
-  promises, the public ones listed in its API. The others may change in any release.
+  but not the themes or the contrast preference. A class is read wherever a template writes
+  it, `clsx()`, ternaries and Angular's `[ngClass]` included, and in the `@apply` of a
+  stylesheet; a class put together at run time (`bg-${tone}-03`) is not.
+- **`no-internal-tokens`**: a project sets or reads only the CSS custom properties a
+  component promises, the public ones listed in its API: in a stylesheet, in an inline style
+  and in a Tailwind class (`[--mds-card-background:...]`, `bg-(--mds-...)`). The others may
+  change in any release.
 - **`no-color-scheme-override`**: no `prefers-color-scheme` media query: it follows the
   system, not the mode chosen on the page. The roles follow both; for a choice that differs
   per mode, use the `dark` variant of Magma's Tailwind theme.
