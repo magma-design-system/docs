@@ -1,0 +1,146 @@
+---
+title: Iniziare un progetto
+description: "Installare Magma in un progetto insieme a un agente AI di sviluppo, e dare all'agente il contesto che gli serve per lavorare con la versione che hai installato."
+---
+
+import FrameworkTabs from '../../../../components/FrameworkTabs.astro';
+
+## Installare Magma
+
+Crea l'app con lo strumento del tuo framework, poi installa il pacchetto di Magma: da quel
+momento le sue guide sono in `node_modules`, dove l'agente può leggerle.
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```bash
+npm create vite@latest my-app -- --template vanilla
+cd my-app
+npm i @maggioli-design-system/magma
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```bash
+npm create vite@latest my-app -- --template react
+cd my-app
+npm i @maggioli-design-system/magma-react @maggioli-design-system/magma
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```bash
+npx @angular/cli new my-app
+cd my-app
+npm i @maggioli-design-system/magma-angular @maggioli-design-system/magma
+```
+
+</Fragment>
+</FrameworkTabs>
+
+Poi chiedi all'agente di installare il resto:
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```text title="Prompt" wrap
+Leggi node_modules/@maggioli-design-system/magma/AGENTS.md e seguilo per installare Magma in questo progetto.
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```text title="Prompt" wrap
+Leggi node_modules/@maggioli-design-system/magma-react/AGENTS.md e seguilo per installare Magma in questo progetto.
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```text title="Prompt" wrap
+Leggi node_modules/@maggioli-design-system/magma-angular/AGENTS.md e seguilo per installare Magma in questo progetto.
+```
+
+</Fragment>
+</FrameworkTabs>
+
+In Claude Code con il [plugin di Magma](../claude-code/), `/magma:setup` fa la stessa cosa,
+e installa anche il pacchetto del tuo framework.
+
+La guida dice all'agente di guardare prima il progetto (framework, bundler, Tailwind,
+rendering lato server, editor), di chiederti solo quello che non riesce a capire da solo,
+come da dove sono servite le icone o se vuoi la modalità scura, e poi di configurare, in
+ordine:
+
+- gli stili, i font e le icone, e la registrazione dei componenti;
+- i suggerimenti dell'editor, per i token e le classi;
+- il [lint](../../development/lint/), nelle configurazioni di ESLint e Stylelint del
+  progetto;
+- il [server MCP](../mcp-server/): il plugin di Magma in Claude Code, una voce nella
+  configurazione degli altri client.
+
+Finisce con una build, un componente nella pagina, un'icona caricata e il lint senza errori.
+Lo strumento `check_setup` del server MCP elenca poi quello che manca ancora al progetto,
+ogni voce con la guida che la risolve.
+
+Controlla il risultato con [Installazione](../../development/installation/): gli stessi
+passaggi, scritti per le persone.
+
+## Dare il contesto all'agente
+
+Un agente inizia ogni sessione da zero. Scrivi nel file di istruzioni del progetto dove si
+trova il contesto di Magma, e lo leggerà ogni volta: `AGENTS.md` alla radice del progetto è
+letto da molti agenti. Claude Code legge `CLAUDE.md`: scrivici `@AGENTS.md` e leggerà lo
+stesso file.
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```md title="AGENTS.md" wrap
+## Interfaccia utente: Magma
+
+L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-design-system/magma`). Prima di scrivere codice di interfaccia, leggi `node_modules/@maggioli-design-system/magma/AGENTS.md`, sezione "Using the components", e solo i file a cui rimanda che ti servono:
+
+- scegli i componenti da `agents/components.md`, il catalogo;
+- per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
+- colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
+
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```md title="AGENTS.md" wrap
+## Interfaccia utente: Magma
+
+L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-design-system/magma-react`). Prima di scrivere codice di interfaccia, leggi `node_modules/@maggioli-design-system/magma-react/AGENTS.md`, sezione "Using the components", e solo i file a cui rimanda che ti servono:
+
+- scegli i componenti da `agents/components.md`, il catalogo;
+- per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
+- colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
+
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```md title="AGENTS.md" wrap
+## Interfaccia utente: Magma
+
+L'interfaccia è costruita con Magma, il design system di Maggioli (`@maggioli-design-system/magma-angular`). Prima di scrivere codice di interfaccia, leggi `node_modules/@maggioli-design-system/magma-angular/AGENTS.md`, sezione "Using the components", e solo i file a cui rimanda che ti servono:
+
+- scegli i componenti da `agents/components.md`, il catalogo;
+- per ogni componente che usi, leggi il suo `AGENTS.md`, `pattern.md` e `antipattern.md`;
+- colori, testo e spaziature vengono dai token e dalle utility di Magma (`agents/color.md`, `agents/typography.md`), mai da valori scritti a mano.
+
+Quando il server MCP `magma` è disponibile, chiedi a lui invece di leggere i file. Dopo ogni modifica, lancia il lint e correggi quello che segnala. Non indovinare mai una proprietà, un valore o un evento: le guide descrivono la versione installata.
+```
+
+</Fragment>
+</FrameworkTabs>
+
+Cosa contiene ogni guida è in [Le guide nel pacchetto](../guides/).

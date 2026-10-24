@@ -51,6 +51,63 @@ export function magmaRequirements() {
 }
 
 /**
+ * The rules of Magma's lint, read from the ESLint and Stylelint plugins of the
+ * installed magma (`magma/eslint`, `magma/stylelint/*`), in the order of the
+ * plugins: each rule with the tools that run it and its severity in the
+ * `recommended` and `strict` presets (`error` or `warn`).
+ * @returns {Promise<{ name: string, tools: string[], recommended: string, strict: string }[]>}
+ */
+export async function lintRules() {
+  const eslint = (await import('@maggioli-design-system/magma/eslint')).default;
+  const stylelint = {
+    recommended: (await import('@maggioli-design-system/magma/stylelint/recommended')).default,
+    strict: (await import('@maggioli-design-system/magma/stylelint/strict')).default,
+  };
+  /** @type {Map<string, { name: string, tools: string[], recommended: string, strict: string }>} */
+  const rules = new Map();
+  const rule = (/** @type {string} */ name) => {
+    const short = name.replace(/^magma\//, '');
+    if (!rules.has(short))
+      rules.set(short, { name: short, tools: [], recommended: '', strict: '' });
+    return /** @type {NonNullable<ReturnType<typeof rules.get>>} */ (rules.get(short));
+  };
+  for (const preset of /** @type {const} */ (['recommended', 'strict'])) {
+    for (const [name, level] of Object.entries(eslint.configs[preset].rules ?? {})) {
+      const entry = rule(name);
+      if (!entry.tools.includes('ESLint')) entry.tools.push('ESLint');
+      entry[preset] = Array.isArray(level) ? String(level[0]) : String(level);
+    }
+    for (const [name, value] of Object.entries(stylelint[preset].rules ?? {})) {
+      const entry = rule(name);
+      if (!entry.tools.includes('Stylelint')) entry.tools.push('Stylelint');
+      // Stylelint: `true` is an error, `[true, { severity: 'warning' }]` a warning.
+      const severity = Array.isArray(value) ? value[1]?.severity : undefined;
+      const level = severity === 'warning' ? 'warn' : 'error';
+      // A rule run by both tools has the same severity in each.
+      entry[preset] ||= level;
+    }
+  }
+  return [...rules.values()];
+}
+
+/**
+ * The tools of the installed `magma-mcp`, in its order, from the definitions
+ * magma exports as data (`dist/lint/mcp/tools.json`, what `tools/list`
+ * answers; magma#1127): each tool with its title and its arguments, the
+ * required ones flagged.
+ * @returns {{ name: string, title: string, args: { name: string, required: boolean }[] }[]}
+ */
+export function mcpTools() {
+  /** @type {{ tools: { name: string, title: string, inputSchema: { properties?: object, required?: string[] } }[] }} */
+  const { tools } = require(resolveMagma('magma/dist/lint/mcp/tools.json'));
+  return tools.map(({ name, title, inputSchema: { properties = {}, required = [] } }) => ({
+    name,
+    title,
+    args: Object.keys(properties).map((arg) => ({ name: arg, required: required.includes(arg) })),
+  }));
+}
+
+/**
  * Sorted list of component tags, used by the sidebar and the routes.
  * @returns {string[]}
  */
@@ -64,9 +121,7 @@ export function componentTags() {
  * The category of each component and the parent of each part of a compound,
  * from the JSDoc of documentation.json: `@category <id>` on a component that
  * stands alone, `@parent <tag>` on a part (its direct parent, the first one
- * where it names several). Proposed in
- * https://github.com/magma-design-system/magma/issues/1106: until Magma ships them, only
- * `mds-pref` has a category.
+ * where it names several). Shipped since Magma 2.6.0 (magma#1106).
  * @returns {{ categories: Map<string, string>, parents: Map<string, string> }}
  */
 export function componentTaxonomy() {

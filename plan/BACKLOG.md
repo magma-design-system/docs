@@ -49,9 +49,15 @@ sketch to turn into a page.
   `disableSort`. Source: section 5 of `magma/agents/assets.md`. Then give this repository the
   same `.vscode/`.
 - **Existing vs new products** page: needs slides 31 and 44 of the Magma introduction deck.
-- Agentic development says "Every Magma package ships guides": only `magma`, `magma-react` and
-  `magma-angular` do.
-- The lint rules page, once Magma's lint exists ([DIRECTION.md](DIRECTION.md), "Lint rules").
+- Run `npm run lint` (Magma's lint on the site) in CI, next to `astro check`: today it runs
+  locally only.
+
+## Agentic development
+
+- `llms.txt` at the root of the site, generated from the navigation, links only (installation,
+  the Agentic development section, the packages' `AGENTS.md`): decided in the epic magma#1083, phase 6.
+- Try the skills of the Magma plugin on this repository (`.claude/settings.json` registers it)
+  and write what they get wrong in [agents/magma.md](../agents/magma.md).
 
 ## Brand assets
 

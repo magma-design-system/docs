@@ -14,6 +14,7 @@
     "preview": "astro preview",
     "check": "astro check",
     "check:authors": "node scripts/check-authors.mjs",
+    "lint": "eslint src && stylelint \"src/**/*.css\"",
     "screenshots": "node scripts/screenshots.mjs",
     "astro": "astro",
     "format": "prettier --write .",
@@ -31,13 +32,13 @@
     "@iconsauce/mdi-svg": "1.1.0",
     "@iconsauce/mgg-icons": "1.2.0",
     "@lobehub/icons-static-svg": "1.98.0",
-    "@maggioli-design-system/design-tokens": "15.2.2",
+    "@maggioli-design-system/design-tokens": "15.3.0",
     "@maggioli-design-system/icons": "1.95.0",
     "@maggioli-design-system/identity": "2.2.0",
-    "@maggioli-design-system/magma": "2.5.1",
-    "@maggioli-design-system/magma-angular": "2.5.1",
-    "@maggioli-design-system/magma-react": "2.5.1",
-    "@maggioli-design-system/styles": "17.3.0",
+    "@maggioli-design-system/magma": "2.7.0",
+    "@maggioli-design-system/magma-angular": "2.7.0",
+    "@maggioli-design-system/magma-react": "2.7.0",
+    "@maggioli-design-system/styles": "17.4.0",
     "@maggioli-design-system/svg-icons": "4.6.0",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.4.2",
@@ -47,8 +48,13 @@
   },
   "devDependencies": {
     "@astrojs/check": "0.9.12",
+    "@html-eslint/parser": "0.67.0",
+    "astro-eslint-parser": "3.2.0",
+    "eslint": "10.13.0",
     "prettier": "3.9.10",
     "prettier-plugin-astro": "1.1.2",
-    "typescript": "6.0.3"
+    "stylelint": "17.16.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0"
   }
 }

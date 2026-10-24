@@ -45,6 +45,12 @@ const favicons = [
 export default defineConfig({
   site: 'https://magma-design-system.github.io',
   base,
+  // Pages that moved, so that links from elsewhere keep working. The source is
+  // under `base`; the destination is not: Astro writes it as it is.
+  redirects: {
+    '/development/agentic-development/': `${base}/ai/start-a-project/`,
+    '/it/development/agentic-development/': `${base}/it/ai/start-a-project/`,
+  },
   integrations: [
     starlight({
       title: 'Magma',
