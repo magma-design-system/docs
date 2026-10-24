@@ -1,33 +1,36 @@
 ---
 title: Building blocks
-description: The parts of a screen that come back again and again - the header of a page, a bar of filters, an empty state - made of Magma components, with their structure and their layout.
+description: The sections of a page that come back again and again - the header of a page, a bar of filters, the summary of the results - made of Magma components, with their structure and their layout.
 ---
 
 import ComingSoon from '../../../components/ComingSoon.astro';
 
 <ComingSoon text="The building blocks are being written, together with the first patterns they come from." />
 
-Between a component and a whole screen there is a middle size. A building block is a group of
-Magma components that screens use again and again, in the same arrangement: the header of a
-page with its title and its actions, a bar of filters, the summary of the results, a section of
-a form, a bar of actions, an empty or an error state, a dialog that asks for confirmation.
+A page is made of sections, and many of them come back from one product to the next. A building
+block is one of those sections, made of Magma components and always arranged the same way: the
+header of a page with its title and its actions, a bar of filters, the summary of the results, a
+section of a form, a bar of actions.
 
 A building block holds no data and no business logic. Its rules are about structure and layout:
 which parts it has and which of them are optional, in which order they come, how it adapts to
-the width of the screen.
+the width of the screen. What happens when people use it belongs to the
+[patterns](../patterns/).
 
 ## Components, blocks, patterns
 
-- A **component** is one Magma element, such as a button or a field: Magma ships it ready.
-- A **building block** puts components together into a part of a screen.
-- A **pattern** is a whole screen or task: building blocks, plus what happens over time -
-  where the state lives, what follows an action, loading, errors, focus.
+- A **component** is one Magma element, such as a button or a field: Magma ships it ready, and
+  you import it.
+- A **building block** puts components together into a section of a page: it is about space.
+- A **pattern** is the solution to a task that people carry out again and again: it is about
+  time - what follows an action, where the state lives, loading, errors, focus. It uses
+  components and building blocks, and you apply it rather than import it.
 
 ## Where they come from
 
-The building blocks are not designed in advance: they come out of the [patterns](../patterns/).
-A part of a screen becomes a block when it comes back in two or three patterns, so that it is
-written once and every screen that needs it builds it the same way.
+The building blocks are not designed in advance: they come out of the patterns. A section of a
+page becomes a block when it comes back in two or three patterns, so that it is written once and
+every page that needs it builds it the same way.
 
-Each block will have its page: its parts, the rules that always hold, its states, the components
-it is made of and its code.
+Each block will have its page: its parts, the rules that always hold, how it adapts to the
+width, the components it is made of and its code.
