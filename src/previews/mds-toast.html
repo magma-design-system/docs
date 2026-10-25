@@ -1,0 +1,13 @@
+<mds-toast visible variant="warning" duration="0" deletable>
+  <mds-icon slot="icon" name="mi/baseline/warning"></mds-icon>
+  La sessione scade tra 5 minuti
+  <mds-button slot="action" size="sm" variant="warning" tone="weak">Rinnova</mds-button>
+</mds-toast>
+<mds-button id="mostra" label="Mostra la notifica" variant="dark" tone="outline"></mds-button>
+
+<script>
+  // The toast stays until its cross closes it: the button shows it again.
+  document.getElementById('mostra').addEventListener('click', () => {
+    document.querySelector('mds-toast').visible = true;
+  });
+</script>

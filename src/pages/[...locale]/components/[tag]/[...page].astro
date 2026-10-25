@@ -10,6 +10,7 @@ import TypeLabels from '../../../../components/TypeLabels.astro';
 import UiText from '../../../../components/UiText.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
 import { methodCalls, propControl } from '../../../../lib/controls';
+import { previewOf } from '../../../../lib/previews';
 import { localeParams } from '../../../../lib/i18n.mjs';
 import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
 import { componentName } from '../../../../lib/nav.mjs';
@@ -48,6 +49,8 @@ const contentLang = locale ? 'en' : undefined;
 // (src/components/frame/PageTitle.astro).
 const name = componentName(data.tag);
 const title = page.id === 'overview' ? name : `${name} ${t(page.label)}`;
+// The preview: Magma's first Pattern example or the site's demo.
+const { example, demo, surface, width, height } = previewOf(data.tag, data.example);
 // Pattern and Antipattern pages are a usage file each, headings included.
 const guide = page.id === 'pattern' || page.id === 'antipattern' ? data[page.id] : undefined;
 
@@ -57,13 +60,13 @@ const sections = {
     {
       id: 'props',
       label: t('component.props'),
-      show: data.example !== '' && data.props.some((prop) => propControl(prop) !== undefined),
+      show: example !== '' && data.props.some((prop) => propControl(prop) !== undefined),
     },
     // The methods the preview calls (Playground.astro).
     {
       id: 'methods',
       label: t('component.methods'),
-      show: data.example !== '' && methodCalls(data.methods as any[]).length > 0,
+      show: example !== '' && methodCalls(data.methods as any[]).length > 0,
     },
     { id: 'overview', label: t('component.overview'), show: true },
     {
@@ -117,8 +120,15 @@ const DESCRIPTION = 'min-w-phrase';
 ---
 
 <StarlightPage frontmatter={{ title, description: data.summary }} headings={headings}>
-  {page.id === 'overview' && data.example !== '' && (
-    <Playground tag={data.tag} props={data.props} methods={data.methods} example={data.example} />
+  {page.id === 'overview' && example !== '' && (
+    <Playground
+      tag={data.tag}
+      props={data.props}
+      methods={data.methods}
+      example={example}
+      stage={{ surface, width, height }}
+      intro={demo ? t('component.preview.introDemo') : undefined}
+    />
   )}
 
   {page.id === 'overview' && (

@@ -69,6 +69,7 @@
   "component.generatedFrom": "Generato da",
   "component.encapsulation": "Incapsulamento",
   "component.preview.intro": "Il primo esempio della pagina Pattern, dal vivo: le maniglie alla sua destra e sotto gli danno meno o più spazio, e le superfici sotto cambiano il fondo su cui poggia.",
+  "component.preview.introDemo": "Una demo del componente, dal vivo, più ricca degli esempi della pagina Pattern: le maniglie alla sua destra e sotto le danno meno o più spazio, e le superfici sotto cambiano il fondo su cui poggia.",
   "component.preview.controls": "Cambia le sue proprietà qui sotto e l'anteprima le segue; Ripristina riporta l'esempio com'era.",
   "component.preview.title": "Anteprima di {{tag}}",
   "component.preview.reset": "Ripristina",

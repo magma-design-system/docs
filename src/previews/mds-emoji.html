@@ -1,0 +1,12 @@
+<mds-emoji name="simi" class="size-6400"></mds-emoji>
+
+<script>
+  // Simi blinks and turns toward the pointer from the start; the methods of
+  // the preview stop them and start them again.
+  customElements.whenDefined('mds-emoji').then(async () => {
+    const emoji = document.querySelector('mds-emoji');
+    await emoji.componentOnReady();
+    emoji.startBlinking();
+    emoji.startFollowMouse();
+  });
+</script>

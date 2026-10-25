@@ -1,0 +1,29 @@
+<div class="flex flex-col items-start gap-400">
+  <mds-text typography="detail" tag="p">
+    Ogni salvataggio mostra una notifica. La regione le allinea in basso, una sotto l'altra, e ne
+    tiene al massimo tre: con la quarta, la pi&ugrave; vecchia lascia il posto.
+  </mds-text>
+  <mds-button
+    id="salva"
+    label="Salva la bozza"
+    icon="mi/baseline/save"
+    variant="primary"
+    tone="strong"
+  ></mds-button>
+</div>
+<mds-toast-region></mds-toast-region>
+
+<script>
+  // A toast per save, appended to the region and removed once it closes.
+  const region = document.querySelector('mds-toast-region');
+  let saved = 0;
+  document.getElementById('salva').addEventListener('click', () => {
+    saved += 1;
+    const toast = document.createElement('mds-toast');
+    toast.variant = 'success';
+    toast.textContent = `Bozza salvata (${saved})`;
+    toast.addEventListener('mdsToastClose', () => toast.remove());
+    region.append(toast);
+    toast.visible = true;
+  });
+</script>

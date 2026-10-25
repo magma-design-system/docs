@@ -1,6 +1,7 @@
 ---
 // The preview at the top of a component's overview: its first Pattern
-// example running in an iframe (src/pages/example/[tag].astro), away from the styles of the site,
+// example, or the site's demo of it (src/lib/previews.ts), running in an
+// iframe (src/pages/example/[tag].astro), away from the styles of the site,
 // on a stage whose handles make it narrower, shorter or taller and whose
 // picker puts it on each surface (PreviewStage.astro); then, in two tabs of
 // an mds-tab (Props and Methods, no heading over them), a control for each prop that
@@ -25,6 +26,7 @@
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
+import type { Preview } from '../lib/previews';
 import Code from './Code.astro';
 import PlaygroundField from './PlaygroundField.astro';
 import PreviewStage from './PreviewStage.astro';
@@ -36,6 +38,8 @@ interface Props {
   methods?: any[];
   /** The markup the preview runs. */
   example: string;
+  /** Where the example starts: its surface and the size of the frame. */
+  stage?: Pick<Preview, 'surface' | 'width' | 'height'>;
   /** The page the preview runs, when it is not the component's example. */
   src?: string;
   /** The text above the stage, when it is not the component's one. */
@@ -44,7 +48,7 @@ interface Props {
   title?: string;
 }
 
-const { tag, props, methods = [], example, intro, title } = Astro.props;
+const { tag, props, methods = [], example, stage, intro, title } = Astro.props;
 const { t } = Astro.locals;
 const src = Astro.props.src ?? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${tag}/`;
 
@@ -89,6 +93,7 @@ const placeholder = (value: string | undefined) =>
   tag={tag}
   src={src}
   surfaces={Astro.props.src === undefined}
+  {...stage}
   title={
     title ??
     t('component.preview.title', {
