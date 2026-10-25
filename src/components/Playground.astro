@@ -8,8 +8,8 @@
 // the prop's name, its kind and its description in an mds-help; a text or
 // number field shows, while empty, an example of what the prop takes, when
 // documentation.json has one (src/lib/controls.ts). Icon props
-// (`icon`, `iconChecked`) pick from the icons Magma's usage docs use most and
-// the ones of the example, or none. A control
+// (`icon`, `iconChecked`, the `name` of mds-icon) pick from the icons Magma's
+// usage docs use most and the ones of the example, or none. A control
 // sets the prop on the element of the example; when the component changes a
 // prop itself (an accordion item opened by a click), its control follows.
 // In the second tab, a button for each method whose parameters take a value to type or
@@ -54,7 +54,9 @@ const src = Astro.props.src ?? `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}
 const ORDER: Control['kind'][] = ['enum', 'boolean', 'string', 'number'];
 // A prop that takes an icon slug, which iconsauce has to know beforehand: a
 // select of icons it collects (it reads documentation.json) instead of a field.
+// The `name` of mds-icon too.
 const ICON_PROP = /^icon(?:[A-Z]|$)/;
+const iconProp = (name: string) => ICON_PROP.test(name) || (tag === 'mds-icon' && name === 'name');
 const icons = [...new Set([...example.matchAll(ICON_SLUG)].map(([slug]) => slug))]
   .concat(usageIcons(20))
   .filter((slug, i, all) => all.indexOf(slug) === i)
@@ -64,7 +66,7 @@ const fields = props
     const control = propControl(prop);
     if (!control) return [];
     const name = prop.name as string;
-    const icon = control.kind === 'string' && ICON_PROP.test(name);
+    const icon = control.kind === 'string' && iconProp(name);
     return [{ name, docs: plainText(prop.docs), control, icon, example: propExample(prop) }];
   })
   .sort(
