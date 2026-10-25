@@ -112,3 +112,18 @@ against open issues before filing.
   expression short keeps its promises (2.3.0, still in 2.5.0).
 - Lint: the presets work on `.astro` templates through `astro-eslint-parser`, which
   `agents/lint.md` does not mention (2.6.0, still in 2.7.0).
+- Found with the component previews (2.7.0; drafts written, to file): in dark mode
+  `accent-emphasis` is a light tint, so the thumb of `mds-input-range` is light on a light
+  progress (1.61:1, after #1073) and the knob of a checked `mds-input-switch` turns dark (after
+  #869): the handle should be the light part in both modes. `mds-calendar`: the weekend days
+  inside a range keep the muted weekend text on the band (3.15:1 light, 2.16:1 dark), and the
+  weekend band is darker than the weekdays' in light, lighter in dark. `mds-modal`: at 480px or
+  less a centred window fills the viewport and its built-in close button is visible only for
+  `left` and `right`, so a phone cannot close it (the site's demo has buttons inside).
+  `mds-filter`: 4px between the label and the pill. `mds-header` hands `nav` and `menu` to its
+  bar as properties, which the bar does not write back on its attributes, the ones its CSS
+  reads: `nav` on the header changes nothing (the demo sets it on the bar too). `deletable` on `mds-toast` and
+  `mds-banner` dismisses, it deletes nothing: `dismissible`. The first examples of the
+  `pattern.md` of `mds-spinner` (hidden), `mds-tree` (no branches) and `mds-toast-region`
+  (`<body>`, no toast) do not show the component: the site gives them a demo
+  ([architecture.md](architecture.md), "Component preview").
