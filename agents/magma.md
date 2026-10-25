@@ -41,9 +41,11 @@ dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), the epic #693 (theme
-studio, for the Themes and preferences page), and #1139 (the background of the actions box of
+studio, for the Themes and preferences page), #1139 (the background of the actions box of
 `mds-table-row`, `--mds-table-row-actions-background`, is internal: `CopyStatus.astro` reads
-it, with the lint off around it).
+it, with the lint off around it), and #1140 (`startBlinking()` in the frame of the load leaves
+the open eyes of `mds-emoji` shifted for good, 48 viewBox units down on Simi: the preview demo
+calls it there).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
