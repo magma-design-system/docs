@@ -11,6 +11,7 @@ import UiText from '../../../../components/UiText.astro';
 import { componentHref, pagesOf, type ComponentPage } from '../../../../lib/components';
 import { methodCalls, propControl } from '../../../../lib/controls';
 import { previewOf } from '../../../../lib/previews';
+import { storybookHref } from '../../../../lib/storybook';
 import { localeParams } from '../../../../lib/i18n.mjs';
 import { READING, TEXT } from '../../../../lib/markdown-text.mjs';
 import { componentName } from '../../../../lib/nav.mjs';
@@ -128,6 +129,7 @@ const DESCRIPTION = 'min-w-phrase';
       example={example}
       stage={{ surface, width, height }}
       intro={demo ? t('component.preview.introDemo') : undefined}
+      storybook={await storybookHref(data.tag)}
     />
   )}
 

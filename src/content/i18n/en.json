@@ -73,6 +73,7 @@
   "component.preview.controls": "Change its props below and the preview follows; Reset brings the example back as it was.",
   "component.preview.title": "Preview of {{tag}}",
   "component.preview.reset": "Reset",
+  "component.preview.storybook": "Open in Storybook",
   "component.preview.surface": "Surface",
   "component.preview.surfaceLevel": "Surface {{surface}}",
   "component.preview.resize": "Width of the preview",

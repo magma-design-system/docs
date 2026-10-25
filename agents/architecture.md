@@ -171,6 +171,14 @@ releases.
   `operazioni-straordinarie.webp` is the cover of a Maggioli Editore book, from
   maggiolieditore.it; `empty-list.svg` (`mds-zero`) is drawn for the site, in steps of the
   brand palette.
+- next to Reset, **Open in Storybook** (`component.preview.storybook`) leads to the
+  component's docs page in Magma's Storybook, with more cases than the preview
+  ([`src/lib/storybook.ts`](../src/lib/storybook.ts)). The packages do not say which stories are
+  a component's, and the story ids do not follow the tag (`mds-icon` is `design-icon`): the build
+  reads `index.json` of the published Storybook once, and maps each entry to a tag by the folder
+  of its file (`importPath`); the shortest title is the component's own. Without the index
+  (offline, 10 seconds) the pages have no button and the build goes on. A workaround: see
+  [magma.md](magma.md).
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in

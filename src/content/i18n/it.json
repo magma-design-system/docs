@@ -73,6 +73,7 @@
   "component.preview.controls": "Cambia le sue proprietà qui sotto e l'anteprima le segue; Ripristina riporta l'esempio com'era.",
   "component.preview.title": "Anteprima di {{tag}}",
   "component.preview.reset": "Ripristina",
+  "component.preview.storybook": "Apri in Storybook",
   "component.preview.surface": "Superficie",
   "component.preview.surfaceLevel": "Superficie {{surface}}",
   "component.preview.resize": "Larghezza dell'anteprima",

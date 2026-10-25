@@ -28,6 +28,7 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 | not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
 | not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
 | [magma#1139](https://github.com/magma-design-system/magma/issues/1139) | `src/components/CopyStatus.astro`           | Reads `--mds-table-row-actions-background`, internal to `mds-table-row`, for the copy status that moves out of the actions box; the lint is off around it                                                                                                               |
+| not filed                                                              | `src/lib/storybook.ts`                      | Reads `index.json` of the published Storybook at build time for the page of each component: the packages do not ship the story ids (see below)                                                                                                                          |
 | not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
 
 ## Open Magma issues that concern the site
@@ -127,3 +128,7 @@ against open issues before filing.
   `pattern.md` of `mds-spinner` (hidden), `mds-tree` (no branches) and `mds-toast-region`
   (`<body>`, no toast) do not show the component: the site gives them a demo
   ([architecture.md](architecture.md), "Component preview").
+- The packages do not say where a component is in Storybook: no story id in
+  `documentation.json` or in the component's docs, and the ids do not follow the tag
+  (`mds-icon` is `design-icon`, `mds-input-otp` is `form-otp`). The site reads the published
+  Storybook's `index.json` instead (workarounds above) (2.7.0).
