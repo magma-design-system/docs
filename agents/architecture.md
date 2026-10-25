@@ -177,8 +177,8 @@ releases.
   a component's, and the story ids do not follow the tag (`mds-icon` is `design-icon`): the build
   reads `index.json` of the published Storybook once, and maps each entry to a tag by the folder
   of its file (`importPath`); the shortest title is the component's own. Without the index
-  (offline, 10 seconds) the pages have no button and the build goes on. A workaround: see
-  [magma.md](magma.md).
+  (offline, 10 seconds) the pages have no button and the build goes on. A workaround of
+  [magma#1148](https://github.com/magma-design-system/magma/issues/1148).
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in

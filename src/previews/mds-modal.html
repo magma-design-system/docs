@@ -21,7 +21,8 @@
 
 <script>
   // Both buttons of the dialog close it: on a narrow screen the window takes
-  // the whole screen, and there is no backdrop left to click.
+  // the whole screen, and there is no backdrop left to click nor close button
+  // to see (https://github.com/magma-design-system/magma/issues/1143).
   const modal = document.getElementById('conferma');
   document.getElementById('apri').addEventListener('click', () => {
     modal.opened = true;

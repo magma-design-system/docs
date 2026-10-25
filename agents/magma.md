@@ -28,7 +28,9 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 | not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
 | not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
 | [magma#1139](https://github.com/magma-design-system/magma/issues/1139) | `src/components/CopyStatus.astro`           | Reads `--mds-table-row-actions-background`, internal to `mds-table-row`, for the copy status that moves out of the actions box; the lint is off around it                                                                                                               |
-| not filed                                                              | `src/lib/storybook.ts`                      | Reads `index.json` of the published Storybook at build time for the page of each component: the packages do not ship the story ids (see below)                                                                                                                          |
+| [magma#1148](https://github.com/magma-design-system/magma/issues/1148) | `src/lib/storybook.ts`                      | Reads `index.json` of the published Storybook at build time for the page of each component: the packages do not ship the story ids                                                                                                                                      |
+| [magma#1143](https://github.com/magma-design-system/magma/issues/1143) | `src/previews/mds-modal.html`               | Buttons inside the dialog close it: on a narrow screen the window fills the viewport and the built-in close button stays hidden                                                                                                                                         |
+| [magma#1147](https://github.com/magma-design-system/magma/issues/1147) | `src/previews/mds-header.html`              | `nav="all"` on the bar too: `mds-header` hands its `nav` to the bar as a property the bar never writes on the attribute its CSS reads                                                                                                                                   |
 | not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
 
 ## Open Magma issues that concern the site
@@ -62,6 +64,17 @@ then found `CopyStatus.astro` reading an internal one, see the workarounds), #11
 (`dist/lint/mcp/tools.json`, the answer of `tools/list`: the tool table of the MCP server page
 reads it; the Stylelint rules have `meta.description`, and the `url` of every rule links the
 installed release).
+
+Filed on 2026-10-25 from the component previews (2.7.0, docs#79): #1141 (dark mode: the thumb
+of `mds-input-range` is light on the light accent of the progress, 1.61:1, and the knob of a
+checked `mds-input-switch` turns dark; after #1073 and #869), #1142 (`mds-calendar`: the weekend
+days inside a range lose contrast, 3.15:1 light, 2.16:1 dark), #1143 (`mds-modal`: at 480px or
+less a centred window fills the viewport and the built-in close button shows only for `left`
+and `right`; see the workarounds), #1144 (`mds-filter`: 4px between the label and the items),
+#1145 (`dismissible` for the `deletable` of `mds-toast` and `mds-banner`), #1146 (the first
+Pattern examples of `mds-spinner`, `mds-tree` and `mds-toast-region` do not show the component:
+the site gives them a demo), #1147 (`mds-header` never hands `nav` and `menu` to its bar; see the
+workarounds), #1148 (no story ids in the packages; see the workarounds).
 
 ## Seen, not filed yet
 
@@ -113,22 +126,3 @@ against open issues before filing.
   expression short keeps its promises (2.3.0, still in 2.5.0).
 - Lint: the presets work on `.astro` templates through `astro-eslint-parser`, which
   `agents/lint.md` does not mention (2.6.0, still in 2.7.0).
-- Found with the component previews (2.7.0; drafts written, to file): in dark mode
-  `accent-emphasis` is a light tint, so the thumb of `mds-input-range` is light on a light
-  progress (1.61:1, after #1073) and the knob of a checked `mds-input-switch` turns dark (after
-  #869): the handle should be the light part in both modes. `mds-calendar`: the weekend days
-  inside a range keep the muted weekend text on the band (3.15:1 light, 2.16:1 dark), and the
-  weekend band is darker than the weekdays' in light, lighter in dark. `mds-modal`: at 480px or
-  less a centred window fills the viewport and its built-in close button is visible only for
-  `left` and `right`, so a phone cannot close it (the site's demo has buttons inside).
-  `mds-filter`: 4px between the label and the pill. `mds-header` hands `nav` and `menu` to its
-  bar as properties, which the bar does not write back on its attributes, the ones its CSS
-  reads: `nav` on the header changes nothing (the demo sets it on the bar too). `deletable` on `mds-toast` and
-  `mds-banner` dismisses, it deletes nothing: `dismissible`. The first examples of the
-  `pattern.md` of `mds-spinner` (hidden), `mds-tree` (no branches) and `mds-toast-region`
-  (`<body>`, no toast) do not show the component: the site gives them a demo
-  ([architecture.md](architecture.md), "Component preview").
-- The packages do not say where a component is in Storybook: no story id in
-  `documentation.json` or in the component's docs, and the ids do not follow the tag
-  (`mds-icon` is `design-icon`, `mds-input-otp` is `form-otp`). The site reads the published
-  Storybook's `index.json` instead (workarounds above) (2.7.0).

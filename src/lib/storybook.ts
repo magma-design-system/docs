@@ -1,8 +1,9 @@
 // The page of each component in Magma's Storybook, for the button next to
 // Reset under its preview (Playground.astro): its stories, with more cases than
 // the preview has. The packages do not say which stories are a component's
-// (not filed yet, see agents/magma.md), and the ids of the stories do not
-// follow the tag (`mds-icon` is `design-icon`, `mds-input-otp` is `form-otp`).
+// (https://github.com/magma-design-system/magma/issues/1148), and the ids of
+// the stories do not follow the tag (`mds-icon` is `design-icon`,
+// `mds-input-otp` is `form-otp`).
 // Until they do, the site reads the index of the published Storybook once per
 // build: each entry names the file it comes from
 // (`./src/components/<tag>/...`). A component's own page is the one with the
