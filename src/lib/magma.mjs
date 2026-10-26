@@ -26,6 +26,20 @@ export function loadComponentDocs() {
   return componentDocs;
 }
 
+/**
+ * The page of a component in Magma's published Storybook: its docs page, with
+ * every story. documentation.json gives the address of Storybook and the id of
+ * each component's page, since the ids do not follow the tags (`mds-img` is
+ * `ui-image`).
+ * @param {string} tag
+ * @returns {string | undefined}
+ */
+export function storybookPage(tag) {
+  const docs = loadComponentDocs();
+  const id = docs.components.find((/** @type {{ tag: string }} */ c) => c.tag === tag)?.storybook;
+  return id ? `${docs.storybook}?path=/docs/${id}` : undefined;
+}
+
 /** Installed version of a Magma package, for "built against" notices. */
 export function magmaVersion(pkg = 'magma') {
   return require(resolveMagma(`${pkg}/package.json`)).version;

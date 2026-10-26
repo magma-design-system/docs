@@ -23,7 +23,7 @@
 // page on the same stage, with its own texts and without controls or
 // surfaces: a page paints its own; the buttons of the `actions` slot go next
 // to Reset. Next to Reset too, the component's page in Magma's Storybook,
-// with more cases than the preview (src/lib/storybook.ts).
+// with more cases than the preview (storybookPage() in src/lib/magma.mjs).
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
@@ -43,7 +43,7 @@ interface Props {
   stage?: Pick<Preview, 'surface' | 'width' | 'height'>;
   /** The page the preview runs, when it is not the component's example. */
   src?: string;
-  /** The component's page in Magma's Storybook (src/lib/storybook.ts). */
+  /** The component's page in Magma's Storybook (storybookPage() in src/lib/magma.mjs). */
   storybook?: string;
   /** The text above the stage, when it is not the component's one. */
   intro?: string;
