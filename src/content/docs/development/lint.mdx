@@ -128,6 +128,10 @@ What each one catches:
 - **`accessible-name`**: a control that shows only its icon has a `label` or an
   `aria-label` that says the action, and an `mds-img` has an `alt`, empty when the image is
   decorative.
+- **`no-deprecated`**: a prop the API marks as deprecated still works until the next major,
+  which removes it. The message says what to use instead, such as `dismissible` in place of
+  the `deletable` of `mds-toast`. The prop is reported written as an attribute or bound in a
+  framework, whatever its value.
 - **`no-raw-palette-classes`**: color classes name a role, such as `bg-surface-raised`,
   never Tailwind's palette (`bg-white`) or a step of Magma's palettes, which follow the mode
   but not the themes or the contrast preference. A class is read wherever a template writes

@@ -1,0 +1,31 @@
+<mds-button
+  id="apri"
+  label="Elimina la bozza"
+  icon="mi/baseline/delete"
+  variant="error"
+  tone="weak"
+></mds-button>
+
+<mds-modal id="conferma">
+  <div class="grid gap-400 p-600">
+    <mds-text typography="h5" tag="h2">Eliminare la bozza?</mds-text>
+    <mds-text typography="detail" tag="p">
+      La bozza della pratica 0142/2025 verr&agrave; eliminata, con i suoi allegati.
+    </mds-text>
+    <div class="flex flex-wrap justify-end gap-200">
+      <mds-button id="annulla" label="Annulla" variant="dark" tone="outline"></mds-button>
+      <mds-button id="elimina" label="Elimina" variant="error" tone="strong"></mds-button>
+    </div>
+  </div>
+</mds-modal>
+
+<script>
+  // Both buttons of the dialog answer its question, and close it.
+  const modal = document.getElementById('conferma');
+  document.getElementById('apri').addEventListener('click', () => {
+    modal.opened = true;
+  });
+  for (const id of ['annulla', 'elimina']) {
+    document.getElementById(id).addEventListener('click', () => modal.close());
+  }
+</script>

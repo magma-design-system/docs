@@ -1,20 +1,22 @@
 ---
 // The live preview of a component, shown in an iframe on its overview
 // (src/components/Playground.astro): the first example of its Pattern usage
-// file, alone on a page with Magma's styles and loader, away from the styles
-// of the site. Scripts of the example run as they are written. One page per
-// component for every language: the examples are in Italian only.
+// file, or the demo the site gives it (src/lib/previews.ts), alone on a page
+// with Magma's styles and loader, away from the styles of the site. Scripts of
+// the example run as they are written. One page per component for every
+// language: the examples are in Italian only.
 // The example flows as on any page, so each component takes the width it has
 // there (a badge its own, a field or a table the whole line; in a flex row
 // fields shrink to nothing), from the top of the frame, as a page starts, and
 // without Astro's dev toolbar, which would cover it in dev.
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { previewOf } from '../../lib/previews';
 import '../../styles/magma.css';
 
 export async function getStaticPaths() {
   const components = await getCollection('components');
   return components
-    .filter((entry) => entry.data.example !== '')
+    .filter((entry) => previewOf(entry.id, entry.data.example).example !== '')
     .map((entry) => ({ params: { tag: entry.id }, props: { entry } }));
 }
 
@@ -22,7 +24,8 @@ interface Props {
   entry: CollectionEntry<'components'>;
 }
 
-const { tag, example } = Astro.props.entry.data;
+const { tag } = Astro.props.entry.data;
+const { example, demo, surface, edgeToEdge } = previewOf(tag, Astro.props.entry.data.example);
 
 // The usage files point their images at files of a product the site does not
 // have (/logo.svg, ./logo.svg, /img/copertina.jpg) or at example.com, a domain
@@ -33,7 +36,8 @@ const { tag, example } = Astro.props.entry.data;
 // (src/pages/downloads/identity), any other image the cover of the site
 // (public/covers), whose proportions suit an illustration too (mds-img takes
 // the whole width it has: a square logo would be as tall as the frame).
-// Videos are left as they are: no package has one.
+// Videos are left as they are: no package has one. A demo of the site has
+// images of the site already.
 const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
 const LOGO = `${base}downloads/identity/internal/magma-design-system/logo-magma.svg`;
 const AVATAR = `${base}downloads/identity/avatar/avatar-magma-256w.png`;
@@ -41,15 +45,15 @@ const COVER = `${base}covers/og-1200x630.png`;
 // The components whose image is the photo of a person.
 const PEOPLE = new Set(['mds-author', 'mds-avatar', 'mds-entity']);
 const IMAGE = /(?<=\b(?:src|poster)=")[^"]+\.(?:jpe?g|png|webp|gif|svg)(?=")/g;
-const html = example.replace(IMAGE, (url) =>
-  /(?:^|\/)logo[^/]*$/.test(url) ? LOGO : PEOPLE.has(tag) ? AVATAR : COVER,
-);
+const html = demo
+  ? example
+  : example.replace(IMAGE, (url) =>
+      /(?:^|\/)logo[^/]*$/.test(url) ? LOGO : PEOPLE.has(tag) ? AVATAR : COVER,
+    );
 
-// The components that run from one edge of the page to the other, as a strip
-// of cards that scrolls sideways: their example has no room around it, and
-// its content slides under the edges of the frame.
-const EDGE_TO_EDGE = new Set(['mds-horizontal-scroll']);
-const padding = EDGE_TO_EDGE.has(tag) ? 'p-0' : 'p-800';
+// The room around the example, but for the components that run from one edge
+// of the page to the other (src/lib/previews.ts).
+const padding = edgeToEdge ? 'p-0' : 'p-800';
 ---
 
 <!doctype html>
@@ -80,11 +84,13 @@ const padding = EDGE_TO_EDGE.has(tag) ? 'p-0' : 'p-800';
     </script>
   </head>
   {/*
-    On surface-raised, a card of the stage; on another level, fading to it,
-    once the picker of the stage sets data-surface (PreviewStage.astro).
+    On surface-raised, a card of the stage, or on the level the component
+    starts on (src/lib/previews.ts); on another level, fading to it, once the
+    picker of the stage sets data-surface (PreviewStage.astro).
   */}
   <body
     data-preview
+    data-surface={surface === 'raised' ? undefined : surface}
     class:list={[
       'm-0 flex min-h-5000 flex-col justify-start bg-surface-raised transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken [&>astro-dev-toolbar]:hidden',
       padding,

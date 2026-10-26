@@ -138,21 +138,52 @@ releases.
 
 - the stage is an iframe of [`src/pages/example/[tag].astro`](../src/pages/example/[tag].astro)
   (`/docs/example/<tag>/`): the first `html` block of the component's Pattern usage, alone on a
-  page with Magma loaded. Patterns use `/docs/example/pattern/<id>/` (`example.html`). The
-  example has room around it (`p-800` on the body), except for the components listed in
-  `EDGE_TO_EDGE` there, which run from one edge of the page to the other
-  (`mds-horizontal-scroll`): their content slides under the edges of the frame.
-- the images of the example point at files of a product (`/logo.svg`, `/img/copertina.jpg`) or
-  at `example.com`, which the site does not serve: the page swaps each `src` or `poster` of an
-  image for one of the site's. A logo becomes Magma's logo, the photo of a person
-  (`mds-author`, `mds-avatar`, `mds-entity`) Magma's avatar, any other image the cover
-  `public/covers/og-1200x630.png`. A square image does not stand in for an illustration:
-  `mds-img` takes the whole width it has (`mds-zero`). Videos stay broken: no package has one.
+  page with Magma loaded, or the component's demo (below). Patterns use
+  `/docs/example/pattern/<id>/` (`example.html`).
+- a **demo**, `src/previews/<tag>.html`, takes the place of Magma's example on the stage only
+  ([`src/lib/previews.ts`](../src/lib/previews.ts)); the Pattern usage page keeps Magma's
+  examples, and the text above the stage says it is a demo (`component.preview.introDemo`).
+  Write one when Magma's first example does not show what the component does (a form that posts
+  to a server the site does not have), shows less than it can (a tree with its branches closed,
+  a region whose one toast leaves after five seconds), or needs a picture or a video. A demo is plain HTML and a script,
+  in Italian as Magma's examples; accented letters as HTML entities (`&egrave;`), `\u00e8` in
+  a script. The controls set the first element of the component in it, so that one comes first.
+  A script that shows something the component cannot show by itself (an OTP checked against a
+  test code, toasts added to a region) stays short and says what it simulates.
+- `STAGES` in `src/lib/previews.ts`: the components that start on another surface (by default
+  `surface-raised`; `surface-default` for the ones drawn on a ground of their own, a card or a
+  bar), at a size of their own (a width or a height in px: a menu, a dialog or a column of toasts
+  needs room to open; `mds-url-view` starts at 360x640, as on a phone), or from one edge of the
+  page to the other (`mds-horizontal-scroll`: no `p-800` around it, its content slides under the
+  edges of the frame). The stage is narrower than Magma's tablet breakpoint (768px) even on a wide
+  screen (about 670px at 1728px): what a component shows from tablet up only, as the navigation
+  of `mds-header`, needs its demo to ask for it at every width.
+- the images of Magma's examples point at files of a product (`/logo.svg`,
+  `/img/copertina.jpg`) or at `example.com`, which the site does not serve: the page swaps each
+  `src` or `poster` of an image for one of the site's. A logo becomes Magma's logo, the photo of
+  a person (`mds-author`, `mds-avatar`, `mds-entity`) Magma's avatar, any other image the cover
+  `public/covers/og-1200x630.png`. A demo keeps its own: files of `public/previews/`, by a path
+  relative to the page of the preview (`../../previews/<file>`). The photos and the video are
+  under CC0, from Wikimedia Commons, reduced for the site (WebP 1200px, the video without
+  audio): `reading-room.webp` (`20191128_National_Library_Portugal_Reading_Room.jpg`, Beireke1),
+  `office.webp` (`LOOM_office_workspaces.jpg`, Loominade), `clouds.webm` and its poster
+  `clouds.webp` (`Timelapse_of_Clouds_over_Bellevue_Canyon.webm`, Extemporalist, 480p).
+  `operazioni-straordinarie.webp` is the cover of a Maggioli Editore book, from
+  maggiolieditore.it; `empty-list.svg` (`mds-zero`) is drawn for the site, in steps of the
+  brand palette.
+- next to Reset, **Open in Storybook** (`component.preview.storybook`) leads to the
+  component's docs page in Magma's Storybook, with more cases than the preview
+  (`storybookPage()` in [`src/lib/magma.mjs`](../src/lib/magma.mjs)). `documentation.json`
+  gives the address of Storybook (`storybook` at the top, also the `STORYBOOK` of the rail and
+  the footer) and the id of each component's page (`storybook` on the component), since 2.8.0
+  (magma#1148): the ids do not follow the tags (`mds-icon` is `design-icon`).
 - under the stage, an `mds-tab` (`size="sm"`) with a Props and a Methods tab, no heading over
   them, the first one open; both are always there, the one with nothing to show disabled.
 - the controls are Magma inputs in the small size (`size="sm"`) built from the props in
   `documentation.json` (`src/lib/controls.ts`); they set the props on the element in the iframe
-  (same origin) and a `MutationObserver` reads changes back.
+  (same origin) and a `MutationObserver` reads changes back. A prop that takes an icon (`icon`,
+  `iconChecked`, the `name` of `mds-icon`) is a select of the icons of the example and of the
+  ones Magma's usage docs use most.
 - the methods whose parameters take a value to type or pick (`methodCalls()` in
   `src/lib/controls.ts`) get a play button each, with a field per parameter
   (`PlaygroundField.astro`, shared with the props); a line under them says what the last call
@@ -166,10 +197,11 @@ releases.
   puts the example on each of Magma's five surfaces: a pill with a circle painted with the
   current one and an `mds-input-select` of the levels by name ("Surface default"), without ring
   or shadow at rest (the pill draws the edge). A level sets `data-surface` on the body of the
-  example's page, whose `data-[surface=...]:` classes paint it (default: `surface-raised`), and
-  on the stage, which takes `wash-base` while the example is on `surface-sunken` (nothing is
-  below it: the frame would blend in). Reset reloads it at full width, at the example's height
-  and on `surface-raised`.
+  example's page, whose `data-[surface=...]:` classes paint it (default: `surface-raised`, or
+  the component's own in `STAGES`), and on the stage, which takes `wash-base` while the example
+  is on `surface-sunken` (nothing is below it: the frame would blend in). Reset reloads it at its
+  starting size (the whole stage wide and the example's height, or the component's own) and on
+  its starting surface.
 
 ## Other routes
 

@@ -1,0 +1,59 @@
+<form id="sblocco" class="flex flex-col items-start gap-400">
+  <mds-text typography="h5" tag="h1">Inserisci il PIN</mds-text>
+  <mds-text typography="detail" tag="p">
+    Il PIN di prova &egrave; 123456: un altro codice mostra l'errore.
+  </mds-text>
+  <mds-input-otp name="otp" accessible-name="PIN"></mds-input-otp>
+  <mds-button
+    id="verifica"
+    type="submit"
+    label="Sblocca"
+    variant="primary"
+    tone="strong"
+  ></mds-button>
+  <mds-banner id="esito" hidden></mds-banner>
+</form>
+
+<script>
+  // The code is checked here, as a server would do it, after a short wait.
+  const form = document.getElementById('sblocco');
+  const otp = form.querySelector('mds-input-otp');
+  const button = document.getElementById('verifica');
+  const outcome = document.getElementById('esito');
+  const PIN = '123456';
+
+  const show = (variant, icon, headline, text) => {
+    outcome.variant = variant;
+    outcome.icon = icon;
+    outcome.headline = headline;
+    outcome.replaceChildren(
+      Object.assign(document.createElement('mds-text'), {
+        typography: 'detail',
+        textContent: text,
+      }),
+    );
+    outcome.hidden = false;
+  };
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    outcome.hidden = true;
+    button.setAttribute('await', '');
+    setTimeout(() => {
+      button.removeAttribute('await');
+      if (otp.value === PIN) {
+        show(
+          'success',
+          'mi/baseline/lock-open',
+          'Sbloccato',
+          'Il PIN \u00e8 corretto: puoi continuare.',
+        );
+        otp.disabled = true;
+        button.disabled = true;
+      } else {
+        show('error', 'mi/baseline/error-outline', 'PIN errato', 'Controlla il codice e riprova.');
+        otp.value = '';
+      }
+    }, 800);
+  });
+</script>
