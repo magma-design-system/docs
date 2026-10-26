@@ -143,9 +143,9 @@ releases.
 - a **demo**, `src/previews/<tag>.html`, takes the place of Magma's example on the stage only
   ([`src/lib/previews.ts`](../src/lib/previews.ts)); the Pattern usage page keeps Magma's
   examples, and the text above the stage says it is a demo (`component.preview.introDemo`).
-  Write one when Magma's first example does not show what the component does (a tree with no
-  branches, a spinner that is hidden, a form that posts to a server the site does not have, a
-  region with nothing in it), or needs a picture or a video. A demo is plain HTML and a script,
+  Write one when Magma's first example does not show what the component does (a form that posts
+  to a server the site does not have), shows less than it can (a tree with its branches closed,
+  a region whose one toast leaves after five seconds), or needs a picture or a video. A demo is plain HTML and a script,
   in Italian as Magma's examples; accented letters as HTML entities (`&egrave;`), `\u00e8` in
   a script. The controls set the first element of the component in it, so that one comes first.
   A script that shows something the component cannot show by itself (an OTP checked against a
