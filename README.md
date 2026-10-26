@@ -16,6 +16,12 @@ people. [`plan/`](plan/) holds the decisions ([`CONTENT_STRUCTURE.md`](plan/CONT
 [`DIRECTION.md`](plan/DIRECTION.md)) and the open work ([`BACKLOG.md`](plan/BACKLOG.md)).
 Whoever learns something the next person needs writes it there, in the same pull request.
 
+In VS Code, accept the extensions the folder recommends (`.vscode/extensions.json`): CSS Var
+Complete lists Magma's tokens inside `var(--...)`, in the order of their scale and with a
+swatch on colors, from `tokens.editor.css` of `styles`; Tailwind CSS IntelliSense completes
+the classes of Magma's theme. The setup is the one of section 5 of Magma's
+`agents/assets.md`.
+
 ## Rule: read Magma only from node_modules
 
 The site never reads the Magma monorepo. Everything comes from the npm packages, exactly as
