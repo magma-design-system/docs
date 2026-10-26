@@ -47,8 +47,10 @@ In a browser driven by an agent (a hidden or embedded pane):
   element enabled with `disabled = false` stays disabled, a tip stays). Count a few
   `requestAnimationFrame` callbacks before trusting what a re-render should change, and check
   it in headless Chrome over the DevTools Protocol (as `scripts/screenshots.mjs` drives it) or
-  in a browser on screen. Two findings of October 2026 (`mds-button` and `mds-input` that stay
-  disabled) came from such a pane and did not reproduce in Chrome.
+  in a browser on screen. Three findings of October 2026 came from such a pane and did not
+  reproduce in Chrome: `mds-button` and `mds-input` that stay disabled, and magma#1147, the bar
+  of `mds-header` that keeps `nav="desktop"` on its attribute after the header hands it
+  `nav="all"`.
 - Lazy `mds-img` never loads in a hidden pane.
 - A hidden pane has `innerHeight` 0 until a viewport size is set, and runs no `ResizeObserver`:
   where a page opens (`#fragment`, back and forward, reload) is measured in headless Chrome.

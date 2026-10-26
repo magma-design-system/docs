@@ -5,12 +5,13 @@
 // they go from the sections of a page down to the values: building blocks,
 // patterns, components, then tokens and icons.
 import { existsSync, readFileSync } from 'node:fs';
-import { componentTags, componentTaxonomy } from './magma.mjs';
+import { componentTags, componentTaxonomy, loadComponentDocs } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
 export const REPOSITORY = 'https://github.com/magma-design-system/magma';
-export const STORYBOOK = 'https://magma-design-system.github.io/magma/storybook/';
+/** The published Storybook, as the installed Magma gives it. */
+export const STORYBOOK = loadComponentDocs().storybook;
 
 /**
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).

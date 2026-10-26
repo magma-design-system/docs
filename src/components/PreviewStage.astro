@@ -8,11 +8,14 @@
 // there is room, what is fixed to the viewport or follows its scroll). Once
 // the height is set by hand, the frame stops following the example, which
 // scrolls inside it. With `surfaces`, a picker under it puts the example on
-// each of Magma's surface levels, to see how it stands on each ground. Reset loads
-// the example again, at full width, at its own height and on its surface; the
-// buttons of the `actions` slot go next to it. The props, methods and theme
-// of the example are Playground.astro's, which finds the frame by
+// each of Magma's surface levels, to see how it stands on each ground. A
+// component can start on another surface and at a size of its own
+// (src/lib/previews.ts). Reset loads the example again, at its starting size
+// (by default the whole stage wide and as tall as the example) and on its
+// surface; the buttons of the `actions` slot go next to it. The props, methods
+// and theme of the example are Playground.astro's, which finds the frame by
 // `data-playground-frame`.
+import type { Surface } from '../lib/previews';
 
 interface Props {
   tag: string;
@@ -25,18 +28,20 @@ interface Props {
    * `data-surface` (src/pages/example/[tag].astro).
    */
   surfaces?: boolean;
+  /** The surface the example starts on. */
+  surface?: Surface;
+  /** The width and height of the frame at the start, in px (src/lib/previews.ts). */
+  width?: number;
+  height?: number;
 }
 
-const { tag, src, title, surfaces = false } = Astro.props;
+const { tag, src, title, surfaces = false, surface = 'raised', width, height } = Astro.props;
 const { t } = Astro.locals;
 // Magma's five levels, from the one sunk into the page to the floating one.
 // The token names, in every language, as the Color page writes them; each
 // option of the picker puts the family before them ("Surface sunken"), so it
 // says what the colors are.
-const SURFACES = ['sunken', 'muted', 'default', 'raised', 'overlay'];
-// The level of the example until another is picked: the body of its page has
-// it without `data-surface`.
-const SURFACE = 'raised';
+const SURFACES: Surface[] = ['sunken', 'muted', 'default', 'raised', 'overlay'];
 ---
 
 {/*
@@ -55,8 +60,14 @@ const SURFACE = 'raised';
 <div
   class="flex rounded-3xl bg-surface-sunken pl-600 pt-600 transition-cosmetic duration-(--duration-300) data-[surface=sunken]:bg-wash-base"
   data-playground-stage={tag}
+  data-surface={surface}
 >
-  <div class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]" data-playground-viewport={tag}>
+  <div
+    class="grid w-full max-w-full grid-cols-[minmax(0,1fr)_auto]"
+    data-playground-viewport={tag}
+    data-width={width}
+    data-height={height}
+  >
     <iframe
       src={src}
       title={title}
@@ -102,24 +113,25 @@ const SURFACE = 'raised';
     <div
       class="flex items-center gap-100 rounded-full border border-border-muted bg-surface-overlay p-100"
       data-playground-surface={tag}
-      data-default={SURFACE}
+      data-default={surface}
     >
       <span
         aria-hidden="true"
         class="size-600 shrink-0 rounded-full border border-border-default bg-surface-raised transition-cosmetic duration-(--duration-300) data-[surface=default]:bg-surface-default data-[surface=muted]:bg-surface-muted data-[surface=overlay]:bg-surface-overlay data-[surface=sunken]:bg-surface-sunken"
         data-surface-swatch
+        data-surface={surface}
       ></span>
       <mds-input-select
         aria-label={t('component.preview.surface')}
         size="sm"
-        value={SURFACE}
+        value={surface}
         class="[--mds-input-select-ring:0_0_0_0_transparent] [--mds-input-select-shadow:0_0_0_0_transparent]"
         data-surface-select
       >
-        {SURFACES.map((surface) => (
-          <option value={surface} selected={surface === SURFACE}>
+        {SURFACES.map((level) => (
+          <option value={level} selected={level === surface}>
             {t('component.preview.surfaceLevel', {
-              surface,
+              surface: level,
               // Astro escapes the text: i18next does not need to.
               interpolation: { escapeValue: false },
             })}
@@ -290,12 +302,16 @@ const SURFACE = 'raised';
     return { update, set };
   };
 
+  /** A size of the frame written on its viewport (`data-width`, `data-height`). */
+  const startSize = (value: string | undefined) => (value ? Number(value) : undefined);
+
   /**
    * The two handles of the frame: the one at its right sets how wide the
    * example is, up to the whole stage; the one under it how tall, from a
    * strip of it to the height of the example or of the window, whichever is
-   * more. Returns what gives the example the whole stage and its own height
-   * again.
+   * more. Returns what gives the example its starting size again: the one of
+   * its component (`data-width`, `data-height`), or the whole stage and its
+   * own height.
    */
   const resizable = (stage: Stage, tag: string) => {
     const { frame } = stage;
@@ -369,8 +385,8 @@ const SURFACE = 'raised';
     sizes.observe(frame);
     update();
     return () => {
-      width.set(undefined);
-      height.set(undefined);
+      width.set(startSize(viewport.dataset.width));
+      height.set(startSize(viewport.dataset.height));
     };
   };
 
@@ -416,10 +432,11 @@ const SURFACE = 'raised';
         ground: document.querySelector(`[data-playground-stage="${tag}"]`),
       };
       stages.set(frame, stage);
-      const fullSize = resizable(stage, tag);
+      const ownSize = resizable(stage, tag);
+      ownSize();
       const ownSurface = surfaces(stage, tag);
       document.querySelector(`[data-playground-reset="${tag}"]`)?.addEventListener('click', () => {
-        fullSize();
+        ownSize();
         ownSurface();
         // Setting `src` loads it again, wherever the example led the frame.
         frame.src = frame.getAttribute('src') ?? '';

@@ -1,0 +1,5 @@
+{
+  "cssvar.files": ["node_modules/@maggioli-design-system/styles/dist/css/tokens.editor.css"],
+  "cssvar.ignore": [],
+  "cssvar.disableSort": true
+}

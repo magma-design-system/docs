@@ -79,7 +79,7 @@ The rule: **a message goes where the thing it talks about is.**
 
 - Toasts at `bottom-center`, the same in every product, at most three at once: one
   `mds-toast-region` per application, which lines them up and reads each one out (2.4.0). A
-  toast with an action has no timer and a way to close it (`deletable`, its hide button); the
+  toast with an action has no timer and a way to close it (`dismissible`, its hide button); the
   focus goes back to the page when it closes.
 - Toasts never sit above an open dialog: `showModal()` makes everything outside the dialog
   inert, and a click on the toast closes the dialog. Anything about a dialog goes into it.

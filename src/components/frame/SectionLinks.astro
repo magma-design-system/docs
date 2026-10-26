@@ -25,7 +25,6 @@ const { sections } = frameNav(starlightRoute, Astro.url.pathname);
           id={compact ? `rail-section-${section.id}` : undefined}
           class="max-w-full"
           href={section.href}
-          role="link"
           type="a"
           aria-current={section.current ? 'page' : undefined}
           icon={section.icon}

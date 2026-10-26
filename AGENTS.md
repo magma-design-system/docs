@@ -86,9 +86,11 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/loaders/components.ts`, `src/lib/components.ts` | Component pages from `magma/dist/documentation.json`                                    |
 | `src/pages/`                                         | Generated routes: component, icon and brand pages, downloads, favicons, preview iframes |
 | `src/patterns/<id>/`                                 | Pattern code: `example.html`, `react.tsx`, `angular.ts`                                 |
+| `src/previews/`, `src/lib/previews.ts`               | Demos of the component previews, in place of Magma's example; the stage of each one     |
 | `src/content/docs/`                                  | Pages: English at the root, Italian under `it/`                                         |
 | `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login              |
 | `public/covers/`                                     | Covers of the site for other sites and link previews (`og:image`), stable URLs          |
+| `public/previews/`                                   | Images and video of the demos (CC0 or Maggioli's own; sources in architecture.md)       |
 | `plan/`                                              | Decision records and open work                                                          |
 
 ## Guides

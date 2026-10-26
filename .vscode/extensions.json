@@ -1,0 +1,4 @@
+{
+  "recommendations": ["phoenisx.cssvar", "bradlc.vscode-tailwindcss"],
+  "unwantedRecommendations": ["vunguyentuan.vscode-css-variables"]
+}

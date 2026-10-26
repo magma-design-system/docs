@@ -308,7 +308,7 @@
     element.textContent = message;
     if (actions.length) {
       element.duration = 0;
-      element.deletable = true;
+      element.dismissible = true;
       for (const action of actions) {
         const button = document.createElement('mds-button');
         button.slot = 'action';

@@ -1,0 +1,14 @@
+<mds-chip
+  label="In lavorazione"
+  icon="mi/baseline/schedule"
+  variant="warning"
+  tone="strong"
+  deletable
+></mds-chip>
+
+<script>
+  // The chip goes once its cross is pressed: Reset brings it back.
+  document.querySelector('mds-chip').addEventListener('mdsChipDelete', (event) => {
+    event.detail.element.remove();
+  });
+</script>

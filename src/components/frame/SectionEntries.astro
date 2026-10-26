@@ -28,7 +28,6 @@ const { entries, currentHref, icons } = Astro.props;
         <mds-button
           class="max-w-full"
           href={entry.href}
-          role="link"
           type="a"
           aria-current={entry.href === currentHref ? 'page' : undefined}
           label={entry.label}
