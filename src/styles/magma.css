@@ -226,19 +226,21 @@ mds-button[icon='mi/baseline/arrow-forward'] {
   }
 
   /*
-    styles 17.0.1: reset.css caps paragraphs at --spacing-text (75ch), then
-    base.css caps them at --spacing-title (30ch), the measure meant for
-    headings. Keep the reading measure.
+    reset.css caps paragraphs at --spacing-text (75ch), then base.css caps them
+    at --spacing-title (30ch), the measure meant for headings (styles 17.0.1,
+    still in 17.4.0; https://github.com/magma-design-system/docs/issues/1).
+    Keep the reading measure.
   */
   p {
     @apply max-w-(--spacing-text);
   }
 
   /*
-    styles 17.0.1: base.css gives the body its font (--font-info, Karla) but
-    nothing to h1-h6, which inherit it. Give them the title font and scale
-    (--font-title, Roboto, and --text-size-title-h*: size, line height, weight,
-    letter spacing).
+    base.css gives the body its font (--font-info, Karla) but nothing to h1-h6,
+    which inherit it (styles 17.0.1, still in 17.4.0;
+    https://github.com/magma-design-system/docs/issues/1). Give them the title
+    font and scale (--font-title, Roboto, and --text-size-title-h*: size, line
+    height, weight, letter spacing).
   */
   h1 {
     @apply font-title text-size-title-h1;
@@ -265,8 +267,9 @@ mds-button[icon='mi/baseline/arrow-forward'] {
   }
 
   /*
-    mds-icon fills its SVG with the inherited `fill`, black by default, and
-    documents no color property: icons placed on the page follow the text.
+    mds-icon fills its SVG with the inherited `fill`, black by default; its
+    Pattern guide colors it with a `fill-*` utility or `fill-current`. Icons
+    placed on the page follow the text.
   */
   mds-icon {
     @apply fill-current;
