@@ -23,7 +23,6 @@ const line = TEXT.anchorLine[typography as keyof typeof TEXT.anchorLine] ?? TEXT
   <span class={line}>
     <mds-button
       href={`#${id}`}
-      role="link"
       {...ANCHOR}
       aria-label={t('heading.anchorLabel', { title: text, interpolation: { escapeValue: false } })}
     ></mds-button>

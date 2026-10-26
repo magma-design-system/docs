@@ -349,7 +349,6 @@ function convertHeading(node, heading, label) {
         'mds-button',
         {
           href: `#${id}`,
-          role: 'link',
           ...ANCHOR,
           'aria-label': label ?? anchorLabel(textOf(node)),
         },
