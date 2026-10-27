@@ -127,8 +127,8 @@
   "component.page.overview": "Panoramica",
   "component.page.api": "API",
   "component.page.css": "CSS",
-  "component.page.pattern": "Pattern",
-  "component.page.antipattern": "Antipattern",
+  "component.page.examples": "Esempi",
+  "component.page.mistakes": "Errori da evitare",
 
   "copy.hint": "Clicca per copiare",
   "copy.copied": "Copiato",

@@ -54,9 +54,12 @@
 
 /*
   The examples the component previews run (src/pages/example/[tag].astro) use
-  Magma's utilities too: the Pattern usage files hold the same markup as
-  documentation.json, without the rest of it.
+  Magma's utilities too: the Examples usage files hold the same markup as
+  documentation.json, without the rest of it. pattern.md is their name before
+  https://github.com/magma-design-system/magma/issues/1169: drop it with the
+  last version that ships it.
 */
+@source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/examples.md';
 @source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/pattern.md';
 
 /*

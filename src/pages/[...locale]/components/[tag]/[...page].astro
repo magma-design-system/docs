@@ -50,10 +50,10 @@ const contentLang = locale ? 'en' : undefined;
 // (src/components/frame/PageTitle.astro).
 const name = componentName(data.tag);
 const title = page.id === 'overview' ? name : `${name} ${t(page.label)}`;
-// The preview: Magma's first Pattern example or the site's demo.
+// The preview: Magma's first example or the site's demo.
 const { example, demo, surface, width, height } = previewOf(data.tag, data.example);
-// Pattern and Antipattern pages are a usage file each, headings included.
-const guide = page.id === 'pattern' || page.id === 'antipattern' ? data[page.id] : undefined;
+// Examples and Mistakes pages are a usage file each, headings included.
+const guide = page.id === 'examples' || page.id === 'mistakes' ? data[page.id] : undefined;
 
 const sections = {
   overview: [
@@ -90,8 +90,8 @@ const sections = {
     },
     { id: 'parts', label: t('component.parts'), show: data.parts.length > 0 },
   ],
-  pattern: [],
-  antipattern: [],
+  examples: [],
+  mistakes: [],
 }[page.id].filter((section) => section.show);
 const label = (id: string) => sections.find((section) => section.id === id)?.label;
 

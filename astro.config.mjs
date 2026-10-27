@@ -3,7 +3,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwindcss from '@tailwindcss/vite';
 import magma from './src/integrations/magma.mjs';
-import { locales } from './src/lib/i18n.mjs';
+import { localeParams, locales } from './src/lib/i18n.mjs';
+import { componentTags } from './src/lib/magma.mjs';
 import { sidebar } from './src/lib/nav.mjs';
 
 /**
@@ -31,6 +32,21 @@ const frame = Object.fromEntries(
 
 const base = '/docs';
 
+/**
+ * The sub-pages of every component that moved: Pattern and Antipattern became
+ * Examples and Mistakes (https://github.com/magma-design-system/magma/issues/1169).
+ */
+const movedComponentPages = Object.fromEntries(
+  localeParams.flatMap((locale) =>
+    componentTags().flatMap((tag) =>
+      Object.entries({ pattern: 'examples', antipattern: 'mistakes' }).map(([from, to]) => {
+        const page = `${locale ? `/${locale}` : ''}/components/${tag}`;
+        return [`${page}/${from}/`, `${base}${page}/${to}/`];
+      }),
+    ),
+  ),
+);
+
 /** The favicons of src/pages/favicons/[file].ts, other than the SVG one (`favicon`). */
 const favicons = [
   // Before the SVG, as Starlight sorts them: the browsers that have both take the SVG.
@@ -50,6 +66,7 @@ export default defineConfig({
   redirects: {
     '/development/agentic-development/': `${base}/ai/start-a-project/`,
     '/it/development/agentic-development/': `${base}/it/ai/start-a-project/`,
+    ...movedComponentPages,
   },
   integrations: [
     starlight({
