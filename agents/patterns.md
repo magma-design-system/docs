@@ -27,13 +27,17 @@ which were Pattern and Antipattern, are Examples and Mistakes since
 [magma#1169](https://github.com/magma-design-system/magma/issues/1169), and so are the
 sub-pages of each component on the site (`/examples/`, `/mistakes/`; the old addresses
 redirect). An anti-pattern is a wrong solution to a task (a toast over an open dialog), not
-wrong markup.
+wrong markup. The group Feedback is called **Messages and states**: "feedback" reads as the
+person telling the product something, while the group is the product telling the person what
+happened. That other sense becomes a candidate of its own: **report a problem or give an
+opinion** on a view or a feature (for AI, rating an answer).
 
 ## State
 
 - Both sections are online only as their landing pages, under construction (`soon: true`).
 - Pattern pages, drafts (`draft: true`, dev only): **List with filters**, **Record detail**.
-- **Feedback** has a clickable sketch, `src/patterns/feedback/example.html`, and no page yet.
+- **Messages and states** has a clickable sketch, `src/patterns/feedback/example.html` (the
+  folder keeps its old id until the pattern is written), and no page yet.
 
 ## How a pattern is made
 
@@ -69,7 +73,7 @@ Decisions.
   code.
 - Patterns connect: the list example opens the detail example (`../record-detail/?id=N`).
 
-## Decided: feedback
+## Decided: where a message goes
 
 The rule: **a message goes where the thing it talks about is.**
 
@@ -117,6 +121,7 @@ Proposals, not decided yet:
 - **Page title**: always the `h1`; its size comes from `typography`, not from the level.
 - **Not ready yet**: features that are not ready are not shown.
 
-Proposed order: feedback (messages, confirmation, empty and error states, loading), then forms
+Proposed order: messages and states (where a message goes, confirmation, empty and error
+states, loading), then forms
 (field, dialog with a form, then the Form and validation pattern), then List with filters with
 row actions, Record detail, search with facets (after a combobox in Magma), AI.
