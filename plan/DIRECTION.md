@@ -168,10 +168,12 @@ Open questions:
 
 - The "Mistakes to avoid" of a pattern will link to the lint rules once they exist.
 
-## Product layers (proposal)
+## Product layers
 
-Proposed on 2026-10-24, not decided. Products need their own blocks and patterns (the records
-of a domain, its procedures), and agents should apply them together with Magma's. Documenting
+Proposed on 2026-10-24, decided on 2026-10-27 with one change, where a product layer lives
+(below; magma-design-system/magma#1083, phase 5).
+
+Products need their own blocks and patterns (the records of a domain, its procedures), and agents should apply them together with Magma's. Documenting
 each product inside Magma is the wrong way: the products are a catalogue of needs, not the
 solution, and a pattern is worth something because it is the same everywhere.
 
@@ -188,7 +190,11 @@ solution, and a pattern is worth something because it is the same everywhere.
   fails in the same pull request, and they are released together. The product layers live in a
   private repository of the organization (visibility is set per repository, and the
   organization's repositories are public), one folder per product with its `CODEOWNERS`, each
-  published to a private registry as a package that depends on the default.
+  published to a private registry as a package that depends on the default. Decided instead
+  on 2026-10-27: a product layer starts in the product's own repository, where Magma's MCP
+  server reads it from the project, as it reads the project for `check_setup`; a package
+  shared by several products, and the private repository and registry it needs, only when two
+  products share a layer.
 - **Agents.** A product installs its layer: its `AGENTS.md` sits in `node_modules` next to
   Magma's, and the agent reads the default first, then the product's choices. The `AGENTS.md`
   of the product (Agentic development) points to both.
@@ -196,6 +202,10 @@ solution, and a pattern is worth something because it is the same everywhere.
   from what the product decides; one page explains the shape of a layer, with an invented
   product, once the mechanism exists.
 
-To check: where the default lives (a project of the monorepo or a repository of its own), what
+Decided on 2026-10-27 too: the format is layered from day one (stable ids a product layer
+extends, the "Always true" rules marked as not overridable, the rest as open choices), and the
+default lives in the Magma monorepo, written by its maintainers. Product layers open later.
+
+To check when the first product layer is written: where the default lives (a project of the monorepo or a repository of its own), what
 the organization's GitHub plan allows on private repositories (branch protection, required
 reviews), the token the products' CI needs to read the private registry.
