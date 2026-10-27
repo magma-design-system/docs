@@ -69,7 +69,7 @@ screen `mds-modal` leaves a strip of backdrop with its close button, at every po
 #1144 (`mds-filter` leaves the gap of a field under its label), #1145 (`dismissible` on
 `mds-toast`, `mds-banner` and `mds-push-notification-item`; `deletable` is deprecated there
 and the lint rule `magma/no-deprecated` reports it; `mds-chip` keeps `deletable`), #1146 (the
-first Pattern examples of `mds-spinner`, `mds-tree` and `mds-toast-region` show the
+first examples of `mds-spinner`, `mds-tree` and `mds-toast-region` show the
 component: the demo of the spinner, the same as Magma's example, is gone; the tree and the
 region keep theirs, which show more), #1147 (not a Magma bug: `mds-header` does hand `nav` to its bar, which writes it on
 its attribute in a re-render; the issue came from a hidden pane that ran no

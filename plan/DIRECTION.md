@@ -47,7 +47,7 @@ a trend, never named.
 
 ## Lint rules
 
-Prose rules already exist in Magma (`docs/agents/anti-patterns.md`,
+Prose rules already exist in Magma (`docs/agents/anti-patterns.md`, `mistakes.md` since magma#1169,
 `conventions.md`, `color.md`, `theming.md`). The lint makes them executable.
 
 - **Package:** a new monorepo project, released with `magma`, with an ESLint plugin
@@ -165,9 +165,6 @@ Built (2026-10-15): the section (overview + Data group) and **list with filters*
 
 Open questions:
 
-- Naming: components already have "Pattern" and "Antipattern" sub-pages (from
-  `pattern.md` / `antipattern.md`). The section is called Patterns for now; either it
-  takes another name, or the sub-pages are labelled differently on the site.
 - The "Mistakes to avoid" of a pattern will link to the lint rules once they exist.
 
 ## Product layers (proposal)

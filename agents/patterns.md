@@ -22,6 +22,13 @@ as blocks: they are patterns, since their parts come from a component (`mds-moda
 common root of the term: a pattern is named by the recurring problem it solves, not by its
 size.
 
+Decided on 2026-10-27: the word stays with this level. The usage files of one component,
+which were Pattern and Antipattern, are Examples and Mistakes since
+[magma#1169](https://github.com/magma-design-system/magma/issues/1169), and so are the
+sub-pages of each component on the site (`/examples/`, `/mistakes/`; the old addresses
+redirect). An anti-pattern is a wrong solution to a task (a toast over an open dialog), not
+wrong markup.
+
 ## State
 
 - Both sections are online only as their landing pages, under construction (`soon: true`).
@@ -35,7 +42,7 @@ One topic at a time:
 1. Collect the real cases from Maggioli's products: the screens, situations, data and roles
    where the need shows up. The products are a catalogue of needs, never the solution to
    document: most of their screens were not designed with the design system.
-2. Check what Magma already offers: the component guides, their `pattern.md`.
+2. Check what Magma already offers: the component guides, their `examples.md`.
 3. Write a proposal with its open questions; the design system team decides.
 4. Build a clickable sketch in `src/patterns/<id>/example.html` and try it.
 5. Write a brief, then the page.
@@ -109,8 +116,6 @@ Proposals, not decided yet:
 - **Navigation within a page**: `mds-tab` for views of the same object, links for pages.
 - **Page title**: always the `h1`; its size comes from `typography`, not from the level.
 - **Not ready yet**: features that are not ready are not shown.
-- **Naming**: components already have Pattern and Antipattern sub-pages (from `pattern.md`);
-  either the section takes another name, or the sub-pages are labelled differently.
 
 Proposed order: feedback (messages, confirmation, empty and error states, loading), then forms
 (field, dialog with a form, then the Form and validation pattern), then List with filters with
