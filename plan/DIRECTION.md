@@ -173,9 +173,10 @@ Open questions:
 Proposed on 2026-10-24, decided on 2026-10-27 with one change, where a product layer lives
 (below; magma-design-system/magma#1083, phase 5).
 
-Products need their own blocks and patterns (the records of a domain, its procedures), and agents should apply them together with Magma's. Documenting
-each product inside Magma is the wrong way: the products are a catalogue of needs, not the
-solution, and a pattern is worth something because it is the same everywhere.
+Products need their own blocks and patterns (the records of a domain, its procedures), and
+agents should apply them together with Magma's. Documenting each product inside Magma is the
+wrong way: the products are a catalogue of needs, not the solution, and a pattern is worth
+something because it is the same everywhere.
 
 - **Layers of the same shape.** Magma ships the default: blocks, patterns, their "Always true"
   rules, the agent guides, the lint configuration. A product layer has the same shape and may
