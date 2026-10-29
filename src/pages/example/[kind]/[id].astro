@@ -1,25 +1,29 @@
 ---
-// The live preview of a pattern, shown in an iframe on its page
-// (src/components/PatternPreview.astro): the plain HTML version of the pattern
-// (src/patterns/<id>/example.html), alone on a page with Magma's styles and
-// loader, away from the styles of the site, as the page of an application.
-// Its script runs as it is written. Opened on its own, it is the full screen
-// version of the preview.
+// The live preview of a pattern or a block, shown in an iframe on its page
+// (src/components/PatternPreview.astro) and, small, in the section navigation
+// and on the cards of its cases (MiniPreview.astro): the plain HTML version
+// (src/patterns/<id>/example.html, src/blocks/<id>/example.html), alone on a
+// page with Magma's styles and loader, away from the styles of the site, as
+// the page of an application. Its script runs as it is written. Opened on its
+// own, it is the full screen version of the preview.
 import { getCollection } from 'astro:content';
 import '../../../styles/magma.css';
-import { patternExample, patternIds } from '../../../lib/patterns';
+import { PATTERN_KINDS, patternExample, patternIds } from '../../../lib/patterns';
 
 export async function getStaticPaths() {
-  // A production build has the previews of the published pattern pages only:
-  // a draft page, or a sketch with no page yet, stays in dev.
-  const pages = await getCollection(
-    'docs',
-    ({ id, data }) => !data.draft && id.startsWith('patterns/'),
+  // A production build has the previews of the published pages only: a
+  // draft page, or a sketch with no page yet, stays in dev.
+  const pages = await getCollection('docs', ({ data }) => !data.draft);
+  const published = new Set(pages.map(({ id }) => id));
+  return PATTERN_KINDS.flatMap((kind) =>
+    patternIds(kind)
+      .filter((id) => !import.meta.env.PROD || published.has(`${kind}/${id}`))
+      .map((id) => ({
+        // /example/pattern/<id>/, /example/block/<id>/: the singular names one.
+        params: { kind: kind.replace(/s$/, ''), id },
+        props: { example: patternExample(id, kind) },
+      })),
   );
-  const published = new Set(pages.map(({ id }) => id.slice('patterns/'.length)));
-  return patternIds()
-    .filter((id) => !import.meta.env.PROD || published.has(id))
-    .map((id) => ({ params: { id }, props: { example: patternExample(id) } }));
 }
 
 interface Props {

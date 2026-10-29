@@ -1,0 +1,70 @@
+---
+// How to apply a pattern or a block with an AI coding agent, at the top of its
+// overview: what to give the agent, the prompt to copy, with the addresses of
+// the sub-pages it reads before writing (the guidelines, the mistakes and the
+// code: src/lib/patterns.ts), and the way to the Agentic development section,
+// which sets the agent up with Magma's guides, MCP server and lint. What is
+// the same for every pattern stays there; what is this pattern's is here. In
+// a card, as the cards of the landing pages (PageCards.astro).
+import { Code as CodeBlock } from '@astrojs/starlight/components';
+import { getEntry } from 'astro:content';
+import { localePrefix } from '../lib/frame';
+import { patternEntryId, patternHref, patternPages, type PatternKind } from '../lib/patterns';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/, or of the block in src/blocks/. */
+  id: string;
+  kind?: PatternKind;
+}
+
+const { id, kind = 'patterns' } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+const strings = kind === 'blocks' ? 'block' : 'pattern';
+
+const entry = async (slug?: string) =>
+  (await getEntry('docs', patternEntryId(locale, kind, id, slug))) ??
+  (await getEntry('docs', patternEntryId(undefined, kind, id, slug)));
+const name = (await entry())?.data.title ?? id;
+// The sub-pages it has, as absolute addresses: the agent reads them on the site.
+const pages = (
+  await Promise.all(
+    patternPages
+      .filter((page) => page.slug !== undefined)
+      .map(async (page) => (await entry(page.slug)) && page),
+  )
+)
+  .filter((page) => page !== undefined)
+  .map(
+    (page) =>
+      `- ${t(page.label)}: ${new URL(patternHref(locale, kind, id, page.slug), Astro.site)}`,
+  )
+  .join('\n');
+// Astro escapes the text of the code block: i18next does not need to.
+const prompt = t(`${strings}.agent.prompt`, { name, pages, interpolation: { escapeValue: false } });
+---
+
+{/* `not-content`: Starlight would put 1rem above every part of the card. */}
+<div class="not-content my-600">
+  <mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
+    <mds-card-header class="items-start">
+      <mds-entity
+        icon="mi/outline/auto-awesome"
+        variant="primary"
+        tone="weak"
+        class="w-full bg-transparent p-0 shadow-none"
+      >
+        <mds-text typography="h6" tag="p">
+          {t('pattern.agent.title')}
+        </mds-text>
+      </mds-entity>
+    </mds-card-header>
+    <mds-card-content class="flex flex-col gap-400 pt-0">
+      <mds-text typography="detail" tag="p">
+        {t(`${strings}.agent.intro`)}{' '}
+        <mds-link href={`${localePrefix(locale)}/ai/`}>{t('pattern.agent.setup')}</mds-link>.
+      </mds-text>
+      <CodeBlock code={prompt} lang="text" title={t('pattern.agent.promptTitle')} wrap />
+    </mds-card-content>
+  </mds-card>
+</div>

@@ -14,8 +14,8 @@ import { resolveMagma } from './src/lib/magma.mjs';
 export default {
   content: [
     './src/**/*.{astro,ts,mjs,md,mdx,json}',
-    // The patterns in each framework (src/patterns/).
-    './src/patterns/**/*.{html,tsx}',
+    // The patterns and blocks in each framework (src/patterns/, src/blocks/).
+    './src/{patterns,blocks}/**/*.{html,tsx}',
     // The usage examples of every component page.
     resolveMagma('magma/dist/documentation.json'),
   ],

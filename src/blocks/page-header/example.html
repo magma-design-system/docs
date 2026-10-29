@@ -1,0 +1,59 @@
+<!--
+  Page header: the top of a page, which says where people are and what they
+  can do there. Plain HTML with Magma's components, styles and Tailwind theme
+  (see Development > Installation). Every part but the title is optional; the
+  actions stand at the right of the text from `lg`, under it on a narrower
+  screen.
+
+  Demo only: the headers of two pages of the same application, one under the
+  other. A page has one, and its title is the only h1 of the page.
+-->
+<div class="flex flex-col gap-1200">
+  <!-- The page of a record: every part. -->
+  <header class="flex flex-col gap-400">
+    <mds-button
+      class="self-start"
+      href="#"
+      icon="mi/baseline/arrow-back"
+      label="Requests"
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+    <div class="flex flex-col gap-400 lg:flex-row lg:items-start lg:justify-between">
+      <div class="flex min-w-0 flex-col gap-200">
+        <mds-text typography="caption" tag="p" class="text-fg-muted">REQ-2026-0512</mds-text>
+        <div class="flex flex-wrap items-center gap-300">
+          <!-- Focused after an action, when the button that ran it is gone. -->
+          <mds-text typography="h3" tag="h1" tabindex="-1" class="outline-none">
+            Change of residence
+          </mds-text>
+          <mds-badge label="In progress" variant="violet"></mds-badge>
+        </div>
+        <mds-text typography="detail" tag="p" class="text-fg-muted">
+          Registry office, received on 14 October 2026
+        </mds-text>
+      </div>
+      <!-- The actions, the main one last. -->
+      <div class="flex flex-wrap gap-200">
+        <mds-button type="button" label="Request documents" tone="weak"></mds-button>
+        <mds-button type="button" label="Close the request" tone="strong"></mds-button>
+      </div>
+    </div>
+  </header>
+
+  <mds-separator></mds-separator>
+
+  <!-- The page of a list: the title, what it holds and its main action. -->
+  <header class="flex flex-col gap-400 lg:flex-row lg:items-start lg:justify-between">
+    <div class="flex min-w-0 flex-col gap-200">
+      <mds-text typography="h3" tag="h1">Users</mds-text>
+      <mds-text typography="detail" tag="p" class="text-fg-muted">
+        The people who can sign in to the back office of the municipality.
+      </mds-text>
+    </div>
+    <div class="flex flex-wrap gap-200">
+      <mds-button type="button" label="Add user" icon="mi/baseline/person-add"></mds-button>
+    </div>
+  </header>
+</div>

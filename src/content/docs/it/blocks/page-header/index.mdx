@@ -1,0 +1,48 @@
+---
+title: Intestazione di pagina
+description: La parte alta di una pagina - il titolo, cosa contiene, lo stato e le azioni, e la strada per tornare indietro - nello stesso ordine su ogni pagina di un prodotto.
+draft: true
+---
+
+import PatternAgent from '../../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../../components/PatternPreview.astro';
+
+<PatternAgent id="page-header" kind="blocks" />
+
+La prima cosa che si legge su una pagina: dove si è, cosa contiene la pagina e cosa ci si può
+fare. Torna in tutti i pattern scritti finora - la [lista con
+filtri](../../patterns/list-with-filters/), il [dettaglio di un
+record](../../patterns/record-detail/), gli utenti di [Messaggi](../../patterns/messages/) - e
+ognuno l'aveva costruita in modo un po' diverso. Scritta una volta, si legge allo stesso modo su
+ogni pagina di un prodotto.
+
+<PatternPreview id="page-header" kind="blocks" />
+
+## Quando usarla
+
+In cima a ogni pagina di un'applicazione, una per pagina: il suo titolo è l'`h1` della pagina.
+Non per le sezioni dentro una pagina, che hanno un titolo proprio, né per un dialog, il cui
+titolo fa parte di `mds-modal`.
+
+## Anatomia
+
+1. **Indietro** (facoltativo): un link alla pagina a cui questa appartiene, chiamato come quella
+   pagina chiama se stessa: "Requests", non "Indietro". Solo quando la pagina ha una pagina
+   sopra di sé, come un record e la sua lista.
+2. **Occhiello** (facoltativo): il numero o il tipo del record, piccolo, sopra il titolo.
+3. **Titolo**: il nome della pagina, o del record che mostra.
+4. **Stato** (facoltativo): lo stato del record, come badge accanto al titolo.
+5. **Descrizione** (facoltativa): una frase - cosa contiene la pagina, o i dati del record.
+6. **Azioni** (facoltative): quello che si può fare con l'intera pagina o con il record, la
+   principale per ultima.
+
+Da `lg` le azioni stanno a destra del testo, allineate al suo inizio; su uno schermo più stretto
+vanno sotto, e vanno a capo quando non stanno su una riga.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella lingua
+del prodotto.
+
+## Componenti
+
+<PatternComponents id="page-header" kind="blocks" />

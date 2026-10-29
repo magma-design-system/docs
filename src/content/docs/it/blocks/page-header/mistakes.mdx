@@ -1,0 +1,50 @@
+---
+title: Intestazione di pagina - Errori da evitare
+description: La parte alta di una pagina - il titolo, cosa contiene, lo stato e le azioni, e la strada per tornare indietro - nello stesso ordine su ogni pagina di un prodotto.
+draft: true
+---
+
+import Usages from '../../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+Il titolo è un `h2` perché la pagina ha già un titolo nella barra dell'header.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il titolo dell'intestazione di pagina è l'`h1`; la sua dimensione viene da `typography`.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un link "Indietro" che esegue `history.back()` qualunque sia la pagina di prima.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Un link alla pagina sopra, chiamato come lei: "Istanze".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Lo stato solo come colore del titolo.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Lo stato come badge accanto al titolo, con il suo nome.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Sei azioni in fila, che su un telefono vanno a capo su tre righe.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Le azioni dell'intera pagina, tre al massimo, la principale per ultima.
+
+</mds-usage>
+</Usages>

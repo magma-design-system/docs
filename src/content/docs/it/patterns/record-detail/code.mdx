@@ -1,0 +1,18 @@
+---
+title: Dettaglio di un record - Codice
+description: Un record di una lista - cos'è, a che punto è, cosa ci si può fare adesso, i suoi dati, documenti e cronologia - e la strada per tornare alla lista.
+draft: true
+---
+
+import PatternCode from '../../../../../components/PatternCode.astro';
+
+La versione in HTML è quella in funzione nell'anteprima della [panoramica](../): si apre dai numeri della
+[lista con filtri](../../list-with-filters/), e il suo link riporta lì. In tutte e tre,
+`fetchRecord` e `runAction` fanno le veci del back end e lavorano su dati di esempio:
+sostituiscile con le chiamate alla tua API. Il componente React riceve l'id del record dal
+componente padre; il componente Angular lo legge dalla sua rotta, `/requests/:id`.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella lingua
+del prodotto.
+
+<PatternCode id="record-detail" />

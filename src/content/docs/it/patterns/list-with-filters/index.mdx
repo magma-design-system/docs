@@ -1,0 +1,49 @@
+---
+title: Lista con filtri
+description: Una lista di record in cui cercare, da restringere, ordinare e scorrere per pagine, con gli stati di caricamento, di nessun risultato e di errore e la ricerca conservata nell'indirizzo.
+draft: true
+---
+
+import PatternAgent from '../../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../../components/PatternPreview.astro';
+
+<PatternAgent id="list-with-filters" />
+
+La schermata che si apre più spesso in un gestionale: la lista dei record su cui si lavora -
+istanze, documenti, pagamenti, pratiche - in cui trovare quelli che servono. Ci si cerca, la si
+restringe per stato o per ufficio, la si ordina e la si scorre per pagine, e ci si torna dopo
+aver aperto un record, aspettandosi di ritrovarla com'era.
+
+<PatternPreview id="list-with-filters" />
+
+## Quando usarla
+
+Usala quando si cercano record in un insieme troppo grande da leggere tutto: da qualche decina
+di record in su, con poche proprietà per cui valga la pena filtrare. Altrimenti c'è di meglio:
+
+- Con una manciata di record, mostrali tutti: filtri e pagine sono solo d'intralcio.
+- Quando i record sono visivi, come immagini o documenti da vedere in anteprima, mostrali come
+  card in una griglia; ricerca, filtri e pagine restano gli stessi.
+- Quando si sceglie un record per proseguire un compito, come un destinatario in un form, un
+  campo di ricerca con suggerimenti è più rapido di una lista intera.
+
+## Anatomia
+
+1. **Titolo e descrizione**: cosa contiene la lista, come titolo della pagina.
+2. **Ricerca e filtri**: un form con il ruolo di ricerca, con un campo che cerca nel numero e
+   nell'oggetto, una select per ogni proprietà con pochi valori, e l'ordinamento.
+3. **Filtro per stato**: gli stati come `mds-filter`, uno alla volta, ciascuno con il numero di
+   record che mostrerebbe.
+4. **Riepilogo**: quali record sono a schermo e su quanti, e il pulsante che azzera i filtri
+   quando ce ne sono.
+5. **Risultati**: una riga per record, con il numero che porta alla sua pagina.
+6. **Pagine**: il paginatore, solo quando c'è più di una pagina.
+
+Tre stati sostituiscono i risultati o si aggiungono a loro: **caricamento** (uno spinner nel
+campo di ricerca, mentre i risultati già presenti restano), **nessun risultato** (un messaggio
+con una via d'uscita), **errore** (un banner con la possibilità di riprovare).
+
+## Componenti
+
+<PatternComponents id="list-with-filters" />

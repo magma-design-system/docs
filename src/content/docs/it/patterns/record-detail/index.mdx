@@ -1,0 +1,49 @@
+---
+title: Dettaglio di un record
+description: Un record di una lista - cos'è, a che punto è, cosa ci si può fare adesso, i suoi dati, documenti e cronologia - e la strada per tornare alla lista.
+draft: true
+---
+
+import PatternAgent from '../../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../../components/PatternPreview.astro';
+
+<PatternAgent id="record-detail" />
+
+La pagina di un record: l'istanza, il documento, il pagamento che qualcuno ha aperto da una
+[lista](../list-with-filters/). Ci si arriva per capire a che punto è il record e per farlo
+avanzare: se ne legge lo stato, se ne controllano dati e documenti, si esegue l'azione che lo
+stato consente, e si torna alla lista.
+
+<PatternPreview id="record-detail" />
+
+## Quando usarlo
+
+Usalo per i record su cui si lavora nel tempo, con uno stato, poche azioni e una cronologia.
+Altrimenti c'è di meglio:
+
+- Un record con pochi campi e niente da farci: mostralo nella sua riga della lista, o in un
+  pannello accanto alla lista, senza una pagina sua.
+- Un record da modificare campo per campo: un form, in cui i campi si cambiano, si controllano e
+  si salvano insieme.
+- Record da confrontare: la lista, con i valori affiancati nelle sue colonne.
+
+## Anatomia
+
+1. **Torna alla lista**: un link che riporta alla lista com'era.
+2. **Identità**: il numero del record, il suo oggetto come titolo della pagina, lo stato come
+   badge, e una riga che dice a chi appartiene e quando è arrivato.
+3. **Azioni**: quelle che lo stato consente, la principale per ultima e nel tono forte.
+4. **Schede**: i dati, i documenti e la cronologia, uno alla volta.
+5. **Dati**: etichette e valori, su due colonne quando c'è spazio.
+6. **Documenti**: un `mds-file` per ogni file.
+7. **Cronologia**: chi ha fatto cosa, e quando, dal più recente, con la nota scritta insieme
+   all'azione.
+
+Intorno: **caricamento** (uno spinner), **non trovato** (un messaggio con un link alla lista),
+**errore** (un banner con la possibilità di riprovare), e il **riscontro** di ogni azione (un
+toast, letto anche dai lettori di schermo).
+
+## Componenti
+
+<PatternComponents id="record-detail" />

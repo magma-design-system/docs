@@ -1,0 +1,50 @@
+---
+title: Page header - Mistakes
+description: The top of a page - its title, what it holds, its status and its actions, and the way back - in the same order on every page of a product.
+draft: true
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+The title is an `h2` because the page already has a heading in its header bar.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The title of the page header is the `h1`; its size comes from `typography`.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A link "Back" that runs `history.back()` whatever page came before.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A link to the page above, named after it: "Requests".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The status only as the color of the title.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The status as a badge next to the title, with its name.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Six actions in a row, wrapping on three lines on a phone.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The actions of the whole page, three at most, the main one last.
+
+</mds-usage>
+</Usages>

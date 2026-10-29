@@ -1,0 +1,53 @@
+---
+title: Dettaglio di un record - Linee guida
+description: Un record di una lista - cos'è, a che punto è, cosa ci si può fare adesso, i suoi dati, documenti e cronologia - e la strada per tornare alla lista.
+draft: true
+---
+
+## Comportamento
+
+- **Lo stato decide le azioni.** Ogni stato mostra solo le azioni che si possono eseguire in
+  quello stato: niente pulsanti disabilitati su cui tirare a indovinare. L'azione principale
+  viene per ultima, nel tono forte; le altre sono più leggere.
+- **Un'azione che ha bisogno di parole le chiede prima.** Richiedere documenti o chiudere
+  l'istanza apre un dialogo con un campo obbligatorio: se resta vuoto, il campo riceve un
+  messaggio d'errore e il focus. Le azioni che non chiedono nulla partono subito.
+- **La pagina mostra il record che restituisce il back end.** Dopo un'azione, stato, azioni e
+  cronologia arrivano dalla risposta del back end, non da una supposizione della pagina: quello
+  che è a schermo è quello che è stato salvato.
+- **Un'azione fallita non cambia nulla.** Il record resta com'era, il dialogo resta aperto con
+  quello che c'era scritto, e un messaggio dice di riprovare.
+- **L'indirizzo contiene il record e la scheda.** Un link alla cronologia di un'istanza si apre
+  sulla sua cronologia.
+- **Indietro riporta alla lista com'era.** Quando è stata la lista ad aprire il record, il link
+  per tornare va indietro nella cronologia del browser, e la lista torna con la sua ricerca, i
+  suoi filtri e la sua pagina.
+- **Non trovato non è un errore.** Un record che non esiste lo dice e porta alla lista; una
+  richiesta che fallisce propone di riprovare.
+
+## Accessibilità
+
+- L'oggetto è il titolo della pagina; il numero sopra e la riga sotto sono testo.
+- Dopo un'azione il pulsante che l'ha eseguita può sparire, perché le azioni seguono lo stato: il
+  focus passa al titolo, che ha `tabindex="-1"`, invece di ricadere in cima alla pagina.
+- L'esito di un'azione è un toast in un `mds-toast-region`, che lo legge senza spostare il
+  focus.
+- Il dialogo ha un nome, il suo titolo, e prende il focus quando si apre; il campo obbligatorio
+  dice a parole cosa manca.
+- I dati sono un elenco descrittivo (`dl`, `dt`, `dd`), così ogni valore viene letto con la sua
+  etichetta. Magma non ha ancora un componente per questo: il codice usa gli elementi nativi, con
+  `mds-text` dentro.
+- I documenti sono pulsanti, annunciati come tali e aperti dalla tastiera: `mds-file` dà loro il
+  ruolo e i tasti.
+
+## Contenuti
+
+- Il titolo è ciò di cui tratta il record, "Cambio di residenza"; il numero va sopra, più piccolo.
+  Le persone riconoscono un oggetto, e copiano un numero.
+- Chiama le azioni con quello che fanno al record, con un verbo: "Richiedi documenti", "Chiudi
+  istanza", mai "OK" o "Procedi".
+- Il pulsante di conferma di un dialogo ripete l'azione, "Chiudi l'istanza", invece di
+  "Conferma".
+- Il testo di un dialogo dice cosa succede dopo: chi riceve cosa, e se si può tornare indietro.
+- Una riga della cronologia dice chi ha fatto cosa, e quando; la nota resta come è stata scritta.
+- Conferma un'azione al passato: "L'istanza è stata chiusa."

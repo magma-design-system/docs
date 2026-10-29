@@ -3,18 +3,25 @@
 // Starlight gives it: the first entry of the table of contents links to it.
 // Component pages get a header instead: the name of the component as the
 // title, its tag under it, then where the page comes from, close together.
-// Their sub-pages are named by the "Documentation" column (DocsNav.astro).
+// Their sub-pages are named by the "Documentation" column (DocsNav.astro), and
+// so are those of a pattern or a block: they keep the title of its overview.
 import { getEntry } from 'astro:content';
 import Code from '../Code.astro';
 import { parseComponentPath } from '../../lib/components';
 import { magmaVersion } from '../../lib/magma.mjs';
 import { TEXT } from '../../lib/markdown-text.mjs';
 import { componentName } from '../../lib/nav.mjs';
+import { parsePatternPath, patternEntryId } from '../../lib/patterns';
 
 const { entry, locale } = Astro.locals.starlightRoute;
 const { t } = Astro.locals;
 const path = parseComponentPath(Astro.url.pathname, locale);
 const component = path && (await getEntry('components', path.tag));
+const pattern = parsePatternPath(Astro.url.pathname, locale);
+const overview =
+  pattern?.slug &&
+  ((await getEntry('docs', patternEntryId(locale, pattern.kind, pattern.id))) ??
+    (await getEntry('docs', patternEntryId(undefined, pattern.kind, pattern.id))));
 ---
 
 {component ? (
@@ -39,6 +46,6 @@ const component = path && (await getEntry('components', path.tag));
   </div>
 ) : (
   <mds-text id="_top" typography="h2" tag="h1" class:list={[TEXT.heading.h1, 'mt-400']}>
-    {entry.data.title}
+    {(overview || entry).data.title}
   </mds-text>
 )}

@@ -1,0 +1,74 @@
+---
+title: Lista con filtri - Errori da evitare
+description: Una lista di record in cui cercare, da restringere, ordinare e scorrere per pagine, con gli stati di caricamento, di nessun risultato e di errore e la ricerca conservata nell'indirizzo.
+draft: true
+---
+
+import Usages from '../../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+La pagina carica tutti i record e li filtra nel browser.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il back end cerca, conta, ordina e divide in pagine; la pagina riceve una pagina.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Le colonne di una lista a pagine si ordinano con `sortable` su `mds-table-header-cell`: ordina
+solo le righe a schermo.
+
+</mds-usage>
+<mds-usage variant="do">
+
+L'ordinamento fa parte della ricerca: il back end ordina tutto l'insieme, poi lo divide in
+pagine.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Lo stato cambia e la lista resta a pagina 4, che non esiste più.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Ogni cambiamento dei filtri riporta a pagina 1.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+I filtri vivono solo nella pagina: un ricaricamento, o Indietro da un record, li perde.
+
+</mds-usage>
+<mds-usage variant="do">
+
+La ricerca sta nell'indirizzo, e la pagina la legge quando si apre.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una ricerca a ogni tasto, e vince la risposta che arriva per ultima, anche quando risponde a una
+ricerca più vecchia.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Una ricerca quando la digitazione si ferma, e ogni nuova ricerca annulla quella ancora in corso.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una richiesta fallita mostra "Nessuna istanza corrisponde".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Una richiesta fallita mostra un errore con la possibilità di riprovare; lo stato vuoto è solo
+per un insieme vuoto.
+
+</mds-usage>
+</Usages>

@@ -1,0 +1,49 @@
+---
+title: List with filters
+description: A list of records to search, narrow down, sort and page through, with its loading, empty and error states and the query kept in the address.
+draft: true
+---
+
+import PatternAgent from '../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+
+<PatternAgent id="list-with-filters" />
+
+The screen people open most in a management application: the list of the records they work on -
+requests, documents, payments, files - where they find the ones they need. They search it,
+narrow it down by status or by office, sort it and move through its pages, and they come back
+to it after opening a record, expecting to find it as they left it.
+
+<PatternPreview id="list-with-filters" />
+
+## When to use it
+
+Use it when people look for records in a set too large to read through: dozens of records or
+more, with a few properties worth filtering on. Something else fits better:
+
+- With a handful of records, show them all: filters and pages only get in the way.
+- When the records are visual, such as images or documents to preview, show them as cards in a
+  grid; the search, the filters and the pages stay the same.
+- When people pick one record to go on with a task, such as a recipient in a form, a search
+  field with suggestions is quicker than a whole list.
+
+## Anatomy
+
+1. **Title and description**: what the list holds, as the heading of the page.
+2. **Search and filters**: a form with the role of a search, with a field that searches the
+   number and the subject, a select for each property with a few values, and the order.
+3. **Status filter**: the statuses as an `mds-filter`, one at a time, each with the number of
+   records it would show.
+4. **Summary**: which records are on screen out of how many, and the button that clears the
+   filters when there are any.
+5. **Results**: one row per record, its number linking to its page.
+6. **Pages**: the paginator, only when there is more than one page.
+
+Three states replace or join the results: **loading** (a spinner in the search field, while
+the results already there stay), **no results** (a message with a way out), **error** (a
+banner with a way to try again).
+
+## Components
+
+<PatternComponents id="list-with-filters" />

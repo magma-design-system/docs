@@ -1,0 +1,52 @@
+---
+title: Record detail - Guidelines
+description: One record of a list - what it is, where it stands, what can be done with it now, its data, documents and history - and the way back to the list.
+draft: true
+---
+
+## Behavior
+
+- **The status decides the actions.** Each status shows only the actions that can run in it:
+  there are no disabled buttons to guess about. The main action comes last, in the strong tone;
+  the others are weaker.
+- **An action that needs words asks for them first.** Requesting documents or closing the
+  request opens a dialog with a required field: left empty, the field gets an error message and
+  the focus. Actions that need nothing run at once.
+- **The page shows the record the back end returns.** After an action, the status, the actions
+  and the history come from the answer of the back end, not from a guess of the page: what is on
+  screen is what was saved.
+- **A failed action changes nothing.** The record stays as it was, the dialog stays open with
+  what was written, and a message says to try again.
+- **The address holds the record and the tab.** A link to the history of a request opens on its
+  history.
+- **Back returns to the list as it was.** When the list opened the record, the link back goes
+  back in the history of the browser, and the list comes back with its search, its filters and
+  its page.
+- **Not found is not an error.** A record that does not exist says so and links to the list; a
+  request that fails offers to try again.
+
+## Accessibility
+
+- The subject is the heading of the page; the number above it and the line below are text.
+- After an action the button that ran it may be gone, since the actions follow the status: the
+  focus moves to the heading, which has `tabindex="-1"`, instead of falling back to the top of
+  the page.
+- The outcome of an action is a toast in an `mds-toast-region`, which reads it out without
+  moving the focus.
+- The dialog has a name, its title, and takes the focus when it opens; the required field says
+  in words what is missing.
+- The data is a description list (`dl`, `dt`, `dd`), so every value is read with its label.
+  Magma has no component for it yet: the code uses the native elements, with `mds-text` inside.
+- The documents are buttons, announced as such and opened from the keyboard: `mds-file` gives
+  them the role and the keys.
+
+## Content
+
+- The heading is what the record is about, "Change of residence"; the number goes above it,
+  smaller. People recognize a subject, and copy a number.
+- Name actions after what they do to the record, with a verb: "Request documents", "Close
+  request", never "OK" or "Proceed".
+- The confirm button of a dialog repeats the action, "Close the request", instead of "Confirm".
+- The text of a dialog says what follows: who receives what, and whether it can be undone.
+- A line of the history says who did what, and when; the note stays as it was written.
+- Confirm an action in the past: "The request was closed."

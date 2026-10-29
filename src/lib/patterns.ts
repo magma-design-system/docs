@@ -1,15 +1,25 @@
-// The patterns of the Patterns section: one folder per pattern in
-// src/patterns/, with the same screen in each framework of FrameworkTabs:
-// `example.html` (plain HTML; it is also the live preview, see
-// src/pages/example/pattern/[id].astro), `react.tsx` and `angular.ts`. They are
-// sample code for other projects, not code of this site: tsconfig.json leaves
-// the framework ones out of the type check.
+// The patterns of the Patterns section and the blocks of the Building blocks
+// section: one folder each in src/patterns/ or src/blocks/, with the same
+// screen in each framework of FrameworkTabs: `example.html` (plain HTML; it is
+// also the live preview, see src/pages/example/[kind]/[id].astro), `react.tsx`
+// and `angular.ts`, which a sketch may not have yet. They are sample code for
+// other projects, not code of this site: tsconfig.json leaves the framework
+// ones out of the type check.
+//
+// Their pages are made like the pages of a component: an overview, then
+// sub-pages listed in the "Documentation" column (DocsNav.astro), each a page
+// of its own in src/content/docs/<kind>/<id>/.
+import { localePrefix } from './frame';
 
-const sources = import.meta.glob<string>('../patterns/*/*.{html,tsx,ts}', {
+const sources = import.meta.glob<string>('../{patterns,blocks}/*/*.{html,tsx,ts}', {
   query: '?raw',
   import: 'default',
   eager: true,
 });
+
+/** The section of a folder, as its folder in src/ and its path on the site. */
+export type PatternKind = 'patterns' | 'blocks';
+export const PATTERN_KINDS: PatternKind[] = ['patterns', 'blocks'];
 
 /** What each file of a pattern folder is, and how the code block names it. */
 const FILES = {
@@ -20,45 +30,120 @@ const FILES = {
 
 export type PatternFramework = keyof typeof FILES;
 
-function source(id: string, file: string) {
-  const code = sources[`../patterns/${id}/${file}`];
-  if (code === undefined) throw new Error(`No pattern file src/patterns/${id}/${file}`);
-  return code;
-}
+const source = (kind: PatternKind, id: string, file: string) => sources[`../${kind}/${id}/${file}`];
 
-/** Every pattern, by the name of its folder. */
-export function patternIds() {
+/** Every pattern or block, by the name of its folder. */
+export function patternIds(kind: PatternKind = 'patterns') {
   return [
     ...new Set(
       Object.keys(sources)
+        .filter((path) => path.startsWith(`../${kind}/`))
         .map((path) => path.split('/')[2])
         .filter(Boolean),
     ),
   ].sort();
 }
 
-/** The code of a pattern in each framework, with the language of its code block. */
-export function patternCode(id: string) {
+/**
+ * The code of a pattern in each framework it has, with the language of its
+ * code block: always the plain HTML one.
+ */
+export function patternCode(id: string, kind: PatternKind = 'patterns') {
   return Object.fromEntries(
-    Object.entries(FILES).map(([framework, { file, lang }]) => [
-      framework,
-      { code: source(id, file).trimEnd(), lang },
-    ]),
-  ) as Record<PatternFramework, { code: string; lang: string }>;
+    Object.entries(FILES).flatMap(([framework, { file, lang }]) => {
+      const code = source(kind, id, file);
+      return code === undefined ? [] : [[framework, { code: code.trimEnd(), lang }]];
+    }),
+  ) as Partial<Record<PatternFramework, { code: string; lang: string }>>;
 }
 
 /** The markup of the live preview: the plain HTML version. */
-export function patternExample(id: string) {
-  return source(id, FILES.vanilla.file);
+export function patternExample(id: string, kind: PatternKind = 'patterns') {
+  const code = source(kind, id, FILES.vanilla.file);
+  if (code === undefined) throw new Error(`No file src/${kind}/${id}/${FILES.vanilla.file}`);
+  return code;
 }
+
+/** The address of the live preview, alone on a page; `query` sets it up (`case=2`). */
+export function patternPreviewHref(id: string, kind: PatternKind = 'patterns', query = '') {
+  const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+  return `${base}example/${kind === 'blocks' ? 'block' : 'pattern'}/${id}/${query && `?${query}`}`;
+}
+
+/**
+ * What the small preview of the section navigation shows when it is not the
+ * screen as it opens, by section and folder: a sketch with a demo panel shows
+ * one of its cases, without the panel.
+ */
+const NAV_PREVIEW: Record<string, string> = { 'patterns/messages': 'case=4' };
+
+export const navPreviewQuery = (id: string, kind: PatternKind = 'patterns') =>
+  NAV_PREVIEW[`${kind}/${id}`];
 
 /**
  * The Magma components the plain HTML version uses, by tag, in alphabetical
  * order: the ones in its markup and the ones its script creates.
  */
-export function patternComponents(id: string) {
-  const uses = patternExample(id).matchAll(
+export function patternComponents(id: string, kind: PatternKind = 'patterns') {
+  const uses = patternExample(id, kind).matchAll(
     /<(mds-[a-z-]+)|createElement\(['"](mds-[a-z-]+)['"]\)/g,
   );
   return [...new Set([...uses].map(([, tag, created]) => tag ?? created))].sort();
+}
+
+export interface PatternPage {
+  id: 'overview' | 'guidelines' | 'code' | 'mistakes';
+  /** Last segment of the URL, `undefined` for the overview. */
+  slug: string | undefined;
+  /** Key of the UI dictionaries. */
+  label:
+    | 'component.page.overview'
+    | 'pattern.page.guidelines'
+    | 'pattern.page.code'
+    | 'component.page.mistakes';
+}
+
+/**
+ * The pages of a pattern or a block, in the order of the "Documentation"
+ * column, as Overview, API, CSS, Examples and Mistakes for a component: the
+ * overview (what it is for, the preview, when to use it, its anatomy and
+ * components), the guidelines (behavior, accessibility, content), the code,
+ * the mistakes. A page exists when its file does.
+ */
+export const patternPages: PatternPage[] = [
+  { id: 'overview', slug: undefined, label: 'component.page.overview' },
+  { id: 'guidelines', slug: 'guidelines', label: 'pattern.page.guidelines' },
+  { id: 'code', slug: 'code', label: 'pattern.page.code' },
+  { id: 'mistakes', slug: 'mistakes', label: 'component.page.mistakes' },
+];
+
+/** The id of a page in the docs collection: `it/patterns/list-with-filters/code`. */
+export function patternEntryId(
+  locale: string | undefined,
+  kind: PatternKind,
+  id: string,
+  slug?: string,
+) {
+  return `${locale ? `${locale}/` : ''}${kind}/${id}${slug ? `/${slug}` : ''}`;
+}
+
+export function patternHref(
+  locale: string | undefined,
+  kind: PatternKind,
+  id: string,
+  slug?: string,
+) {
+  return `${localePrefix(locale)}/${kind}/${id}/${slug ? `${slug}/` : ''}`;
+}
+
+/** Section, folder and sub-page of a pattern or block page URL, `undefined` for any other page. */
+export function parsePatternPath(pathname: string, locale: string | undefined) {
+  for (const kind of PATTERN_KINDS) {
+    const prefix = `${localePrefix(locale)}/${kind}/`;
+    if (!pathname.startsWith(prefix)) continue;
+    const [id, slug] = pathname.slice(prefix.length).split('/');
+    if (!id || !patternIds(kind).includes(id)) return undefined;
+    return { kind, id, slug: slug || undefined };
+  }
+  return undefined;
 }

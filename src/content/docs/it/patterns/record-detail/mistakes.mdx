@@ -1,0 +1,70 @@
+---
+title: Dettaglio di un record - Errori da evitare
+description: Un record di una lista - cos'è, a che punto è, cosa ci si può fare adesso, i suoi dati, documenti e cronologia - e la strada per tornare alla lista.
+draft: true
+---
+
+import Usages from '../../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+Tutte le azioni sono sempre a schermo, e quelle che non si possono eseguire sono disabilitate.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A schermo ci sono solo le azioni che lo stato consente.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Dopo un'azione, la pagina cambia lo stato da sola, e spera che il back end sia d'accordo.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Dopo un'azione, la pagina mostra il record che restituisce il back end.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un dialogo chiede "Sei sicuro?" con OK e Annulla.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il dialogo dice cosa succederà, e il suo pulsante ripete l'azione: "Chiudi l'istanza".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il pulsante dell'azione sparisce con il vecchio stato, e il focus ricade in cima alla pagina.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il focus passa al titolo della pagina, e l'esito viene letto.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il link per tornare apre la lista da capo, senza la ricerca e i filtri.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Indietro riporta alla lista com'era.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un record che non esiste mostra un errore e "Riprova".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Dice che il record non esiste, e porta alla lista.
+
+</mds-usage>
+</Usages>

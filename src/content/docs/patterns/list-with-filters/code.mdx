@@ -1,0 +1,14 @@
+---
+title: List with filters - Code
+description: A list of records to search, narrow down, sort and page through, with its loading, empty and error states and the query kept in the address.
+draft: true
+---
+
+import PatternCode from '../../../../components/PatternCode.astro';
+
+The plain HTML version is the one running in the preview of the [overview](../). In all three, `fetchRequests`
+stands in for the back end and works on demo data: replace it with the call to your API. The
+Angular component reads and writes the query through the router, so it must be the component
+of a route.
+
+<PatternCode id="list-with-filters" />

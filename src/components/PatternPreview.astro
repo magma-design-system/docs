@@ -1,28 +1,31 @@
 ---
-// The live preview of a pattern: its plain HTML version running in an iframe
-// (src/pages/example/pattern/[id].astro) on the stage of the component
-// previews (Playground.astro), whose handles narrow it down to a phone and
-// make it shorter or taller, and a button that opens it alone in a new tab,
-// as the page of an application.
+// The live preview of a pattern or a block: its plain HTML version running in
+// an iframe (src/pages/example/[kind]/[id].astro) on the stage of the
+// component previews (Playground.astro), whose handles narrow it down to a
+// phone and make it shorter or taller, and a button that opens it alone in a
+// new tab, as the page of an application.
+import { patternPreviewHref, type PatternKind } from '../lib/patterns';
 import Playground from './Playground.astro';
 
 interface Props {
-  /** The folder of the pattern in src/patterns/. */
+  /** The folder of the pattern in src/patterns/, or of the block in src/blocks/. */
   id: string;
+  kind?: PatternKind;
 }
 
-const { id } = Astro.props;
+const { id, kind = 'patterns' } = Astro.props;
 const { t } = Astro.locals;
-const src = `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/pattern/${id}/`;
+const src = patternPreviewHref(id, kind);
+const strings = kind === 'blocks' ? 'block' : 'pattern';
 ---
 
 <Playground
-  tag={`pattern-${id}`}
+  tag={`${strings}-${id}`}
   props={[]}
   example=""
   src={src}
-  intro={t('pattern.preview.intro')}
-  title={t('pattern.preview.title')}
+  intro={t(`${strings}.preview.intro`)}
+  title={t(`${strings}.preview.title`)}
 >
   <mds-button
     slot="actions"

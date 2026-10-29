@@ -1,0 +1,74 @@
+---
+title: Messages
+description: Where each message of an application goes - under a field, in the part of the page it is about, in the dialog still open, in a toast, in a dialog that asks first - so that people find it where they are looking.
+draft: true
+---
+
+import PatternAgent from '../../../../components/PatternAgent.astro';
+import PatternCases from '../../../../components/PatternCases.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+
+<PatternAgent id="messages" />
+
+An application talks to people all the time: a field is missing, a list did not load, a change
+was saved, a deletion needs a yes. A message works only when it is seen where people are looking,
+understood, and answered when it asks something. Magma has a component for each kind of message;
+this pattern decides which one goes where, with one rule:
+
+**A message goes where the thing it talks about is.**
+
+<PatternPreview id="messages" />
+
+## When to use it
+
+Whenever the application tells people what happened, or asks them something before going on:
+the message of a field, a part of the page that failed, the result of an action, a decision, a
+notice about the whole application. The other states of a screen in the same group, Messages
+and states - nothing to show yet, loading - will have patterns of their own.
+
+## The cases
+
+Seven cases cover the messages of a management application. Each card shows the preview above in
+that case; open it to try it.
+
+<PatternCases
+  id="messages"
+  cases={[
+    {
+      title: 'A field',
+      text: 'Under the field, the message of `mds-input-field`, from the moment the form is sent until the field changes.',
+    },
+    {
+      title: 'A part of the page that failed',
+      text: 'In that part, an `mds-banner` error with Try again. What was on screen stays.',
+    },
+    {
+      title: 'An action that failed while its place is open',
+      text: 'In the dialog, an `mds-banner` error. What was written stays.',
+    },
+    {
+      title: 'An action that succeeded, whose place is gone',
+      text: 'A toast that leaves after 5 seconds, after every create, edit and delete: the dialog is closed, the record deleted.',
+    },
+    {
+      title: 'The same action, failed',
+      text: 'A toast that stays, with Try again: `mds-toast` error with `duration="0"`.',
+    },
+    {
+      title: 'A decision before going on',
+      text: 'A dialog, `mds-modal`, that names the object and the consequence, before anything changes.',
+    },
+    {
+      title: 'The whole application, with a deadline',
+      text: 'A strict dialog, which also opens over another one: the session is about to end.',
+    },
+  ]}
+/>
+
+A notice about the whole application with nothing to decide, such as being offline and back
+online, is a toast too.
+
+## Components
+
+<PatternComponents id="messages" />

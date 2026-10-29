@@ -1,12 +1,13 @@
 <!--
-  Feedback, a sketch: where each message of an application goes. The rule: a
-  message goes where the thing it talks about is. One screen, the users of a
-  back office, with an action for each case, and a demo panel that makes the
+  Messages: where each message of an application goes. The rule: a message
+  goes where the thing it talks about is. One screen, the users of a back
+  office, with an action for each case, and a demo panel that makes the
   server fail or the session end. Plain HTML with Magma's components, styles
-  and Tailwind theme.
+  and Tailwind theme. A sketch still: no React and Angular versions yet.
 
-  Not a pattern page yet: it is here to look at the cases together before
-  writing one, so it has no React and Angular versions.
+  ?case=1 to ?case=7 open the screen on one case, without the demo panel and
+  with nothing that leaves by itself: the small previews of the cases on the
+  page of the pattern.
 -->
 <main class="flex min-w-0 flex-col gap-600">
   <header class="flex flex-wrap items-end justify-between gap-400">
@@ -21,6 +22,7 @@
 
   <!-- Demo only: not part of the screen. -->
   <aside
+    id="demo"
     aria-labelledby="demo-title"
     class="flex flex-col gap-400 rounded-xl bg-surface-sunken p-500"
   >
@@ -306,6 +308,8 @@
     const element = document.createElement('mds-toast');
     element.variant = variant;
     element.textContent = message;
+    // Demo only: a case shown still keeps its toast.
+    if (still) element.duration = 0;
     if (actions.length) {
       element.duration = 0;
       element.dismissible = true;
@@ -627,5 +631,54 @@
     status,
   }));
 
-  load();
+  // ---- Demo only: one case at a time ----------------------------------------
+
+  // /example/pattern/messages/?case=4: the screen on that case, as the cards
+  // of the cases show it, without the panel and with toasts that stay.
+  const shown = Number(new URLSearchParams(location.search).get('case'));
+  const still = shown >= 1 && shown <= 7;
+
+  /** Each case, from the list as it loads. */
+  const CASES = {
+    // A field: the form sent with the email empty.
+    1: () => {
+      openEdit();
+      fields.name.input.value = 'Sara Conti';
+      form.requestSubmit();
+    },
+    // A part of the page: the list does not load again; its rows stay.
+    2: () => {
+      server.failing = true;
+      return load();
+    },
+    // An action whose place is open: saving in the dialog fails.
+    3: () => {
+      openEdit(users[1]);
+      server.failing = true;
+      form.requestSubmit();
+    },
+    // An action whose place is gone: the changes are saved, the dialog closed.
+    4: () => toast(`Changes to ${users[1].name} saved.`),
+    // The same, failed: the invitation does not leave.
+    5: () => {
+      server.failing = true;
+      return resend(users[2], rows.querySelector('[data-action="resend"]'));
+    },
+    // A decision: delete asks first.
+    6: () => openConfirm(users[1]),
+    // The whole application: the session ends, also over an open dialog.
+    7: () => {
+      openEdit(users[0]);
+      sessionDialog.opened = true;
+    },
+  };
+
+  if (still) {
+    // Out of sight, not out of the page: load() runs its buttons. Its `flex`
+    // class would beat the `hidden` attribute.
+    $('demo').style.display = 'none';
+    load().then(CASES[shown]);
+  } else {
+    load();
+  }
 </script>

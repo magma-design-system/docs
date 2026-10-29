@@ -1,0 +1,48 @@
+---
+title: Record detail
+description: One record of a list - what it is, where it stands, what can be done with it now, its data, documents and history - and the way back to the list.
+draft: true
+---
+
+import PatternAgent from '../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+
+<PatternAgent id="record-detail" />
+
+The page of one record: the request, the document, the payment someone opened from a
+[list](../list-with-filters/). People come to it to see where the record stands and to move it
+forward: they read its status, check its data and documents, run the action the status allows,
+and go back to the list.
+
+<PatternPreview id="record-detail" />
+
+## When to use it
+
+Use it for records people work on over time, with a status, a few actions and a history.
+Something else fits better:
+
+- A record with a few fields and nothing to do with it: show it in its row of the list, or in a
+  panel next to the list, without a page of its own.
+- A record to edit field by field: a form, where the fields are changed, checked and saved
+  together.
+- Records to compare: the list, with the values side by side in its columns.
+
+## Anatomy
+
+1. **Back to the list**: a link that returns to the list as it was.
+2. **Identity**: the number of the record, its subject as the heading of the page, its status as
+   a badge, and a line that says where it belongs and when it arrived.
+3. **Actions**: the ones the status allows, the main one last and in the strong tone.
+4. **Tabs**: the data, the documents and the history, one at a time.
+5. **Data**: labels and values, in two columns when there is room.
+6. **Documents**: one `mds-file` for each file.
+7. **History**: who did what, and when, the newest first, with the note written with the action.
+
+Around them: **loading** (a spinner), **not found** (a message with a link to the list),
+**error** (a banner with a way to try again), and the **feedback** of each action (a toast, also
+read out by screen readers).
+
+## Components
+
+<PatternComponents id="record-detail" />

@@ -1,0 +1,60 @@
+---
+// The cases of a pattern, one card each, numbered: the preview of the pattern
+// running small on that case (MiniPreview.astro, `case=<n>` in its address,
+// which its example.html reads), what the case is and where its message goes,
+// and a button that opens the case alone in a new tab, to try it. Two columns
+// when the content column has room, as the cards of the landing pages
+// (PageCards.astro).
+import { patternPreviewHref, type PatternKind } from '../lib/patterns';
+import MiniPreview from './MiniPreview.astro';
+import UiText from './UiText.astro';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/. */
+  id: string;
+  kind?: PatternKind;
+  /** In the order of the cases of its example: the first is `case=1`. Text with `code` in backticks. */
+  cases: { title: string; text: string }[];
+}
+
+const { id, kind = 'patterns', cases } = Astro.props;
+const { t } = Astro.locals;
+---
+
+{/* `not-content`: Starlight would put 1rem above every card but the first. */}
+<div class="not-content @container my-600">
+  <ol class="m-0 grid list-none gap-600 p-0 @xl:grid-cols-2">
+    {cases.map(({ title, text }, index) => {
+      const query = `case=${index + 1}`;
+      const src = patternPreviewHref(id, kind, query);
+      return (
+        <li class="flex">
+          <mds-card class="w-full [--mds-card-background:rgb(var(--magma-surface-overlay))]">
+            <mds-card-header class="flex-col items-stretch gap-400">
+              <MiniPreview id={id} kind={kind} query={query} href={src} shape="landscape" />
+              <mds-text typography="h6" tag="h3">
+                {`${index + 1}. ${title}`}
+              </mds-text>
+            </mds-card-header>
+            <mds-card-content class="pt-0">
+              <mds-text typography="detail">
+                <UiText text={text} />
+              </mds-text>
+            </mds-card-content>
+            <mds-card-footer>
+              <mds-button
+                href={src}
+                target="blank"
+                label={t('pattern.cases.open')}
+                aria-label={`${t('pattern.cases.open')}: ${title}`}
+                icon="mi/baseline/open-in-new"
+                variant="primary"
+                tone="text"
+              />
+            </mds-card-footer>
+          </mds-card>
+        </li>
+      );
+    })}
+  </ol>
+</div>

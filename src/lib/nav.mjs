@@ -69,17 +69,29 @@ export const sections = [
     group: 'guidelines',
     icon: 'mi/outline/extension',
     soon: true,
-    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
+    // Each block with a small preview of it (SectionEntries.astro). Its
+    // sub-pages are listed in the "Documentation" column (src/lib/patterns.ts).
+    items: () =>
+      published([
+        { slug: 'blocks', ...sidebarLabel('nav.overview') },
+        { slug: 'blocks/page-header' },
+      ]),
   },
   {
     id: 'patterns',
     group: 'guidelines',
     icon: 'mi/outline/view-quilt',
     soon: true,
-    // The groups of the landing page, in its order.
+    // The groups of the landing page, in its order. Each pattern with a small
+    // preview of it (SectionEntries.astro); its sub-pages are listed in the
+    // "Documentation" column (src/lib/patterns.ts).
     items: () =>
       published([
         { slug: 'patterns', ...sidebarLabel('nav.overview') },
+        {
+          ...sidebarLabel('nav.patterns.messages'),
+          items: [{ slug: 'patterns/messages' }],
+        },
         {
           ...sidebarLabel('nav.patterns.data'),
           items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
@@ -292,6 +304,7 @@ export const GROUP_ICONS = {
   'nav.tokens.tools': 'mi/outline/handyman',
   'nav.icons.guides': 'mi/outline/menu-book',
   'nav.icons.packages': 'mi/outline/inventory-2',
+  'nav.patterns.messages': 'mi/outline/notifications',
   'nav.patterns.data': 'mi/outline/table-chart',
   'nav.brand.assets': 'mi/outline/collections',
   'nav.brand.package': 'mi/outline/inventory-2',
@@ -314,13 +327,14 @@ export const GROUP_ICONS = {
 
 /**
  * Whether the page of a sidebar slug is a draft (`draft: true` in its front
- * matter). Read on use, from astro.config.mjs: once bundled, `import.meta.url`
- * no longer points at src/ (as in i18n.mjs).
+ * matter), a file or the index of a folder (the overview of a pattern, with
+ * its sub-pages around it). Read on use, from astro.config.mjs: once bundled,
+ * `import.meta.url` no longer points at src/ (as in i18n.mjs).
  * @param {string} slug
  */
 function isDraft(slug) {
-  for (const extension of ['mdx', 'md']) {
-    const file = new URL(`../content/docs/${slug}.${extension}`, import.meta.url);
+  for (const path of [slug, `${slug}/index`].flatMap((path) => [`${path}.mdx`, `${path}.md`])) {
+    const file = new URL(`../content/docs/${path}`, import.meta.url);
     if (!existsSync(file)) continue;
     const frontMatter = readFileSync(file, 'utf8').split(/^---$/m)[1] ?? '';
     return /^draft:\s*true\s*$/m.test(frontMatter);
