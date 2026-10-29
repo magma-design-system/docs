@@ -32,7 +32,7 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.8.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
+As of Magma 2.9.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
 `disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
 dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
