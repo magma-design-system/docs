@@ -11,6 +11,8 @@ import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
 export const REPOSITORY = 'https://github.com/magma-design-system/magma';
+/** The repository of this site, where the code of the patterns and blocks lives for now. */
+export const SITE_REPOSITORY = 'https://github.com/magma-design-system/docs';
 /** The published Storybook, as the installed Magma gives it. */
 export const STORYBOOK = loadComponentDocs().storybook;
 
@@ -69,12 +71,13 @@ export const sections = [
     group: 'guidelines',
     icon: 'mi/outline/extension',
     soon: true,
-    // Each block with a small preview of it (SectionEntries.astro). Its
-    // sub-pages are listed in the "Documentation" column (src/lib/patterns.ts).
+    // The groups of the landing page, in its order (its gallery,
+    // PatternGallery.astro). The sub-pages of a block are listed in the
+    // "Documentation" column (src/lib/patterns.ts).
     items: () =>
       published([
         { slug: 'blocks', ...sidebarLabel('nav.overview') },
-        { slug: 'blocks/page-header' },
+        { ...sidebarLabel('nav.blocks.page'), items: [{ slug: 'blocks/page-header' }] },
       ]),
   },
   {
@@ -82,8 +85,8 @@ export const sections = [
     group: 'guidelines',
     icon: 'mi/outline/view-quilt',
     soon: true,
-    // The groups of the landing page, in its order. Each pattern with a small
-    // preview of it (SectionEntries.astro); its sub-pages are listed in the
+    // The groups of the landing page, in its order (its gallery,
+    // PatternGallery.astro). The sub-pages of a pattern are listed in the
     // "Documentation" column (src/lib/patterns.ts).
     items: () =>
       published([
@@ -304,6 +307,7 @@ export const GROUP_ICONS = {
   'nav.tokens.tools': 'mi/outline/handyman',
   'nav.icons.guides': 'mi/outline/menu-book',
   'nav.icons.packages': 'mi/outline/inventory-2',
+  'nav.blocks.page': 'mi/outline/web',
   'nav.patterns.messages': 'mi/outline/notifications',
   'nav.patterns.data': 'mi/outline/table-chart',
   'nav.brand.assets': 'mi/outline/collections',

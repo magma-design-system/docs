@@ -1,10 +1,8 @@
 ---
 // Links of a section, nested groups shown as sub-headings, each under its
 // icon (GROUP_ICONS in src/lib/nav.mjs). The rail draws its groups with the
-// same parts (NavList, NavHeading, NavLink). The links to a pattern or a block
-// show it running small, a gallery of what the section holds.
+// same parts (NavList, NavHeading, NavLink).
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
-import { parsePatternPath } from '../../lib/patterns';
 import NavHeading from './NavHeading.astro';
 import NavLink from './NavLink.astro';
 import NavList from './NavList.astro';
@@ -17,18 +15,12 @@ interface Props {
 }
 
 const { entries, currentHref, icons } = Astro.props;
-const { locale } = Astro.locals.starlightRoute;
 ---
 
 <NavList>
   {entries.map((entry) =>
     entry.type === 'link' ? (
-      <NavLink
-        href={entry.href}
-        label={entry.label}
-        current={entry.href === currentHref}
-        preview={parsePatternPath(entry.href, locale)}
-      />
+      <NavLink href={entry.href} label={entry.label} current={entry.href === currentHref} />
     ) : (
       <li class="mt-600">
         <NavHeading icon={icons.get(entry.label)}>{entry.label}</NavHeading>

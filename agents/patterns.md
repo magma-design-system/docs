@@ -87,9 +87,18 @@ components below take `kind="blocks"`.
   - `guidelines.mdx`: behavior, accessibility, content.
   - `code.mdx`: what to replace, then the code.
   - `mistakes.mdx`: the do and don't blocks.
-- The section navigation shows each pattern and block small (`MiniPreview.astro`, in
-  `NavLink.astro`): its preview page in an inert, lazy frame scaled down to the column. A
-  sketch with a demo panel shows one of its cases instead (`navPreviewQuery`).
+- The landing page of each section is its gallery (`PatternGallery.astro`, placed right after
+  the introduction): the patterns or blocks by topic, the groups of the section navigation
+  (`galleryGroups()`), each topic a heading that `src/route-data.ts` adds to the table of
+  contents. One card each: the pattern running small (`MiniPreview.astro`, an inert, lazy frame
+  scaled down to its box; a sketch with a demo panel shows one of its cases,
+  `cardPreviewQuery`), its title and description, then what it takes to find it again and
+  adapt it, by the rules of the product layers (plan/DIRECTION.md): its id, which does not
+  change, where its code is and in which frameworks, and what a product decides (`choices` in
+  the front matter of the overview, a sentence); the rest is always true. Decided on
+  2026-10-29: no previews in the section navigation, which stays a list of links by topic.
+- Every pattern and block belongs to a topic: a group in `src/lib/nav.mjs`, with its icon
+  (`GROUP_ICONS`). Building blocks start with Page structure.
 - **Cases**: a pattern made of cases (Messages) reads `?case=<n>` in its example and opens on
   that case, without its demo panel and with nothing that leaves by itself;
   `PatternCases.astro` shows each one small on a card, with a button to try it. A frame that is

@@ -6,44 +6,22 @@
 // whose line height adds space below it to the gap. It is pulled left by the
 // padding of the button, so that its label lines up with the headings
 // (NavHeading.astro) and the background of the selected or hovered one stands
-// out of the column. A pattern or a block shows a small preview of itself
-// above the button (MiniPreview.astro), as wide as the column.
-import MiniPreview from '../MiniPreview.astro';
-import { navPreviewQuery, type PatternKind } from '../../lib/patterns';
-
+// out of the column.
 interface Props {
   href: string;
   label: string;
   current: boolean;
   /** Long labels wrap rather than end in an ellipsis (the right column). */
   wrap?: boolean;
-  /** The pattern or block the link leads to, shown small above it. */
-  preview?: { id: string; kind: PatternKind };
   class?: string;
 }
 
-const { href, label, current, wrap = false, preview, class: className } = Astro.props;
+const { href, label, current, wrap = false, class: className } = Astro.props;
 ---
 
-<li
-  class:list={[
-    '-ml-300 flex',
-    wrap && 'max-w-[calc(100%_+_--spacing(300))]',
-    preview && 'mb-400 flex-col gap-200',
-    className,
-  ]}
->
-  {preview && (
-    <MiniPreview
-      id={preview.id}
-      kind={preview.kind}
-      query={navPreviewQuery(preview.id, preview.kind)}
-      href={href}
-      class="ms-300"
-    />
-  )}
+<li class:list={['-ml-300 flex', wrap && 'max-w-[calc(100%_+_--spacing(300))]', className]}>
   <mds-button
-    class="max-w-full self-start"
+    class="max-w-full"
     href={href}
     type="a"
     aria-current={current ? 'page' : undefined}

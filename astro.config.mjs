@@ -82,6 +82,9 @@ export default defineConfig({
       editLink: {
         baseUrl: 'https://github.com/magma-design-system/docs/edit/main/',
       },
+      // The topics of the galleries of Patterns and Building blocks in the
+      // table of contents of their landing pages.
+      routeMiddleware: './src/route-data.ts',
       // The page footer (Footer.astro) has no previous/next links.
       pagination: false,
       // One group per section of the rail: src/lib/nav.mjs.

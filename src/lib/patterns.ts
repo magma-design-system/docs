@@ -9,7 +9,8 @@
 // Their pages are made like the pages of a component: an overview, then
 // sub-pages listed in the "Documentation" column (DocsNav.astro), each a page
 // of its own in src/content/docs/<kind>/<id>/.
-import { localePrefix } from './frame';
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import { frameNav, localePrefix } from './frame';
 
 const sources = import.meta.glob<string>('../{patterns,blocks}/*/*.{html,tsx,ts}', {
   query: '?raw',
@@ -71,14 +72,14 @@ export function patternPreviewHref(id: string, kind: PatternKind = 'patterns', q
 }
 
 /**
- * What the small preview of the section navigation shows when it is not the
+ * What the small preview of its card in the gallery shows, when it is not the
  * screen as it opens, by section and folder: a sketch with a demo panel shows
  * one of its cases, without the panel.
  */
-const NAV_PREVIEW: Record<string, string> = { 'patterns/messages': 'case=4' };
+const CARD_PREVIEW: Record<string, string> = { 'patterns/messages': 'case=3' };
 
-export const navPreviewQuery = (id: string, kind: PatternKind = 'patterns') =>
-  NAV_PREVIEW[`${kind}/${id}`];
+export const cardPreviewQuery = (id: string, kind: PatternKind = 'patterns') =>
+  CARD_PREVIEW[`${kind}/${id}`];
 
 /**
  * The Magma components the plain HTML version uses, by tag, in alphabetical
@@ -146,4 +147,43 @@ export function parsePatternPath(pathname: string, locale: string | undefined) {
     return { kind, id, slug: slug || undefined };
   }
   return undefined;
+}
+
+/** A topic of the gallery of a landing page, with its patterns or blocks. */
+export interface GalleryGroup {
+  /** The id of its heading, which the table of contents links to. */
+  slug: string;
+  label: string;
+  items: { kind: PatternKind; id: string; href: string; label: string }[];
+}
+
+/** The id of a heading from its text, as Markdown makes it: `Messaggi e stati` -> `messaggi-e-stati`. */
+const slugOf = (text: string) =>
+  text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+/**
+ * The patterns or the blocks of the landing page of their section, by topic:
+ * the groups of the section navigation (src/lib/nav.mjs), in its order, which
+ * a production build leaves without the drafts. Empty on any other page. Read
+ * by the gallery (PatternGallery.astro) and by the table of contents
+ * (src/route-data.ts), which lists a heading for each group.
+ */
+export function galleryGroups(route: StarlightRouteData, pathname: string): GalleryGroup[] {
+  const kind = PATTERN_KINDS.find((kind) => pathname === `${localePrefix(route.locale)}/${kind}/`);
+  const { section } = frameNav(route, pathname);
+  if (!kind || section?.id !== kind) return [];
+  return section.group.entries.flatMap((entry) => {
+    if (entry.type !== 'group') return [];
+    const items = entry.entries.flatMap((link) => {
+      if (link.type !== 'link') return [];
+      const pattern = parsePatternPath(link.href, route.locale);
+      return pattern ? [{ ...pattern, href: link.href, label: link.label }] : [];
+    });
+    return items.length > 0 ? [{ slug: slugOf(entry.label), label: entry.label, items }] : [];
+  });
 }
