@@ -1,0 +1,24 @@
+---
+// A list of links of the frame's menus, the rail (SectionLinks.astro), the
+// section navigation (SectionEntries.astro) and the right column
+// (DocsNav.astro): its items are NavLink.astro, its groups NavHeading.astro.
+// The labels are titles, written as they must read: mds-button would
+// uppercase their first letter (iOS).
+interface Props {
+  /** The id of the heading that names the list. */
+  labelledby?: string;
+  class?: string;
+}
+
+const { labelledby, class: className } = Astro.props;
+---
+
+<ul
+  class:list={[
+    'm-0 flex list-none flex-col gap-100 p-0 [--mds-button-label-transform:none]',
+    className,
+  ]}
+  aria-labelledby={labelledby}
+>
+  <slot />
+</ul>

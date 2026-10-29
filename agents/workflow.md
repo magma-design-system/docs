@@ -34,7 +34,7 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: drafts, lab pages and previews of draft patterns are left out.
+- A production build is not dev: drafts and previews of draft patterns are left out.
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):
@@ -110,6 +110,10 @@ A new author, step by step:
 
 - Prefer few pull requests, each complete, over stacks of pull requests based on each other.
 - Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue).
+  It updates `magma` without `magma-react` and `magma-angular`, which ask for the same version as
+  a peer: `npm ci` stops on the conflict, and the build of the pull request is red. Bump the
+  three together (Upgrading Magma, below); magma 2.9.0 reached `main` this way, with a red
+  build, and the next updates merged red after it.
 
 ## Publishing
 
@@ -121,7 +125,7 @@ A new author, step by step:
   - Building blocks and Patterns exist only as their landing pages, with the "Under
     construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
     cards carry the badge.
-  - No placeholder text, no dev-only page (`/lab/`).
+  - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 
 ## Upgrading Magma

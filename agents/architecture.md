@@ -44,16 +44,34 @@ Starlight's components listed in `astro.config.mjs` are replaced by
 
 - `PageFrame`: the grid. Desktop: the rail on the page background, then a card with the section
   navigation, the content and the right column; `SiteFooter` under the card on every page.
-  Below 64rem: the mobile header (`Header`) with everything in its menu; the right column stays
-  down to 48rem.
-- `Rail`: brand, search field (`SearchField`, a button that opens Pagefind), the sections
-  (`SectionLinks`), repository and Storybook links, and a Preferences button that opens
-  `mds-pref` (mode, language, theme: `Preferences`) in an `mds-dropdown`. Collapsible to icons
-  with tooltips; the state is in `localStorage` (`magma-docs:rail`).
+  Below 64rem: the mobile header (`Header`) with everything in its menu. The right column stands
+  next to the content from 80rem (`wide`); below, it opens in a dropdown (`TwoColumnContent`).
+- `Rail`: brand, search field (`SearchField`, a button that opens Pagefind), the sections in
+  their groups (`SectionLinks`, `groups` of `frameNav()`), repository and Storybook links, and a
+  Preferences button that opens `mds-pref` (mode, language, theme: `Preferences`) in an
+  `mds-dropdown`. Collapsible to icons with tooltips; the state is in `localStorage`
+  (`magma-docs:rail`).
 - `Sidebar` / `SectionNav` / `SectionEntries`: the section navigation, from Starlight's sidebar.
+- `NavList` / `NavHeading` / `NavLink`: the parts of every menu of the frame (the open rail, the
+  section navigation, the right column), so they look alike: change the design of the menus
+  there, not in the menus.
 - `TwoColumnContent` / `PageSidebar` / `TableOfContents` / `DocsNav`: the right column, a table
   of contents with a reading indicator, or the sub-pages of a component, an icon set or a brand
-  group (`DocsNav`).
+  group (`DocsNav`). Below `wide` (1280px) the column moves into the `mds-dropdown` of the
+  button of the reading bar (`docs-aside`). The bar, at every width, names the section being
+  read and holds its anchor, a link to its heading that also copies the address: headings have
+  no anchor of their own. The section is the last heading reached (`src/scripts/reading.ts`,
+  shared with `docs-toc`) among the page title (`_top`) and the headings marked
+  `data-section-heading`, the h2 and h3 of `markdown-text.mjs` and `Heading.astro`, also on
+  pages whose column lists sub-pages. From `desktop` the bar floats over the top of the content
+  and slides down once the page scrolls (headings land below it: `--frame-reading-bar-height`
+  and the scroll padding in `magma.css`); below, the script moves it into the slot `nav` of the
+  mobile header's `mds-header-bar`, between the logo and the menu button. The bar is kept with
+  `docs-aside` from page to page: it takes the place of the bar of the new page, for the
+  dropdown and the tooltips to keep their buttons, and goes back into the new header. A page
+  with the search of the icons (`data-icon-bar`, `IconTiles`) has no bar: the script takes it
+  out. On the pages of an icon set with categories the column stands next to the content from
+  `desktop` (`data-beside`, `BESIDE`).
 - `PageTitle`, `Hero` (the home page's splash), `Footer` (page footer, see below),
   `ThemeProvider` (mode and theme before the first paint).
 
@@ -92,8 +110,9 @@ edit it on GitHub. Git history is the only source (layout decision 2 in
 
 ## Sections
 
-The eleven rail sections are defined once in [`src/lib/nav.mjs`](../src/lib/nav.mjs): id, icon,
-sidebar items. The structure and its reasons are in
+The eleven rail sections are defined once in [`src/lib/nav.mjs`](../src/lib/nav.mjs): id, group
+of the rail (and a short name under it, `railLabel`), icon, sidebar items; the icons of the
+groups of the rail are `RAIL_GROUP_ICONS`. The structure and its reasons are in
 [plan/CONTENT_STRUCTURE.md](../plan/CONTENT_STRUCTURE.md).
 
 | Section             | Pages and data                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -125,7 +144,7 @@ releases.
   version, and their files hold the same sections.
 - A line the parser does not know (not a release heading, a group heading, an entry or an
   indented line under an entry) fails the build, so a change of format is seen and handled.
-- `Changelog.astro`: a heading per version (id `<package>-<version>`, with its anchor), the date
+- `Changelog.astro`: a heading per version (id `<package>-<version>`), the date
   and the link to the GitHub release; the groups in the order of the release, their names from
   `changelog.group.*` (a group not in the map keeps its English name); entries as `mds-list`,
   scopes as code, linked to the component page when they are a component tag, `(#n)` linked to
@@ -211,8 +230,6 @@ releases.
   profiles (Covers).
 - `src/pages/covers/previews/[...file].ts`: light WebP previews of the covers, for the Media kit
   (Covers).
-- `src/pages/lab/[name].astro`: pages to check a detail by eye (heading anchors). Dev only: a
-  build has none.
 - `src/pages/downloads/`: files of the packages served for download (Figma tokens, the
   color files of the native platforms, brand assets).
 

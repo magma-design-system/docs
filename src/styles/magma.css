@@ -71,6 +71,23 @@
 @custom-variant rail-collapsed (&:where([data-rail='collapsed'] *));
 
 /*
+  Magma's animation preference, for a transition: `reduce` stops it, `system`
+  and no choice at all follow the operating system (float-wave, below, for an
+  animation).
+*/
+@custom-variant motion-reduced {
+  &:where(.pref-animation-reduce *) {
+    @slot;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &:where(.pref-animation-system *, html:not([class*='pref-animation-']) *) {
+      @slot;
+    }
+  }
+}
+
+/*
   Tokens of the site, with their utilities: `shadow-sticky` is the shadow of
   a sticky bar while it sticks (`data-stuck`, markStuck in
   src/scripts/icon-tiles.ts): a soft line under its bottom edge, short of
@@ -80,24 +97,6 @@
   --shadow-sticky:
     0px 13px 4px -14px rgb(var(--magma-shadow-ink) / 0.16),
     0px 12px 6px -14px rgb(var(--magma-shadow-ink) / 0.1);
-}
-
-/*
-  The box of a heading's anchor (TEXT.anchorLine in src/lib/markdown-text.mjs),
-  with the heading's typography: an invisible character gives it the height of
-  one line of the heading, trimmed as Magma trims headings, and the anchor is
-  centered on it. In front of the heading, at the top of the row, it lines up
-  with the heading's first line, at any size and on any number of lines.
-*/
-@utility anchor-line {
-  display: flex;
-  flex: none;
-  align-items: center;
-
-  &::before {
-    content: '\200b';
-    @apply text-box-vertical-margin;
-  }
 }
 
 /*
@@ -201,6 +200,23 @@ mds-button[icon='mi/baseline/arrow-forward'] {
       --frame-sticky-top: calc(--spacing(400) + 1px);
       /* The column gap already separates the content from the section navigation. */
       --sl-content-pad-x: 0rem;
+    }
+
+    /* Height of the reading bar of the right column (TwoColumnContent.astro). */
+    --frame-reading-bar-height: --spacing(1500);
+  }
+
+  /*
+    From `desktop` the reading bar floats over the top of the content,
+    --spacing(400) below where the columns stick: a link to a heading lands
+    below it, on the pages that have it. Important: Starlight sets the scroll
+    padding of <html> outside the layers (Page.astro).
+  */
+  @variant desktop {
+    html:has([data-aside-bar]) {
+      scroll-padding-top: calc(
+        var(--frame-sticky-top) + --spacing(400) + var(--frame-reading-bar-height)
+      ) !important;
     }
   }
 

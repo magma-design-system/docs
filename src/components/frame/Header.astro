@@ -1,6 +1,13 @@
 ---
 // Mobile and tablet header: brand and the menu button of mds-header. The menu
 // holds what the desktop frame shows in its columns.
+//
+// Between them, in the slot of the navigation, the reading bar of the pages
+// with a right column, put there by TwoColumnContent.astro: the navigation of
+// mds-header-bar shows only while it has an item, and grows and shrinks (its
+// parts; Magma's own do not shrink) to give the bar the room left. Below
+// `tablet` the bar takes the room of the logo and the name of the site while
+// the page is being read.
 import Brand from './Brand.astro';
 import DocsNav from './DocsNav.astro';
 import SearchField from './SearchField.astro';
@@ -8,13 +15,13 @@ import SectionLinks from './SectionLinks.astro';
 import SectionNav from './SectionNav.astro';
 ---
 
-<mds-header appearance="inline" menu="all" nav="none" data-frame-menu>
-  <mds-header-bar class="bg-surface-overlay">
+<mds-header appearance="inline" menu="all" nav="all" data-frame-menu>
+  <mds-header-bar class="group/header bg-surface-overlay [&::part(content)]:min-w-0 [&::part(actions)]:min-w-0 [&::part(actions)]:grow [&::part(actions)]:gap-300 [&::part(actions)]:justify-end [&::part(nav)]:min-w-0 [&::part(nav)]:shrink [&::part(nav)]:grow">
     <Brand />
   </mds-header-bar>
   <div slot="menu" class="flex flex-col gap-800 p-600">
     <SearchField />
-    <SectionLinks />
+    <SectionLinks idPrefix="menu-sections" />
     <DocsNav headingId="menu-docs-nav-heading" />
     <SectionNav headingId="menu-section-nav-heading" />
     <!-- Preferences.astro moves itself here below 64rem. -->

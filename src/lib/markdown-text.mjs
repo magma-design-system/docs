@@ -7,9 +7,9 @@
 // but code in headings, where it is plain text (code blocks stay as they are),
 // lists mds-list and mds-list-item, rules mds-hr, links mds-link (inside the
 // code, for a link around inline code). Ordered lists stay <ol>:
-// mds-list has no numbered form. Section headings (h2, h3) get an anchor in
-// front of them, an mds-button that links to them (`anchoredHeading`), in
-// place of Starlight's, which the deeper ones lose.
+// mds-list has no numbered form. Headings lose Starlight's anchor: the one of
+// the section being read is in the reading bar (TwoColumnContent.astro), which
+// finds the section headings (h2, h3) by `data-section-heading`.
 //
 // mds-text and mds-list-item are meant for plain text, while Markdown puts
 // code, links and bold in paragraphs and list items. mds-text is a flex box,
@@ -99,28 +99,6 @@ export const TEXT = {
     h5: 'block scroll-mt-600 mt-800 first:mt-0',
     h6: 'block scroll-mt-600 mt-800 first:mt-0',
   },
-  // The heading of an anchored row (below), without the space above it.
-  headingText: 'block scroll-mt-600',
-  // A heading with its anchor, in a row that takes the space above the
-  // heading. `not-content`: Starlight would put 1rem above the heading, since
-  // it follows the anchor.
-  anchored: {
-    h2: 'not-content flex items-start mt-1200 first:mt-0',
-    h3: 'not-content flex items-start mt-1000 first:mt-0',
-  },
-  // The box of the anchor, by the heading's typography: one line of it
-  // (`anchor-line`, see src/styles/magma.css), so the anchor sits on the
-  // middle of the heading's first line at every size. h4 to h6 have the
-  // anchor closer to the text, and h6 one step higher (by eye: 25, the
-  // smallest of Magma's sizes; h5 would want half of it, which has no token).
-  anchorLine: {
-    h1: 'anchor-line text-title-h1 me-300',
-    h2: 'anchor-line text-title-h2 me-300',
-    h3: 'anchor-line text-title-h3 me-300',
-    h4: 'anchor-line text-title-h4 me-150',
-    h5: 'anchor-line text-title-h5 me-150',
-    h6: 'anchor-line text-title-h6 me-150 *:-translate-y-25',
-  },
   paragraph: 'block max-w-(--spacing-text)',
   // Inline code, everywhere: mds-text in the code typography of its kind of
   // text (KIND), without the ring and with a lighter background than
@@ -132,27 +110,14 @@ export const TEXT = {
 };
 
 const HEADINGS = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
-/** The headings that get an anchor: the sections of a page and their parts. */
-const ANCHORED = new Set(['h2', 'h3']);
-
 /**
- * The anchor of a heading: an icon button that links to it (the link icon is
- * collected by iconsauce from this file). Heading.astro writes the same. A
- * click also copies the address of the heading (HeadingAnchors.astro).
- * Centered in its box (TEXT.anchorLine), whose height its negative block
- * margins leave to the line: a button taller than the line overflows it.
+ * The headings of the sections of a page and of their parts, the ones the
+ * table of contents lists: the reading bar names them and links to them.
  */
-export const ANCHOR = {
-  'data-heading-anchor': '',
-  icon: 'mi/baseline/link',
-  variant: 'dark',
-  class: '-my-4000 self-center',
-  tone: 'text',
-  size: 'md',
-};
+const SECTIONS = new Set(['h2', 'h3']);
 
-/** Starlight's label for the anchor, for text that Starlight did not give one. */
-const anchorLabel = (/** @type {string} */ title) => `Section titled \u201c${title}\u201d`;
+/** The mark of a section heading (Heading.astro writes it too). */
+export const SECTION = { 'data-section-heading': '' };
 
 /** The text of an element, without its markup. */
 const textOf = (/** @type {any} */ node) =>
@@ -223,22 +188,13 @@ function convert(node, heading, kind = KIND.reading) {
   const children = () => (node.children ?? []).map((child) => convert(child, heading, kind));
   const tag = node.tagName;
 
-  // Starlight's heading with its anchor: the heading with ours instead,
-  // under Starlight's label, which is in the language of the page.
+  // Starlight's heading with its anchor: the heading alone.
   if (tag === 'div' && classesOf(node).includes('sl-heading-wrapper')) {
     const inner = (node.children ?? []).filter(
       (/** @type {any} */ child) => child.type === 'element',
     );
     const title = inner.find((/** @type {any} */ child) => HEADINGS.has(child.tagName));
-    const link = inner.find((/** @type {any} */ child) =>
-      classesOf(child).includes('sl-anchor-link'),
-    );
-    const label =
-      link &&
-      (link.children ?? []).find((/** @type {any} */ child) =>
-        classesOf(child).includes('sr-only'),
-      );
-    if (title) return convertHeading(title, heading, label ? textOf(label) : undefined);
+    if (title) return convertHeading(title, heading);
   }
   if (HEADINGS.has(tag)) return convertHeading(node, heading);
   if (tag === 'p') {
@@ -322,42 +278,29 @@ const withoutCode = (nodes) =>
   });
 
 /**
- * A heading as mds-text, with its typography and tag; h2 and h3 with an anchor
- * in front of them (Heading.astro writes the same). `label`: the anchor's
- * accessible name, Starlight's English one if not given.
+ * A heading as mds-text, with its typography and tag; h2 and h3 marked as
+ * section headings (Heading.astro writes the same).
  * @param {any} node
  * @param {(heading: any) => string | undefined} heading
- * @param {string} [label]
  */
-function convertHeading(node, heading, label) {
+function convertHeading(node, heading) {
   const tag = node.tagName;
   const id = heading(node);
   const children = withoutCode(node.children ?? []).map((/** @type {any} */ child) =>
     convert(child, heading),
   );
-  if (!id || !ANCHORED.has(tag)) {
-    return element(
-      'mds-text',
-      { ...own(node), ...(id && { id }), typography: tag, tag },
-      TEXT.heading[/** @type {keyof typeof TEXT.heading} */ (tag)],
-      children,
-    );
-  }
-  return element('div', {}, TEXT.anchored[/** @type {keyof typeof TEXT.anchored} */ (tag)], [
-    element('span', {}, TEXT.anchorLine[/** @type {keyof typeof TEXT.anchorLine} */ (tag)], [
-      element(
-        'mds-button',
-        {
-          href: `#${id}`,
-          ...ANCHOR,
-          'aria-label': label ?? anchorLabel(textOf(node)),
-        },
-        '',
-        [],
-      ),
-    ]),
-    element('mds-text', { ...own(node), id, typography: tag, tag }, TEXT.headingText, children),
-  ]);
+  return element(
+    'mds-text',
+    {
+      ...own(node),
+      ...(id && { id }),
+      ...(id && SECTIONS.has(tag) && SECTION),
+      typography: tag,
+      tag,
+    },
+    TEXT.heading[/** @type {keyof typeof TEXT.heading} */ (tag)],
+    children,
+  );
 }
 
 export function magmaText() {

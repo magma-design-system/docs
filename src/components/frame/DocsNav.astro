@@ -13,6 +13,8 @@ import { componentParts, componentRoot } from '../../lib/magma.mjs';
 import { componentName } from '../../lib/nav.mjs';
 import { brandOwnerHref, parseBrandPath } from '../../lib/brand-pages';
 import { iconCategoryHref, parseIconSetPath } from '../../lib/icon-pages';
+import NavLink from './NavLink.astro';
+import NavList from './NavList.astro';
 
 interface Props {
   /** Unique per page: the component is rendered twice (frame and mobile menu). */
@@ -76,24 +78,11 @@ if (path) {
         <mds-text class="mb-400 block" id={id} typography="h5" tag="h2">
           {heading}
         </mds-text>
-        {/* Labels lined up with the heading, as in SectionEntries.astro. */}
-        <ul class="m-0 flex list-none flex-col items-start gap-100 p-0">
+        <NavList class="items-start">
           {links.map((link) => (
-            <li class="-ml-300 flex max-w-[calc(100%_+_--spacing(300))]">
-              <mds-button
-                class="max-w-full"
-                href={link.href}
-                type="a"
-                aria-current={link.current ? 'page' : undefined}
-                label={link.label}
-                variant="dark"
-                tone={link.current ? 'strong' : 'text'}
-                size="sm"
-                truncate="none"
-              />
-            </li>
+            <NavLink href={link.href} label={link.label} current={link.current} wrap />
           ))}
-        </ul>
+        </NavList>
       </nav>
     ),
 )}
