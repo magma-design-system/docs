@@ -67,6 +67,7 @@
   "frame.repository": "Magma on GitHub",
   "frame.storybook": "Magma Storybook",
   "frame.preferences": "Preferences",
+  "frame.aside.copyLink": "Copy the link to the section",
   "frame.footer.modified": "Modified {{date}}",
   "frame.footer.created": "Created {{date}}",
   "frame.cover.alt": "Magma, the design system of Maggioli Group",

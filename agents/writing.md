@@ -57,8 +57,9 @@ when they hold code, links or bold; links are `mds-link`.
 - **Markdown** is converted by [`src/lib/markdown-text.mjs`](../src/lib/markdown-text.mjs) and
   [`src/lib/markdown-tables.mjs`](../src/lib/markdown-tables.mjs): write plain Markdown.
 - **By hand** in `.astro`: use the same classes and props, exported by `markdown-text.mjs`
-  (`TEXT`, `KIND`, `READING`), `Heading.astro` for a section heading with its anchor,
-  `Code.astro` for inline code, `UiText.astro` for a UI string with code in it.
+  (`TEXT`, `KIND`, `READING`), `Heading.astro` for a section heading (the reading bar names it
+  and copies its link), `Code.astro` for inline code, `UiText.astro` for a UI string with code
+  in it.
 - Magma has no component for `strong` / `em`, numbered lists, code blocks, block quotes or
   description lists: these stay native (code blocks are Starlight's). Do not imitate a
   component with another one; note the gap instead ([magma.md](magma.md)).

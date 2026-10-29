@@ -121,3 +121,29 @@ only until Magma publishes translations.
    section presents it as a step of the agent's work and links it. The name says the practice,
    not the tool (first "AI agents", renamed the same day); the URL stays the short `/ai/`. The old page
    `/development/agentic-development/` redirects to `/ai/start-a-project/`.
+6. The right column (table of contents, sub-pages) stands next to the content only from 1280px
+   (Magma's `wide`; decided 2026-10-28). Between 1024 and 1280px, next to the rail and the
+   section navigation, it left the text a narrow strip. Below 1280px it opens in a dropdown from
+   the button of a reading bar (revised 2026-10-29: a button that stuck next to the title, and
+   named the section once the page scrolled, covered the text below the title). The bar names
+   the section being read, the heading the table of contents marks, also on the pages whose
+   column lists sub-pages, and holds its anchor: a link to the heading of the section, which
+   also copies its address. Headings have no anchor of their own: the bar is where the reader
+   already looks to know where they are, and one anchor replaces one per heading (decided
+   2026-10-29). So the bar is there at every width, from 1280px without the button of the
+   column, which is in view. How far the page has been read is told once, by the table of
+   contents: a progress bar under the name said it again. From 1024px the bar floats over the
+   top of the content, as wide as the text, the name in `h4`; once the page scrolls it comes
+   down from above the window, past its place, and settles, and it goes back up when the page is
+   at the top, where the title says where the reader is (a movement, not a fade). Links to
+   headings land below it. Below 1024px it is in the mobile header, between the logo and the
+   menu button: there the button of the column stays, and the anchor and the name (`h5`, the
+   room is short) show while the page is read, in place of the logo and the name of the site up
+   to 768px (from there both fit). The list does not open by itself: over the text it would
+   cover the lines being read; the bar tells where the reader is, the list is a click away. The
+   same button serves phones, which had no table of contents before. The pages of the icons have
+   no reading bar (decided 2026-10-29): their search sticks at the top of the content and looks
+   through the whole set, and two bars stuck one over the other did not fit. On the pages of a
+   set with categories (Material Icons, Material Design Icons) the column, the categories,
+   stands next to the icons from 1024px: a grid of icons has no measure of text to keep, and
+   without the bar the categories would have no button there.

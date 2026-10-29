@@ -1,35 +1,332 @@
 ---
-// Page content and the right column (PageSidebar), inside the card.
-import HeadingAnchors from '../HeadingAnchors.astro';
+// Page content and the right column (PageSidebar), inside the card, with the
+// reading bar.
+//
+// From Magma's `wide` breakpoint (1280px) the column stands next to the
+// content. Below it, next to the rail and the section navigation, it would
+// leave the text a narrow strip: the content takes the width, and the column
+// opens in a dropdown from the button of the reading bar.
+//
+// The reading bar names the section being read, the heading the table of
+// contents marks (src/scripts/reading.ts), and holds its anchor: a link to
+// the heading of that section, which also copies its address, in place of an
+// anchor in front of every heading. How far the page has been read is told
+// once, by the table of contents. From `desktop` the bar floats over the top
+// of the content, and comes down once the page scrolls: at the top the title
+// says where the reader is. Below `desktop` it goes in the mobile header,
+// between the logo and the menu button, where the button of the column stays
+// and the rest shows once the page scrolls. The script below moves the column
+// and the bar between their places.
+//
+// The pages of the icons have no reading bar: their search sticks there
+// (IconTiles.astro). On those of a set with categories, the column (the
+// categories) stands next to the icons from `desktop`: a grid has no measure
+// to keep, and without the bar the column would have no button there.
 import { parseBrandPath } from '../../lib/brand-pages';
 import { parseComponentPath } from '../../lib/components';
 import { parseIconSetPath } from '../../lib/icon-pages';
 
-const { toc, locale } = Astro.locals.starlightRoute;
+const { t, starlightRoute } = Astro.locals;
+const { toc, locale } = starlightRoute;
 const hasRightColumn =
   Boolean(toc) ||
   parseComponentPath(Astro.url.pathname, locale) !== undefined ||
   (parseIconSetPath(Astro.url.pathname, locale)?.categories.length ?? 0) > 0 ||
   (parseBrandPath(Astro.url.pathname, locale)?.owners.length ?? 0) > 0;
+
+/** Where the column stands next to the content: `wide`, or `desktop` for the icons. */
+const beside =
+  (parseIconSetPath(Astro.url.pathname, locale)?.categories.length ?? 0) > 0 ? 'desktop' : 'wide';
+/** The classes of each breakpoint, written out for Tailwind. */
+const BESIDE = {
+  wide: {
+    grid: 'desktop:pe-800 wide:grid wide:grid-cols-[minmax(0px,720px)_minmax(240px,1fr)] wide:gap-0 wide:pe-0',
+    aside:
+      'wide:pointer-events-auto wide:h-auto wide:col-start-2 wide:row-start-1 wide:max-h-[calc(100vh-var(--frame-sticky-top))] wide:self-start wide:overflow-y-auto wide:p-800',
+    column: 'hidden wide:block',
+    dropdown: 'wide:hidden',
+    main: 'wide:col-start-1 wide:row-start-1',
+  },
+  desktop: {
+    grid: 'desktop:grid desktop:grid-cols-[minmax(0px,720px)_minmax(240px,1fr)] desktop:gap-0',
+    aside:
+      'desktop:pointer-events-auto desktop:h-auto desktop:col-start-2 desktop:row-start-1 desktop:max-h-[calc(100vh-var(--frame-sticky-top))] desktop:self-start desktop:overflow-y-auto desktop:p-800',
+    column: 'hidden desktop:block',
+    dropdown: 'desktop:hidden',
+    main: 'desktop:col-start-1 desktop:row-start-1',
+  },
+}[beside];
 ---
 
-<div
-  class:list={[
-    hasRightColumn &&
-      'tablet:grid tablet:grid-cols-[minmax(0px,720px)_minmax(240px,1fr)] tablet:gap-0',
-  ]}
->
-  <div data-frame-main>
-    <slot />
-    <HeadingAnchors />
-  </div>
+{/*
+  Below `wide` the column no longer keeps the text off the border of the card:
+  the content does, as the section navigation does on the other side.
+*/}
+<div class:list={[hasRightColumn && BESIDE.grid]}>
+  {/*
+    Sticky, so its own stacking context: below `desktop`, where the bar is in
+    the header, on Magma's header layer, for the dropdown and the tooltips to
+    show over the header; from `desktop` above the bar.
+  */}
   {hasRightColumn && (
-    <div
+    <docs-aside
       data-frame-aside
+      data-beside={beside}
       transition:persist="frame-aside"
-      class="w-full hidden tablet:sticky tablet:top-(--frame-sticky-top) tablet:block tablet:max-h-[calc(100vh-var(--frame-sticky-top))] tablet:self-start tablet:overflow-y-auto tablet:p-600 desktop:p-800 [scrollbar-width:thin] print:hidden"
+      class:list={[
+        'pointer-events-none sticky top-(--frame-sticky-top) z-(--magma-header-z-index) block h-0 desktop:z-20 [scrollbar-width:thin] print:hidden',
+        BESIDE.aside,
+      ]}
     >
-      <slot name="right-sidebar" />
-    </div>
+      <mds-tooltip target="#aside-link" relation="label" placement="bottom">
+        {t('frame.aside.copyLink')}
+      </mds-tooltip>
+      <mds-tooltip target="#aside-toggle" relation="label" placement="bottom">
+        {t('tableOfContents.onThisPage')}
+      </mds-tooltip>
+      <span
+        class="sr-only"
+        role="status"
+        data-aside-live
+        data-done={t('heading.linkCopied')}
+        data-failed={t('heading.linkNotCopied')}
+      />
+      {/*
+        Below the card of the bar and below the mobile header, whose bottom
+        edges are 12px and 26px below the button.
+      */}
+      <mds-dropdown
+        class:list={['pointer-events-auto p-600', BESIDE.dropdown]}
+        target="#aside-toggle"
+        placement="bottom-end"
+        strategy="fixed"
+        offset="36"
+        role="dialog"
+      >
+        {/* The scroll clips: room for the links, which stand out of the column (NavLink.astro). */}
+        <div
+          class="-ms-300 max-h-[calc(100vh-2*var(--frame-sticky-top))] min-w-2xs max-w-8000 overflow-y-auto ps-300 [scrollbar-width:thin]"
+          data-aside="dropdown"
+        />
+      </mds-dropdown>
+      <div class={BESIDE.column} data-aside="column">
+        <div data-aside-content>
+          <slot name="right-sidebar" />
+        </div>
+      </div>
+    </docs-aside>
   )}
+  <div data-frame-main class={BESIDE.main}>
+    {/* No height: the bar floats over the content, it does not push it down. */}
+    {hasRightColumn && (
+      <div
+        class="pointer-events-none sticky top-(--frame-sticky-top) z-10 hidden h-0 desktop:block print:hidden"
+        data-aside="bar"
+      >
+        {/*
+          From `desktop` a card, put away above the top of the window until the
+          page scrolls, or until one of its buttons has the focus: it comes down
+          past its place and settles (`ease-out-back`), and goes back up after
+          a short dip (`ease-in-back`), the timing of the state it moves to.
+          Links to headings land below it (its height,
+          --frame-reading-bar-height, in magma.css). In the mobile header, the
+          button of the column only, until the page scrolls.
+        */}
+        <div
+          class="pointer-events-auto flex min-w-0 grow items-center justify-end gap-300 transition-[translate] duration-(--duration-500) ease-out-back motion-reduced:transition-none desktop:relative desktop:top-400 desktop:h-(--frame-reading-bar-height) desktop:rounded-lg desktop:bg-surface-overlay desktop:px-300 desktop:shadow-md-sharp desktop:not-data-reading:not-focus-within:pointer-events-none desktop:not-data-reading:not-focus-within:-translate-y-[calc(100%+var(--frame-sticky-top)+--spacing(800))] desktop:not-data-reading:not-focus-within:duration-(--duration-300) desktop:not-data-reading:not-focus-within:ease-in-back"
+          data-aside-bar
+          data-overview={t('tableOfContents.overview')}
+        >
+          <div class="hidden min-w-0 grow items-center gap-300 in-data-reading:flex desktop:flex">
+            {/* mds-button stands at the start of the cross axis (`align-self` on its host). */}
+            <mds-button
+              id="aside-link"
+              class="shrink-0 self-center"
+              href="#_top"
+              type="a"
+              icon="mi/baseline/link"
+              variant="dark"
+              tone="text"
+              data-aside-link
+            />
+            <mds-text
+              class="min-w-0 grow"
+              typography="h4"
+              tag="span"
+              truncate="word"
+              data-aside-name
+            />
+          </div>
+          <mds-button
+            id="aside-toggle"
+            class="shrink-0 self-center wide:hidden"
+            type="button"
+            icon="mi/outline/toc"
+            variant="dark"
+            tone="text"
+          />
+        </div>
+      </div>
+    )}
+    <slot />
+  </div>
 </div>
+
+<script>
+  import { readingPosition } from '../../scripts/reading';
+
+  const LINK_ICON = 'mi/baseline/link';
+  const COPIED_ICON = 'mi/baseline/check';
+  /** How long the anchor shows the check, in milliseconds. */
+  const SHOWN = 1500;
+
+  /**
+   * The right column, in its column from Magma's `wide` breakpoint (`desktop`
+   * on the pages of the icons), in the dropdown of the reading bar below it;
+   * and the reading bar, over the
+   * content from `desktop`, in the mobile header below it. The bar names the
+   * section being read once the page scrolls, and its anchor links to it and
+   * copies the link.
+   */
+  class DocsAside extends HTMLElement {
+    /** The column next to the content: from `wide`, or from `desktop` (`data-beside`). */
+    private beside = matchMedia(
+      `(min-width: ${this.dataset.beside === 'desktop' ? 1024 : 1280}px)`,
+    );
+    private desktop = matchMedia('(min-width: 1024px)');
+    private content = this.querySelector<HTMLElement>('[data-aside-content]');
+    /**
+     * The bar, on the page: kept and moved while this element is kept from
+     * page to page, so that the dropdown and the tooltips keep their buttons.
+     */
+    private bar = document.querySelector<HTMLElement>('[data-aside-bar]');
+    private label = this.bar?.querySelector<HTMLElement>('[data-aside-name]');
+    private link = this.bar?.querySelector<HTMLElement>('[data-aside-link]');
+    private live = this.querySelector<HTMLElement>('[data-aside-live]');
+    private dropdown = this.querySelector<HTMLElement & { visible: boolean }>('mds-dropdown');
+    /** The headings of the sections of the page, its title first. */
+    private sections: HTMLElement[] = [];
+    /** The id of the heading of the section being read. */
+    private section = '';
+    private copied?: ReturnType<typeof setTimeout>;
+    // The page grows when its content loads: the section being read can change.
+    private resize = new ResizeObserver(() => this.name());
+
+    connectedCallback() {
+      // The button of the column is named by the heading of the column.
+      const heading = this.content?.querySelector('[id]')?.textContent?.trim();
+      const tooltip = this.querySelector('mds-tooltip[target="#aside-toggle"]');
+      if (tooltip && heading) tooltip.textContent = heading;
+      this.place();
+      this.beside.addEventListener('change', this.place);
+      this.desktop.addEventListener('change', this.place);
+      window.addEventListener('scroll', this.name, { passive: true });
+      this.link?.addEventListener('click', this.copy);
+      // A link followed from the dropdown: the page is in view again.
+      this.addEventListener('click', this.close);
+      // The list of the table of contents has no size while the dropdown is
+      // closed: its reading indicator is filled once it opens.
+      this.dropdown?.addEventListener('mdsDropdownVisible', this.fill);
+      // The page and the mobile header are new: the bar goes back in.
+      document.addEventListener('astro:after-swap', this.place);
+      this.resize.observe(document.body);
+    }
+
+    disconnectedCallback() {
+      this.beside.removeEventListener('change', this.place);
+      this.desktop.removeEventListener('change', this.place);
+      window.removeEventListener('scroll', this.name);
+      this.link?.removeEventListener('click', this.copy);
+      document.removeEventListener('astro:after-swap', this.place);
+      this.resize.disconnect();
+    }
+
+    private place = () => {
+      // A new page has a bar of its own: this one takes its place.
+      const fresh = [...document.querySelectorAll('[data-aside-bar]')].find(
+        (bar) => bar !== this.bar,
+      );
+      if (this.bar && fresh) fresh.replaceWith(this.bar);
+      const box = this.querySelector(
+        `[data-aside="${this.beside.matches ? 'column' : 'dropdown'}"]`,
+      );
+      if (this.content && box && this.content.parentElement !== box) box.append(this.content);
+      if (this.beside.matches && this.dropdown) this.dropdown.visible = false;
+      // Below `desktop` the bar is an item of the header, in the slot of its
+      // navigation, between the logo and the menu button (Header.astro).
+      const header = this.desktop.matches
+        ? null
+        : document.querySelector('mds-header[data-frame-menu] mds-header-bar');
+      const home = header ?? document.querySelector('[data-aside="bar"]');
+      // The pages of the icons have a sticky bar of their own, their search
+      // (IconTiles.astro), which looks through the whole set: no reading bar,
+      // the two would stick over each other.
+      if (document.querySelector('[data-frame-main] [data-icon-bar]')) {
+        this.bar?.remove();
+      } else if (this.bar && home && this.bar.parentElement !== home) {
+        if (header) this.bar.slot = 'nav';
+        else this.bar.removeAttribute('slot');
+        home.append(this.bar);
+      }
+      // In the header, between the logo and two buttons, a step smaller.
+      this.label?.setAttribute('typography', header ? 'h5' : 'h4');
+      // The sections the table of contents lists (src/lib/markdown-text.mjs,
+      // Heading.astro), also where there is none: the sub-pages of a component.
+      this.sections = [
+        document.getElementById('_top'),
+        ...document.querySelectorAll<HTMLElement>('[data-frame-main] [data-section-heading]'),
+      ].filter((heading) => heading !== null);
+      this.name();
+    };
+
+    private name = () => {
+      if (!this.bar?.isConnected || this.sections.length === 0) return;
+      const heading = this.sections[readingPosition(this.sections).index];
+      const name =
+        heading.id === '_top' ? (this.bar.dataset.overview ?? '') : heading.textContent?.trim();
+      if (heading.id !== this.section) this.link?.setAttribute('href', `#${heading.id}`);
+      this.section = heading.id;
+      this.bar.toggleAttribute('data-reading', window.scrollY > 0);
+      if (this.label && name && this.label.textContent !== name) this.label.textContent = name;
+    };
+
+    /**
+     * The link to the section being read, to the page for its overview. The
+     * anchor still leads to the heading: the copy comes on top of it.
+     */
+    private copy = async () => {
+      const url = new URL(location.href);
+      url.hash = this.section === '_top' ? '' : this.section;
+      let copied = Boolean(navigator.clipboard);
+      try {
+        await navigator.clipboard?.writeText(url.href);
+      } catch {
+        copied = false;
+      }
+      // Emptied first: the same text twice in a row would not be read again.
+      const live = this.live;
+      if (live) {
+        live.textContent = '';
+        requestAnimationFrame(() => {
+          live.textContent = (copied ? live.dataset.done : live.dataset.failed) ?? '';
+        });
+      }
+      if (!copied || !this.link) return;
+      this.link.setAttribute('icon', COPIED_ICON);
+      clearTimeout(this.copied);
+      this.copied = setTimeout(() => this.link?.setAttribute('icon', LINK_ICON), SHOWN);
+    };
+
+    private fill = () =>
+      requestAnimationFrame(() =>
+        this.querySelector<HTMLElement & { update?(): void }>('docs-toc')?.update?.(),
+      );
+
+    private close = (event: Event) => {
+      const link = (event.target as Element).closest('mds-button[href]');
+      if (link && this.dropdown && this.content?.contains(link)) this.dropdown.visible = false;
+    };
+  }
+
+  customElements.define('docs-aside', DocsAside);
+</script>
