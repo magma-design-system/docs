@@ -109,11 +109,15 @@ A new author, step by step:
    no page needs touching.
 
 - Prefer few pull requests, each complete, over stacks of pull requests based on each other.
-- Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue).
-  It updates `magma` without `magma-react` and `magma-angular`, which ask for the same version as
-  a peer: `npm ci` stops on the conflict, and the build of the pull request is red. Bump the
-  three together (Upgrading Magma, below); magma 2.9.0 reached `main` this way, with a red
-  build, and the next updates merged red after it.
+- Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue)
+  and merges them itself with GitHub auto-merge. `magma-react` and `magma-angular` ask for the
+  same `magma` version as an exact peer, so a pull request that bumps `magma` alone stops
+  `npm ci` on the conflict (ERESOLVE) and its build is red. Magma 2.9.0 reached `main` this way
+  on 2026-10-28: Renovate's rate limit held back the updates of the wrappers. Since then
+  `renovate.json` groups the three (`groupName: "magma"`, branch `renovate/magma`): one pull
+  request bumps them together, as a person does (Upgrading Magma, below). Nothing stops a red
+  Renovate pull request: no status check is required on `main`, so GitHub merges it as soon as
+  its checks end, whatever their result (2.9.0 and the two updates after it merged red).
 
 ## Publishing
 
