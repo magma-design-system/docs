@@ -15,12 +15,16 @@ the `magma` package); this file covers what is specific to the site.
   utility class always wins over them.
 - Hooks for scripts are `data-*` attributes, never classes.
 - Variants: `dark` (follows Magma's `pref-mode-*` classes, not the system), `rail-collapsed`,
-  and Magma's breakpoints `tablet` (48rem) and `desktop` (64rem).
+  `motion-reduced` (Magma's animation preference, for transitions:
+  `motion-reduced:transition-none`), and Magma's breakpoints `tablet` (48rem) and `desktop`
+  (64rem).
 - Site tokens and utilities, in `magma.css`: `--frame-header-height` and `--frame-sticky-top`
-  (top offset of sticky elements at each breakpoint), `shadow-sticky` (a sticky bar while it is
-  stuck, `data-stuck`), `anchor-line` (heading anchors), `float-wave` (home statistics).
+  (top offset of sticky elements at each breakpoint), `--frame-reading-bar-height`,
+  `shadow-sticky` (a sticky bar while it is stuck, `data-stuck`), `float-wave` (home
+  statistics).
 - Motion: anything that moves stops with `.pref-animation-reduce`, and with the system's
-  reduced motion under `.pref-animation-system`, as Magma's components do (see `float-wave`).
+  reduced motion under `.pref-animation-system`, as Magma's components do (`float-wave` for an
+  animation, the `motion-reduced` variant for a transition).
 
 ## Traps
 

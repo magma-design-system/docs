@@ -54,11 +54,14 @@ const items = toc ? flatten(toc.items) : [];
 )}
 
 <script>
+  import { readingPosition } from '../../scripts/reading';
+
   /**
    * Progress along the list as a function of the scroll position: when the
-   * heading of item `i` reaches the reading line, the bar is filled down to the
-   * bottom of item `i`; between two headings it moves linearly; at the end of
-   * the page it is full. The item being read gets `aria-current`.
+   * heading of item `i` reaches the reading line (src/scripts/reading.ts), the
+   * bar is filled down to the bottom of item `i`; between two headings it moves
+   * linearly; at the end of the page it is full. The item being read gets
+   * `aria-current`.
    */
   class DocsToc extends HTMLElement {
     private indicator = this.querySelector('mds-progress');
@@ -87,48 +90,41 @@ const items = toc ? flatten(toc.items) : [];
       this.resize.disconnect();
     }
 
-    private update = () => {
+    /** Also called by the right column when its dropdown opens (TwoColumnContent.astro). */
+    update = () => {
       if (!this.indicator || !this.list || this.items.length === 0) return;
-      const list = this.list.getBoundingClientRect();
-      if (list.height === 0) return; // column hidden at this width
-
-      const root = document.documentElement;
-      const maxScroll = Math.max(0, root.scrollHeight - window.innerHeight);
-      // Where a heading lands when its link is followed.
-      const line = (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0) + 1;
-
-      // (scroll position, progress) pairs, both non-decreasing.
-      let previous = 0;
-      const knots = this.items.map(({ link, heading }) => {
-        const top = heading.getBoundingClientRect().top + window.scrollY - line;
-        previous = Math.min(maxScroll, Math.max(previous, top));
-        const bottom = link.closest('li')!.getBoundingClientRect().bottom;
-        return { scroll: previous, progress: (bottom - list.top) / list.height };
-      });
-      knots.push({ scroll: maxScroll, progress: 1 });
-
-      const y = window.scrollY;
-      let index = 0;
-      let progress = knots[0].progress;
-      for (let i = 0; i < knots.length - 1; i++) {
-        const from = knots[i];
-        const to = knots[i + 1];
-        if (y < from.scroll) break;
-        index = Math.min(i, this.items.length - 1);
-        const span = to.scroll - from.scroll;
-        progress =
-          span > 0
-            ? from.progress + (to.progress - from.progress) * Math.min(1, (y - from.scroll) / span)
-            : to.progress;
-      }
-
-      this.indicator.setAttribute('progress', Math.min(1, Math.max(0, progress)).toFixed(4));
+      const { index, tops, maxScroll, y } = readingPosition(
+        this.items.map(({ heading }) => heading),
+      );
       const link = this.items[index].link;
       if (link !== this.current) {
         this.current?.removeAttribute('aria-current');
         link.setAttribute('aria-current', 'true');
         this.current = link;
       }
+
+      const list = this.list.getBoundingClientRect();
+      if (list.height === 0) return; // hidden: no bar to fill
+
+      // (scroll position, progress) pairs, both non-decreasing.
+      const knots = this.items.map(({ link }, i) => {
+        const bottom = link.closest('li')!.getBoundingClientRect().bottom;
+        return { scroll: tops[i], progress: (bottom - list.top) / list.height };
+      });
+      knots.push({ scroll: maxScroll, progress: 1 });
+
+      let progress = knots[0].progress;
+      for (let i = 0; i < knots.length - 1; i++) {
+        const from = knots[i];
+        const to = knots[i + 1];
+        if (y < from.scroll) break;
+        const span = to.scroll - from.scroll;
+        progress =
+          span > 0
+            ? from.progress + (to.progress - from.progress) * Math.min(1, (y - from.scroll) / span)
+            : to.progress;
+      }
+      this.indicator.setAttribute('progress', Math.min(1, Math.max(0, progress)).toFixed(4));
     };
   }
 

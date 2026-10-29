@@ -34,7 +34,7 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: drafts, lab pages and previews of draft patterns are left out.
+- A production build is not dev: drafts and previews of draft patterns are left out.
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):
@@ -109,7 +109,15 @@ A new author, step by step:
    no page needs touching.
 
 - Prefer few pull requests, each complete, over stacks of pull requests based on each other.
-- Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue).
+- Renovate opens the dependency updates (`.github/renovate.json`, Dependency Dashboard issue)
+  and merges them itself with GitHub auto-merge. `magma-react` and `magma-angular` ask for the
+  same `magma` version as an exact peer, so a pull request that bumps `magma` alone stops
+  `npm ci` on the conflict (ERESOLVE) and its build is red. Magma 2.9.0 reached `main` this way
+  on 2026-10-28: Renovate's rate limit held back the updates of the wrappers. Since then
+  `renovate.json` groups the three (`groupName: "magma"`, branch `renovate/magma`): one pull
+  request bumps them together, as a person does (Upgrading Magma, below). Nothing stops a red
+  Renovate pull request: no status check is required on `main`, so GitHub merges it as soon as
+  its checks end, whatever their result (2.9.0 and the two updates after it merged red).
 
 ## Publishing
 
@@ -121,7 +129,7 @@ A new author, step by step:
   - Building blocks and Patterns exist only as their landing pages, with the "Under
     construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
     cards carry the badge.
-  - No placeholder text, no dev-only page (`/lab/`).
+  - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 
 ## Upgrading Magma

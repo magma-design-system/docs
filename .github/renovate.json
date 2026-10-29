@@ -1,6 +1,15 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>nicolatamburini/renovate-runner"
+  "extends": ["github>nicolatamburini/renovate-runner"],
+  "packageRules": [
+    {
+      "description": "The wrappers declare the same magma version as an exact peer dependency: bumped alone, npm ci fails with ERESOLVE.",
+      "matchPackageNames": [
+        "@maggioli-design-system/magma",
+        "@maggioli-design-system/magma-react",
+        "@maggioli-design-system/magma-angular"
+      ],
+      "groupName": "magma"
+    }
   ]
 }

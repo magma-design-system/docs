@@ -1,5 +1,7 @@
 ---
 // Logo and name of the site, linking to the home page of the current locale.
+// In the mobile header, below `tablet`, the reading bar takes its room while
+// the page is read (Header.astro).
 import { localePrefix } from '../../lib/frame';
 import Logo from './Logo.astro';
 
@@ -7,7 +9,7 @@ const { t, starlightRoute } = Astro.locals;
 ---
 
 <a
-  class="flex min-w-0 items-center gap-300 rounded-lg focus-bounce text-fg-default no-underline p-200 pr-300 hover:bg-surface-muted transition-cosmetic hover:shadow-outline"
+  class="flex min-w-0 items-center gap-300 rounded-lg focus-bounce text-fg-default no-underline p-200 pr-300 hover:bg-surface-muted transition-cosmetic hover:shadow-outline max-tablet:group-has-data-reading/header:hidden"
   href={`${localePrefix(starlightRoute.locale)}/`}
   tabindex={0}
 >
