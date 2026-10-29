@@ -12,12 +12,12 @@ Decided on 2026-10-08.
 | Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                  | deck + new writing                  |
 | Building blocks     | Recurring sections of a page made of components (page header, filter bar, ...): structure and layout, no data | written here, see `DIRECTION.md`    |
 | Patterns            | Solutions to recurring tasks (confirm an action, ...): behavior first, with code in HTML, React and Angular   | written here, see `DIRECTION.md`    |
+| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                  |
+| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin                 | `AGENTS.md`, `agents/*.md` of magma |
 | Components          | One page per component                                                                                        | `magma/dist/documentation.json`     |
 | Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma)    | `design-tokens`, `styles`           |
 | Icons               | Library, semantic dictionary                                                                                  | `svg-icons`, `icons`                |
 | Brands / Assets     | Logos, illustrations, avatars                                                                                 | `identity`                          |
-| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                  |
-| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin                 | `AGENTS.md`, `agents/*.md` of magma |
 | Community           | Support, feature requests, contributions, training                                                            | deck + Magma GitHub issue templates |
 
 Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes only from
@@ -27,8 +27,33 @@ Order (decided 2026-10-24): after Foundation the rail goes from the sections of 
 the values: Building blocks, Patterns, Components, then Tokens and Icons. Building blocks are
 about space (a section of a page), patterns about time (what follows an action), components are
 the parts both are made of; tokens and icons come after, as DIRECTION.md orders by how often
-they are needed. Components keeps its place, the fifth item of the rail; Building blocks and
-Patterns stand before it even while they are coming soon.
+they are needed. Building blocks and Patterns stand before Components even while they are
+coming soon. Since 2026-10-28 Development and Agentic development stand between the guidelines
+and the library (Groups, below).
+
+Groups (decided 2026-10-26, revised 2026-10-28): eleven items in one column had become hard to
+scan, so the rail lists them under three labels. Guidelines: Foundation, Building blocks,
+Patterns, the prose written here. Development: Development and Agentic development, how a
+product is built with Magma, by hand or with an agent; it comes right after the guidelines.
+Library: Components, Tokens, Icons, Brand assets, the data that comes from the packages.
+Community stands alone, at the end. Home has no item: the logo and the name of the site, at the
+top of the rail and of the mobile header, link to it (a Home item said the same thing twice; the
+Changelog, the other page of the Home section, is reached from the home page and its section
+navigation). Under the Development label the two sections are named Code and Agentic (Codice,
+Agentico): "Development" and "Agentic development" one under the other read alike. Their pages,
+their section navigation and the tooltips of the collapsed rail keep the full names.
+
+One design for every menu: the open rail, the section navigation and the right column are made
+of the same parts (`NavList`, `NavHeading`, `NavLink` in `src/components/frame/`). A group is
+its icon above its `h6` label, its links are small buttons whose labels line up with the label;
+in the rail, Community is a link of its own, like the Overview of a section. The
+labels of the rail sit as far from its edge as those of the section navigation from the border
+of the card (32px). Icons: one per group, none on the sections. Eleven icons, one per section,
+read well with five sections and had become noise. The collapsed rail, which has no labels,
+keeps the icon of every section, with a separator between the groups.
+
+Height: the groups make the rail taller. The open rail needs about 990px, the collapsed one about
+940px; below that they scroll (before the groups: 780px open, 860px collapsed).
 
 ## From the deck, kept
 

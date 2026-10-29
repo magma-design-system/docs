@@ -88,7 +88,15 @@ const actions = [
     <div class="flex flex-1 flex-col justify-between gap-1000">
       <div class="flex flex-col gap-600">
         <SearchField />
-        <SectionLinks />
+        <!--
+          The links are pulled left by the padding of their button
+          (NavLink.astro): with the padding of the rail, this inset puts their
+          labels as far from the edge as the section navigation has them from
+          the border of the card (`ps-800` of its column in PageFrame), 32px.
+        -->
+        <div class="px-400">
+          <SectionLinks idPrefix="rail-sections" />
+        </div>
       </div>
       <div data-preferences="rail">
         <Preferences />

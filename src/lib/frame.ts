@@ -1,8 +1,9 @@
 // What the frame shows, read from Starlight's sidebar of the current page: the
-// rail (one item per section, src/lib/nav.mjs) and the section navigation.
+// rail (one item per section, in the groups of src/lib/nav.mjs) and the section
+// navigation.
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
 import { componentRoot } from './magma.mjs';
-import { sections as sectionConfig } from './nav.mjs';
+import { RAIL_GROUP_ICONS, sections as sectionConfig } from './nav.mjs';
 
 type SidebarEntry = StarlightRouteData['sidebar'][number];
 export type SidebarLink = Extract<SidebarEntry, { type: 'link' }>;
@@ -16,10 +17,23 @@ export interface FrameSection {
   href: string;
   current: boolean;
   group: SidebarGroup;
+  /** UI string of its name under the label of its group, when it has one of its own. */
+  railLabel?: string;
+}
+
+/** Sections that follow each other in the rail, under the label of their group. */
+export interface FrameSectionGroup {
+  /** `frame.sections.<id>`; none for a section that stands alone. */
+  id?: string;
+  /** Drawn before the label, in place of the icons of its sections. */
+  icon?: string;
+  sections: FrameSection[];
 }
 
 export interface FrameNav {
   sections: FrameSection[];
+  /** The sections as the rail lists them, without those it leaves to the brand (Home). */
+  groups: FrameSectionGroup[];
   /** Section of the current page. */
   section?: FrameSection;
   /** Sidebar link of the current page, or of the page it belongs to (component sub-pages). */
@@ -68,10 +82,30 @@ export function frameNav(route: StarlightRouteData, pathname: string): FrameNav 
       href: groupLinks[0]?.href ?? '',
       current: current !== undefined && groupLinks.includes(current),
       group,
+      railLabel: sectionConfig[i].railLabel,
     };
   });
 
-  return { sections, section: sections.find((s) => s.current), currentHref: current?.href };
+  const railGroups: FrameSectionGroup[] = [];
+  sections.forEach((section, i) => {
+    if (sectionConfig[i].rail === false) return;
+    const id = sectionConfig[i].group;
+    const last = railGroups.at(-1);
+    if (id && last?.id === id) last.sections.push(section);
+    else
+      railGroups.push({
+        id,
+        icon: id ? RAIL_GROUP_ICONS[id as keyof typeof RAIL_GROUP_ICONS] : undefined,
+        sections: [section],
+      });
+  });
+
+  return {
+    sections,
+    groups: railGroups,
+    section: sections.find((s) => s.current),
+    currentHref: current?.href,
+  };
 }
 
 /** Site path of a locale: `''` for the root locale, `'/it'` for Italian. */

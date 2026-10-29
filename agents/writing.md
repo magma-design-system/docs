@@ -122,6 +122,18 @@ element` does not put a text field in the table. The usage files stay Markdown w
 
 - Sections and their items are in [`src/lib/nav.mjs`](../src/lib/nav.mjs). A section's
   navigation mirrors the groups of its landing page, in the same order.
+- The rail lists the sections in three groups (`group` in `nav.mjs`, labels
+  `frame.sections.<group>`): Guidelines (Foundation, Building blocks, Patterns), Development
+  (Development, Agentic development), Library (Components, Tokens, Icons, Brand assets).
+  Community stands alone, at the end; Home has no item (`rail: false`), the brand above links to
+  it. A new section joins a group, next to the sections of that group: a group split in two
+  would show its label twice. The collapsed rail shows a separator in place of each label.
+- A section whose name repeats the label of its group gets a short name for the rail and the
+  menu (`railLabel` in `nav.mjs`): under Development, Code and Agentic. The tooltips of the
+  collapsed rail, which has no labels, and the section navigation keep the full name.
+- In the open rail and in the menu the icon belongs to the group (`RAIL_GROUP_ICONS` in
+  `nav.mjs`), not to its sections; the icon of a section shows only in the collapsed rail. A new
+  group needs its icon there.
 - The landing page of a section is labelled "Overview" / "Panoramica" (`nav.overview`) when its
   title repeats the section's name. Sections whose landing page has its own title keep it
   (Community: "Channels").

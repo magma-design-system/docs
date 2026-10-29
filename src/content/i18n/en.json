@@ -54,6 +54,11 @@
 
   "frame.brand.description": "Design System",
   "frame.sections": "Sections",
+  "frame.sections.guidelines": "Guidelines",
+  "frame.sections.development": "Development",
+  "frame.sections.development.code": "Code",
+  "frame.sections.development.agentic": "Agentic",
+  "frame.sections.library": "Library",
   "frame.rail.collapse": "Collapse the navigation",
   "frame.rail.expand": "Expand the navigation",
   "frame.theme.default": "Neutral",

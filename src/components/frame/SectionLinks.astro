@@ -1,48 +1,98 @@
 ---
-// The sections of the site, in the rail and in the mobile menu. `compact`
-// (the collapsed rail): icons only, each named by the label of its section in
-// a tooltip, which shows it on hover.
+// The sections of the site, in the rail and in the mobile menu, in the groups
+// of src/lib/nav.mjs, drawn as the section navigation draws its own
+// (SectionEntries.astro, with the same NavList, NavHeading and NavLink): each
+// group under its icon and its label, the section that stands alone
+// (Community) as a link of its own. Home has no item: the brand above links to
+// it. A section named after its group shows its `railLabel`. `compact` (the
+// collapsed rail): the icon of each section, named by the name of the section
+// in a tooltip, which shows it on hover; a separator stands for the label of
+// each group.
 import { frameNav } from '../../lib/frame';
+import NavHeading from './NavHeading.astro';
+import NavLink from './NavLink.astro';
+import NavList from './NavList.astro';
 
 interface Props {
   compact?: boolean;
+  /** Prefix of the ids of the group labels: the rail and the menu are on the same page. */
+  idPrefix?: string;
 }
 
-const { compact = false } = Astro.props;
+const { compact = false, idPrefix = 'sections' } = Astro.props;
 const { t, starlightRoute } = Astro.locals;
-const { sections } = frameNav(starlightRoute, Astro.url.pathname);
+const { groups } = frameNav(starlightRoute, Astro.url.pathname);
+const groupLabel = (id: string) => t(`frame.sections.${id}` as never);
 ---
 
 <nav aria-label={t('frame.sections')}>
-  {/*
-    The items are flex boxes: in a block, the button would sit on a line of
-    text, whose line height adds space below it to the gap.
-  */}
-  <ul class="m-0 flex list-none flex-col gap-100 p-0">
-    {sections.map((section) => (
-      <li class="flex">
-        <mds-button
-          id={compact ? `rail-section-${section.id}` : undefined}
-          class="max-w-full"
-          href={section.href}
-          type="a"
-          aria-current={section.current ? 'page' : undefined}
-          icon={section.icon}
-          label={compact ? undefined : section.label}
-          variant="dark"
-          tone={section.current ? 'strong' : 'text'}
-        />
-        {compact && (
-          <mds-tooltip
-            target={`#rail-section-${section.id}`}
-            relation="label"
-            placement="right"
-            disable-auto-placement
+  {compact ? (
+    // The items are flex boxes: in a block, the button would sit on a line
+    // of text, whose line height adds space below it to the gap.
+    <ul class="m-0 flex list-none flex-col gap-300 p-0">
+      {groups.map((group, i) => (
+        <li class="flex flex-col gap-300">
+          {i > 0 && <mds-separator />}
+          <ul
+            class="m-0 flex list-none flex-col gap-100 p-0"
+            aria-label={group.id && groupLabel(group.id)}
           >
-            {section.label}
-          </mds-tooltip>
-        )}
-      </li>
-    ))}
-  </ul>
+            {group.sections.map((section) => (
+              <li class="flex">
+                <mds-button
+                  id={`rail-section-${section.id}`}
+                  href={section.href}
+                  type="a"
+                  aria-current={section.current ? 'page' : undefined}
+                  icon={section.icon}
+                  variant="dark"
+                  tone={section.current ? 'strong' : 'text'}
+                />
+                <mds-tooltip
+                  target={`#rail-section-${section.id}`}
+                  relation="label"
+                  placement="right"
+                  disable-auto-placement
+                >
+                  {section.label}
+                </mds-tooltip>
+              </li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  ) : (
+    <NavList>
+      {groups.map((group, i) =>
+        group.id ? (
+          <li class="mt-600 first:mt-0">
+            <NavHeading icon={group.icon} id={`${idPrefix}-${group.id}`} tag="span">
+              {groupLabel(group.id)}
+            </NavHeading>
+            <NavList labelledby={`${idPrefix}-${group.id}`}>
+              {group.sections.map((section) => (
+                <NavLink
+                  href={section.href}
+                  label={section.railLabel ? t(section.railLabel as never) : section.label}
+                  current={section.current}
+                />
+              ))}
+            </NavList>
+          </li>
+        ) : (
+          // A section that stands alone after a group (Community) is set
+          // apart from it as a group would be.
+          group.sections.map((section) => (
+            <NavLink
+              class={i > 0 ? 'mt-600' : undefined}
+              href={section.href}
+              label={section.label}
+              current={section.current}
+            />
+          ))
+        ),
+      )}
+    </NavList>
+  )}
 </nav>

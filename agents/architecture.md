@@ -46,11 +46,15 @@ Starlight's components listed in `astro.config.mjs` are replaced by
   navigation, the content and the right column; `SiteFooter` under the card on every page.
   Below 64rem: the mobile header (`Header`) with everything in its menu; the right column stays
   down to 48rem.
-- `Rail`: brand, search field (`SearchField`, a button that opens Pagefind), the sections
-  (`SectionLinks`), repository and Storybook links, and a Preferences button that opens
-  `mds-pref` (mode, language, theme: `Preferences`) in an `mds-dropdown`. Collapsible to icons
-  with tooltips; the state is in `localStorage` (`magma-docs:rail`).
+- `Rail`: brand, search field (`SearchField`, a button that opens Pagefind), the sections in
+  their groups (`SectionLinks`, `groups` of `frameNav()`), repository and Storybook links, and a
+  Preferences button that opens `mds-pref` (mode, language, theme: `Preferences`) in an
+  `mds-dropdown`. Collapsible to icons with tooltips; the state is in `localStorage`
+  (`magma-docs:rail`).
 - `Sidebar` / `SectionNav` / `SectionEntries`: the section navigation, from Starlight's sidebar.
+- `NavList` / `NavHeading` / `NavLink`: the parts of every menu of the frame (the open rail, the
+  section navigation, the right column), so they look alike: change the design of the menus
+  there, not in the menus.
 - `TwoColumnContent` / `PageSidebar` / `TableOfContents` / `DocsNav`: the right column, a table
   of contents with a reading indicator, or the sub-pages of a component, an icon set or a brand
   group (`DocsNav`).
@@ -92,8 +96,9 @@ edit it on GitHub. Git history is the only source (layout decision 2 in
 
 ## Sections
 
-The eleven rail sections are defined once in [`src/lib/nav.mjs`](../src/lib/nav.mjs): id, icon,
-sidebar items. The structure and its reasons are in
+The eleven rail sections are defined once in [`src/lib/nav.mjs`](../src/lib/nav.mjs): id, group
+of the rail (and a short name under it, `railLabel`), icon, sidebar items; the icons of the
+groups of the rail are `RAIL_GROUP_ICONS`. The structure and its reasons are in
 [plan/CONTENT_STRUCTURE.md](../plan/CONTENT_STRUCTURE.md).
 
 | Section             | Pages and data                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
