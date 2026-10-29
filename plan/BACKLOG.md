@@ -35,8 +35,8 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 ## Building blocks and Patterns
 
-See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Feedback
-sketch to turn into a page.
+See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Messages
+and states sketch to turn into a page.
 
 ## Development
 

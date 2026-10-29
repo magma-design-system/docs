@@ -2,17 +2,20 @@
 // frame (plan/CONTENT_STRUCTURE.md, layout decision 4). A sub-page exists only
 // when documentation.json has its data: Anatomy, Features and Installation have
 // no source yet and are left out until they do. The overview opens with the
-// preview of the component (Playground.astro), then its description. Pattern
-// and Antipattern are two of the usage files (the third, Description, is the
+// preview of the component (Playground.astro), then its description. Examples
+// and Mistakes are two of the usage files (the third, Description, is the
 // overview's text), split so the right and the wrong forms are never on the
-// same page.
+// same page. Their names are not Pattern and Antipattern since
+// https://github.com/magma-design-system/magma/issues/1169: a pattern is the
+// solution to a task across components (agents/patterns.md); the old addresses
+// redirect (`redirects` in astro.config.mjs).
 import type { CollectionEntry } from 'astro:content';
 import { localePrefix } from './frame';
 
 type ComponentData = CollectionEntry<'components'>['data'];
 
 export interface ComponentPage {
-  id: 'overview' | 'api' | 'css' | 'pattern' | 'antipattern';
+  id: 'overview' | 'api' | 'css' | 'examples' | 'mistakes';
   /** Last segment of the URL, `undefined` for the component's main page. */
   slug: string | undefined;
   /** Key of the UI dictionaries. */
@@ -20,8 +23,8 @@ export interface ComponentPage {
     | 'component.page.overview'
     | 'component.page.api'
     | 'component.page.css'
-    | 'component.page.pattern'
-    | 'component.page.antipattern';
+    | 'component.page.examples'
+    | 'component.page.mistakes';
   has: (data: ComponentData) => boolean;
 }
 
@@ -40,16 +43,16 @@ export const componentPages: ComponentPage[] = [
     has: (d) => d.styles.length + d.parts.length > 0,
   },
   {
-    id: 'pattern',
-    slug: 'pattern',
-    label: 'component.page.pattern',
-    has: (d) => d.pattern.html !== '',
+    id: 'examples',
+    slug: 'examples',
+    label: 'component.page.examples',
+    has: (d) => d.examples.html !== '',
   },
   {
-    id: 'antipattern',
-    slug: 'antipattern',
-    label: 'component.page.antipattern',
-    has: (d) => d.antipattern.html !== '',
+    id: 'mistakes',
+    slug: 'mistakes',
+    label: 'component.page.mistakes',
+    has: (d) => d.mistakes.html !== '',
   },
 ];
 

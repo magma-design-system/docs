@@ -1,9 +1,9 @@
 // The live preview of each component (src/pages/example/[tag].astro, on the
 // stage of Playground.astro). It runs the first example of the component's
-// Pattern usage file, the canonical form Magma writes for it, unless
+// Examples usage file, the canonical form Magma writes for it, unless
 // src/previews/<tag>.html gives the component a demo of its own: a richer one,
 // written for this site, to try what the component does (branches to open, a
-// toast to dismiss, a code that unlocks). The Pattern usage page keeps Magma's
+// toast to dismiss, a code that unlocks). The Examples usage page keeps Magma's
 // examples. A demo is plain HTML and a script, in Italian as Magma's examples;
 // the controls of the preview set the first element of the component in it.
 // Its images are the site's own, in public/previews/, by a path relative to
@@ -63,7 +63,7 @@ const STAGES: Record<string, Partial<Omit<Preview, 'example'>>> = {
   'mds-url-view': { width: 360, height: 640 },
 };
 
-/** The preview of a component, from the first example of its Pattern usage file. */
+/** The preview of a component, from the first example of its Examples usage file. */
 export function previewOf(tag: string, patternExample: string): Preview {
   const demo = demos[`../previews/${tag}.html`];
   return {

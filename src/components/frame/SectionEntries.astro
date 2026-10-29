@@ -1,7 +1,11 @@
 ---
 // Links of a section, nested groups shown as sub-headings, each under its
-// icon (GROUP_ICONS in src/lib/nav.mjs).
+// icon (GROUP_ICONS in src/lib/nav.mjs). The rail draws its groups with the
+// same parts (NavList, NavHeading, NavLink).
 import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import NavHeading from './NavHeading.astro';
+import NavLink from './NavLink.astro';
+import NavList from './NavList.astro';
 
 interface Props {
   entries: StarlightRouteData['sidebar'];
@@ -13,39 +17,15 @@ interface Props {
 const { entries, currentHref, icons } = Astro.props;
 ---
 
-{/*
-  The link items are flex boxes: in a block, the button would sit on a line of
-  text, whose line height adds space below it to the gap. They are pulled left
-  by the padding of the button, so that its label lines up with the headings
-  and the background of the selected or hovered one stands out of the column.
-  The labels are page titles, written as they must read: mds-button would
-  uppercase their first letter (iOS).
-*/}
-<ul class="m-0 flex list-none flex-col gap-100 p-0 [--mds-button-label-transform:none]">
+<NavList>
   {entries.map((entry) =>
     entry.type === 'link' ? (
-      <li class="-ml-300 flex">
-        <mds-button
-          class="max-w-full"
-          href={entry.href}
-          type="a"
-          aria-current={entry.href === currentHref ? 'page' : undefined}
-          label={entry.label}
-          variant="dark"
-          tone={entry.href === currentHref ? 'strong' : 'text'}
-          size="sm"
-        />
-      </li>
+      <NavLink href={entry.href} label={entry.label} current={entry.href === currentHref} />
     ) : (
       <li class="mt-600">
-        {icons.has(entry.label) && (
-          <mds-icon class="mb-200 block w-600" name={icons.get(entry.label)} />
-        )}
-        <mds-text class="mb-200 block" typography="h6" tag="h3">
-          {entry.label}
-        </mds-text>
+        <NavHeading icon={icons.get(entry.label)}>{entry.label}</NavHeading>
         <Astro.self entries={entry.entries} currentHref={currentHref} icons={icons} />
       </li>
     ),
   )}
-</ul>
+</NavList>

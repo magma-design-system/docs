@@ -1,9 +1,10 @@
 // The sections of the site (plan/CONTENT_STRUCTURE.md): the items of the rail.
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
-// of the current page from Starlight and the icon from here. After Foundation
-// they go from the sections of a page down to the values: building blocks,
-// patterns, components, then tokens and icons.
+// of the current page from Starlight and the icon from here. After the
+// guidelines (Foundation, building blocks, patterns) come the development
+// sections (code, agents), then the library: components, tokens, icons and
+// brand assets.
 import { existsSync, readFileSync } from 'node:fs';
 import { componentTags, componentTaxonomy, loadComponentDocs } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
@@ -19,17 +20,28 @@ export const STORYBOOK = loadComponentDocs().storybook;
  * A landing page titled like its section is labelled Overview in the section navigation.
  * `soon`: a section still being written, whose landing page says what is coming
  * (its pages are drafts, see `published`).
+ * `group`: the group of the rail the section is listed under, labelled
+ * `frame.sections.<group>`: the guidelines written here, the development of a
+ * product with Magma, the library that comes from the packages. The sections
+ * of a group follow each other; Community stands alone, at the end.
+ * `railLabel`: the UI string that names the section in the open rail and in
+ * the menu, under the label of its group, when its own name repeats it
+ * (Development > Code); the collapsed rail keeps the name of the section.
+ * `rail: false`: a section with no item in the rail and in the menu: Home,
+ * which the logo and the name of the site above them link to (Brand.astro).
  */
 export const sections = [
   {
     id: 'home',
     icon: 'mi/outline/home',
+    rail: false,
     // The home page has no section navigation (`template: splash`); the
     // Changelog has, with the home page as Overview.
     items: () => [{ slug: 'index', ...sidebarLabel('nav.overview') }, { slug: 'changelog' }],
   },
   {
     id: 'foundation',
+    group: 'guidelines',
     icon: 'mi/outline/account-balance',
     // The groups of the landing page, in its order.
     items: () => [
@@ -54,12 +66,14 @@ export const sections = [
   },
   {
     id: 'blocks',
+    group: 'guidelines',
     icon: 'mi/outline/extension',
     soon: true,
     items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
   },
   {
     id: 'patterns',
+    group: 'guidelines',
     icon: 'mi/outline/view-quilt',
     soon: true,
     // The groups of the landing page, in its order.
@@ -73,7 +87,43 @@ export const sections = [
       ]),
   },
   {
+    id: 'development',
+    group: 'development',
+    railLabel: 'frame.sections.development.code',
+    icon: 'mi/outline/code',
+    items: () => [
+      { slug: 'development', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.development.guides'),
+        items: [
+          { slug: 'development/installation' },
+          { slug: 'development/lint' },
+          { slug: 'development/versions' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ai',
+    group: 'development',
+    railLabel: 'frame.sections.development.agentic',
+    icon: 'mi/outline/auto-awesome',
+    // The groups of the landing page, in its order.
+    items: () => [
+      { slug: 'ai', ...sidebarLabel('nav.overview') },
+      {
+        ...sidebarLabel('nav.ai.start'),
+        items: [{ slug: 'ai/start-a-project' }, { slug: 'ai/working-with-agents' }],
+      },
+      {
+        ...sidebarLabel('nav.ai.tools'),
+        items: [{ slug: 'ai/guides' }, { slug: 'ai/mcp-server' }, { slug: 'ai/claude-code' }],
+      },
+    ],
+  },
+  {
     id: 'components',
+    group: 'library',
     icon: 'mi/outline/widgets',
     items: () => [
       { ...sidebarLabel('nav.components.overview'), link: '/components/' },
@@ -82,6 +132,7 @@ export const sections = [
   },
   {
     id: 'tokens',
+    group: 'library',
     icon: 'mi/outline/palette',
     items: () => [
       { slug: 'tokens', ...sidebarLabel('nav.overview') },
@@ -114,6 +165,7 @@ export const sections = [
   },
   {
     id: 'icons',
+    group: 'library',
     icon: 'mi/outline/brush',
     // The guides, then the packages, as on the landing page.
     items: () => [
@@ -136,6 +188,7 @@ export const sections = [
   },
   {
     id: 'brand',
+    group: 'library',
     icon: 'mi/outline/design-services',
     items: () => [
       { slug: 'brand', ...sidebarLabel('nav.overview') },
@@ -151,37 +204,6 @@ export const sections = [
       {
         ...sidebarLabel('nav.brand.package'),
         items: [{ slug: 'brand/identity-package' }],
-      },
-    ],
-  },
-  {
-    id: 'development',
-    icon: 'mi/outline/code',
-    items: () => [
-      { slug: 'development', ...sidebarLabel('nav.overview') },
-      {
-        ...sidebarLabel('nav.development.guides'),
-        items: [
-          { slug: 'development/installation' },
-          { slug: 'development/lint' },
-          { slug: 'development/versions' },
-        ],
-      },
-    ],
-  },
-  {
-    id: 'ai',
-    icon: 'mi/outline/auto-awesome',
-    // The groups of the landing page, in its order.
-    items: () => [
-      { slug: 'ai', ...sidebarLabel('nav.overview') },
-      {
-        ...sidebarLabel('nav.ai.start'),
-        items: [{ slug: 'ai/start-a-project' }, { slug: 'ai/working-with-agents' }],
-      },
-      {
-        ...sidebarLabel('nav.ai.tools'),
-        items: [{ slug: 'ai/guides' }, { slug: 'ai/mcp-server' }, { slug: 'ai/claude-code' }],
       },
     ],
   },
@@ -202,6 +224,18 @@ export const sections = [
     ],
   },
 ];
+
+/**
+ * The icon of each group of the rail, drawn before its label. The sections of
+ * a group have none in the open rail and in the menu: the icon of a section
+ * shows only in the collapsed rail, which has no labels, and on the sections
+ * that stand alone (Home, Community).
+ */
+export const RAIL_GROUP_ICONS = {
+  guidelines: 'mi/outline/menu-book',
+  development: 'mi/outline/code',
+  library: 'mi/outline/category',
+};
 
 /**
  * The categories of the components (`@category` in documentation.json, since

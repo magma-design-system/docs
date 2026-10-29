@@ -1,0 +1,19 @@
+---
+// The heading of a group of links, in the rail (SectionLinks.astro) and in the
+// section navigation (SectionEntries.astro): its icon above its label, so the
+// two menus read alike.
+interface Props {
+  icon?: string;
+  /** For the list it names (`aria-labelledby`). */
+  id?: string;
+  /** A heading in the section navigation; in the rail, which has none above it, a label. */
+  tag?: 'h3' | 'span';
+}
+
+const { icon, id, tag = 'h3' } = Astro.props;
+---
+
+{icon && <mds-icon class="mb-200 block w-600" name={icon} />}
+<mds-text class="mb-200 block" id={id} typography="h6" tag={tag}>
+  <slot />
+</mds-text>
