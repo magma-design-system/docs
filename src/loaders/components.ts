@@ -57,16 +57,26 @@ function nestHeadings(markdown: string, level: number): string {
  * Usage files of a component, by name: "1. Description" -> "description".
  * They are the whole hand-written documentation of a component, as in Magma's
  * per-component agent docs. The readme is not used: it holds a generic intro
- * only.
+ * only. The names are Magma's contract ("documentation.json" in its
+ * docs/CONTRACTS.md): Pattern and Antipattern became Examples and Mistakes
+ * (https://github.com/magma-design-system/magma/issues/1169), and both are read
+ * until no version the site supports has the old ones. A name not listed here
+ * fails the build: left out, it would take its page away without a word.
  */
-const USAGE = ['description', 'pattern', 'antipattern'] as const;
-type Usage = (typeof USAGE)[number];
+const USAGE = {
+  description: 'description',
+  examples: 'examples',
+  mistakes: 'mistakes',
+  pattern: 'examples',
+  antipattern: 'mistakes',
+} as const;
+type Usage = (typeof USAGE)[keyof typeof USAGE];
 
 const HTML_FENCE = /^```html[^\n]*\n([\s\S]*?)^```/m;
 
 /**
- * The first HTML example of the Pattern usage file, its canonical form (the
- * patterns go from the most common to the most specialized): the markup of
+ * The first HTML example of the Examples usage file, its canonical form (the
+ * examples go from the most common to the most specialized): the markup of
  * the component's preview (src/pages/example/[tag].astro). Empty when it does
  * not use the component itself, as for the parts another component renders
  * (mds-calendar-cell, mds-paginator-item): there is nothing of its own to try.
@@ -108,11 +118,12 @@ export function componentsLoader(): Loader {
         for (const [key, markdown] of Object.entries<string>(component.usage ?? {})) {
           // Keys look like "1. Description": the number only sets the order.
           const name = key.replace(/^\d+\.\s*/, '').toLowerCase();
-          if (USAGE.includes(name as Usage)) {
-            usage[name as Usage] = markdown;
-          } else {
-            logger.warn(`${component.tag}: usage "${key}" has no place on the site, left out`);
-          }
+          const page = USAGE[name as keyof typeof USAGE];
+          if (!page)
+            throw new Error(
+              `${component.tag}: usage "${key}" has no place on the site (it knows ${Object.keys(USAGE).join(', ')}): see "documentation.json" in Magma's docs/CONTRACTS.md`,
+            );
+          usage[page] = markdown;
         }
 
         // On the API and CSS sub-pages, in the cells of their tables.
@@ -132,9 +143,9 @@ export function componentsLoader(): Loader {
             // The Overview, under its h2.
             descriptionHtml: await toHtml(nestHeadings(usage.description ?? '', 3), 0),
             // Sub-pages of their own: their entries are the h2 of the page.
-            pattern: await render(nestHeadings(usage.pattern ?? '', 2), 1),
-            antipattern: await render(nestHeadings(usage.antipattern ?? '', 2), 1),
-            example: firstExample(usage.pattern, component.tag),
+            examples: await render(nestHeadings(usage.examples ?? '', 2), 1),
+            mistakes: await render(nestHeadings(usage.mistakes ?? '', 2), 1),
+            example: firstExample(usage.examples, component.tag),
             props: await withHtml(component.props),
             events: await withHtml(component.events),
             methods: await withHtml(component.methods),

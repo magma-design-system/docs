@@ -82,11 +82,12 @@ only until Magma publishes translations.
    commit, which keeps the author of each commit (decided 2026-10-20). Co-authors are not
    shown yet.
 3. Component preview: inline, driven by the attributes table. Iframe only for full demos.
-4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Pattern,
-   Antipattern, Installation) is a sub-page of the component. What goes into Anatomy is
+4. Component "Documentation" column: each entry (Anatomy, API, CSS, Features, Examples,
+   Mistakes, Installation) is a sub-page of the component. What goes into Anatomy is
    still to be defined. The usage Description opens the component's main page (Overview);
-   Pattern and Antipattern are separate sub-pages, so the right and the wrong forms are
-   never mixed (decided 2026-10-09).
+   Examples and Mistakes are separate sub-pages, so the right and the wrong forms are
+   never mixed (decided 2026-10-09; named Pattern and Antipattern until 2026-10-27,
+   magma#1169).
 5. Agentic development is a section of its own (decided 2026-10-24, at `/ai/`), after Development: with Magma 2.6.0
    the agent tooling of the epic magma#1083 (guides in the package, MCP server, Claude Code
    plugin and skills, lint) is more than one page of Development can hold. Its message is

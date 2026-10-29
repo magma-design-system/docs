@@ -22,11 +22,22 @@ as blocks: they are patterns, since their parts come from a component (`mds-moda
 common root of the term: a pattern is named by the recurring problem it solves, not by its
 size.
 
+Decided on 2026-10-27: the word stays with this level. The usage files of one component,
+which were Pattern and Antipattern, are Examples and Mistakes since
+[magma#1169](https://github.com/magma-design-system/magma/issues/1169), and so are the
+sub-pages of each component on the site (`/examples/`, `/mistakes/`; the old addresses
+redirect). An anti-pattern is a wrong solution to a task (a toast over an open dialog), not
+wrong markup. The group Feedback is called **Messages and states**: "feedback" reads as the
+person telling the product something, while the group is the product telling the person what
+happened. That other sense becomes a candidate of its own: **report a problem or give an
+opinion** on a view or a feature (for AI, rating an answer).
+
 ## State
 
 - Both sections are online only as their landing pages, under construction (`soon: true`).
 - Pattern pages, drafts (`draft: true`, dev only): **List with filters**, **Record detail**.
-- **Feedback** has a clickable sketch, `src/patterns/feedback/example.html`, and no page yet.
+- **Messages and states** has a clickable sketch, `src/patterns/feedback/example.html` (the
+  folder keeps its old id until the pattern is written), and no page yet.
 
 ## How a pattern is made
 
@@ -35,7 +46,7 @@ One topic at a time:
 1. Collect the real cases from Maggioli's products: the screens, situations, data and roles
    where the need shows up. The products are a catalogue of needs, never the solution to
    document: most of their screens were not designed with the design system.
-2. Check what Magma already offers: the component guides, their `pattern.md`.
+2. Check what Magma already offers: the component guides, their `examples.md`.
 3. Write a proposal with its open questions; the design system team decides.
 4. Build a clickable sketch in `src/patterns/<id>/example.html` and try it.
 5. Write a brief, then the page.
@@ -62,7 +73,7 @@ Decisions.
   code.
 - Patterns connect: the list example opens the detail example (`../record-detail/?id=N`).
 
-## Decided: feedback
+## Decided: where a message goes
 
 The rule: **a message goes where the thing it talks about is.**
 
@@ -109,9 +120,8 @@ Proposals, not decided yet:
 - **Navigation within a page**: `mds-tab` for views of the same object, links for pages.
 - **Page title**: always the `h1`; its size comes from `typography`, not from the level.
 - **Not ready yet**: features that are not ready are not shown.
-- **Naming**: components already have Pattern and Antipattern sub-pages (from `pattern.md`);
-  either the section takes another name, or the sub-pages are labelled differently.
 
-Proposed order: feedback (messages, confirmation, empty and error states, loading), then forms
+Proposed order: messages and states (where a message goes, confirmation, empty and error
+states, loading), then forms
 (field, dialog with a form, then the Form and validation pattern), then List with filters with
 row actions, Record detail, search with facets (after a combobox in Magma), AI.

@@ -115,8 +115,10 @@ wrapper). Before writing UI code, read
 the files it points to that you need:
 
 - choose components from `agents/components.md`, the catalogue;
-- for each component you use, read its `AGENTS.md`, `pattern.md` and `antipattern.md`
-  (`dist/collection/components/<tag>/`);
+- for each component you use, read its `AGENTS.md` and the two usage files beside it,
+  `examples.md` and `mistakes.md` (`pattern.md` and `antipattern.md` before
+  [magma#1169](https://github.com/magma-design-system/magma/issues/1169)), in
+  `dist/collection/components/<tag>/`;
 - color, type and spacing come from Magma's tokens and utilities (`agents/color.md`,
   `agents/typography.md`), never from literal values.
 
