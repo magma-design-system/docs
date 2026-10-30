@@ -1,0 +1,57 @@
+---
+title: Messages - Guidelines
+description: Where each message of an application goes - under a field, in the part of the page it is about, in the dialog still open, in a toast, in a dialog that asks first - so that people find it where they are looking.
+draft: true
+---
+
+## Behavior
+
+- **The place follows the subject.** Where a message goes depends on what it is about, never on
+  how important it looks: a field, a part of the page, a dialog, an action whose place is gone,
+  the whole application.
+- **What failed keeps what was there.** A list that cannot load again keeps its rows, with the
+  banner above them saying they may not be current; a dialog that cannot save keeps what was
+  written. Nobody has to start again because of an error.
+- **The messages of a form** appear when it is sent, on every field with a problem at once, and
+  each one leaves as soon as its field changes. The focus goes to the first field with a
+  message.
+- **A toast after every create, edit and delete**, also when the result is visible: the dialog
+  that closed or the row that disappeared does not say that the change was saved.
+- **Toasts at the bottom, in the middle, three at most.** One `mds-toast-region` per application
+  lines them up, the same in every product; a new toast sends away the oldest one with a timer.
+  A toast without actions leaves after 5 seconds. A toast with an action, such as Try again, has
+  no timer and can be closed with its hide button (`dismissible`).
+- **Never a toast over an open dialog.** `mds-modal` opens a modal dialog, which makes
+  everything outside it inert: the toast could be seen but not used, and a click on it would
+  close the dialog. Whatever is about a dialog goes into the dialog.
+- **Ask before what cannot be undone.** The dialog names the object and the consequence, and
+  nothing changes until people confirm. When the action fails, the dialog stays open with a
+  banner that says nothing was changed.
+- **The whole application**: a notice with nothing to decide is a toast. One with a decision and
+  a deadline, such as a session about to end, is a strict dialog (`interaction="strict"`), which
+  only a choice closes and which also opens over another dialog.
+
+## Accessibility
+
+- The toast region reads each toast out: do not add a live region of your own around it.
+- An urgent message that is not a toast, such as a Try again that failed again, is read out by a
+  live region with `role="alert"`, emptied and filled again, so that the same message is read a
+  second time.
+- After a deletion, the row and the button that opened the dialog are gone: the focus goes to
+  the title of the page, which takes it with `tabindex="-1"`. When a toast with an action leaves,
+  the focus that was in it goes back to the title too.
+- The message of a field belongs to the field: `mds-input-field` links it to its input, so a
+  screen reader reads it with the field.
+- The status of each user is the text of its badge, not only its color.
+
+## Content
+
+- Say what happened, then what to do: "The users could not be loaded. Check the connection, then
+  try again."
+- Name the object: "Changes to Marco Rossi saved.", "Delete Marco Rossi?".
+- A field says how to fix it: "Enter an email address like name@example.com.", not "Invalid
+  value".
+- After a failure, say what stays: "What you wrote is still here", "Nothing was changed".
+- The button that confirms says the action, "Delete", in the error variant: never OK or Yes.
+- Never show internal messages, the status text of the server ("500 Internal Server Error") or
+  "coming soon".

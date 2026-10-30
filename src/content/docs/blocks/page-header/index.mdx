@@ -1,0 +1,44 @@
+---
+title: Page header
+description: The top of a page - its title, what it holds, its status and its actions, and the way back - in the same order on every page of a product.
+choices: Which optional parts it shows, its actions (three at most), the texts.
+draft: true
+---
+
+import PatternAgent from '../../../../components/PatternAgent.astro';
+import PatternComponents from '../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../components/PatternPreview.astro';
+
+<PatternAgent id="page-header" kind="blocks" />
+
+The first thing people read on a page: where they are, what the page holds and what they can do
+there. It comes back in every pattern written so far - the [list with
+filters](../../patterns/list-with-filters/), the [record detail](../../patterns/record-detail/),
+the users of [Messages](../../patterns/messages/) - and each one had built it a little
+differently. Written once, it reads the same on every page of a product.
+
+<PatternPreview id="page-header" kind="blocks" />
+
+## When to use it
+
+At the top of every page of an application, once per page: its title is the `h1` of the page.
+Not for the sections inside a page, which have a heading of their own, nor for a dialog, whose
+title is part of `mds-modal`.
+
+## Anatomy
+
+1. **Back** (optional): a link to the page this one belongs to, named as that page names
+   itself: "Requests", not "Back". Only when the page has a page above it, such as a record and
+   its list.
+2. **Overline** (optional): the number or the kind of the record, small, above the title.
+3. **Title**: the name of the page, or of the record it shows.
+4. **Status** (optional): the status of the record, as a badge next to the title.
+5. **Description** (optional): one sentence - what the page holds, or the facts of the record.
+6. **Actions** (optional): what can be done with the whole page or record, the main one last.
+
+From `lg` the actions stand at the right of the text, aligned to its top; on a narrower screen
+they go under it, and wrap when they do not fit on one line.
+
+## Components
+
+<PatternComponents id="page-header" kind="blocks" />

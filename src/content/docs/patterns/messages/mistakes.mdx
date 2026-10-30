@@ -1,0 +1,71 @@
+---
+title: Messages - Mistakes
+description: Where each message of an application goes - under a field, in the part of the page it is about, in the dialog still open, in a toast, in a dialog that asks first - so that people find it where they are looking.
+draft: true
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+Every message in a dialog, the errors of the fields and the confirmations of a save too.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A dialog only for a decision; every other message where its subject is.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A toast says that the form in the dialog could not be saved.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The dialog shows a banner, and what was written stays.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A list that did not load shows "No users".
+
+</mds-usage>
+<mds-usage variant="do">
+
+A banner says the users could not be loaded, with Try again; the empty state is only for an
+empty set.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A failed action in a toast that leaves after 5 seconds.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A toast that stays, with Try again and a way to close it.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+"Are you sure?", with OK and Cancel.
+
+</mds-usage>
+<mds-usage variant="do">
+
+"Delete Marco Rossi?", with what follows, and the button Delete.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The message shows "Error 500".
+
+</mds-usage>
+<mds-usage variant="do">
+
+The message says what happened and what to do.
+
+</mds-usage>
+</Usages>

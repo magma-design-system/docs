@@ -1,0 +1,152 @@
+---
+// The gallery of the landing page of Patterns or Building blocks: the
+// patterns or the blocks of the section by topic, in the groups and the order
+// of the section navigation (galleryGroups() in src/lib/patterns.ts), each
+// topic under a heading that the table of contents lists (src/route-data.ts).
+// One card each: the pattern running small (MiniPreview.astro), its name and
+// what it is for, then what it takes to find it again and adapt it to a
+// product, by the rules of the product layers (plan/DIRECTION.md): its id,
+// which does not change and which a product layer extends, where its code is
+// and in which frameworks, and what a product decides (`choices` in the front
+// matter of its overview); the rest is always true. A production build leaves
+// the drafts out: until a page is published, the gallery draws nothing.
+import { getEntry } from 'astro:content';
+import { FRAMEWORKS } from '../lib/frameworks.mjs';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
+import { SITE_REPOSITORY } from '../lib/nav.mjs';
+import {
+  cardPreviewQuery,
+  galleryGroups,
+  patternCode,
+  patternEntryId,
+  patternHref,
+} from '../lib/patterns';
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+import MiniPreview from './MiniPreview.astro';
+
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+
+const groups = await Promise.all(
+  galleryGroups(starlightRoute, Astro.url.pathname).map(async (group) => ({
+    ...group,
+    items: await Promise.all(
+      group.items.map(async ({ kind, id, href }) => {
+        const entry =
+          (await getEntry('docs', patternEntryId(locale, kind, id))) ??
+          (await getEntry('docs', patternEntryId(undefined, kind, id)));
+        if (!entry) throw new Error(`PatternGallery: no page ${kind}/${id}`);
+        const code = patternCode(id, kind);
+        return {
+          kind,
+          id,
+          href,
+          title: entry.data.title,
+          description: entry.data.description,
+          choices: entry.data.choices,
+          draft: entry.data.draft,
+          frameworks: FRAMEWORKS.filter((framework) => framework.id in code).map(
+            (framework) => framework.label,
+          ),
+          folder: `src/${kind}/${id}/`,
+        };
+      }),
+    ),
+  })),
+);
+/** A line of a card: what it is, muted, then its value. */
+const LABEL = 'text-fg-muted';
+---
+
+{groups.length > 0 && (
+  <>
+    <mds-text {...READING} tag="p" class={TEXT.paragraph}>
+      {t('gallery.intro')}
+    </mds-text>
+    {groups.map(({ slug, label, items }) => (
+      <>
+        <Heading id={slug} text={label} />
+        {/* `not-content`: Starlight would put 1rem above every card but the first. */}
+        <div class="not-content @container my-600">
+          <div class="grid gap-600 @xl:grid-cols-2">
+            {items.map((item) => (
+              <mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
+                <mds-card-header class="flex-col items-stretch gap-400">
+                  <MiniPreview
+                    id={item.id}
+                    kind={item.kind}
+                    query={cardPreviewQuery(item.id, item.kind)}
+                    href={item.href}
+                    shape="landscape"
+                  />
+                  <div class="flex flex-wrap items-center gap-200">
+                    <mds-text typography="h6" tag="h3">
+                      {item.title}
+                    </mds-text>
+                    {item.draft && <mds-badge label={t('gallery.draft')} variant="warning" />}
+                  </div>
+                </mds-card-header>
+                <mds-card-content class="flex flex-col gap-300 pt-0">
+                  <mds-text typography="detail" tag="p">
+                    {item.description}
+                  </mds-text>
+                  <mds-text typography="detail" tag="p">
+                    <mds-text typography="detail" tag="span" class={LABEL}>
+                      {t('gallery.id')}:
+                    </mds-text>{' '}
+                    <Code>{item.id}</Code>
+                  </mds-text>
+                  <mds-text typography="detail" tag="p">
+                    <mds-text typography="detail" tag="span" class={LABEL}>
+                      {t('pattern.page.code')}:
+                    </mds-text>{' '}
+                    {item.frameworks.join(', ')}, {t('gallery.in')}{' '}
+                    <Code>
+                      <mds-link href={`${SITE_REPOSITORY}/tree/main/${item.folder}`} target="blank">
+                        {item.folder}
+                      </mds-link>
+                    </Code>
+                  </mds-text>
+                  {item.choices && (
+                    <mds-text typography="detail" tag="p">
+                      <mds-text typography="detail" tag="span" class={LABEL}>
+                        {t('gallery.choices')}:
+                      </mds-text>{' '}
+                      {item.choices} {t('gallery.always')}{' '}
+                      {/* No full stop after it: on a line of its own, it would get a space. */}
+                      <mds-link href={patternHref(locale, item.kind, item.id, 'guidelines')}>
+                        {t('pattern.page.guidelines')}
+                      </mds-link>
+                    </mds-text>
+                  )}
+                </mds-card-content>
+                <mds-card-footer class="flex flex-wrap gap-200">
+                  <mds-button
+                    href={item.href}
+                    type="a"
+                    label={t('cards.open')}
+                    aria-label={`${t('cards.open')}: ${item.title}`}
+                    icon="mi/baseline/arrow-forward"
+                    icon-position="right"
+                    variant="primary"
+                    tone="text"
+                  />
+                  <mds-button
+                    href={patternHref(locale, item.kind, item.id, 'code')}
+                    type="a"
+                    label={t('pattern.page.code')}
+                    aria-label={`${t('pattern.page.code')}: ${item.title}`}
+                    icon="mi/baseline/code"
+                    variant="primary"
+                    tone="text"
+                  />
+                </mds-card-footer>
+              </mds-card>
+            ))}
+          </div>
+        </div>
+      </>
+    ))}
+  </>
+)}

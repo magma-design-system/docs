@@ -1,0 +1,35 @@
+---
+title: Page header - Guidelines
+description: The top of a page - its title, what it holds, its status and its actions, and the way back - in the same order on every page of a product.
+draft: true
+---
+
+## Layout
+
+- The parts always come in the same order: back, overline, title with status, description,
+  actions. A part that is missing leaves no room behind.
+- The title takes the size of `typography="h3"` on every page, whatever its level: the size
+  comes from `typography`, the level from `tag`.
+- The actions stand at the right of the text from `lg`, aligned to its top, and under it on a
+  narrower screen. The text takes the room that is left (`min-w-0`), so a long title wraps
+  instead of pushing the actions out.
+- The status follows the title on the same line, and goes under it when there is no room.
+- Three actions at most. More belong to a menu or to the parts of the page they act on, such
+  as the rows of a table.
+
+## Accessibility
+
+- The title is the only `h1` of the page, and the first heading a screen reader finds.
+- When an action removes the button that ran it, the focus goes to the title, which takes it
+  with `tabindex="-1"` and shows no ring.
+- The status is the text of the badge, not only its color.
+- The back link is a link, named after the page it leads to: a screen reader announces where
+  it goes.
+
+## Content
+
+- Name the page after what it holds, in the plural for a list ("Requests"), after the record
+  for a record ("Change of residence").
+- The description is one sentence, without a full stop when it is a list of facts.
+- The labels of the actions start with a verb and name the object when it is not obvious:
+  "Close the request", "Add user".

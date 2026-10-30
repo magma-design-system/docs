@@ -1,0 +1,35 @@
+---
+title: Intestazione di pagina - Linee guida
+description: La parte alta di una pagina - il titolo, cosa contiene, lo stato e le azioni, e la strada per tornare indietro - nello stesso ordine su ogni pagina di un prodotto.
+draft: true
+---
+
+## Disposizione
+
+- Le parti vengono sempre nello stesso ordine: indietro, occhiello, titolo con lo stato,
+  descrizione, azioni. Una parte che manca non lascia spazio vuoto.
+- Il titolo ha la dimensione di `typography="h3"` su ogni pagina, qualunque sia il suo livello:
+  la dimensione viene da `typography`, il livello da `tag`.
+- Le azioni stanno a destra del testo da `lg`, allineate al suo inizio, e sotto su uno schermo
+  più stretto. Il testo prende lo spazio che resta (`min-w-0`), così un titolo lungo va a capo
+  invece di spingere fuori le azioni.
+- Lo stato segue il titolo sulla stessa riga, e va sotto quando non c'è spazio.
+- Tre azioni al massimo. Le altre vanno in un menu o nelle parti della pagina su cui agiscono,
+  come le righe di una tabella.
+
+## Accessibilità
+
+- Il titolo è l'unico `h1` della pagina, e il primo titolo che trova uno screen reader.
+- Quando un'azione toglie il pulsante che l'ha avviata, il focus va al titolo, che lo riceve con
+  `tabindex="-1"` e non mostra l'anello.
+- Lo stato è il testo del badge, non solo il suo colore.
+- Il link per tornare indietro è un link, chiamato come la pagina a cui porta: uno screen reader
+  dice dove va.
+
+## Contenuti
+
+- Chiama la pagina come quello che contiene, al plurale per una lista ("Istanze"), come il
+  record per un record ("Cambio di residenza").
+- La descrizione è una frase, senza punto finale quando è un elenco di dati.
+- Le etichette delle azioni cominciano con un verbo e nominano l'oggetto quando non è ovvio:
+  "Chiudi l'istanza", "Aggiungi utente".

@@ -1,0 +1,59 @@
+---
+title: Messaggi - Linee guida
+description: Dove va ogni messaggio di un'applicazione - sotto un campo, nella parte della pagina di cui parla, nel dialog ancora aperto, in un toast, in un dialog che chiede prima - perché lo si trovi dove si sta guardando.
+draft: true
+---
+
+## Comportamento
+
+- **Il posto segue l'argomento.** Dove va un messaggio dipende da ciò di cui parla, mai da quanto
+  sembra importante: un campo, una parte della pagina, un dialog, un'azione il cui posto non c'è
+  più, l'intera applicazione.
+- **Quello che non ha funzionato tiene quello che c'era.** Una lista che non riesce a ricaricarsi
+  tiene le sue righe, con sopra il banner che dice che potrebbero non essere aggiornate; un
+  dialog che non riesce a salvare tiene quello che si è scritto. Nessuno deve ricominciare per un
+  errore.
+- **I messaggi di un form** compaiono quando lo si invia, su tutti i campi con un problema
+  insieme, e ognuno se ne va appena il suo campo cambia. Il focus va al primo campo con un
+  messaggio.
+- **Un toast dopo ogni creazione, modifica ed eliminazione**, anche quando l'esito si vede: il
+  dialog che si è chiuso o la riga che è sparita non dicono che la modifica è stata salvata.
+- **Toast in basso, al centro, tre al massimo.** Un solo `mds-toast-region` per applicazione li
+  mette in fila, uguali in ogni prodotto; un toast nuovo manda via il più vecchio con un timer.
+  Un toast senza azioni se ne va dopo 5 secondi. Un toast con un'azione, come Riprova, non ha
+  timer e si chiude con il suo pulsante (`dismissible`).
+- **Mai un toast sopra un dialog aperto.** `mds-modal` apre un dialog modale, che rende inerte
+  tutto quello che c'è fuori: il toast si vedrebbe ma non si potrebbe usare, e un clic su di
+  esso chiuderebbe il dialog. Quello che riguarda un dialog va nel dialog.
+- **Chiedere prima di ciò che non si può annullare.** Il dialog nomina l'oggetto e la
+  conseguenza, e niente cambia finché non si conferma. Quando l'azione fallisce, il dialog resta
+  aperto con un banner che dice che non è cambiato niente.
+- **L'intera applicazione**: un avviso senza niente da decidere è un toast. Uno con una decisione
+  e una scadenza, come una sessione che sta per scadere, è un dialog rigido
+  (`interaction="strict"`), che si chiude solo con una scelta e che si apre anche sopra un altro
+  dialog.
+
+## Accessibilità
+
+- La regione dei toast legge ogni toast: non aggiungerci intorno una live region tua.
+- Un messaggio urgente che non è un toast, come un Riprova fallito di nuovo, lo legge una live
+  region con `role="alert"`, svuotata e riempita di nuovo, perché lo stesso messaggio venga letto
+  una seconda volta.
+- Dopo un'eliminazione, la riga e il pulsante che aveva aperto il dialog non ci sono più: il
+  focus va al titolo della pagina, che lo riceve con `tabindex="-1"`. Quando se ne va un toast
+  con un'azione, anche il focus che era al suo interno torna al titolo.
+- Il messaggio di un campo appartiene al campo: `mds-input-field` lo collega al suo input, così
+  uno screen reader lo legge con il campo.
+- Lo stato di ogni utente è il testo del suo badge, non solo il suo colore.
+
+## Contenuti
+
+- Di' cosa è successo, poi cosa fare: "Non è stato possibile caricare gli utenti. Controlla la
+  connessione, poi riprova."
+- Nomina l'oggetto: "Modifiche a Marco Rossi salvate.", "Eliminare Marco Rossi?".
+- Un campo dice come correggerlo: "Inserisci un indirizzo email come nome@esempio.it.", non
+  "Valore non valido".
+- Dopo un errore, di' cosa resta: "Quello che hai scritto è ancora qui", "Non è cambiato niente".
+- Il pulsante che conferma dice l'azione, "Elimina", nella variante di errore: mai OK o Sì.
+- Non mostrare mai messaggi interni, il testo di stato del server ("500 Internal Server Error") o
+  "in arrivo".

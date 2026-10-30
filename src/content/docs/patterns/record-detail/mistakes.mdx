@@ -1,0 +1,71 @@
+---
+title: Record detail - Mistakes
+description: One record of a list - what it is, where it stands, what can be done with it now, its data, documents and history - and the way back to the list.
+draft: true
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+Every action is always on screen, and the ones that cannot run are disabled.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Only the actions the status allows are on screen.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+After an action, the page changes the status by itself, and hopes the back end agrees.
+
+</mds-usage>
+<mds-usage variant="do">
+
+After an action, the page shows the record the back end returns.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A dialog asks "Are you sure?" with OK and Cancel.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The dialog says what will happen, and its button repeats the action: "Close the request".
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The button of the action disappears with the old status, and the focus falls back to the top of
+the page.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The focus moves to the heading of the page, and the outcome is read out.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The link back opens the list from scratch, without the search and the filters.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Back returns to the list as it was.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A record that does not exist shows an error and "Try again".
+
+</mds-usage>
+<mds-usage variant="do">
+
+It says the record does not exist, and links to the list.
+
+</mds-usage>
+</Usages>

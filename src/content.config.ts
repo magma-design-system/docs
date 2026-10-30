@@ -23,7 +23,17 @@ const uiStrings = z.object(
 );
 
 export const collections = {
-  docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
+  docs: defineCollection({
+    loader: docsLoader(),
+    schema: docsSchema({
+      extend: z.object({
+        // The overview of a pattern or a block: what a product decides on it,
+        // the open choices of a product layer (plan/DIRECTION.md); the rest is
+        // always true. On its card in the gallery (PatternGallery.astro).
+        choices: z.string().optional(),
+      }),
+    }),
+  }),
   i18n: defineCollection({ loader: i18nLoader(), schema: i18nSchema({ extend: uiStrings }) }),
   // The people who write the pages, by GitHub login: the name and role shown
   // in the page footer (src/components/frame/Footer.astro), and the emails of

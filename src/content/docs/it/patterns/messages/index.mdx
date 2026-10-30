@@ -1,0 +1,78 @@
+---
+title: Messaggi
+description: Dove va ogni messaggio di un'applicazione - sotto un campo, nella parte della pagina di cui parla, nel dialog ancora aperto, in un toast, in un dialog che chiede prima - perché lo si trovi dove si sta guardando.
+choices: I testi dei messaggi, e quali azioni fallite offrono Riprova.
+draft: true
+---
+
+import PatternAgent from '../../../../../components/PatternAgent.astro';
+import PatternCases from '../../../../../components/PatternCases.astro';
+import PatternComponents from '../../../../../components/PatternComponents.astro';
+import PatternPreview from '../../../../../components/PatternPreview.astro';
+
+<PatternAgent id="messages" />
+
+Un'applicazione parla di continuo con chi la usa: manca un campo, una lista non si è caricata,
+una modifica è stata salvata, un'eliminazione chiede un sì. Un messaggio funziona solo se lo si
+vede dove si sta guardando, lo si capisce, e gli si risponde quando chiede qualcosa. Magma ha un
+componente per ogni tipo di messaggio; questo pattern decide quale va dove, con una regola sola:
+
+**Un messaggio va dove sta la cosa di cui parla.**
+
+<PatternPreview id="messages" />
+
+## Quando usarlo
+
+Ogni volta che l'applicazione dice cosa è successo, o chiede qualcosa prima di andare avanti: il
+messaggio di un campo, una parte della pagina che non ha funzionato, l'esito di un'azione, una
+decisione, un avviso sull'intera applicazione. Gli altri stati di una schermata dello stesso
+gruppo, Messaggi e stati - niente ancora da mostrare, caricamento - avranno pattern propri.
+
+## I casi
+
+Sette casi coprono i messaggi di un gestionale. Ogni card mostra l'anteprima qui sopra in quel
+caso; aprila per provarlo.
+
+<PatternCases
+  id="messages"
+  cases={[
+    {
+      title: 'Un campo',
+      text: 'Sotto il campo, il messaggio di `mds-input-field`, da quando si invia il form finché il campo non cambia.',
+    },
+    {
+      title: 'Una parte della pagina che non ha funzionato',
+      text: 'In quella parte, un `mds-banner` di errore con Riprova. Quello che era sullo schermo resta.',
+    },
+    {
+      title: "Un'azione fallita mentre il suo posto è aperto",
+      text: 'Nel dialog, un `mds-banner` di errore. Quello che si è scritto resta.',
+    },
+    {
+      title: "Un'azione riuscita, il cui posto non c'è più",
+      text: 'Un toast che se ne va dopo 5 secondi, dopo ogni creazione, modifica ed eliminazione: il dialog è chiuso, il record eliminato.',
+    },
+    {
+      title: 'La stessa azione, fallita',
+      text: 'Un toast che resta, con Riprova: `mds-toast` di errore con `duration="0"`.',
+    },
+    {
+      title: 'Una decisione prima di andare avanti',
+      text: "Un dialog, `mds-modal`, che nomina l'oggetto e la conseguenza, prima che cambi qualcosa.",
+    },
+    {
+      title: "L'intera applicazione, con una scadenza",
+      text: 'Un dialog rigido, che si apre anche sopra un altro: la sessione sta per scadere.',
+    },
+  ]}
+/>
+
+Un avviso sull'intera applicazione senza niente da decidere, come essere offline e tornare
+online, è anch'esso un toast.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella lingua
+del prodotto.
+
+## Componenti
+
+<PatternComponents id="messages" />

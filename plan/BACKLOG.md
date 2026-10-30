@@ -35,8 +35,21 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 ## Building blocks and Patterns
 
-See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Messages
-and states sketch to turn into a page.
+See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, what each
+draft still needs before it is published. Next steps:
+
+- The patterns adopt the Page header block, in their three frameworks: today each builds its
+  own header.
+- Messages: the React and Angular versions.
+- Record detail: an action that fails in its dialog shows a toast; by the rule of Messages it
+  must be a banner in the dialog.
+- List with filters: the "don't" about `sortable` is out of date since Magma 2.3.0
+  (`mdsTableHeaderCellSort` lets the back end sort).
+- Patterns for agents: today an agent reads them on the site (the prompt of each overview).
+  Plain text versions for agents (or the patterns in the Magma package, or an MCP tool) would
+  save it the HTML.
+- Rendered use cases in Magma: once a release ships them, the small previews can take them
+  from the package (`resolveMagma()`) where they show more than the live example.
 
 ## Development
 

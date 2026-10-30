@@ -1,0 +1,55 @@
+---
+title: Lista con filtri - Linee guida
+description: Una lista di record in cui cercare, da restringere, ordinare e scorrere per pagine, con gli stati di caricamento, di nessun risultato e di errore e la ricerca conservata nell'indirizzo.
+draft: true
+---
+
+## Comportamento
+
+- **Il lavoro lo fa il back end.** Cerca, conta, ordina e divide in pagine i record, e la
+  pagina riceve una pagina di risultati. Filtrare nel browser funziona solo finché tutto
+  l'insieme sta nella pagina, e gli insiemi crescono.
+- **La ricerca sta nell'indirizzo.** Testo cercato, stato, ufficio, ordinamento e pagina sono
+  parametri dell'indirizzo: un ricaricamento, un segnalibro o un link mandato a un collega
+  mostrano gli stessi risultati, e Indietro da un record riporta alla lista com'era. I valori
+  lasciati al loro predefinito restano fuori, per tenere corto l'indirizzo.
+- **Un nuovo filtro riparte dalla prima pagina.** Ogni cambiamento tranne la pagina riporta a
+  pagina 1: la pagina 4 di un insieme più piccolo può non esistere. Un indirizzo che chiede una
+  pagina oltre la fine riceve l'ultima.
+- **Una ricerca alla volta.** La ricerca aspetta una pausa nella digitazione (300 ms) invece di
+  partire a ogni tasto, e una nuova ricerca annulla quella ancora in corso: una risposta più
+  vecchia e più lenta non sostituisce mai una più recente.
+- **I risultati restano mentre arrivano i nuovi.** Lo spinner nel campo di ricerca, e
+  `aria-busy` sulla tabella, dicono che stanno arrivando nuovi risultati; la pagina non si
+  svuota per un istante.
+- **I conteggi seguono gli altri filtri.** Ogni stato mostra quanti record mostrerebbe con il
+  testo e l'ufficio scelti, così uno stato vuoto si vede prima di sceglierlo.
+- **Nessun risultato non è un errore.** Quando nulla corrisponde, la pagina lo dice e propone
+  di azzerare i filtri. Quando la richiesta fallisce, dice che i risultati non si sono potuti
+  caricare e propone di riprovare, invece di mostrare una lista vuota.
+
+## Accessibilità
+
+- I filtri sono un form con `role="search"`, un landmark a cui chi usa un lettore di schermo
+  può saltare. Ogni controllo ha un'etichetta visibile, data da `mds-input-field`: il
+  placeholder è un esempio, non l'etichetta.
+- Il riepilogo ha `role="status"`: dopo ogni cambiamento, i lettori di schermo leggono quali
+  record sono mostrati e su quanti, mentre il focus resta sul controllo appena usato, così si
+  può continuare a restringere.
+- Lo stato di ogni record è il testo del suo badge, non solo il suo colore.
+- Il numero di ogni record è il link alla sua pagina, e il nome del link. Un pulsante "Apri" su
+  ogni riga suonerebbe uguale su ogni riga.
+- La tabella tiene le intestazioni delle colonne, e su uno schermo stretto scorre di lato
+  invece di schiacciare le colonne: le sue celle restano su una riga.
+
+## Contenuti
+
+- Chiama la lista con ciò che contiene, al plurale: "Istanze", non "Elenco istanze" o
+  "Ricerca".
+- L'etichetta del campo di ricerca dice cos'è; il placeholder dice dove cerca: "Numero o
+  oggetto".
+- Chiama gli stati come li chiama la pagina del record, ed elencali nell'ordine del processo.
+- Conta i risultati, e usa il singolare per uno: "1 istanza", "11-20 di 46 istanze".
+- Quando nulla corrisponde, dillo e di' come uscirne: "Nessuna istanza corrisponde", con
+  "Azzera i filtri" - non "Nessun dato".
+- Scrivi le date nel formato della lingua della pagina.

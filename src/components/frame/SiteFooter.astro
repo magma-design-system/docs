@@ -6,13 +6,12 @@
 // (.github/ISSUE_TEMPLATE); the problems of this site go to its own issues.
 import { localePrefix } from '../../lib/frame';
 import { magmaVersion } from '../../lib/magma.mjs';
-import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import { REPOSITORY, SITE_REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
 import Brand from './Brand.astro';
 
 const { t, starlightRoute } = Astro.locals;
 const local = (path: string) => `${localePrefix(starlightRoute.locale)}/${path}`;
 const issue = (template: string) => `${REPOSITORY}/issues/new?template=${template}.yml`;
-const SITE_REPOSITORY = 'https://github.com/magma-design-system/docs';
 
 const columns = [
   {

@@ -127,7 +127,8 @@ A new author, step by step:
 - **Publish check**, on a production build of `main` before opening that pull request, and on
   the live site after the deploy:
   - Building blocks and Patterns exist only as their landing pages, with the "Under
-    construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
+    construction" banner; no pattern or block page and no `/example/pattern/<id>/` or
+    `/example/block/<id>/` is built; their home
     cards carry the badge.
   - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.

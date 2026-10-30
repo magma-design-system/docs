@@ -1,0 +1,73 @@
+---
+title: List with filters - Mistakes
+description: A list of records to search, narrow down, sort and page through, with its loading, empty and error states and the query kept in the address.
+draft: true
+---
+
+import Usages from '../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+The page loads every record and filters them in the browser.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The back end searches, counts, sorts and pages; the page receives one page.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The columns of a list with pages are sortable with `sortable` on `mds-table-header-cell`: it
+sorts only the rows on screen.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The order is part of the query: the back end sorts the whole set, then pages it.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The status changes and the list stays on page 4, which no longer exists.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Every change of the filters goes back to page 1.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+The filters live only in the page: a reload, or Back from a record, loses them.
+
+</mds-usage>
+<mds-usage variant="do">
+
+The query is in the address, and the page reads it when it opens.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A query for every key pressed, and the answer that arrives last wins, even when it is the
+answer to an older query.
+
+</mds-usage>
+<mds-usage variant="do">
+
+A query when the typing pauses, and each new query cancels the one still running.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+A failed request shows "No requests match".
+
+</mds-usage>
+<mds-usage variant="do">
+
+A failed request shows an error with a way to try again; the empty state is only for an empty
+set.
+
+</mds-usage>
+</Usages>

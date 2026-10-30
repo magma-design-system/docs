@@ -1,0 +1,17 @@
+---
+title: Lista con filtri - Codice
+description: Una lista di record in cui cercare, da restringere, ordinare e scorrere per pagine, con gli stati di caricamento, di nessun risultato e di errore e la ricerca conservata nell'indirizzo.
+draft: true
+---
+
+import PatternCode from '../../../../../components/PatternCode.astro';
+
+La versione in HTML è quella in funzione nell'anteprima della [panoramica](../). In tutte e tre,
+`fetchRequests` fa le veci del back end e lavora su dati di esempio: sostituiscila con la
+chiamata alla tua API. Il componente Angular legge e scrive la ricerca attraverso il router,
+quindi deve essere il componente di una rotta.
+
+Gli esempi sono in inglese, come il codice: i testi dell'interfaccia vanno tradotti nella
+lingua del prodotto.
+
+<PatternCode id="list-with-filters" />

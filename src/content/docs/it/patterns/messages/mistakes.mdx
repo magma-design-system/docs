@@ -1,0 +1,71 @@
+---
+title: Messaggi - Errori da evitare
+description: Dove va ogni messaggio di un'applicazione - sotto un campo, nella parte della pagina di cui parla, nel dialog ancora aperto, in un toast, in un dialog che chiede prima - perché lo si trovi dove si sta guardando.
+draft: true
+---
+
+import Usages from '../../../../../components/Usages.astro';
+
+<Usages>
+<mds-usage variant="dont">
+
+Ogni messaggio in un dialog, anche gli errori dei campi e le conferme di un salvataggio.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Un dialog solo per una decisione; ogni altro messaggio dove sta il suo argomento.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un toast dice che il form nel dialog non è stato salvato.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il dialog mostra un banner, e quello che si è scritto resta.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Una lista che non si è caricata mostra "Nessun utente".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Un banner dice che non è stato possibile caricare gli utenti, con Riprova; lo stato vuoto è solo
+per un insieme vuoto.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Un'azione fallita in un toast che se ne va dopo 5 secondi.
+
+</mds-usage>
+<mds-usage variant="do">
+
+Un toast che resta, con Riprova e un modo per chiuderlo.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+"Sei sicuro?", con OK e Annulla.
+
+</mds-usage>
+<mds-usage variant="do">
+
+"Eliminare Marco Rossi?", con quello che segue, e il pulsante Elimina.
+
+</mds-usage>
+<mds-usage variant="dont">
+
+Il messaggio mostra "Errore 500".
+
+</mds-usage>
+<mds-usage variant="do">
+
+Il messaggio dice cosa è successo e cosa fare.
+
+</mds-usage>
+</Usages>

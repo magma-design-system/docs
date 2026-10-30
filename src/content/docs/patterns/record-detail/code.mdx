@@ -1,0 +1,15 @@
+---
+title: Record detail - Code
+description: One record of a list - what it is, where it stands, what can be done with it now, its data, documents and history - and the way back to the list.
+draft: true
+---
+
+import PatternCode from '../../../../components/PatternCode.astro';
+
+The plain HTML version is the one running in the preview of the [overview](../): it opens from the numbers of the
+[list with filters](../../list-with-filters/), and its link goes back to it. In all three,
+`fetchRecord` and `runAction` stand in for the back end and work on demo data: replace them with
+the calls to your API. The React component receives the id of the record from its parent; the
+Angular component reads it from its route, `/requests/:id`.
+
+<PatternCode id="record-detail" />

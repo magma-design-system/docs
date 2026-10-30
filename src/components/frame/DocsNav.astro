@@ -1,6 +1,7 @@
 ---
 // The sub-pages column of the frame: the "Documentation" column of a component
-// page, its sub-pages (src/lib/components.ts), the "Categories" column of an
+// page, its sub-pages (src/lib/components.ts), and of a pattern or block page,
+// the sub-pages it has (src/lib/patterns.ts), the "Categories" column of an
 // icon set page, its categories with how many icons each one has
 // (src/lib/icon-pages.ts), and the "Brands" column of a Brand assets page, its
 // owners with how many artworks each one has (src/lib/brand-pages.ts). A part
@@ -13,6 +14,7 @@ import { componentParts, componentRoot } from '../../lib/magma.mjs';
 import { componentName } from '../../lib/nav.mjs';
 import { brandOwnerHref, parseBrandPath } from '../../lib/brand-pages';
 import { iconCategoryHref, parseIconSetPath } from '../../lib/icon-pages';
+import { parsePatternPath, patternEntryId, patternHref, patternPages } from '../../lib/patterns';
 import NavLink from './NavLink.astro';
 import NavList from './NavList.astro';
 
@@ -38,6 +40,7 @@ let parts: Link[] = [];
 const path = parseComponentPath(Astro.url.pathname, locale);
 const icons = parseIconSetPath(Astro.url.pathname, locale);
 const brand = parseBrandPath(Astro.url.pathname, locale);
+const pattern = parsePatternPath(Astro.url.pathname, locale);
 if (path) {
   const entry = await getEntry('components', path.tag);
   heading = t('component.documentation');
@@ -51,6 +54,25 @@ if (path) {
     label: componentName(part),
     current: part === path.tag,
   }));
+} else if (pattern) {
+  const { kind, id } = pattern;
+  heading = t('component.documentation');
+  // The sub-pages written in this language, else in English (Starlight's fallback).
+  const pages = await Promise.all(
+    patternPages.map(async (page) => {
+      const written =
+        (await getEntry('docs', patternEntryId(locale, kind, id, page.slug))) ??
+        (await getEntry('docs', patternEntryId(undefined, kind, id, page.slug)));
+      return written && page;
+    }),
+  );
+  links = pages
+    .filter((page) => page !== undefined)
+    .map((page) => ({
+      href: patternHref(locale, kind, id, page.slug),
+      label: t(page.label),
+      current: page.slug === pattern.slug,
+    }));
 } else if (icons) {
   heading = t('icons.categories');
   links = icons.categories.map(({ id, label, count }) => ({

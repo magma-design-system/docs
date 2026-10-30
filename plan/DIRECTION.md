@@ -142,8 +142,9 @@ First wave: list with filters, detail, form and validation, empty and error stat
 
 Built (2026-10-15): the section (overview + Data group) and **list with filters**.
 
-- Code lives in this site for now: `src/patterns/<id>/` holds `example.html` (plain
-  HTML, also the live preview at `/example/pattern/<id>/`), `react.tsx` and
+- Code lives in this site for now: `src/patterns/<id>/` (and `src/blocks/<id>/` for the
+  building blocks) holds `example.html` (plain HTML, also the live preview at
+  `/example/pattern/<id>/`), `react.tsx` and
   `angular.ts`, read by `src/lib/patterns.ts`. The React and Angular files are left out
   of the site's type check (tsconfig.json); they were checked once with `tsc` (React
   19, strict) and `ngc` (Angular 20, `strictTemplates`). Later they can move into the

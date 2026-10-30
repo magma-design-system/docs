@@ -1,0 +1,106 @@
+---
+// A pattern or a block running small, to see at a glance what it does: its
+// preview page (src/pages/example/[kind]/[id].astro) in a frame as large as a
+// screen, scaled down to the width of its box (the script below). Only a
+// picture: the frame is inert, and the link around it, which takes a click on
+// it to `href`, is hidden from assistive technologies and from the keyboard.
+// The title next to it, on a card of a gallery (PatternGallery.astro) or of a
+// case (PatternCases.astro), names the same page for everyone. The frame loads when it comes near the
+// viewport, and follows the light or dark mode and the theme of the page.
+import { patternPreviewHref, type PatternKind } from '../lib/patterns';
+
+interface Props {
+  /** The folder of the pattern in src/patterns/, or of the block in src/blocks/. */
+  id: string;
+  kind?: PatternKind;
+  /** Sets the preview up, as the address of the preview reads it (`case=2`). */
+  query?: string;
+  /** Where a click on it leads. */
+  href: string;
+  /** The screen it is drawn on: tall, or wide. */
+  shape?: 'portrait' | 'landscape';
+  class?: string;
+}
+
+const { id, kind = 'patterns', query, href, shape = 'portrait', class: className } = Astro.props;
+// The size of the screen, in CSS pixels, and the box that keeps its proportions.
+const SHAPES = {
+  portrait: { width: 800, height: 1120, box: 'aspect-5/7' },
+  landscape: { width: 1024, height: 640, box: 'aspect-8/5' },
+}[shape];
+---
+
+<docs-mini-preview class:list={['block', className]}>
+  <a
+    href={href}
+    tabindex="-1"
+    aria-hidden="true"
+    class:list={[
+      'relative block overflow-hidden rounded-lg border border-border-muted bg-surface-default shadow-sm transition-cosmetic hover:border-border-strong',
+      SHAPES.box,
+    ]}
+  >
+    <iframe
+      src={patternPreviewHref(id, kind, query)}
+      title={id}
+      width={SHAPES.width}
+      height={SHAPES.height}
+      loading="lazy"
+      tabindex="-1"
+      inert
+      class="pointer-events-none absolute start-0 top-0 origin-top-left border-0"
+      data-mini-preview-frame
+    ></iframe>
+  </a>
+</docs-mini-preview>
+
+<script>
+  // The classes and attributes of <html> that carry the mode and the theme, as
+  // the preview page copies them before its first paint.
+  const MODE = /^pref-mode-/;
+  const ATTRIBUTES = ['data-magma-pref', 'data-theme-name'];
+
+  class MiniPreview extends HTMLElement {
+    private frame = this.querySelector<HTMLIFrameElement>('[data-mini-preview-frame]');
+    private resize = new ResizeObserver(() => this.fit());
+    private mode = new MutationObserver(() => this.sync());
+
+    connectedCallback() {
+      this.resize.observe(this);
+      this.mode.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', ...ATTRIBUTES],
+      });
+      this.frame?.addEventListener('load', this.sync);
+      this.fit();
+    }
+
+    disconnectedCallback() {
+      this.resize.disconnect();
+      this.mode.disconnect();
+      this.frame?.removeEventListener('load', this.sync);
+    }
+
+    /** The screen scaled down to the width of the box. */
+    private fit() {
+      if (!this.frame || this.clientWidth === 0) return;
+      this.frame.style.scale = String(this.clientWidth / Number(this.frame.width));
+    }
+
+    /** The mode and the theme of the page, also when they change after the load. */
+    private sync = () => {
+      const root = this.frame?.contentDocument?.documentElement;
+      if (!root) return;
+      const around = document.documentElement;
+      root.classList.remove(...[...root.classList].filter((name) => MODE.test(name)));
+      root.classList.add(...[...around.classList].filter((name) => MODE.test(name)));
+      for (const name of ATTRIBUTES) {
+        const value = around.getAttribute(name);
+        if (value === null) root.removeAttribute(name);
+        else root.setAttribute(name, value);
+      }
+    };
+  }
+
+  customElements.define('docs-mini-preview', MiniPreview);
+</script>
