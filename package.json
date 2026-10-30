@@ -50,7 +50,7 @@
     "@astrojs/check": "0.9.12",
     "@html-eslint/parser": "0.67.0",
     "astro-eslint-parser": "3.2.0",
-    "eslint": "10.13.0",
+    "eslint": "10.14.0",
     "prettier": "3.9.10",
     "prettier-plugin-astro": "1.1.2",
     "stylelint": "17.16.0",
