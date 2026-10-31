@@ -4,9 +4,12 @@
 // Component pages get a header instead: the name of the component as the
 // title, its tag under it, then where the page comes from, close together.
 // Their sub-pages are named by the "Documentation" column (DocsNav.astro).
+// The pages of the domains of the design language, generated too, say where
+// they come from under their title.
 import { getEntry } from 'astro:content';
 import Code from '../Code.astro';
 import { parseComponentPath } from '../../lib/components';
+import { parseDomainPath } from '../../lib/domains';
 import { magmaVersion } from '../../lib/magma.mjs';
 import { TEXT } from '../../lib/markdown-text.mjs';
 import { componentName } from '../../lib/nav.mjs';
@@ -15,6 +18,8 @@ const { entry, locale } = Astro.locals.starlightRoute;
 const { t } = Astro.locals;
 const path = parseComponentPath(Astro.url.pathname, locale);
 const component = path && (await getEntry('components', path.tag));
+const domainId = parseDomainPath(Astro.url.pathname, locale);
+const domain = domainId && (await getEntry('domains', domainId));
 ---
 
 {component ? (
@@ -29,6 +34,22 @@ const component = path && (await getEntry('components', path.tag));
       {t('component.generatedFrom')} <Code>@maggioli-design-system/magma@{magmaVersion()}</Code>
       <Code>dist/documentation.json</Code>. {t('component.encapsulation')}:{' '}
       <Code>{component.data.encapsulation}</Code>.
+      {locale && (
+        <>
+          <br />
+          {t('component.sourceLanguage')}
+        </>
+      )}
+    </mds-text>
+  </div>
+) : domain ? (
+  <div class="mt-400">
+    <mds-text id="_top" typography="h2" tag="h1" class={TEXT.heading.h1}>
+      {entry.data.title}
+    </mds-text>
+    <mds-text typography="caption" tag="p" class:list={[TEXT.block, 'mt-400 text-fg-muted']}>
+      {t('component.generatedFrom')} <Code>@maggioli-design-system/magma@{magmaVersion()}</Code>
+      <Code>{`agents/patterns/${domain.id}.md`}</Code>.
       {locale && (
         <>
           <br />

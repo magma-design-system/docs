@@ -55,6 +55,14 @@ keeps the icon of every section, with a separator between the groups.
 Height: the groups make the rail taller. The open rail needs about 990px, the collapsed one about
 940px; below that they scroll (before the groups: 780px open, 860px collapsed).
 
+Composition (decided 2026-11-01, magma-design-system/magma#1197): the domains of Magma's design
+language (rhythm, density, actions, titles, surfaces, widths and alignment) are a group of their
+own in Foundation, after Design: Color and Typography stay where they are and link to them.
+Their pages are generated from the installed `magma` (`agents/patterns/<id>.md`, `kind:
+foundation`), the whole file as the agents read it, in English on the Italian pages too, as the
+component pages; the group appears with the release of magma that ships the domains. Rejected:
+the six domains inside Design, nine items in one group.
+
 ## From the deck, kept
 
 - Foundation / Documentation / Product, with Content, Design, Development (slides 10-17).

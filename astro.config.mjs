@@ -86,6 +86,8 @@ export default defineConfig({
       pagination: false,
       // One group per section of the rail: src/lib/nav.mjs.
       sidebar: sidebar(),
+      // The table of contents of the landing page of Foundation: src/route-data.ts.
+      routeMiddleware: './src/route-data.ts',
     }),
     magma(),
   ],

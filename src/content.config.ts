@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { componentsLoader } from './loaders/components';
+import { domainsLoader } from './loaders/domains';
 import en from './content/i18n/en.json';
 
 const documented = z.looseObject({ name: z.string(), docsHtml: z.string() });
@@ -55,5 +56,10 @@ export const collections = {
       dependencies: z.array(z.string()),
       encapsulation: z.string(),
     }),
+  }),
+  // The domains of the design language, one page each under Foundation.
+  domains: defineCollection({
+    loader: domainsLoader(),
+    schema: guide.extend({ title: z.string(), need: z.string(), principle: z.string() }),
   }),
 };

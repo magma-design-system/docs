@@ -2,7 +2,9 @@
 // Rule: everything is read from node_modules, never from the Magma monorepo.
 // If something is missing here, it is a Magma packaging bug: track it in
 // https://github.com/magma-design-system/docs/issues/1
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 
@@ -24,6 +26,39 @@ let componentDocs;
 export function loadComponentDocs() {
   componentDocs ??= require(resolveMagma('magma/dist/documentation.json'));
   return componentDocs;
+}
+
+const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
+
+let domains;
+
+/**
+ * The domains of the design language the installed magma ships: the files of
+ * `agents/patterns/` whose frontmatter says `kind: foundation`
+ * (https://github.com/magma-design-system/magma/issues/1189), each with its id
+ * (the file name), its frontmatter and its body as written. The contract is
+ * "The patterns" in Magma's docs/CONTRACTS.md and "A domain of Foundation" in
+ * its docs/PATTERNS.md. Empty for a version that ships none (2.9.0 and before):
+ * the folder sits beside the package's AGENTS.md.
+ * @returns {{ id: string, frontmatter: string, body: string }[]}
+ */
+export function loadDomains() {
+  if (domains) return domains;
+  const folder = path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
+  domains = [];
+  if (!existsSync(folder)) return domains;
+  for (const name of readdirSync(folder).sort()) {
+    if (!name.endsWith('.md')) continue;
+    const source = readFileSync(path.join(folder, name), 'utf8');
+    const match = FRONTMATTER.exec(source);
+    if (!match || !/^kind:\s*foundation\s*$/m.test(match[1])) continue;
+    domains.push({
+      id: name.slice(0, -'.md'.length),
+      frontmatter: match[1],
+      body: source.slice(match[0].length),
+    });
+  }
+  return domains;
 }
 
 /**
