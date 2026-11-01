@@ -39,8 +39,9 @@ let domains;
  * (the file name), its frontmatter and its body as written. The contract is
  * "The patterns" in Magma's docs/CONTRACTS.md and "A domain of Foundation" in
  * its docs/PATTERNS.md. Empty for a version that ships none (2.9.0 and before):
- * the folder sits beside the package's AGENTS.md.
- * @returns {{ id: string, frontmatter: string, body: string }[]}
+ * the folder sits beside the package's AGENTS.md. Each with the previews of
+ * its cases, by file name (readPreviews()).
+ * @returns {{ id: string, frontmatter: string, body: string, previews: Preview[] }[]}
  */
 export function loadDomains() {
   if (domains) return domains;
@@ -52,13 +53,59 @@ export function loadDomains() {
     const source = readFileSync(path.join(folder, name), 'utf8');
     const match = FRONTMATTER.exec(source);
     if (!match || !/^kind:\s*foundation\s*$/m.test(match[1])) continue;
+    const id = name.slice(0, -'.md'.length);
     domains.push({
-      id: name.slice(0, -'.md'.length),
+      id,
       frontmatter: match[1],
       body: source.slice(match[0].length),
+      previews: readPreviews(path.join(folder, 'previews', id)),
     });
   }
   return domains;
+}
+
+/**
+ * @typedef {{ case: string, try: string, height?: number, wholePage: boolean, markup: string }} Preview
+ */
+
+// The opening comment of a preview: its keys, one `key: value` per line.
+const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
+
+/**
+ * The previews of the cases of a pattern or a domain, from the installed magma
+ * (`agents/patterns/previews/<id>/<case>.html`, "The preview of a case" in
+ * Magma's docs/PATTERNS.md): the stage, what to try in it (required), the
+ * height of an overlay and `whole-page`, a stage with a frame of its own that
+ * takes no inset. None when the folder is missing (a domain with no preview).
+ * Magma's check holds the format; a preview without what to try fails here
+ * too, so the page never shows a still stage with nothing said.
+ * @param {string} folder
+ * @returns {Preview[]}
+ */
+function readPreviews(folder) {
+  if (!existsSync(folder)) return [];
+  return readdirSync(folder)
+    .filter((name) => name.endsWith('.html'))
+    .sort()
+    .map((name) => {
+      const source = readFileSync(path.join(folder, name), 'utf8').replace(/\r\n/g, '\n');
+      const head = PREVIEW_HEAD.exec(source);
+      const keys = Object.fromEntries(
+        (head?.[1] ?? '')
+          .split('\n')
+          .map((line) => /^\s*([a-z-]+):\s*(.*?)\s*$/.exec(line))
+          .filter(Boolean)
+          .map((match) => [match[1], match[2]]),
+      );
+      if (!keys.try) throw new Error(`The preview ${path.join(folder, name)} says nothing to try`);
+      return {
+        case: name.slice(0, -'.html'.length),
+        try: keys.try,
+        ...(keys.height ? { height: Number(keys.height) } : {}),
+        wholePage: keys['whole-page'] === 'true',
+        markup: head ? source.slice(head[0].length) : source,
+      };
+    });
 }
 
 /**

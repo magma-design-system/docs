@@ -1,11 +1,13 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import DomainPreviews from '../../../components/DomainPreviews.astro';
 import { localeParams } from '../../../lib/i18n.mjs';
 
 // One page per domain of the design language the installed magma ships
 // (src/loaders/domains.ts), in every language: the whole file, as the agents
-// read it. The header says where it comes from (src/components/frame/PageTitle.astro).
+// read it, with the previews of its cases after its table of cases. The header
+// says where it comes from (src/components/frame/PageTitle.astro).
 export async function getStaticPaths() {
   const domains = await getCollection('domains');
   return localeParams.flatMap((locale) =>
@@ -25,10 +27,21 @@ const { t } = Astro.locals;
 const title = t(`nav.foundation.${entry.id}` as any);
 // What comes from the Magma packages is in English only (the header says so).
 const contentLang = locale ? 'en' : undefined;
-// The table of contents: the sections of the file (Cases, Always true, ...).
-const headings = data.headings.filter((heading) => heading.depth <= 3);
+// The table of contents: the sections of the file (Cases, Always true, ...),
+// and under Cases the previews of the cases, by their id.
+const headings = [
+  ...data.headings,
+  ...data.previews.map((preview) => ({
+    depth: 3,
+    slug: `preview-${preview.case}`,
+    text: preview.case,
+  })),
+  ...data.restHeadings,
+].filter((heading) => heading.depth <= 3);
 ---
 
 <StarlightPage frontmatter={{ title, description: data.need }} headings={headings}>
   <div lang={contentLang} set:html={data.html} />
+  <DomainPreviews domain={entry.id} previews={data.previews} contentLang={contentLang} />
+  {data.rest && <div lang={contentLang} set:html={data.rest} />}
 </StarlightPage>
