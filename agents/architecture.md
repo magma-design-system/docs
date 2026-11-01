@@ -60,13 +60,18 @@ Starlight's components listed in `astro.config.mjs` are replaced by
   group (`DocsNav`). Below `wide` (1280px) the column moves into the `mds-dropdown` of the
   button of the reading bar (`docs-aside`). The bar, at every width, names the section being
   read and holds its anchor, a link to its heading that also copies the address: headings have
-  no anchor of their own. The section is the last heading reached (`src/scripts/reading.ts`,
-  shared with `docs-toc`) among the page title (`_top`) and the headings marked
-  `data-section-heading`, the h2 and h3 of `markdown-text.mjs` and `Heading.astro`, also on
-  pages whose column lists sub-pages. From `desktop` the bar floats over the top of the content
-  and slides down once the page scrolls (headings land below it: `--frame-reading-bar-height`
-  and the scroll padding in `magma.css`); below, the script moves it into the slot `nav` of the
-  mobile header's `mds-header-bar`, between the logo and the menu button. The bar is kept with
+  no anchor of their own. From `tablet` two arrows (buttons, so the focus stays on them) scroll
+  to the heading of the section before and after, among those the bar can name: at the end of a
+  short page the last headings all land at the bottom. The section is the last heading reached
+  (`src/scripts/reading.ts`, shared with `docs-toc`) among the page title (`_top`) and the
+  headings marked `data-section-heading`, the h2 and h3 of `markdown-text.mjs` and
+  `Heading.astro`, also on pages whose column lists sub-pages. From `desktop` the bar floats over
+  the top of the content and slides down once the page scrolls (headings land below it:
+  `--frame-reading-bar-height` and the scroll padding in `magma.css`). Its buttons sit inside
+  that scroll padding: they carry a negative scroll margin as tall as the bar, or focusing one,
+  which a click on an `mds-button` does, scrolls the page up by about half the window to bring
+  it out of the padding; below, the script moves the bar into the slot `nav` of the mobile
+  header's `mds-header-bar`, between the logo and the menu button. The bar is kept with
   `docs-aside` from page to page: it takes the place of the bar of the new page, for the
   dropdown and the tooltips to keep their buttons, and goes back into the new header. A page
   with the search of the icons (`data-icon-bar`, `IconTiles`) has no bar: the script takes it

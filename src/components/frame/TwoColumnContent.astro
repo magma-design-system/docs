@@ -10,7 +10,9 @@
 // The reading bar names the section being read, the heading the table of
 // contents marks (src/scripts/reading.ts), and holds its anchor: a link to
 // the heading of that section, which also copies its address, in place of an
-// anchor in front of every heading. How far the page has been read is told
+// anchor in front of every heading. Already there, the anchor only copies.
+// Two arrows lead to the section before and the one after, from `tablet`:
+// below, the name keeps their room. How far the page has been read is told
 // once, by the table of contents. From `desktop` the bar floats over the top
 // of the content, and comes down once the page scrolls: at the top the title
 // says where the reader is. Below `desktop` it goes in the mobile header,
@@ -81,6 +83,12 @@ const BESIDE = {
       <mds-tooltip target="#aside-link" relation="label" placement="bottom">
         {t('frame.aside.copyLink')}
       </mds-tooltip>
+      <mds-tooltip target="#aside-previous" relation="label" placement="bottom">
+        {t('frame.aside.previous')}
+      </mds-tooltip>
+      <mds-tooltip target="#aside-next" relation="label" placement="bottom">
+        {t('frame.aside.next')}
+      </mds-tooltip>
       <mds-tooltip target="#aside-toggle" relation="label" placement="bottom">
         {t('tableOfContents.onThisPage')}
       </mds-tooltip>
@@ -131,9 +139,16 @@ const BESIDE = {
           Links to headings land below it (its height,
           --frame-reading-bar-height, in magma.css). In the mobile header, the
           button of the column only, until the page scrolls.
+
+          Its buttons stand in the room the scroll padding of the page keeps
+          for the bar: a negative scroll margin as tall as the bar tells the
+          browser they are in view. Without it, focusing one (a click on an
+          mds-button focuses its host) scrolls the page up to bring it below
+          the padding: a click on the anchor of the heading already reached,
+          where the link has nothing left to scroll, took the reader away.
         */}
         <div
-          class="pointer-events-auto flex min-w-0 grow items-center justify-end gap-300 transition-[translate] duration-(--duration-500) ease-out-back motion-reduced:transition-none desktop:relative desktop:top-400 desktop:h-(--frame-reading-bar-height) desktop:rounded-lg desktop:bg-surface-overlay desktop:px-300 desktop:shadow-md-sharp desktop:not-data-reading:not-focus-within:pointer-events-none desktop:not-data-reading:not-focus-within:-translate-y-[calc(100%+var(--frame-sticky-top)+--spacing(800))] desktop:not-data-reading:not-focus-within:duration-(--duration-300) desktop:not-data-reading:not-focus-within:ease-in-back"
+          class="pointer-events-auto flex min-w-0 grow items-center justify-end gap-300 transition-[translate] duration-(--duration-500) ease-out-back motion-reduced:transition-none desktop:relative desktop:top-400 desktop:h-(--frame-reading-bar-height) desktop:rounded-lg desktop:bg-surface-overlay desktop:px-300 desktop:shadow-md-sharp desktop:**:-scroll-mt-(--frame-reading-bar-height) desktop:not-data-reading:not-focus-within:pointer-events-none desktop:not-data-reading:not-focus-within:-translate-y-[calc(100%+var(--frame-sticky-top)+--spacing(800))] desktop:not-data-reading:not-focus-within:duration-(--duration-300) desktop:not-data-reading:not-focus-within:ease-in-back"
           data-aside-bar
           data-overview={t('tableOfContents.overview')}
         >
@@ -155,6 +170,27 @@ const BESIDE = {
               tag="span"
               truncate="word"
               data-aside-name
+            />
+            {/* Buttons, not links: the focus stays on them, step after step. */}
+            <mds-button
+              id="aside-previous"
+              class="shrink-0 self-center max-tablet:hidden"
+              type="button"
+              icon="mi/baseline/arrow-upward"
+              variant="dark"
+              tone="text"
+              disabled
+              data-aside-step="-1"
+            />
+            <mds-button
+              id="aside-next"
+              class="shrink-0 self-center max-tablet:hidden"
+              type="button"
+              icon="mi/baseline/arrow-downward"
+              variant="dark"
+              tone="text"
+              disabled
+              data-aside-step="1"
             />
           </div>
           <mds-button
@@ -185,8 +221,8 @@ const BESIDE = {
    * on the pages of the icons), in the dropdown of the reading bar below it;
    * and the reading bar, over the
    * content from `desktop`, in the mobile header below it. The bar names the
-   * section being read once the page scrolls, and its anchor links to it and
-   * copies the link.
+   * section being read once the page scrolls, its anchor links to it and
+   * copies the link, and its arrows lead to the sections around it.
    */
   class DocsAside extends HTMLElement {
     /** The column next to the content: from `wide`, or from `desktop` (`data-beside`). */
@@ -202,6 +238,8 @@ const BESIDE = {
     private bar = document.querySelector<HTMLElement>('[data-aside-bar]');
     private label = this.bar?.querySelector<HTMLElement>('[data-aside-name]');
     private link = this.bar?.querySelector<HTMLElement>('[data-aside-link]');
+    /** The arrows, by `data-aside-step`: -1 to the section before, 1 to the one after (`around`). */
+    private steps = [...(this.bar?.querySelectorAll<HTMLElement>('[data-aside-step]') ?? [])];
     private live = this.querySelector<HTMLElement>('[data-aside-live]');
     private dropdown = this.querySelector<HTMLElement & { visible: boolean }>('mds-dropdown');
     /** The headings of the sections of the page, its title first. */
@@ -222,6 +260,7 @@ const BESIDE = {
       this.desktop.addEventListener('change', this.place);
       window.addEventListener('scroll', this.name, { passive: true });
       this.link?.addEventListener('click', this.copy);
+      for (const step of this.steps) step.addEventListener('click', this.step);
       // A link followed from the dropdown: the page is in view again.
       this.addEventListener('click', this.close);
       // The list of the table of contents has no size while the dropdown is
@@ -237,6 +276,7 @@ const BESIDE = {
       this.desktop.removeEventListener('change', this.place);
       window.removeEventListener('scroll', this.name);
       this.link?.removeEventListener('click', this.copy);
+      for (const step of this.steps) step.removeEventListener('click', this.step);
       document.removeEventListener('astro:after-swap', this.place);
       this.resize.disconnect();
     }
@@ -281,18 +321,40 @@ const BESIDE = {
 
     private name = () => {
       if (!this.bar?.isConnected || this.sections.length === 0) return;
-      const heading = this.sections[readingPosition(this.sections).index];
+      const position = readingPosition(this.sections);
+      const heading = this.sections[position.index];
       const name =
         heading.id === '_top' ? (this.bar.dataset.overview ?? '') : heading.textContent?.trim();
       if (heading.id !== this.section) this.link?.setAttribute('href', `#${heading.id}`);
       this.section = heading.id;
       this.bar.toggleAttribute('data-reading', window.scrollY > 0);
       if (this.label && name && this.label.textContent !== name) this.label.textContent = name;
+      for (const step of this.steps) {
+        step.toggleAttribute('disabled', !this.around(Number(step.dataset.asideStep), position));
+      }
+    };
+
+    /**
+     * The heading of the section before (-1) or after (1) the one being read,
+     * among those the bar can name: at the end of a short page the last
+     * headings all land at the bottom, where the bar names the last of them.
+     */
+    private around(step: number, { index, tops } = readingPosition(this.sections)) {
+      if (step < 0) return this.sections[tops.findLastIndex((top) => top < tops[index])];
+      const after = tops[index + 1];
+      return after === undefined ? undefined : this.sections[tops.lastIndexOf(after)];
+    }
+
+    /** To the heading of the section before or after, where its link lands. */
+    private step = (event: Event) => {
+      const step = Number((event.currentTarget as HTMLElement).dataset.asideStep);
+      this.around(step)?.scrollIntoView();
     };
 
     /**
      * The link to the section being read, to the page for its overview. The
-     * anchor still leads to the heading: the copy comes on top of it.
+     * anchor still leads to the heading: the copy comes on top of it. Already
+     * at the heading, the browser has nothing to scroll: it only copies.
      */
     private copy = async () => {
       const url = new URL(location.href);

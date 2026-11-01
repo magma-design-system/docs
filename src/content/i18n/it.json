@@ -68,6 +68,8 @@
   "frame.storybook": "Storybook di Magma",
   "frame.preferences": "Preferenze",
   "frame.aside.copyLink": "Copia il link alla sezione",
+  "frame.aside.previous": "Sezione precedente",
+  "frame.aside.next": "Sezione successiva",
   "frame.footer.modified": "Modificato {{date}}",
   "frame.footer.created": "Creato {{date}}",
   "frame.cover.alt": "Magma, il design system del Gruppo Maggioli",
