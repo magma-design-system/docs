@@ -49,7 +49,11 @@ no longer shows a progress ring: no workaround left.
 Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
 resolver says which contexts of a modifier are deprecated only in its `description`, in words:
 `default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
-the table above).
+the table above), #1250 (since 2.10.0 `mds-card-footer` stacks its row under 380 px of
+container, `actions/stacked`, and stretches what it holds: the single "Read" of the cards of the
+landing pages takes the width of the card with its label in the middle, and the Download
+`mds-button-dropdown` of the brand cards stretches its host, not its two buttons, an empty blue
+bar after them; the site keeps the rule as it is).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
