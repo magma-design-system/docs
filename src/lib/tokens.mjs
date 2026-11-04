@@ -78,18 +78,43 @@ function tokensOf(ref) {
 }
 
 /**
+ * The contexts Magma deprecates, by modifier: the resolver names them only in
+ * words, in the description of the modifier (`theme` since design-tokens
+ * 15.5.0: "Deprecated, removed in the next major: default (...); cool (...);
+ * warm (...)"). Not filed (agents/magma.md). The same context with the
+ * contrast preference (`cool-contrast-more`) is deprecated with it. A name the
+ * resolver no longer has fails the build: the major that removes them takes
+ * this list away.
+ * @type {Record<string, string[]>}
+ */
+const DEPRECATED_CONTEXTS = { theme: ['default', 'cool', 'warm'] };
+
+/**
  * The modifiers of the resolver (mode, theme, corner shape, depth): their
- * contexts in the resolver's order and the default one.
- * @returns {{ name: string, description: string, contexts: string[], default: string }[]}
+ * contexts in the resolver's order, those of them Magma deprecates, and the
+ * default one.
+ * @returns {{ name: string, description: string, contexts: string[], deprecated: string[], default: string }[]}
  */
 export function modifiers() {
   const { modifiers } = loadResolver();
-  return Object.entries(modifiers).map(([name, modifier]) => ({
-    name,
-    description: modifier.description ?? '',
-    contexts: Object.keys(modifier.contexts),
-    default: modifier.default,
-  }));
+  return Object.entries(modifiers).map(([name, modifier]) => {
+    const contexts = Object.keys(modifier.contexts);
+    const old = DEPRECATED_CONTEXTS[name] ?? [];
+    for (const context of old)
+      if (!contexts.includes(context))
+        throw new Error(
+          `The modifier ${name} has no context ${context}: remove it from DEPRECATED_CONTEXTS`,
+        );
+    return {
+      name,
+      description: modifier.description ?? '',
+      contexts,
+      deprecated: contexts.filter((context) =>
+        old.some((one) => context === one || context === `${one}-contrast-more`),
+      ),
+      default: modifier.default,
+    };
+  });
 }
 
 /** The condition of the stylesheets with no class or attribute: every modifier at its default. */
