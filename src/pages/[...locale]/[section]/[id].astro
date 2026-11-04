@@ -1,0 +1,71 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PatternAgent from '../../../components/PatternAgent.astro';
+import PatternPreviews from '../../../components/PatternPreviews.astro';
+import PreviewZoom from '../../../components/PreviewZoom.astro';
+import { localeParams } from '../../../lib/i18n.mjs';
+import { PATTERN_SECTIONS } from '../../../lib/nav.mjs';
+
+// One page per file of agents/patterns/ of the installed magma
+// (src/loaders/patterns.ts), in every language, in the section of its kind: a
+// domain of the design language under Foundation, a pattern under Patterns, a
+// building block under Building blocks. The whole file, as the agents read it,
+// with the previews of its cases after its table of cases, those of its rules
+// after Always true and those of the situations of a block after Situations;
+// a decided pattern or block opens with how to apply it with an AI agent. The
+// header says where it comes from (src/components/frame/PageTitle.astro).
+export async function getStaticPaths() {
+  const patterns = await getCollection('patterns');
+  return localeParams.flatMap((locale) =>
+    patterns.map((entry) => ({
+      params: { locale, section: PATTERN_SECTIONS[entry.data.kind], id: entry.id },
+      props: { entry },
+    })),
+  );
+}
+
+interface Props {
+  entry: CollectionEntry<'patterns'>;
+}
+
+const { entry } = Astro.props;
+const { data } = entry;
+const { locale } = Astro.params;
+const { t } = Astro.locals;
+// A domain is named in the language of the page, as the navigation has it; a
+// pattern or a block by its title, as the package writes it.
+const title = data.kind === 'foundation' ? t(`nav.foundation.${entry.id}` as any) : data.title;
+// What comes from the Magma packages is in English only (the header says so).
+const contentLang = locale ? 'en' : undefined;
+// The table of contents: the sections of the file (Cases, Always true, ...),
+// and under each the previews of its cases, rules or situations, by their id.
+const headings = data.parts
+  .flatMap((part) => [
+    ...part.headings,
+    ...part.previews.map((preview) => ({
+      depth: 3,
+      slug: `preview-${preview.id}`,
+      text: preview.id,
+    })),
+  ])
+  .filter((heading) => heading.depth <= 3);
+---
+
+<StarlightPage frontmatter={{ title, description: data.need }} headings={headings}>
+  {data.kind !== 'foundation' && data.status === 'decided' && (
+    <PatternAgent kind={data.kind} id={entry.id} />
+  )}
+  {data.parts.map((part) => (
+    <>
+      <div lang={contentLang} set:html={part.html} />
+      <PatternPreviews
+        kind={data.kind}
+        id={entry.id}
+        previews={part.previews}
+        contentLang={contentLang}
+      />
+    </>
+  ))}
+  {data.parts.some((part) => part.previews.length > 0) && <PreviewZoom />}
+</StarlightPage>

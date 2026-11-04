@@ -27,8 +27,8 @@ Order (decided 2026-10-24): after Foundation the rail goes from the sections of 
 the values: Building blocks, Patterns, Components, then Tokens and Icons. Building blocks are
 about space (a section of a page), patterns about time (what follows an action), components are
 the parts both are made of; tokens and icons come after, as DIRECTION.md orders by how often
-they are needed. Building blocks and Patterns stand before Components even while they are
-coming soon. Since 2026-10-28 Development and Agentic development stand between the guidelines
+they are needed. Building blocks and Patterns stood before Components even while they were
+coming soon; since 2026-11-04 their pages are generated from Magma's patterns. Since 2026-10-28 Development and Agentic development stand between the guidelines
 and the library (Groups, below).
 
 Groups (decided 2026-10-26, revised 2026-10-28): eleven items in one column had become hard to

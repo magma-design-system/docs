@@ -1,41 +1,51 @@
 ---
 title: Pattern
-description: Soluzioni ai compiti che le persone svolgono di continuo - confermare un'azione, cercare in una lista, compilare un form - con il loro comportamento, la loro accessibilità e il codice per HTML, React e Angular.
+description: Soluzioni ai compiti che le persone svolgono di continuo - sapere cosa è successo, decidere prima di un'azione che non si può annullare, cercare in una lista lunga - uguali in ogni prodotto, come Magma le consegna alle persone e agli agenti AI.
 ---
 
-import ComingSoon from '../../../../components/ComingSoon.astro';
+import PatternGallery from '../../../../components/PatternGallery.astro';
 
-<ComingSoon text="I primi pattern sono in scrittura. Compariranno qui quando saranno abbastanza completi da copiarli in un prodotto." />
+Un componente risolve una parte di una schermata; le persone usano un prodotto per portare a
+termine qualcosa. Un pattern è la soluzione a un compito che i prodotti di Maggioli Group
+incontrano di continuo: dire alla persona cosa è successo dopo un'azione, chiedere prima di una
+che non si può annullare, mostrare una parte della pagina senza contenuto, cercare in una lista
+lunga. Mette insieme componenti di Magma e [building block](../blocks/), e prende le decisioni
+che i componenti non possono prendere da soli: dove va un messaggio, cosa può fare la persona
+mentre aspetta, cosa segue un errore.
 
-Un componente risolve una parte di una schermata; chi usa un prodotto vuole portare a termine
-qualcosa. Un pattern è la soluzione a un compito che i prodotti del Gruppo Maggioli incontrano di
-continuo - confermare un'azione, cercare in una lista, compilare un form - montata con i
-componenti Magma e i [building block](../blocks/), insieme alle decisioni che i componenti da
-soli non possono prendere: cosa segue un'azione, cosa mostra la pagina quando non trova nulla,
-cosa va nell'indirizzo, dove va il focus, cosa sente chi usa un lettore di schermo.
+I pattern arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`. Ogni pagina qui è
+generata dal file del suo pattern, lo stesso file che legge un agente AI, ed è scritta in
+inglese.
 
-Il cuore di un pattern è il suo comportamento, per questo la sua misura cambia. Può essere
-piccolo come un pulsante che apre una finestra di dialogo: cosa chiede la finestra, dove torna il
-focus quando si chiude, quale messaggio segue. Oppure grande come una pagina intera, come una
-lista in cui cercare e restringere i risultati. Un componente si importa pronto; un pattern si
-applica, seguendo la sua guida e il suo codice.
+<PatternGallery kind="pattern" />
 
-## Cosa contiene la pagina di un pattern
+## Come si legge un pattern
 
-Ogni pattern avrà le stesse parti: il pattern in funzione, quando usarlo, la sua anatomia, i
-componenti di cui è fatto, il comportamento, l'accessibilità, i testi, gli errori da evitare e,
-per ultimo, il suo codice in HTML, React e Angular. Il codice sarà completo: copialo in un
-progetto in cui Magma è installato, sostituisci i dati di esempio con il tuo back end, e
-funziona.
+Un pattern parte da poche variabili della situazione: se l'azione si può annullare, su quanti
+elementi agisce, dove si trova la persona quando finisce. Ogni combinazione dei loro valori è un
+**caso** (Cases), che indica quali componenti usare e come; un'anteprima lo esegue, con una riga
+su cosa provare. Poi vengono:
 
-## I primi
+- **Always true**: le regole che valgono in ogni caso e in ogni prodotto.
+- **Open choices**: quello che un prodotto può decidere da sé, con il default che vale finché
+  non lo fa.
+- **Situations**: situazioni reali, ognuna con il caso in cui ricade. Sono il modo più rapido
+  per trovare la tua.
+- **Decisions**: quando è stata decisa ogni regola e perché, con il link alla discussione.
 
-- **Lista con filtri**: record da cercare, restringere, ordinare e sfogliare per pagine.
-- **Dettaglio di un record**: un record, cosa si può fare con lui e la sua storia.
-- **Form e validazione**: dati da compilare, controllati mentre si scrive e all'invio.
-- **Stati vuoti e di errore**: cosa mostra una schermata quando non c'è ancora nulla, o quando
-  qualcosa è andato storto.
+Un **candidato** è un bisogno che Magma conosce e non ha ancora definito: la sua pagina contiene
+solo il bisogno. Finché il pattern non è definito, scegli quello che si adatta al prodotto,
+scrivi perché, e proponilo al team di Magma.
 
-Le pagine Pattern e Antipattern di ogni [componente](../components/) mostrano già come usare quel
-componente da solo. Questa sezione mostrerà come componenti e building block lavorano insieme
-per portare a termine un compito.
+## Con un agente AI
+
+Un agente non legge queste pagine: chiede il pattern al server MCP di Magma, `get_pattern`, con i
+valori delle variabili che conosce, e riceve l'unico caso da seguire e le sue regole. La pagina
+di ogni pattern ha un prompt da dargli. Come preparare l'agente è spiegato in
+[Sviluppo agentico](../ai/).
+
+## Il livello di un prodotto
+
+Un prodotto può restringere un pattern senza copiarlo. Un file nel suo repository,
+`magma/patterns/<id>.md`, fissa le scelte aperte e aggiunge le situazioni del prodotto; le regole
+che valgono sempre restano come sono. `get_pattern` applica il livello del progetto in cui gira.

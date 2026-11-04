@@ -6,7 +6,7 @@
 // domain of the design language, a page generated from the installed magma,
 // is named in the language of the page and described by its need, in English.
 import { getEntry } from 'astro:content';
-import { domainHref } from '../lib/domains';
+import { patternHref } from '../lib/patterns';
 import { localePrefix } from '../lib/frame';
 
 interface Props {
@@ -25,14 +25,15 @@ const cards = await Promise.all(
   pages.map(async (page) => {
     const { icon } = page;
     if ('domain' in page) {
-      const domain = await getEntry('domains', page.domain);
-      if (!domain) throw new Error(`PageCards: no domain ${page.domain}`);
+      const domain = await getEntry('patterns', page.domain);
+      if (domain?.data.kind !== 'foundation')
+        throw new Error(`PageCards: no domain ${page.domain}`);
       return {
         icon,
         title: t(`nav.foundation.${page.domain}` as any),
         description: domain.data.need,
         descriptionLang: locale ? 'en' : undefined,
-        href: domainHref(locale, page.domain),
+        href: patternHref(locale, 'foundation', page.domain),
       };
     }
     const { slug } = page;

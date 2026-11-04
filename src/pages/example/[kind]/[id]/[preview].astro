@@ -1,23 +1,30 @@
 ---
-// The preview of a case or a rule of a domain of the design language, shown in
-// an iframe on the page of the domain (src/components/DomainPreviews.astro):
-// the stage Magma ships (agents/patterns/previews/<domain>/<case or rule>.html),
-// alone on a page with Magma's styles and loader, away from the styles of the
-// site. As Magma's render_preview runs it: the words of the stage in Italian,
-// an inset of 600 around it, none for a stage that is a whole page and lays
-// out its own frame (`whole-page`, "The preview of a case" in Magma's
-// docs/PATTERNS.md).
-// Opened on its own, it is the full screen version of the preview.
+// A preview of a domain of the design language, a pattern or a building block
+// (a case, a rule or a situation), shown in an iframe on its page
+// (src/components/PatternPreviews.astro) and, small, on a card of the landing
+// pages (MiniPreview.astro): the stage Magma ships
+// (agents/patterns/previews/<id>/<preview>.html), alone on a page with Magma's
+// styles and loader, away from the styles of the site, at
+// /docs/example/<domain, pattern or block>/<id>/<preview>/ (previewHref() in
+// src/lib/patterns.ts). As Magma's render_preview runs it: the words of the
+// stage in Italian, an inset of 600 around it, none for a stage that is a
+// whole page and lays out its own frame (`whole-page`, "The preview of a case"
+// in Magma's docs/PATTERNS.md). Opened on its own, it is the full screen
+// version of the preview.
 import { getCollection } from 'astro:content';
 import '../../../../styles/magma.css';
 
 export async function getStaticPaths() {
-  const domains = await getCollection('domains');
-  return domains.flatMap(({ id, data }) =>
+  const patterns = await getCollection('patterns');
+  return patterns.flatMap(({ id, data }) =>
     data.parts
       .flatMap((part) => part.previews)
       .map((preview) => ({
-        params: { domain: id, preview: preview.id },
+        params: {
+          kind: data.kind === 'foundation' ? 'domain' : data.kind,
+          id,
+          preview: preview.id,
+        },
         props: { markup: preview.markup, wholePage: preview.wholePage },
       })),
   );
@@ -29,7 +36,7 @@ interface Props {
 }
 
 const { markup, wholePage } = Astro.props;
-const { domain, preview: id } = Astro.params;
+const { id, preview } = Astro.params;
 ---
 
 <!doctype html>
@@ -38,7 +45,7 @@ const { domain, preview: id } = Astro.params;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex" />
-    <title>{`${domain}/${id}`}</title>
+    <title>{`${id}/${preview}`}</title>
     <script is:inline>
       // The light or dark mode and the theme of the page around it before the
       // first paint, as in src/pages/example/[tag].astro.

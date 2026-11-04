@@ -1,0 +1,64 @@
+---
+// The previews of a domain of the design language, a pattern or a building
+// block, after the section of the items they show: its cases, its rules after
+// Always true, the situations of a block (src/pages/[...locale]/[section]/[id].astro).
+// For each one, in the order of the table, a heading with its id, the stage
+// that runs it (PreviewStage.astro, on the page
+// src/pages/example/[kind]/[id]/[preview].astro) and what to try in it, the
+// line the preview says. Next to Reset, the preview larger, in an
+// mds-url-view (PreviewZoom.astro, once on the page), and alone in a new tab.
+// Nothing where Magma has no preview. What to try comes from the package, in
+// English only.
+import { previewHref, type PatternKind } from '../lib/patterns';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
+import Heading from './Heading.astro';
+import PreviewStage from './PreviewStage.astro';
+
+interface Props {
+  kind: PatternKind;
+  /** The id of the domain, the pattern or the block. */
+  id: string;
+  previews: Array<{ id: string; of: 'case' | 'rule' | 'situation'; try: string; height?: number }>;
+  /** The language of what comes from the package, on a page in another one. */
+  contentLang?: string;
+}
+
+const { kind, id, previews, contentLang } = Astro.props;
+const { t } = Astro.locals;
+---
+
+{previews.map((preview) => {
+  const src = previewHref(kind, id, preview.id);
+  const tag = `${kind}-${id}-${preview.id}`;
+  const title = t(`pattern.preview.${preview.of}`, { id: preview.id });
+  return (
+    <>
+      <Heading id={`preview-${preview.id}`} text={preview.id} level={3} />
+      <PreviewStage tag={tag} src={src} title={title} height={preview.height}>
+        <mds-button
+          slot="actions"
+          data-preview-zoom={src}
+          data-preview-zoom-label={title}
+          label={t('pattern.preview.zoom')}
+          icon="mi/baseline/open-in-full"
+          variant="dark"
+          tone="text"
+          size="sm"
+        ></mds-button>
+        <mds-button
+          slot="actions"
+          href={src}
+          target="blank"
+          label={t('pattern.preview.open')}
+          icon="mi/baseline/open-in-new"
+          variant="dark"
+          tone="text"
+          size="sm"
+        ></mds-button>
+      </PreviewStage>
+      <mds-text {...READING} tag="p" class={TEXT.paragraph} lang={contentLang}>
+        {preview.try}
+      </mds-text>
+    </>
+  );
+})}

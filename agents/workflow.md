@@ -34,7 +34,7 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: drafts and previews of draft patterns are left out.
+- A production build is not dev: a page with `draft: true` is left out (none today).
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):
@@ -126,9 +126,9 @@ A new author, step by step:
   `github-pages` environment deploys from `production` only.
 - **Publish check**, on a production build of `main` before opening that pull request, and on
   the live site after the deploy:
-  - Building blocks and Patterns exist only as their landing pages, with the "Under
-    construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
-    cards carry the badge.
+  - Patterns and Building blocks: a page per pattern and per block the installed `magma`
+    ships, each with its previews (`/example/pattern/<id>/<case>/`), and the gallery of their
+    landing pages with the small previews running.
   - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 

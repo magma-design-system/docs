@@ -1,0 +1,100 @@
+---
+// The gallery of the landing page of Patterns or Building blocks: what the
+// installed magma ships of that kind, by topic, in the groups and the order of
+// the section navigation (patternGroups() in src/lib/nav.mjs), each topic under
+// a heading that the table of contents lists (src/route-data.ts). One card
+// each: its first preview running small (MiniPreview.astro), its title and its
+// need as the package writes them, in English, and its id, which an agent and
+// a product's layer use. A candidate, a need Magma knows with no default yet,
+// has no preview and a badge.
+import { getEntry } from 'astro:content';
+import { patternGroups } from '../lib/nav.mjs';
+import { patternHref, previewHref } from '../lib/patterns';
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+import MiniPreview from './MiniPreview.astro';
+
+interface Props {
+  kind: 'pattern' | 'block';
+}
+
+const { kind } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+const section = kind === 'block' ? 'blocks' : 'patterns';
+// What comes from the Magma packages is in English only.
+const contentLang = locale ? 'en' : undefined;
+
+const groups = await Promise.all(
+  patternGroups(kind).map(async (group) => ({
+    id: group.id,
+    label: t(`nav.${section}.${group.id}` as any),
+    items: await Promise.all(
+      group.patterns.map(async ({ id, title, status }) => {
+        const entry = await getEntry('patterns', id);
+        if (!entry) throw new Error(`PatternGallery: no pattern ${id}`);
+        const first = entry.data.parts.flatMap((part) => part.previews)[0];
+        return {
+          id,
+          title,
+          candidate: status === 'candidate',
+          need: entry.data.need,
+          href: patternHref(locale, kind, id),
+          preview: first && previewHref(kind, id, first.id),
+        };
+      }),
+    ),
+  })),
+);
+---
+
+{groups.map(({ id, label, items }) => (
+  <>
+    <Heading id={id} text={label} />
+    {/* `not-content`: Starlight would put 1rem above every card but the first. */}
+    <div class="not-content @container my-600">
+      <div class="grid gap-600 @xl:grid-cols-2">
+        {items.map((item) => (
+          <mds-card class="bg-surface-overlay">
+            <mds-card-header class="flex-col items-stretch gap-400 bg-surface-overlay">
+              {item.preview && (
+                <MiniPreview src={item.preview} title={item.title} href={item.href} />
+              )}
+              <div class="flex flex-wrap items-center gap-200">
+                <mds-text typography="h6" tag="h3" lang={contentLang}>
+                  {item.title}
+                </mds-text>
+                {item.candidate && (
+                  <mds-badge label={t('pattern.candidate')} variant="info" tone="weak" />
+                )}
+              </div>
+            </mds-card-header>
+            <mds-card-content class="flex flex-col gap-300 bg-surface-overlay pt-0">
+              <mds-text typography="detail" tag="p" lang={contentLang}>
+                {item.need}
+              </mds-text>
+              <mds-text typography="detail" tag="p">
+                <mds-text typography="detail" tag="span" class="text-fg-muted">
+                  {t('pattern.id')}:
+                </mds-text>{' '}
+                <Code>{item.id}</Code>
+              </mds-text>
+            </mds-card-content>
+            <mds-card-footer class="bg-surface-overlay">
+              <mds-button
+                href={item.href}
+                type="a"
+                label={t('cards.open')}
+                aria-label={`${t('cards.open')}: ${item.title}`}
+                icon="mi/baseline/arrow-forward"
+                icon-position="right"
+                variant="primary"
+                tone="text"
+              />
+            </mds-card-footer>
+          </mds-card>
+        ))}
+      </div>
+    </div>
+  </>
+))}

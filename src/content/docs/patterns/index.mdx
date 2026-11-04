@@ -1,39 +1,52 @@
 ---
 title: Patterns
-description: Solutions to the tasks people carry out again and again - confirming an action, searching a list, filling in a form - with their behavior, their accessibility and the code for HTML, React and Angular.
+description: Solutions to the tasks people carry out again and again - learning what happened, deciding before an action that cannot be undone, searching a long list - the same in every product, as Magma ships them to people and to AI agents.
 ---
 
-import ComingSoon from '../../../components/ComingSoon.astro';
-
-<ComingSoon text="The first patterns are being written. They will appear here once they are complete enough to copy into a product." />
+import PatternGallery from '../../../components/PatternGallery.astro';
 
 A component solves one part of a screen; people come to a product to get something done. A
-pattern is the solution to a task that the products of Maggioli Group meet again and again -
-confirming an action, searching a list, filling in a form - put together from Magma components
-and [building blocks](../blocks/), with the decisions the components cannot take on their own:
-what follows an action, what the page shows when nothing matches, what goes into the address,
-where the focus goes, what a screen reader hears.
+pattern is the solution to a task that the products of Maggioli Group meet again and again:
+telling the person what happened after an action, asking before one that cannot be taken back,
+showing a part of the page with nothing in it, searching a long list. It puts Magma components
+and [building blocks](../blocks/) together, and takes the decisions the components cannot take
+on their own: where a message goes, what the person can do while waiting, what follows an
+error.
 
-The heart of a pattern is its behavior, so its size varies. It can be as small as a button that
-opens a dialog: what the dialog asks, where the focus goes when it closes, which message follows.
-Or as large as a whole page, such as a list to search and narrow down. A component is imported
-ready to use; a pattern is applied, following its guide and its code.
+The patterns ship with Magma, in the package `@maggioli-design-system/magma`. Each page here is
+generated from the file of its pattern, the same file an AI agent reads, and it is written in
+English.
 
-## What a pattern page holds
+<PatternGallery kind="pattern" />
 
-Every pattern will have the same parts: the pattern running, when to use it, its anatomy, the
-components it is made of, its behavior, its accessibility, its texts, the mistakes to avoid and,
-last, its code in plain HTML, React and Angular. The code will be complete: copy it into a
-project where Magma is installed, replace the demo data with your back end, and it runs.
+## Reading a pattern
 
-## The first ones
+A pattern starts from a few variables of the situation: whether the action can be undone, how
+many items it acts on, where the person is when it ends. Each combination of their values is a
+**case**, which names the components to use and how to use them; a preview runs it, with a line
+on what to try in it. Then come:
 
-- **List with filters**: records to search, narrow down, sort and page through.
-- **Record detail**: one record, what can be done with it and its history.
-- **Form and validation**: data to fill in, checked as people type and when they send it.
-- **Empty and error states**: what a screen shows when there is nothing yet, or something
-  went wrong.
+- **Always true**: the rules that hold in every case and in every product.
+- **Open choices**: what a product may decide for itself, with the default that holds until it
+  does.
+- **Situations**: real situations, each with the case it falls in. They are the quickest way to
+  find yours.
+- **Decisions**: when each rule was decided and why, with the link to the discussion.
 
-The Pattern and Antipattern pages of each [component](../components/) already show how to use
-that component on its own. This section will show how components and building blocks work
-together to complete a task.
+A **candidate** is a need Magma knows and has not defined yet: its page holds the need only.
+Until the pattern is defined, choose what fits the product, write down why, and propose it to
+the Magma team.
+
+## With an AI agent
+
+An agent does not read these pages: it asks the Magma MCP server for the pattern, `get_pattern`,
+with the values of the variables it knows, and gets back the one case to follow and its rules.
+The page of each pattern has a prompt to give it. How to set the agent up is in
+[Agentic development](../ai/).
+
+## The layer of a product
+
+A product can narrow a pattern without copying it. A file in its own repository,
+`magma/patterns/<id>.md`, fixes the open choices and adds the situations of the product; the
+rules that are always true stay as they are. `get_pattern` applies the layer of the project it
+runs in.

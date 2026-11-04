@@ -1,0 +1,49 @@
+---
+// How to apply a pattern or a building block with an AI coding agent, at the
+// top of its page (src/pages/[...locale]/[section]/[id].astro): the agent
+// finds it in the Magma installed in the project, through the MCP server
+// (`get_pattern` with the id and the values of the variables, the one case
+// or the regions to lay out) or in its file, so the prompt to copy names the
+// id and asks for the situation. The way to Agentic development, which sets
+// the agent up with Magma's guides, MCP server and lint, closes the text. In
+// a card, as the cards of the landing pages (PageCards.astro).
+import { Code as CodeBlock } from '@astrojs/starlight/components';
+import { localePrefix } from '../lib/frame';
+
+interface Props {
+  kind: 'pattern' | 'block';
+  /** The id of the pattern or the block. */
+  id: string;
+}
+
+const { kind, id } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+// Astro escapes the text of the code block: i18next does not need to.
+const prompt = t(`${kind}.agent.prompt`, { id, interpolation: { escapeValue: false } });
+---
+
+{/* `not-content`: Starlight would put 1rem above every part of the card. */}
+<div class="not-content my-600">
+  <mds-card class="bg-surface-overlay">
+    <mds-card-header class="items-start bg-surface-overlay">
+      <mds-entity
+        icon="mi/outline/auto-awesome"
+        variant="primary"
+        tone="weak"
+        class="w-full bg-transparent p-0 shadow-none"
+      >
+        <mds-text typography="h6" tag="p">
+          {t('pattern.agent.title')}
+        </mds-text>
+      </mds-entity>
+    </mds-card-header>
+    <mds-card-content class="flex flex-col gap-400 bg-surface-overlay pt-0">
+      <mds-text typography="detail" tag="p">
+        {t(`${kind}.agent.intro`)}{' '}
+        <mds-link href={`${localePrefix(locale)}/ai/`}>{t('pattern.agent.setup')}</mds-link>.
+      </mds-text>
+      <CodeBlock code={prompt} lang="text" title={t('pattern.agent.promptTitle')} wrap />
+    </mds-card-content>
+  </mds-card>
+</div>
