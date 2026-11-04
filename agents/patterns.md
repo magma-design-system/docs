@@ -83,13 +83,16 @@ builds a pattern with the components of the project from the case `get_pattern` 
   Navigation first as in Magma's catalogue, then Messages and states, Data, Input; in a group the
   decided ones, then the candidates, by title. A pattern is named by its title in English, as
   its page. The landing pages show the same groups as a gallery (`PatternGallery.astro`): the
-  first preview running small (`MiniPreview.astro`, an inert frame of 720 by 450 scaled to the
-  card), the title, the need, the id, the badge of a candidate; `src/route-data.ts` adds the
-  headings of the groups to the table of contents. A picture would be far lighter than a running
-  frame (a preview in a card loads 25 to 58 files, 650 to 975 KB, and hydrates its components;
-  its WebP weighs 1 to 28 KB), but the package ships the stages only: asked in
-  [magma#1243](https://github.com/magma-design-system/magma/issues/1243). When it ships them,
-  the cards show the image, light or dark with the mode, and `MiniPreview.astro` goes.
+  media of the card, the title, the need, the id, the badge of a candidate; `src/route-data.ts`
+  adds the headings of the groups to the table of contents.
+- The media of a card is a placeholder, the icon of the group on the neutral surface
+  `mds-card-media` paints before its asset. It waits for an image of the first preview, which
+  the package does not ship (2.10.0): asked in
+  [magma#1243](https://github.com/magma-design-system/magma/issues/1243). When it ships, the
+  image takes the place of the icon as an `mds-img`, light or dark with the mode. Decided on
+  2026-11-04 against running the preview small in an inert frame, as the first version of #101
+  did: a preview in a card loaded 25 to 58 files, 650 to 975 KB, and hydrated its components,
+  where its WebP weighs 1 to 28 KB.
 - The build fails, rather than leaving a page out of the navigation: a kind other than
   `foundation`, `pattern` and `block`; a group `PATTERN_GROUPS` lacks (add it, with its UI strings
   `nav.patterns.<group>` and `nav.blocks.<group>`); a domain `DOMAINS` lacks; a preview of no

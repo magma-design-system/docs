@@ -3,16 +3,20 @@
 // installed magma ships of that kind, by topic, in the groups and the order of
 // the section navigation (patternGroups() in src/lib/nav.mjs), each topic under
 // a heading that the table of contents lists (src/route-data.ts). One card
-// each: its first preview running small (MiniPreview.astro), its title and its
-// need as the package writes them, in English, and its id, which an agent and
-// a product's layer use. A candidate, a need Magma knows with no default yet,
-// has no preview and a badge.
+// each: its media, its title and its need as the package writes them, in
+// English, and its id, which an agent and a product's layer use. A candidate,
+// a need Magma knows with no default yet, has a badge.
+//
+// The media is a placeholder, the icon of the group on the neutral surface
+// mds-card-media paints before its asset: the image of the first preview
+// takes its place, as an mds-img, once the package ships one
+// (https://github.com/magma-design-system/magma/issues/1243). Running each
+// preview in a frame instead would load a whole page per card.
 import { getEntry } from 'astro:content';
 import { patternGroups } from '../lib/nav.mjs';
-import { patternHref, previewHref } from '../lib/patterns';
+import { patternHref } from '../lib/patterns';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
-import MiniPreview from './MiniPreview.astro';
 
 interface Props {
   kind: 'pattern' | 'block';
@@ -28,19 +32,18 @@ const contentLang = locale ? 'en' : undefined;
 const groups = await Promise.all(
   patternGroups(kind).map(async (group) => ({
     id: group.id,
+    icon: group.icon,
     label: t(`nav.${section}.${group.id}` as any),
     items: await Promise.all(
       group.patterns.map(async ({ id, title, status }) => {
         const entry = await getEntry('patterns', id);
         if (!entry) throw new Error(`PatternGallery: no pattern ${id}`);
-        const first = entry.data.parts.flatMap((part) => part.previews)[0];
         return {
           id,
           title,
           candidate: status === 'candidate',
           need: entry.data.need,
           href: patternHref(locale, kind, id),
-          preview: first && previewHref(kind, id, first.id),
         };
       }),
     ),
@@ -48,7 +51,7 @@ const groups = await Promise.all(
 );
 ---
 
-{groups.map(({ id, label, items }) => (
+{groups.map(({ id, icon, label, items }) => (
   <>
     <Heading id={id} text={label} />
     {/* `not-content`: Starlight would put 1rem above every card but the first. */}
@@ -56,18 +59,18 @@ const groups = await Promise.all(
       <div class="grid gap-600 @xl:grid-cols-2">
         {items.map((item) => (
           <mds-card class="bg-surface-overlay">
-            <mds-card-header class="flex-col items-stretch gap-400 bg-surface-overlay">
-              {item.preview && (
-                <MiniPreview src={item.preview} title={item.title} href={item.href} />
-              )}
-              <div class="flex flex-wrap items-center gap-200">
-                <mds-text typography="h6" tag="h3" lang={contentLang}>
-                  {item.title}
-                </mds-text>
-                {item.candidate && (
-                  <mds-badge label={t('pattern.candidate')} variant="info" tone="weak" />
-                )}
+            <mds-card-media>
+              <div aria-hidden="true" class="grid aspect-8/5 w-full place-items-center">
+                <mds-icon name={icon} class="w-1200 fill-current text-fg-muted" />
               </div>
+            </mds-card-media>
+            <mds-card-header class="flex-wrap items-center gap-200 bg-surface-overlay">
+              <mds-text typography="h6" tag="h3" lang={contentLang}>
+                {item.title}
+              </mds-text>
+              {item.candidate && (
+                <mds-badge label={t('pattern.candidate')} variant="info" tone="weak" />
+              )}
             </mds-card-header>
             <mds-card-content class="flex flex-col gap-300 bg-surface-overlay pt-0">
               <mds-text typography="detail" tag="p" lang={contentLang}>
