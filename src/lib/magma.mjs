@@ -58,6 +58,11 @@ function scalar(frontmatter, key) {
 /** @type {MagmaPattern[] | undefined} */
 let patterns;
 
+/** `agents/patterns/` of the installed magma, beside its AGENTS.md. */
+function patternsFolder() {
+  return path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
+}
+
 /**
  * The patterns the installed magma ships, `agents/patterns/<id>.md` beside the
  * package's AGENTS.md, of three kinds: the domains of the design language
@@ -73,7 +78,7 @@ let patterns;
  */
 export function loadPatterns() {
   if (patterns) return patterns;
-  const folder = path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
+  const folder = patternsFolder();
   patterns = [];
   if (!existsSync(folder)) return patterns;
   for (const name of readdirSync(folder).sort()) {
@@ -110,6 +115,24 @@ export function loadDomains() {
  * @typedef {{ id: string, of?: 'case' | 'rule' | 'situation', try: string, height?: number, wholePage: boolean, markup: string }} Preview
  */
 
+/** The schemes Magma renders each preview in, an image each. */
+export const PREVIEW_SCHEMES = /** @type {const} */ (['light', 'dark']);
+
+/** @typedef {(typeof PREVIEW_SCHEMES)[number]} PreviewScheme */
+
+/**
+ * The image of a preview in a scheme, beside its stage:
+ * `agents/patterns/previews/<id>/<preview>.<scheme>.webp`, 1440 x 900 pixels,
+ * the stage laid out at 960 x 600 at 1.5x ("Its images" in Magma's
+ * docs/PATTERNS.md, from magma 2.11.0). readPreviews() checks it is there.
+ * @param {string} id
+ * @param {string} preview
+ * @param {PreviewScheme} scheme
+ */
+export function previewImage(id, preview, scheme) {
+  return path.join(patternsFolder(), 'previews', id, `${preview}.${scheme}.webp`);
+}
+
 // The opening comment of a preview: its keys, one `key: value` per line.
 const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
 
@@ -121,7 +144,8 @@ const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
  * takes no inset. None when the folder is missing (a candidate, a domain with
  * no preview).
  * Magma's check holds the format; a preview without what to try fails here
- * too, so the page never shows a still stage with nothing said.
+ * too, so the page never shows a still stage with nothing said, and so does
+ * one without its images (previewImage()), which the cards show.
  * @param {string} folder
  * @returns {Preview[]}
  */
@@ -141,8 +165,12 @@ function readPreviews(folder) {
           .map((match) => [match[1], match[2]]),
       );
       if (!keys.try) throw new Error(`The preview ${path.join(folder, name)} says nothing to try`);
+      const id = name.slice(0, -'.html'.length);
+      for (const scheme of PREVIEW_SCHEMES)
+        if (!existsSync(path.join(folder, `${id}.${scheme}.webp`)))
+          throw new Error(`The preview ${path.join(folder, name)} has no ${scheme} image`);
       return {
-        id: name.slice(0, -'.html'.length),
+        id,
         try: keys.try,
         ...(keys.height ? { height: Number(keys.height) } : {}),
         wholePage: keys['whole-page'] === 'true',

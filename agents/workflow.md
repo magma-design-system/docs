@@ -128,7 +128,7 @@ A new author, step by step:
   the live site after the deploy:
   - Patterns and Building blocks: a page per pattern and per block the installed `magma`
     ships, each with its previews (`/example/pattern/<id>/<case>/`), and the gallery of their
-    landing pages with the small previews running.
+    landing pages with the image of the first preview of each, light and dark with the mode.
   - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 

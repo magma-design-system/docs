@@ -57,7 +57,7 @@
   Magma's utilities too: the Examples usage files hold the same markup as
   documentation.json, without the rest of it. So do the previews of the
   patterns, the building blocks and the domains of the design language (their
-  pages run them: src/pages/example/domain/), which Magma lays out with
+  pages run them: src/pages/example/[kind]/), which Magma lays out with
   Tailwind: a class only they use is generated from them.
 */
 @source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/examples.md';

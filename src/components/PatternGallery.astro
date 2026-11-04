@@ -7,14 +7,15 @@
 // English, and its id, which an agent and a product's layer use. A candidate,
 // a need Magma knows with no default yet, has a badge.
 //
-// The media is a placeholder, the icon of the group on the neutral surface
-// mds-card-media paints before its asset: the image of the first preview
-// takes its place, as an mds-img, once the package ships one
-// (https://github.com/magma-design-system/magma/issues/1243). Running each
-// preview in a frame instead would load a whole page per card.
+// The media is the image of the first preview, the one Magma ships beside its
+// stage, light or dark as the page (previewImageHref() in src/lib/patterns.ts):
+// a WebP of a few KB, where running the stage in a frame would load a whole
+// page per card. The hidden one is not loaded (`loading` is lazy). A candidate
+// has no preview: its media is the icon of its group, on the neutral surface
+// of mds-card-media.
 import { getEntry } from 'astro:content';
 import { patternGroups } from '../lib/nav.mjs';
-import { patternHref } from '../lib/patterns';
+import { patternHref, previewImageHref } from '../lib/patterns';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
 
@@ -38,12 +39,17 @@ const groups = await Promise.all(
       group.patterns.map(async ({ id, title, status }) => {
         const entry = await getEntry('patterns', id);
         if (!entry) throw new Error(`PatternGallery: no pattern ${id}`);
+        const first = entry.data.parts.flatMap((part) => part.previews)[0];
         return {
           id,
           title,
           candidate: status === 'candidate',
           need: entry.data.need,
           href: patternHref(locale, kind, id),
+          images: first && {
+            light: previewImageHref(kind, id, first.id, 'light'),
+            dark: previewImageHref(kind, id, first.id, 'dark'),
+          },
         };
       }),
     ),
@@ -60,9 +66,28 @@ const groups = await Promise.all(
         {items.map((item) => (
           <mds-card class="bg-surface-overlay">
             <mds-card-media>
-              <div aria-hidden="true" class="grid aspect-8/5 w-full place-items-center">
-                <mds-icon name={icon} class="w-1200 fill-current text-fg-muted" />
-              </div>
+              {item.images ? (
+                <>
+                  <mds-img
+                    class="aspect-8/5 [--mds-img-background:transparent] dark:hidden"
+                    src={item.images.light}
+                    alt=""
+                    width="1440"
+                    height="900"
+                  />
+                  <mds-img
+                    class="hidden aspect-8/5 [--mds-img-background:transparent] dark:flex"
+                    src={item.images.dark}
+                    alt=""
+                    width="1440"
+                    height="900"
+                  />
+                </>
+              ) : (
+                <div aria-hidden="true" class="grid aspect-8/5 w-full place-items-center">
+                  <mds-icon name={icon} class="w-1200 fill-current text-fg-muted" />
+                </div>
+              )}
             </mds-card-media>
             <mds-card-header class="flex-wrap items-center gap-200 bg-surface-overlay">
               <mds-text typography="h6" tag="h3" lang={contentLang}>

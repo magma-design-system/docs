@@ -38,8 +38,7 @@ dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
-(theme studio, for the Themes and preferences page). Filed on 2026-11-04: #1243 (an image of each preview of the patterns in the package, light
-and dark: the cards of the galleries show a placeholder until then, `PatternGallery.astro`). Filed on 2026-10-28: #1177
+(theme studio, for the Themes and preferences page). Filed on 2026-10-28: #1177
 (`mds-radial-progress` steps back before it moves when `progress` changes in an event handler:
 `animateTo()` takes `start = performance.now()`, and the first `requestAnimationFrame`
 timestamp, the start of the frame, is earlier, so `t` and `easeOutExpo(t)` are negative; also the
@@ -82,6 +81,10 @@ region keep theirs, which show more), #1147 (not a Magma bug: `mds-header` does 
 its attribute in a re-render; the issue came from a hidden pane that ran no
 `requestAnimationFrame`, see [workflow.md](workflow.md)), #1148 (`storybook` in
 `documentation.json`: the Storybook buttons and links read it).
+
+Closed by 2.11.0, filed on 2026-11-04 from the galleries of Patterns and Building blocks
+(docs#101): #1243 (an image of each preview, light and dark, beside its stage: the cards show
+the one of the first preview, `PatternGallery.astro`).
 
 ## Seen, not filed yet
 

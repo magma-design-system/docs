@@ -79,24 +79,28 @@ builds a pattern with the components of the project from the case `get_pattern` 
   (`src/pages/example/[kind]/[id]/[preview].astro`), as `render_preview` runs it: the words in
   Italian, an inset of 600, none for `whole-page`. Magma lays the previews out with Tailwind:
   `src/styles/magma.css` takes their folder as a `@source`.
+- Its images beside it, `<preview>.light.webp` and `<preview>.dark.webp`
+  (`src/pages/example/[kind]/[id]/[image].webp.ts`, `previewImageHref()` in
+  `src/lib/patterns.ts`), copied as Magma ships them since 2.11.0: the stage laid out at 960 x 600
+  and taken at 1.5x, 1440 x 900 pixels, 8:5 as the cards, made by the render that checks it.
 - Navigation: a group per topic (`PATTERN_GROUPS`, `patternGroups()` in `src/lib/nav.mjs`),
   Navigation first as in Magma's catalogue, then Messages and states, Data, Input; in a group the
   decided ones, then the candidates, by title. A pattern is named by its title in English, as
   its page. The landing pages show the same groups as a gallery (`PatternGallery.astro`): the
   media of the card, the title, the need, the id, the badge of a candidate; `src/route-data.ts`
   adds the headings of the groups to the table of contents.
-- The media of a card is a placeholder, the icon of the group on the neutral surface
-  `mds-card-media` paints before its asset. It waits for an image of the first preview, which
-  the package does not ship (2.10.0): asked in
-  [magma#1243](https://github.com/magma-design-system/magma/issues/1243). When it ships, the
-  image takes the place of the icon as an `mds-img`, light or dark with the mode. Decided on
-  2026-11-04 against running the preview small in an inert frame, as the first version of #101
-  did: a preview in a card loaded 25 to 58 files, 650 to 975 KB, and hydrated its components,
-  where its WebP weighs 1 to 28 KB.
+- The media of a card is the image of the first preview, two `mds-img` switched by Magma's
+  `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded), on a transparent
+  background over the neutral surface of `mds-card-media` while it loads. A candidate has no
+  preview: its media is the icon of its group. Decided on 2026-11-04 against running the preview
+  small in an inert frame, as the first version of #101 did: a preview in a card loaded 25 to 58
+  files, 650 to 975 KB, and hydrated its components, where its WebP weighs 1 to 28 KB. The
+  images were asked in [magma#1243](https://github.com/magma-design-system/magma/issues/1243)
+  and ship since 2.11.0.
 - The build fails, rather than leaving a page out of the navigation: a kind other than
   `foundation`, `pattern` and `block`; a group `PATTERN_GROUPS` lacks (add it, with its UI strings
   `nav.patterns.<group>` and `nav.blocks.<group>`); a domain `DOMAINS` lacks; a preview of no
-  case, rule or situation; a preview without what to try.
+  case, rule or situation; a preview without what to try or without its two images.
 
 ## Open on the site
 
