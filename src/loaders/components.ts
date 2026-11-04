@@ -58,17 +58,13 @@ function nestHeadings(markdown: string, level: number): string {
  * They are the whole hand-written documentation of a component, as in Magma's
  * per-component agent docs. The readme is not used: it holds a generic intro
  * only. The names are Magma's contract ("documentation.json" in its
- * docs/CONTRACTS.md): Pattern and Antipattern became Examples and Mistakes
- * (https://github.com/magma-design-system/magma/issues/1169), and both are read
- * until no version the site supports has the old ones. A name not listed here
- * fails the build: left out, it would take its page away without a word.
+ * docs/CONTRACTS.md). A name not listed here fails the build: left out, it
+ * would take its page away without a word.
  */
 const USAGE = {
   description: 'description',
   examples: 'examples',
   mistakes: 'mistakes',
-  pattern: 'examples',
-  antipattern: 'mistakes',
 } as const;
 type Usage = (typeof USAGE)[keyof typeof USAGE];
 
