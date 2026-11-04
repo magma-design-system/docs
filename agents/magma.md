@@ -22,14 +22,14 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                | Where                                       | What the site does                                                                                                                                                                                                                                                                                                   |
-| -------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                                                             |
-| not filed                                                            | `src/components/frame/Header.astro`         | `min-w-0` and `shrink` on the parts `content`, `actions` and `nav` of `mds-header-bar`: Magma's do not shrink, and a long item in the navigation pushes the menu button off a phone screen                                                                                                                           |
-| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                                                                          |
-| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                                                                       |
-| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line)                                              |
-| not filed                                                            | `src/lib/tokens.mjs`                        | `DEPRECATED_CONTEXTS`: the contexts of `theme` Magma deprecates since design-tokens 15.5.0 (`default`, `cool`, `warm` and their `-contrast-more`), which the resolver names only in the description of the modifier; the tables of `TokenConditions.astro` leave them out. A name the resolver drops fails the build |
+| Issue                                                                  | Where                                       | What the site does                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                                                             |
+| not filed                                                              | `src/components/frame/Header.astro`         | `min-w-0` and `shrink` on the parts `content`, `actions` and `nav` of `mds-header-bar`: Magma's do not shrink, and a long item in the navigation pushes the menu button off a phone screen                                                                                                                           |
+| not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                                                                          |
+| not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                                                                       |
+| not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line)                                              |
+| [magma#1249](https://github.com/magma-design-system/magma/issues/1249) | `src/lib/tokens.mjs`                        | `DEPRECATED_CONTEXTS`: the contexts of `theme` Magma deprecates since design-tokens 15.5.0 (`default`, `cool`, `warm` and their `-contrast-more`), which the resolver names only in the description of the modifier; the tables of `TokenConditions.astro` leave them out. A name the resolver drops fails the build |
 
 ## Open Magma issues that concern the site
 
@@ -83,6 +83,11 @@ its attribute in a re-render; the issue came from a hidden pane that ran no
 `requestAnimationFrame`, see [workflow.md](workflow.md)), #1148 (`storybook` in
 `documentation.json`: the Storybook buttons and links read it).
 
+Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
+resolver says which contexts of a modifier are deprecated only in its `description`, in words:
+`default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
+the table above).
+
 Closed by 2.11.0, filed on 2026-11-04 from the galleries of Patterns and Building blocks
 (docs#101): #1243 (an image of each preview, light and dark, beside its stage: the cards show
 the one of the first preview, `PatternGallery.astro`).
@@ -112,11 +117,6 @@ against open issues before filing.
   in 2.5.0).
 - `mds-breadcrumb` has no links; Magma has no description list, no ordered list and no code
   block component.
-- The DTCG resolver (`dist/dtcg/magma.resolver.json`) says which contexts of a modifier are
-  deprecated only in its `description`, in words: `default`, `cool` and `warm` of `theme`
-  (design-tokens 15.5.0). A reader that lists the themes, as the token tables of the site, has
-  to copy the list (`DEPRECATED_CONTEXTS` in `src/lib/tokens.mjs`): a `$deprecated` on the
-  context, or a list beside `contexts`, would let it read them.
 - `mds-button[href]` has no `download`, nor has `mds-link` (2.5.0): the Figma files of
   `FigmaDownloads.astro` stay native `<a download>`.
 - `mds-link` takes text only in its slot (2.5.0, by design): a link around inline code goes

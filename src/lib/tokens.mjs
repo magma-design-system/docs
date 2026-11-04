@@ -81,7 +81,8 @@ function tokensOf(ref) {
  * The contexts Magma deprecates, by modifier: the resolver names them only in
  * words, in the description of the modifier (`theme` since design-tokens
  * 15.5.0: "Deprecated, removed in the next major: default (...); cool (...);
- * warm (...)"). Not filed (agents/magma.md). The same context with the
+ * warm (...)"), https://github.com/magma-design-system/magma/issues/1249: the
+ * list goes away when a release says it in data. The same context with the
  * contrast preference (`cool-contrast-more`) is deprecated with it. A name the
  * resolver no longer has fails the build: the major that removes them takes
  * this list away.
