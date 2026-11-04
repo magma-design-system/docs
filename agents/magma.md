@@ -46,6 +46,11 @@ timestamp, the start of the frame, is earlier, so `t` and `easeOutExpo(t)` are n
 CSS transition of the registered `--mds-radial-progress` runs on top of the JS tween). The site
 no longer shows a progress ring: no workaround left.
 
+Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
+resolver says which contexts of a modifier are deprecated only in its `description`, in words:
+`default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
+the table above).
+
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
 on the props that take a format: the preview placeholders), #960, #981 (`CHANGELOG.md` in
@@ -82,11 +87,6 @@ region keep theirs, which show more), #1147 (not a Magma bug: `mds-header` does 
 its attribute in a re-render; the issue came from a hidden pane that ran no
 `requestAnimationFrame`, see [workflow.md](workflow.md)), #1148 (`storybook` in
 `documentation.json`: the Storybook buttons and links read it).
-
-Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
-resolver says which contexts of a modifier are deprecated only in its `description`, in words:
-`default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
-the table above).
 
 Closed by 2.11.0, filed on 2026-11-04 from the galleries of Patterns and Building blocks
 (docs#101): #1243 (an image of each preview, light and dark, beside its stage: the cards show
