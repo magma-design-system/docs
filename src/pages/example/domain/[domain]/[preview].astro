@@ -1,11 +1,12 @@
 ---
-// The preview of a case of a domain of the design language, shown in an iframe
-// on the page of the domain (src/components/DomainPreviews.astro): the stage
-// Magma ships (agents/patterns/previews/<domain>/<case>.html), alone on a page
-// with Magma's styles and loader, away from the styles of the site. As Magma's
-// render_preview runs it: the words of the stage in Italian, an inset of 600
-// around it, none for a stage that is a whole page and lays out its own frame
-// (`whole-page`, "The preview of a case" in Magma's docs/PATTERNS.md).
+// The preview of a case or a rule of a domain of the design language, shown in
+// an iframe on the page of the domain (src/components/DomainPreviews.astro):
+// the stage Magma ships (agents/patterns/previews/<domain>/<case or rule>.html),
+// alone on a page with Magma's styles and loader, away from the styles of the
+// site. As Magma's render_preview runs it: the words of the stage in Italian,
+// an inset of 600 around it, none for a stage that is a whole page and lays
+// out its own frame (`whole-page`, "The preview of a case" in Magma's
+// docs/PATTERNS.md).
 // Opened on its own, it is the full screen version of the preview.
 import { getCollection } from 'astro:content';
 import '../../../../styles/magma.css';
@@ -13,10 +14,12 @@ import '../../../../styles/magma.css';
 export async function getStaticPaths() {
   const domains = await getCollection('domains');
   return domains.flatMap(({ id, data }) =>
-    data.previews.map((preview) => ({
-      params: { domain: id, case: preview.case },
-      props: { markup: preview.markup, wholePage: preview.wholePage },
-    })),
+    data.parts
+      .flatMap((part) => part.previews)
+      .map((preview) => ({
+        params: { domain: id, preview: preview.id },
+        props: { markup: preview.markup, wholePage: preview.wholePage },
+      })),
   );
 }
 
@@ -26,7 +29,7 @@ interface Props {
 }
 
 const { markup, wholePage } = Astro.props;
-const { domain, case: id } = Astro.params;
+const { domain, preview: id } = Astro.params;
 ---
 
 <!doctype html>

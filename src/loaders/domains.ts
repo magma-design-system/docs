@@ -1,5 +1,5 @@
 import type { Loader } from 'astro/loaders';
-import { loadDomains } from '../lib/magma.mjs';
+import { loadDomains, type Preview } from '../lib/magma.mjs';
 import { PROSE_CELLS_FIELD } from '../lib/markdown-tables.mjs';
 import { DOMAINS } from '../lib/nav.mjs';
 
@@ -25,27 +25,57 @@ function pageBody(body: string, ids: Set<string>): string {
 }
 
 /**
- * The body cut after its section Cases, where the page shows the previews of
- * the cases (DomainPreviews.astro): the text up to the next h2, and the rest.
- * The whole body first when it has no Cases, or no section after it.
+ * The sections whose items Magma may show at work, by the key of the
+ * frontmatter that lists the items: a preview is named after a case, or after
+ * a rule that is always true ("The preview of a case" in Magma's
+ * docs/PATTERNS.md; the first are the rules of actions, in 2.10.0).
  */
-function splitAfterCases(body: string): [string, string] {
-  const cases = /^## Cases[ \t]*$/m.exec(body);
-  if (!cases) return [body, ''];
-  const next = /^## /m.exec(body.slice(cases.index + cases[0].length));
-  if (!next) return [body, ''];
-  const at = cases.index + cases[0].length + next.index;
-  return [body.slice(0, at), body.slice(at)];
+const PREVIEWED = [
+  { of: 'case', heading: 'Cases', key: 'cases' },
+  { of: 'rule', heading: 'Always true', key: 'always-true' },
+] as const;
+
+/**
+ * The body cut after each section with previews, where the page shows them
+ * (DomainPreviews.astro): each part is the text up to the h2 after such a
+ * section, with the previews of its items in their order. The last part, the
+ * text after the last cut, has none; the whole body is one part for a domain
+ * with no preview.
+ */
+function splitAfterPreviewed(
+  body: string,
+  previewed: Array<{ heading: string; previews: Preview[] }>,
+): Array<{ text: string; previews: Preview[] }> {
+  const cuts = previewed
+    .filter(({ previews }) => previews.length)
+    .map(({ heading, previews }) => {
+      const section = new RegExp(`^## ${heading}[ \\t]*$`, 'm').exec(body);
+      if (!section)
+        throw new Error(`Previews of the ${heading} of a domain that has no ${heading}`);
+      const from = section.index + section[0].length;
+      const next = /^## /m.exec(body.slice(from));
+      return { at: next ? from + next.index : body.length, previews };
+    })
+    .sort((a, b) => a.at - b.at);
+  const parts: Array<{ text: string; previews: Preview[] }> = [];
+  let from = 0;
+  for (const { at, previews } of cuts) {
+    parts.push({ text: body.slice(from, at), previews });
+    from = at;
+  }
+  if (from < body.length || !parts.length) parts.push({ text: body.slice(from), previews: [] });
+  return parts;
 }
 
 /**
  * The domains of the design language, from the installed magma
  * (`agents/patterns/<id>.md`, `kind: foundation`): one page each under
  * Foundation (src/pages/[...locale]/foundation/[domain].astro), the whole file
- * as Magma ships it to the agents, with the previews of its cases in the order
- * of its cases. A domain DOMAINS (src/lib/nav.mjs) does not list fails the
+ * as Magma ships it to the agents, with the previews of its cases after its
+ * Cases and those of its rules after its Always true, in the order of the
+ * frontmatter. A domain DOMAINS (src/lib/nav.mjs) does not list fails the
  * build: left out, it would have no place in the navigation; so does a preview
- * of a case the domain does not have.
+ * of no case or rule of the domain.
  */
 export function domainsLoader(): Loader {
   return {
@@ -65,21 +95,31 @@ export function domainsLoader(): Loader {
         // The YAML of the frontmatter, read by Astro's Markdown processor.
         const { metadata: head } = await renderMarkdown(`---\n${domain.frontmatter}\n---\n`);
         const frontmatter = head?.frontmatter ?? {};
-        // The two parts around the previews, each with the tables of a domain.
+        // The tables of a domain are prose.
         const render = (text: string) =>
           renderMarkdown(`---\n${PROSE_CELLS_FIELD}: true\n---\n${text}`);
-        const [top, tail] = splitAfterCases(pageBody(domain.body, ids));
-        const before = await render(top);
-        const after = tail ? await render(tail) : undefined;
-        // The previews in the order of the cases of the frontmatter.
-        const cases: string[] = (frontmatter.cases ?? []).map((entry: { id: string }) => entry.id);
-        const strays = domain.previews.filter((one) => !cases.includes(one.case));
+        // The previews of each section, in the order of its items.
+        const previewed = PREVIEWED.map(({ of, heading, key }) => {
+          const items: string[] = (frontmatter[key] ?? []).map((entry: { id: string }) => entry.id);
+          const previews = domain.previews
+            .filter((one) => items.includes(one.id))
+            .sort((a, b) => items.indexOf(a.id) - items.indexOf(b.id))
+            .map((one) => ({ ...one, of }));
+          return { heading, previews };
+        });
+        const shown = new Set(previewed.flatMap(({ previews }) => previews.map((one) => one.id)));
+        const strays = domain.previews.filter((one) => !shown.has(one.id));
         if (strays.length)
           throw new Error(
-            `magma ships previews of ${domain.id} for no case of it: ${strays.map((one) => one.case).join(', ')}`,
+            `magma ships previews of ${domain.id} for no case or rule of it: ${strays.map((one) => one.id).join(', ')}`,
           );
-        const previews = [...domain.previews].sort(
-          (a, b) => cases.indexOf(a.case) - cases.indexOf(b.case),
+        const parts = await Promise.all(
+          splitAfterPreviewed(pageBody(domain.body, ids), previewed).map(
+            async ({ text, previews }) => {
+              const { html, metadata } = await render(text);
+              return { html, headings: metadata?.headings ?? [], previews };
+            },
+          ),
         );
         const data = await parseData({
           id: domain.id,
@@ -87,11 +127,7 @@ export function domainsLoader(): Loader {
             title: String(frontmatter.title ?? domain.id),
             need: String(frontmatter.need ?? '').trim(),
             principle: String(frontmatter.principle ?? '').trim(),
-            html: before.html,
-            headings: before.metadata?.headings ?? [],
-            rest: after?.html ?? '',
-            restHeadings: after?.metadata?.headings ?? [],
-            previews,
+            parts,
           },
         });
         store.set({ id: domain.id, data, digest: generateDigest(data) });

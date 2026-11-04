@@ -40,7 +40,7 @@ let domains;
  * "The patterns" in Magma's docs/CONTRACTS.md and "A domain of Foundation" in
  * its docs/PATTERNS.md. Empty for a version that ships none (2.9.0 and before):
  * the folder sits beside the package's AGENTS.md. Each with the previews of
- * its cases, by file name (readPreviews()).
+ * its cases and its rules, by file name (readPreviews()).
  * @returns {{ id: string, frontmatter: string, body: string, previews: Preview[] }[]}
  */
 export function loadDomains() {
@@ -65,16 +65,18 @@ export function loadDomains() {
 }
 
 /**
- * @typedef {{ case: string, try: string, height?: number, wholePage: boolean, markup: string }} Preview
+ * A preview: `id` is the name of its file, the case or the rule it shows,
+ * which the loader of its page sets in `of`.
+ * @typedef {{ id: string, of?: 'case' | 'rule', try: string, height?: number, wholePage: boolean, markup: string }} Preview
  */
 
 // The opening comment of a preview: its keys, one `key: value` per line.
 const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
 
 /**
- * The previews of the cases of a pattern or a domain, from the installed magma
- * (`agents/patterns/previews/<id>/<case>.html`, "The preview of a case" in
- * Magma's docs/PATTERNS.md): the stage, what to try in it (required), the
+ * The previews of a pattern or a domain, from the installed magma
+ * (`agents/patterns/previews/<id>/<case or rule>.html`, "The preview of a
+ * case" in Magma's docs/PATTERNS.md): the stage, what to try in it (required), the
  * height of an overlay and `whole-page`, a stage with a frame of its own that
  * takes no inset. None when the folder is missing (a domain with no preview).
  * Magma's check holds the format; a preview without what to try fails here
@@ -99,7 +101,7 @@ function readPreviews(folder) {
       );
       if (!keys.try) throw new Error(`The preview ${path.join(folder, name)} says nothing to try`);
       return {
-        case: name.slice(0, -'.html'.length),
+        id: name.slice(0, -'.html'.length),
         try: keys.try,
         ...(keys.height ? { height: Number(keys.height) } : {}),
         wholePage: keys['whole-page'] === 'true',

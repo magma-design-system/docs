@@ -28,20 +28,24 @@ const title = t(`nav.foundation.${entry.id}` as any);
 // What comes from the Magma packages is in English only (the header says so).
 const contentLang = locale ? 'en' : undefined;
 // The table of contents: the sections of the file (Cases, Always true, ...),
-// and under Cases the previews of the cases, by their id.
-const headings = [
-  ...data.headings,
-  ...data.previews.map((preview) => ({
-    depth: 3,
-    slug: `preview-${preview.case}`,
-    text: preview.case,
-  })),
-  ...data.restHeadings,
-].filter((heading) => heading.depth <= 3);
+// and under each the previews of its cases or rules, by their id.
+const headings = data.parts
+  .flatMap((part) => [
+    ...part.headings,
+    ...part.previews.map((preview) => ({
+      depth: 3,
+      slug: `preview-${preview.id}`,
+      text: preview.id,
+    })),
+  ])
+  .filter((heading) => heading.depth <= 3);
 ---
 
 <StarlightPage frontmatter={{ title, description: data.need }} headings={headings}>
-  <div lang={contentLang} set:html={data.html} />
-  <DomainPreviews domain={entry.id} previews={data.previews} contentLang={contentLang} />
-  {data.rest && <div lang={contentLang} set:html={data.rest} />}
+  {data.parts.map((part) => (
+    <>
+      <div lang={contentLang} set:html={part.html} />
+      <DomainPreviews domain={entry.id} previews={part.previews} contentLang={contentLang} />
+    </>
+  ))}
 </StarlightPage>

@@ -1,10 +1,12 @@
 ---
 // The previews of the cases of a domain of the design language, after its
-// table of cases (src/pages/[...locale]/foundation/[domain].astro): for each
-// case, in the order of the table, a heading with its id, the stage that runs
-// it (PreviewStage.astro, on the page src/pages/example/domain/[domain]/[case].astro)
-// and what to try in it, the line the preview says. Nothing for a domain with
-// no preview yet. What to try comes from the package, in English only.
+// table of cases, or of its rules, after Always true
+// (src/pages/[...locale]/foundation/[domain].astro): for each case or rule, in
+// the order of the table, a heading with its id, the stage that runs it
+// (PreviewStage.astro, on the page
+// src/pages/example/domain/[domain]/[preview].astro) and what to try in it, the
+// line the preview says. Nothing for a domain with no preview yet. What to try
+// comes from the package, in English only.
 import { domainPreviewHref } from '../lib/domains';
 import { READING, TEXT } from '../lib/markdown-text.mjs';
 import Heading from './Heading.astro';
@@ -13,7 +15,7 @@ import PreviewStage from './PreviewStage.astro';
 interface Props {
   /** The id of the domain. */
   domain: string;
-  previews: Array<{ case: string; try: string; height?: number }>;
+  previews: Array<{ id: string; of: 'case' | 'rule'; try: string; height?: number }>;
   /** The language of what comes from the package, on a page in another one. */
   contentLang?: string;
 }
@@ -23,15 +25,15 @@ const { t } = Astro.locals;
 ---
 
 {previews.map((preview) => {
-  const src = domainPreviewHref(domain, preview.case);
-  const tag = `domain-${domain}-${preview.case}`;
+  const src = domainPreviewHref(domain, preview.id);
+  const tag = `domain-${domain}-${preview.id}`;
   return (
     <>
-      <Heading id={`preview-${preview.case}`} text={preview.case} level={3} />
+      <Heading id={`preview-${preview.id}`} text={preview.id} level={3} />
       <PreviewStage
         tag={tag}
         src={src}
-        title={t('domain.preview.title', { case: preview.case })}
+        title={t(`domain.preview.${preview.of}`, { id: preview.id })}
         height={preview.height}
       >
         <mds-button

@@ -12,9 +12,9 @@ export function domainHref(locale: string | undefined, id: string): string {
   return `${localePrefix(locale)}/foundation/${id}/`;
 }
 
-/** The page that runs the preview of a case of a domain, in an iframe. */
-export function domainPreviewHref(id: string, caseId: string): string {
-  return `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/domain/${id}/${caseId}/`;
+/** The page that runs the preview of a case or a rule of a domain, in an iframe. */
+export function domainPreviewHref(id: string, preview: string): string {
+  return `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/domain/${id}/${preview}/`;
 }
 
 /** The id of the domain of a page URL, `undefined` for any other page. */

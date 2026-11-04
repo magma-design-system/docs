@@ -60,20 +60,24 @@ export const collections = {
   // The domains of the design language, one page each under Foundation.
   domains: defineCollection({
     loader: domainsLoader(),
-    schema: guide.extend({
+    schema: z.object({
       title: z.string(),
       need: z.string(),
       principle: z.string(),
-      // The body after its section Cases: the previews of the cases stand between.
-      rest: z.string(),
-      restHeadings: guide.shape.headings,
-      previews: z.array(
-        z.object({
-          case: z.string(),
-          try: z.string(),
-          height: z.number().optional(),
-          wholePage: z.boolean(),
-          markup: z.string(),
+      // The body in parts, each followed by the previews of the section it
+      // ends with: the cases after Cases, the rules after Always true.
+      parts: z.array(
+        guide.extend({
+          previews: z.array(
+            z.object({
+              id: z.string(),
+              of: z.enum(['case', 'rule']),
+              try: z.string(),
+              height: z.number().optional(),
+              wholePage: z.boolean(),
+              markup: z.string(),
+            }),
+          ),
         }),
       ),
     }),
