@@ -38,7 +38,9 @@ dropdown inserted and removed at once no longer throws in Chromium), #1061
 (next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
 `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
 `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
-(theme studio, for the Themes and preferences page). Filed on 2026-10-28: #1177
+(theme studio, for the Themes and preferences page). Filed on 2026-11-04: #1243 (an image of each preview of the patterns in the package, light
+and dark: the cards of the galleries run each preview in an inert frame until then,
+`MiniPreview.astro`). Filed on 2026-10-28: #1177
 (`mds-radial-progress` steps back before it moves when `progress` changes in an event handler:
 `animateTo()` takes `start = performance.now()`, and the first `requestAnimationFrame`
 timestamp, the start of the frame, is earlier, so `t` and `easeOutExpo(t)` are negative; also the

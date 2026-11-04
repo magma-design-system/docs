@@ -38,7 +38,9 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 Generated from the package since Magma 2.10.0 ([agents/patterns.md](../agents/patterns.md)).
 Open: the drawing of components, blocks and patterns, a page on `get_pattern` and the layer
 format, a guide to design for a product, `get_pattern` in `McpTools` and `/magma:pattern-layer`
-on the Claude Code page (#89).
+on the Claude Code page (#89). The cards of the galleries show an image of the preview instead
+of a running frame once Magma ships one
+([magma#1243](https://github.com/magma-design-system/magma/issues/1243)).
 
 ## Development
 
