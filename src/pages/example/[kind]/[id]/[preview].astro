@@ -17,16 +17,14 @@ import '../../../../styles/magma.css';
 export async function getStaticPaths() {
   const patterns = await getCollection('patterns');
   return patterns.flatMap(({ id, data }) =>
-    data.parts
-      .flatMap((part) => part.previews)
-      .map((preview) => ({
-        params: {
-          kind: data.kind === 'foundation' ? 'domain' : data.kind,
-          id,
-          preview: preview.id,
-        },
-        props: { markup: preview.markup, wholePage: preview.wholePage },
-      })),
+    data.previews.map((preview) => ({
+      params: {
+        kind: data.kind === 'foundation' ? 'domain' : data.kind,
+        id,
+        preview: preview.id,
+      },
+      props: { markup: preview.markup, wholePage: preview.wholePage },
+    })),
   );
 }
 

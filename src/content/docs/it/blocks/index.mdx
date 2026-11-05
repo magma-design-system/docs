@@ -5,6 +5,13 @@ description: Le sezioni di una pagina che tornano da un prodotto all'altro - la 
 
 import PatternGallery from '../../../../components/PatternGallery.astro';
 
+Ogni building block è una sezione di pagina che torna da un prodotto all'altro. Aprine uno: si
+parte dalle sue situazioni in funzione, le regioni e le regole vengono dopo.
+
+<PatternGallery kind="block" />
+
+## Che cos'è un building block
+
 Una pagina è fatta di sezioni, e molte tornano da un prodotto all'altro. Un building block è una
 di queste sezioni, fatta di componenti di Magma e disposta sempre allo stesso modo: la struttura
 dell'applicazione intorno a ogni pagina, l'intestazione di una pagina con il titolo e le azioni,
@@ -17,8 +24,6 @@ un'attesa, un errore - appartiene ai [pattern](../patterns/), che usano i block.
 I building block arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`. Ogni pagina
 qui è generata dal file del suo block, lo stesso file che legge un agente AI, ed è scritta in
 inglese.
-
-<PatternGallery kind="block" />
 
 ## Componenti, block, pattern
 
@@ -34,8 +39,8 @@ inglese.
 Un block parte da poche variabili della pagina: se sta in cima all'applicazione o al suo
 interno, se mostra un elemento o un insieme. Invece dei casi ha delle **regioni** (Regions),
 nell'ordine della pagina, ognuna con quando compare; **Layout** dice come si dispongono a ogni
-larghezza. Le **Situations** sono pagine reali, ognuna con la sua anteprima. **Always true** e
-**Decisions** funzionano come per un pattern.
+larghezza. Le **Situations** sono pagine reali, che lo stage in cima alla pagina esegue una alla
+volta. **Always true** e **Decisions** funzionano come per un pattern.
 
 ## Da dove vengono
 

@@ -5,6 +5,13 @@ description: Solutions to the tasks people carry out again and again - learning 
 
 import PatternGallery from '../../../components/PatternGallery.astro';
 
+Each pattern solves a task that people carry out in every product. Open one: it starts with
+its cases at work, and the rules come after.
+
+<PatternGallery kind="pattern" />
+
+## What a pattern is
+
 A component solves one part of a screen; people come to a product to get something done. A
 pattern is the solution to a task that the products of Maggioli Group meet again and again:
 telling the person what happened after an action, asking before one that cannot be taken back,
@@ -17,14 +24,13 @@ The patterns ship with Magma, in the package `@maggioli-design-system/magma`. Ea
 generated from the file of its pattern, the same file an AI agent reads, and it is written in
 English.
 
-<PatternGallery kind="pattern" />
-
 ## Reading a pattern
 
 A pattern starts from a few variables of the situation: whether the action can be undone, how
 many items it acts on, where the person is when it ends. Each combination of their values is a
-**case**, which names the components to use and how to use them; a preview runs it, with a line
-on what to try in it. Then come:
+**case**, which names the components to use and how to use them. The stage at the top of the
+page runs the cases one at a time, with a line on what to try: pick one there, or click its id
+in the table of the cases. Then come:
 
 - **Always true**: the rules that hold in every case and in every product.
 - **Open choices**: what a product may decide for itself, with the default that holds until it

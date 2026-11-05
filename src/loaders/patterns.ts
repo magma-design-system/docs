@@ -1,5 +1,5 @@
 import type { Loader } from 'astro/loaders';
-import { loadPatterns, type Preview } from '../lib/magma.mjs';
+import { loadPatterns } from '../lib/magma.mjs';
 import { PROSE_CELLS_FIELD } from '../lib/markdown-tables.mjs';
 import { DOMAINS, PATTERN_GROUPS, PATTERN_SECTIONS } from '../lib/nav.mjs';
 
@@ -26,48 +26,35 @@ function pageBody(body: string, sections: Map<string, string>): string {
 }
 
 /**
- * The sections whose items Magma may show at work, by the key of the
- * frontmatter that lists the items: a preview is named after a case, after a
- * rule that is always true (the first are the rules of actions, in 2.10.0),
- * or after a situation of a building block, which has regions instead of
- * cases ("The preview of a case" in Magma's docs/PATTERNS.md).
+ * The items Magma may show at work, by the key of the frontmatter that lists
+ * them, in the order the page offers their previews (PatternStage.astro): a
+ * preview is named after a case, after a rule that is always true (the rules
+ * of actions, since 2.10.0), or after a situation of a building block, which
+ * has regions instead of cases ("The preview of a case" in Magma's
+ * docs/PATTERNS.md).
  */
 const PREVIEWED = [
-  { of: 'case', heading: 'Cases', key: 'cases' },
-  { of: 'rule', heading: 'Always true', key: 'always-true' },
-  { of: 'situation', heading: 'Situations', key: 'situations' },
+  { of: 'case', key: 'cases' },
+  { of: 'rule', key: 'always-true' },
+  { of: 'situation', key: 'situations' },
 ] as const;
 
+// An inline code of the rendered body, as src/lib/markdown-text.mjs writes it.
+const INLINE_CODE = /(<mds-text\b[^>]*\btag="code"[^>]*>)([a-z0-9-]+)(<\/mds-text>)/g;
+
 /**
- * The body cut after each section with previews, where the page shows them
- * (PatternPreviews.astro): each part is the text up to the h2 after such a
- * section, with the previews of its items in their order. The last part, the
- * text after the last cut, has none; the whole body is one part for a file
- * with no preview.
+ * The ids of the previews written as inline code in the body (the first
+ * column of the table of the cases, a rule that names another) link to the
+ * stage at the top of the page, which runs that preview: an mds-link inside
+ * the code, as every link on code of the site (agents/writing.md, Links). The
+ * address works without the script of the stage too, which reads it.
  */
-function splitAfterPreviewed(
-  body: string,
-  previewed: Array<{ heading: string; previews: Preview[] }>,
-): Array<{ text: string; previews: Preview[] }> {
-  const cuts = previewed
-    .filter(({ previews }) => previews.length)
-    .map(({ heading, previews }) => {
-      const section = new RegExp(`^## ${heading}[ \\t]*$`, 'm').exec(body);
-      if (!section)
-        throw new Error(`Previews of the ${heading} of a pattern that has no ${heading}`);
-      const from = section.index + section[0].length;
-      const next = /^## /m.exec(body.slice(from));
-      return { at: next ? from + next.index : body.length, previews };
-    })
-    .sort((a, b) => a.at - b.at);
-  const parts: Array<{ text: string; previews: Preview[] }> = [];
-  let from = 0;
-  for (const { at, previews } of cuts) {
-    parts.push({ text: body.slice(from, at), previews });
-    from = at;
-  }
-  if (from < body.length || !parts.length) parts.push({ text: body.slice(from), previews: [] });
-  return parts;
+function linkPreviews(html: string, ids: Set<string>): string {
+  return html.replace(INLINE_CODE, (whole, open: string, id: string, close: string) =>
+    ids.has(id)
+      ? `${open}<mds-link href="?preview=${id}#try" data-try-preview="${id}">${id}</mds-link>${close}`
+      : whole,
+  );
 }
 
 /**
@@ -75,9 +62,9 @@ function splitAfterPreviewed(
  * design language (`kind: foundation`), the patterns and the building blocks,
  * one page each in the section of its kind
  * (src/pages/[...locale]/[section]/[id].astro): the whole file as Magma ships
- * it to the agents, with the previews of its cases after its Cases, those of
- * its rules after its Always true, those of the situations of a block after
- * its Situations, in the order of the frontmatter. A candidate, a need Magma
+ * it to the agents, and its previews, which the stage at the top of the page
+ * runs one at a time: its cases, the rules that are always true, the
+ * situations of a block, in the order of the frontmatter. A candidate, a need Magma
  * knows with no default yet, has a page too: its need and a line on what the
  * agent does meanwhile. Fails the build, rather than leaving a page out of
  * the navigation: a domain DOMAINS (src/lib/nav.mjs) does not list, a pattern
@@ -96,7 +83,7 @@ export function patternsLoader(): Loader {
       );
       if (homeless.length)
         throw new Error(
-          `magma ships ${homeless.map(({ id, kind, group }) => `${id} (${kind}${group ? `, group ${group}` : ''})`).join(', ')}, which have no place on the site: add a domain to DOMAINS in src/lib/nav.mjs with its UI string nav.foundation.<id>, a group to PATTERN_GROUPS with its UI strings nav.patterns.<group> and nav.blocks.<group>`,
+          `magma ships ${homeless.map(({ id, kind, group }) => `${id} (${kind}${group ? `, group ${group}` : ''})`).join(', ')}, which have no place on the site: add a domain to DOMAINS in src/lib/nav.mjs with its UI string nav.design-language.<id>, a group to PATTERN_GROUPS with its UI strings nav.patterns.<group> and nav.blocks.<group>`,
         );
       const sections = new Map(
         shipped.map(({ id, kind }) => [id, PATTERN_SECTIONS[kind]] as [string, string]),
@@ -110,31 +97,24 @@ export function patternsLoader(): Loader {
         // The tables of a pattern are prose.
         const render = (text: string) =>
           renderMarkdown(`---\n${PROSE_CELLS_FIELD}: true\n---\n${text}`);
-        // The previews of each section, in the order of its items.
-        const previewed = PREVIEWED.map(({ of, heading, key }) => {
+        // The previews of the cases, then of the rules, then of the
+        // situations, each in the order of its list.
+        const previews = PREVIEWED.flatMap(({ of, key }) => {
           const items: string[] = (frontmatter[key] ?? []).map(
             (entry: { id?: string }) => entry.id,
           );
-          const previews = pattern.previews
+          return pattern.previews
             .filter((one) => items.includes(one.id))
             .sort((a, b) => items.indexOf(a.id) - items.indexOf(b.id))
             .map((one) => ({ ...one, of }));
-          return { heading, previews };
         });
-        const shown = new Set(previewed.flatMap(({ previews }) => previews.map((one) => one.id)));
+        const shown = new Set(previews.map((one) => one.id));
         const strays = pattern.previews.filter((one) => !shown.has(one.id));
         if (strays.length)
           throw new Error(
             `magma ships previews of ${pattern.id} for no case, rule or situation of it: ${strays.map((one) => one.id).join(', ')}`,
           );
-        const parts = await Promise.all(
-          splitAfterPreviewed(pageBody(pattern.body, sections), previewed).map(
-            async ({ text, previews }) => {
-              const { html, metadata } = await render(text);
-              return { html, headings: metadata?.headings ?? [], previews };
-            },
-          ),
-        );
+        const { html, metadata } = await render(pageBody(pattern.body, sections));
         const data = await parseData({
           id: pattern.id,
           data: {
@@ -144,7 +124,9 @@ export function patternsLoader(): Loader {
             title: pattern.title,
             need: String(frontmatter.need ?? '').trim(),
             principle: String(frontmatter.principle ?? '').trim(),
-            parts,
+            html: linkPreviews(html, shown),
+            headings: metadata?.headings ?? [],
+            previews,
           },
         });
         store.set({ id: pattern.id, data, digest: generateDigest(data) });

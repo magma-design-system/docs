@@ -5,6 +5,13 @@ description: Soluzioni ai compiti che le persone svolgono di continuo - sapere c
 
 import PatternGallery from '../../../../components/PatternGallery.astro';
 
+Ogni pattern risolve un compito che le persone svolgono in ogni prodotto. Aprine uno: si parte
+dai suoi casi in funzione, le regole vengono dopo.
+
+<PatternGallery kind="pattern" />
+
+## Che cos'è un pattern
+
 Un componente risolve una parte di una schermata; le persone usano un prodotto per portare a
 termine qualcosa. Un pattern è la soluzione a un compito che i prodotti di Maggioli Group
 incontrano di continuo: dire alla persona cosa è successo dopo un'azione, chiedere prima di una
@@ -17,14 +24,13 @@ I pattern arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`. Ogn
 generata dal file del suo pattern, lo stesso file che legge un agente AI, ed è scritta in
 inglese.
 
-<PatternGallery kind="pattern" />
-
 ## Come si legge un pattern
 
 Un pattern parte da poche variabili della situazione: se l'azione si può annullare, su quanti
 elementi agisce, dove si trova la persona quando finisce. Ogni combinazione dei loro valori è un
-**caso** (Cases), che indica quali componenti usare e come; un'anteprima lo esegue, con una riga
-su cosa provare. Poi vengono:
+**caso** (Cases), che indica quali componenti usare e come. Lo stage in cima alla pagina esegue
+i casi uno alla volta, con una riga su cosa provare: sceglilo lì, o fai clic sul suo id nella
+tabella dei casi. Poi vengono:
 
 - **Always true**: le regole che valgono in ogni caso e in ogni prodotto.
 - **Open choices**: quello che un prodotto può decidere da sé, con il default che vale finché

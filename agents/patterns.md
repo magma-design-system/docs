@@ -64,17 +64,29 @@ builds a pattern with the components of the project from the case `get_pattern` 
 
 - `loadPatterns()` (`src/lib/magma.mjs`) reads every file and its previews; the collection
   `patterns` (`src/loaders/patterns.ts`) renders each body without its `h1` and its notes for
-  maintainers, cut after each section with previews: the cases after Cases, the rules after
-  Always true, the situations of a block after Situations (`PREVIEWED`).
-- One route for the three kinds, `src/pages/[...locale]/[section]/[id].astro`: `/foundation/<id>/`
-  for a domain, `/patterns/<id>/`, `/blocks/<id>/` (`PATTERN_SECTIONS` in `src/lib/nav.mjs`).
-  The page shows the whole file in English (the Italian page says so), a decided pattern or
-  block opens with the card "With an AI agent" (`PatternAgent.astro`: the prompt names the id
-  and asks for the values of the variables, as `get_pattern` takes them), and each preview runs
-  on a `PreviewStage.astro` (`PatternPreviews.astro`), with Enlarge (`PreviewZoom.astro`: an
+  maintainers, and lists its previews in the order of the page: the cases, the rules that are
+  always true, the situations of a block, each in the order of its list (`PREVIEWED`). Every
+  inline code of the body that is the id of a preview gets an `mds-link` inside, to
+  `?preview=<id>#try` (`linkPreviews()`).
+- One route for the three kinds, `src/pages/[...locale]/[section]/[id].astro`:
+  `/design-language/<id>/` for a domain, `/patterns/<id>/`, `/blocks/<id>/` (`PATTERN_SECTIONS` in
+  `src/lib/nav.mjs`). The working case first, the reasons after (plan/CONTENT_STRUCTURE.md,
+  2026-11-05): the need in one line, then the stage (`PatternStage.astro`, heading `try`), then,
+  for a decided pattern or block, the card "With an AI agent" (`PatternAgent.astro`: the prompt
+  names the id and asks for the values of the variables, as `get_pattern` takes them), then the
+  whole file in English (the Italian page says so). The header says where the page comes from,
+  a candidate has a badge (`PageTitle.astro`).
+- The stage runs one preview at a time on a `PreviewStage.astro`, the first case at the start: an
+  `mds-input-select` lists them all, an `optgroup` for the cases, one for the rules, one for the
+  situations. Picking one sets the frame, its title, what to try, Enlarge (`PreviewZoom.astro`: an
   `mds-url-view` in the window slot of an `mds-modal`, as wide as `wide`; made on each opening
-  with the absolute address it needs, removed on closing) and Open in a new tab next to Reset.
-  The header says where the page comes from, a candidate has a badge (`PageTitle.astro`).
+  with the absolute address it needs, removed on closing) and Open in a new tab, and keeps the
+  address (`?preview=<id>`), which the page reads on load. A click on an id in the text picks it
+  without the router loading the page again (a listener in the capture phase), and brings the
+  stage into view. `mds-input-select` emits `mdsInputSelectChange` on the `input` event of its
+  select, which the browser fires on a real choice: a script that tests it must dispatch `input`,
+  not `change`. One frame per page: `confirm-action` went from 6 frames and 13,000 px to 1 and
+  9,500 px, the first case from 3,300 px to 460 px from the top.
 - Each preview runs alone at `/docs/example/<domain|pattern|block>/<id>/<preview>/`
   (`src/pages/example/[kind]/[id]/[preview].astro`), as `render_preview` runs it: the words in
   Italian, an inset of 600, none for `whole-page`. Magma lays the previews out with Tailwind:
@@ -86,13 +98,18 @@ builds a pattern with the components of the project from the case `get_pattern` 
 - Navigation: a group per topic (`PATTERN_GROUPS`, `patternGroups()` in `src/lib/nav.mjs`),
   Navigation first as in Magma's catalogue, then Messages and states, Data, Input; in a group the
   decided ones, then the candidates, by title. A pattern is named by its title in English, as
-  its page. The landing pages show the same groups as a gallery (`PatternGallery.astro`): the
-  media of the card, the title, the need, the id, the badge of a candidate; `src/route-data.ts`
-  adds the headings of the groups to the table of contents.
+  its page. The landing pages open with one line and show the same groups as a gallery
+  (`PatternGallery.astro`): the media of the card, the title, the need, the id, the badge of a
+  candidate; `src/route-data.ts` adds the headings of the groups to the table of contents. What
+  a pattern or a block is comes after the gallery.
+- The domains have their own section, Design language (`DOMAINS`, `shippedDomains()`): a flat
+  navigation in the order of `DOMAINS`, each named in the language of the page
+  (`nav.design-language.<id>`), and the same gallery on its landing page, in one grid. Density
+  ships no preview: its card shows its icon, and its page has no stage.
 - The media of a card is the image of the first preview, two `mds-img` switched by Magma's
   `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded), on a transparent
-  background over the neutral surface of `mds-card-media` while it loads. A candidate has no
-  preview: its media is the icon of its group. Decided on 2026-11-04 against running the preview
+  background over the neutral surface of `mds-card-media` while it loads. Without a preview (a
+  candidate, a domain that ships none) the media is the icon of its group or of the domain. Decided on 2026-11-04 against running the preview
   small in an inert frame, as the first version of #101 did: a preview in a card loaded 25 to 58
   files, 650 to 975 KB, and hydrated its components, where its WebP weighs 1 to 28 KB. The
   images were asked in [magma#1243](https://github.com/magma-design-system/magma/issues/1243)

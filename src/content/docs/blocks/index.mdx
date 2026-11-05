@@ -5,6 +5,13 @@ description: The sections of a page that come back from one product to the next 
 
 import PatternGallery from '../../../components/PatternGallery.astro';
 
+Each building block is a section of a page that comes back from one product to the next. Open
+one: it starts with its situations at work, and the regions and the rules come after.
+
+<PatternGallery kind="block" />
+
+## What a building block is
+
 A page is made of sections, and many of them come back from one product to the next. A building
 block is one of those sections, made of Magma components and always laid out the same way: the
 shell of the application around every page, the header of a page with its title and its
@@ -17,8 +24,6 @@ belongs to the [patterns](../patterns/), which use the blocks.
 The building blocks ship with Magma, in the package `@maggioli-design-system/magma`. Each page
 here is generated from the file of its block, the same file an AI agent reads, and it is written
 in English.
-
-<PatternGallery kind="block" />
 
 ## Components, blocks, patterns
 
@@ -34,8 +39,8 @@ in English.
 A block starts from a few variables of the page: whether it sits at the top of the application
 or inside it, whether it shows one item or a set of them. Instead of cases it has **regions**, in
 the order of the page, each saying when it shows; **Layout** says how they stand at each width.
-**Situations** are real pages, each with its preview. **Always true** and **Decisions** work as
-for a pattern.
+**Situations** are real pages, which the stage at the top of the page runs one at a time.
+**Always true** and **Decisions** work as for a pattern.
 
 ## Where they come from
 

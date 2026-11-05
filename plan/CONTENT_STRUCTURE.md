@@ -4,12 +4,13 @@ Decision record for the information architecture of the site. Source: the intern
 "Magma Design System - Introduzione" (50 slides), reworked for a public documentation site.
 Decided on 2026-10-08.
 
-## Navigation (11 rail items)
+## Navigation (12 rail items)
 
 | Rail                | Pages                                                                                                         | Source                              |
 | ------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
 | Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                     | deck                                |
 | Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                  | deck + new writing                  |
+| Design language     | The domains of composition: rhythm, density, actions, titles, surfaces, widths and alignment                  | `agents/patterns/` of magma         |
 | Building blocks     | Recurring sections of a page made of components (page header, filter bar, ...): structure and layout, no data | written here, see `DIRECTION.md`    |
 | Patterns            | Solutions to recurring tasks (confirm an action, ...): behavior first, with code in HTML, React and Angular   | written here, see `DIRECTION.md`    |
 | Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                  |
@@ -24,7 +25,9 @@ Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes o
 `node_modules`. Guidelines prose (principles, content design, patterns) is written here.
 
 Order (decided 2026-10-24): after Foundation the rail goes from the sections of a page down to
-the values: Building blocks, Patterns, Components, then Tokens and Icons. Building blocks are
+the values: Building blocks, Patterns, Components, then Tokens and Icons. Design language
+(2026-11-05) stands between Foundation and Building blocks: the rules of composition come before
+the blocks and the patterns that follow them. Building blocks are
 about space (a section of a page), patterns about time (what follows an action), components are
 the parts both are made of; tokens and icons come after, as DIRECTION.md orders by how often
 they are needed. Building blocks and Patterns stood before Components even while they were
@@ -32,8 +35,8 @@ coming soon; since 2026-11-04 their pages are generated from Magma's patterns. S
 and the library (Groups, below).
 
 Groups (decided 2026-10-26, revised 2026-10-28): eleven items in one column had become hard to
-scan, so the rail lists them under three labels. Guidelines: Foundation, Building blocks,
-Patterns, the prose written here. Development: Development and Agentic development, how a
+scan, so the rail lists them under three labels. Guidelines: Foundation, Design language,
+Building blocks, Patterns, the guidelines. Development: Development and Agentic development, how a
 product is built with Magma, by hand or with an agent; it comes right after the guidelines.
 Library: Components, Tokens, Icons, Brand assets, the data that comes from the packages.
 Community stands alone, at the end. Home has no item: the logo and the name of the site, at the
@@ -62,6 +65,22 @@ Their pages are generated from the installed `magma` (`agents/patterns/<id>.md`,
 foundation`), the whole file as the agents read it, in English on the Italian pages too, as the
 component pages; the group appears with the release of magma that ships the domains. Rejected:
 the six domains inside Design, nine items in one group.
+
+Design language (decided 2026-11-05, superseding Composition before it was published): the
+domains are a section of their own, between Foundation and Building blocks, at
+`/design-language/<id>/`, with a landing page that shows them as a gallery, as Building blocks
+and Patterns. Under Foundation the group was named Composition, and the words "design language",
+Magma's name for the domains, appeared nowhere: a reader looking for it did not find it.
+Foundation keeps a line that points to it. Rejected: the group renamed Design language and moved
+first in Foundation, closer to Magma's catalogue (its section Foundation) but still hidden.
+
+The pages of the patterns, the blocks and the domains (decided 2026-11-05): the working case
+first, the reasons after. Under the title, the need in one line, then a stage that runs one
+preview at a time with a picker of all of them (cases, rules always true, situations), then the
+agent card and the file. The ids of the previews in the text link to the stage. The landing
+pages open with one line and the gallery; what a pattern, a block or a domain is comes after it.
+Rejected: the previews stacked at the top, the same length and every frame loaded. Before, the
+first preview of a pattern stood about four screens down, after the table of its cases.
 
 ## From the deck, kept
 

@@ -1,5 +1,5 @@
 // The pages of what Magma ships in agents/patterns/: the domains of the design
-// language under Foundation, the patterns and the building blocks, each page
+// language, the patterns and the building blocks, each page
 // with the previews of its cases, rules or situations (src/loaders/patterns.ts
 // gives the data): their addresses, and the pattern of an address.
 import { localePrefix } from './frame';
@@ -9,9 +9,6 @@ import { PATTERN_SECTIONS } from './nav.mjs';
 export type PatternKind = MagmaPattern['kind'];
 
 const KINDS = new Map(loadPatterns().map(({ id, kind }) => [id, kind]));
-
-/** The id of the heading of the group Composition on the landing page of Foundation. */
-export const COMPOSITION = 'composition';
 
 /** The page of a domain, a pattern or a building block. */
 export function patternHref(locale: string | undefined, kind: PatternKind, id: string): string {

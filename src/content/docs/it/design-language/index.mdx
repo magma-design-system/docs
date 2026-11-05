@@ -1,0 +1,45 @@
+---
+title: Linguaggio di design
+description: Le regole che mettono insieme i componenti di una schermata - lo spazio tra loro, quanto sono densi, quale azione pesa di più, lo stile di un titolo, quando una superficie, quanto largo - come Magma le consegna alle persone e agli agenti AI.
+---
+
+import PatternGallery from '../../../../components/PatternGallery.astro';
+
+Ogni dominio risponde a una domanda su come mettere insieme i componenti in una schermata.
+Aprine uno: si parte dai suoi casi in funzione, le regole vengono dopo.
+
+<PatternGallery kind="foundation" />
+
+## Che cos'è il linguaggio di design
+
+Un componente decide come appare. Non decide quanto sta lontano dal successivo, quale di tre
+azioni pesa di più, come sta un titolo sopra il suo contenuto, quando un gruppo ha bisogno di una
+superficie propria o quanto è largo un form. Il linguaggio di design decide queste domande, allo
+stesso modo in ogni prodotto, così che due schermate fatte da due team si leggano come un solo
+prodotto.
+
+Ogni dominio è una di queste domande: ritmo e densità per lo spazio, azioni per il peso di quello
+che la persona può fare, titoli, superfici, larghezze e allineamento. I
+[building block](../blocks/) e i [pattern](../patterns/) seguono queste regole, e le seguono
+anche le schermate di un prodotto.
+
+## Come si legge un dominio
+
+Un dominio si legge come un pattern. Parte dal contesto di un elemento, dove sta e cosa ha
+intorno: ogni combinazione è un **caso** (Cases), che dice cosa usare. Lo stage in cima alla
+pagina esegue i casi uno alla volta, e le regole che valgono ovunque (**Always true**) dove Magma
+le mostra, con una riga su cosa provare. Le **Situations** sono schermate reali, ognuna con il
+caso in cui ricade; **Decisions** dice quando è stata decisa ogni regola e perché.
+
+## Con un agente AI
+
+Un agente legge gli stessi file. Chiede al server MCP di Magma la regola del suo contesto con
+`get_pattern`, o un dominio intero con `get_guide` e il suo id (`rhythm`). Come preparare
+l'agente è in [Sviluppo agentico](../ai/).
+
+## Da dove vengono
+
+I domini arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`, accanto ai pattern.
+Ogni pagina qui è generata dal file del suo dominio, ed è scritta in inglese. Le decisioni su cui
+poggiano, i principi, l'accessibilità, il colore e la tipografia, sono nei
+[Fondamenti](../foundation/).

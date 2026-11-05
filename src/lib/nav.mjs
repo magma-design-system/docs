@@ -2,7 +2,7 @@
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here. After the
-// guidelines (Foundation, building blocks, patterns) come the development
+// guidelines (Foundation, design language, building blocks, patterns) come the development
 // sections (code, agents), then the library: components, tokens, icons and
 // brand assets.
 import {
@@ -21,12 +21,12 @@ export const STORYBOOK = loadComponentDocs().storybook;
 
 /**
  * The domains of the design language, the rules of composition Magma ships as
- * files (`agents/patterns/<id>.md`, `kind: foundation`): the group Composition
- * of Foundation. The order is the one of the domains in
+ * files (`agents/patterns/<id>.md`, `kind: foundation`): the section Design
+ * language, after Foundation. The order is the one of the domains in
  * https://github.com/magma-design-system/magma/issues/1189, rhythm and density
  * first, the two the patterns show the missing rules of most. `icon` is an
  * mds-icon slug, collected by iconsauce; the label is the UI string
- * `nav.foundation.<id>`. A domain the installed magma ships and this list
+ * `nav.design-language.<id>`. A domain the installed magma ships and this list
  * lacks fails the build (src/loaders/patterns.ts): add it here.
  */
 export const DOMAINS = [
@@ -40,7 +40,7 @@ export const DOMAINS = [
 
 /**
  * The domains the installed magma ships, in the order of DOMAINS: none before
- * the release that ships them, so the group Composition is left out.
+ * the release that ships them.
  */
 export function shippedDomains() {
   const shipped = new Set(loadDomains().map((domain) => domain.id));
@@ -65,7 +65,11 @@ export const PATTERN_GROUPS = [
 ];
 
 /** The section of the site of a kind of pattern, as the first segment of its address. */
-export const PATTERN_SECTIONS = { foundation: 'foundation', pattern: 'patterns', block: 'blocks' };
+export const PATTERN_SECTIONS = {
+  foundation: 'design-language',
+  pattern: 'patterns',
+  block: 'blocks',
+};
 
 /**
  * The patterns (`kind: pattern`) or the building blocks (`block`) the
@@ -151,23 +155,24 @@ export const sections = [
           { slug: 'foundation/illustration' },
         ],
       },
-      // The domains of the design language, generated from the installed magma
-      // (src/pages/[...locale]/foundation/[domain].astro).
-      ...(shippedDomains().length
-        ? [
-            {
-              ...sidebarLabel('nav.foundation.composition'),
-              items: shippedDomains().map(({ id }) => ({
-                ...sidebarLabel(`nav.foundation.${id}`),
-                link: `/foundation/${id}/`,
-              })),
-            },
-          ]
-        : []),
       {
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
       },
+    ],
+  },
+  {
+    id: 'design-language',
+    group: 'guidelines',
+    icon: 'mi/outline/design-services',
+    // The domains, generated from the installed magma
+    // (src/pages/[...locale]/[section]/[id].astro), in the order of DOMAINS.
+    items: () => [
+      { slug: 'design-language', ...sidebarLabel('nav.overview') },
+      ...shippedDomains().map(({ id }) => ({
+        ...sidebarLabel(`nav.design-language.${id}`),
+        link: `/design-language/${id}/`,
+      })),
     ],
   },
   {

@@ -2,19 +2,21 @@
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { getCollection, type CollectionEntry } from 'astro:content';
 import PatternAgent from '../../../components/PatternAgent.astro';
-import PatternPreviews from '../../../components/PatternPreviews.astro';
+import PatternStage from '../../../components/PatternStage.astro';
 import PreviewZoom from '../../../components/PreviewZoom.astro';
 import { localeParams } from '../../../lib/i18n.mjs';
+import { READING, TEXT } from '../../../lib/markdown-text.mjs';
 import { PATTERN_SECTIONS } from '../../../lib/nav.mjs';
 
 // One page per file of agents/patterns/ of the installed magma
 // (src/loaders/patterns.ts), in every language, in the section of its kind: a
-// domain of the design language under Foundation, a pattern under Patterns, a
-// building block under Building blocks. The whole file, as the agents read it,
-// with the previews of its cases after its table of cases, those of its rules
-// after Always true and those of the situations of a block after Situations;
-// a decided pattern or block opens with how to apply it with an AI agent. The
-// header says where it comes from (src/components/frame/PageTitle.astro).
+// domain under Design language, a pattern under Patterns, a building block
+// under Building blocks. The working case first, the reasons after: the need
+// in one line, then the stage that runs its previews one at a time, the first
+// case at the start (PatternStage.astro), then, for a decided pattern or
+// block, how to apply it with an AI agent, then the whole file as the agents
+// read it, where the id of a preview links back to the stage. The header says
+// where it comes from (src/components/frame/PageTitle.astro).
 export async function getStaticPaths() {
   const patterns = await getCollection('patterns');
   return localeParams.flatMap((locale) =>
@@ -35,37 +37,33 @@ const { locale } = Astro.params;
 const { t } = Astro.locals;
 // A domain is named in the language of the page, as the navigation has it; a
 // pattern or a block by its title, as the package writes it.
-const title = data.kind === 'foundation' ? t(`nav.foundation.${entry.id}` as any) : data.title;
+const title = data.kind === 'foundation' ? t(`nav.design-language.${entry.id}` as any) : data.title;
 // What comes from the Magma packages is in English only (the header says so).
 const contentLang = locale ? 'en' : undefined;
-// The table of contents: the sections of the file (Cases, Always true, ...),
-// and under each the previews of its cases, rules or situations, by their id.
-const headings = data.parts
-  .flatMap((part) => [
-    ...part.headings,
-    ...part.previews.map((preview) => ({
-      depth: 3,
-      slug: `preview-${preview.id}`,
-      text: preview.id,
-    })),
-  ])
-  .filter((heading) => heading.depth <= 3);
+const staged = data.previews.length > 0;
+// The table of contents: the stage, then the sections of the file (Cases,
+// Always true, ...).
+const headings = [
+  ...(staged ? [{ depth: 2, slug: 'try', text: t('pattern.stage.title') }] : []),
+  ...data.headings.filter((heading) => heading.depth <= 3),
+];
 ---
 
 <StarlightPage frontmatter={{ title, description: data.need }} headings={headings}>
+  <mds-text {...READING} tag="p" class={TEXT.paragraph} lang={contentLang}>
+    {data.need}
+  </mds-text>
+  {staged && (
+    <PatternStage
+      kind={data.kind}
+      id={entry.id}
+      previews={data.previews}
+      contentLang={contentLang}
+    />
+  )}
   {data.kind !== 'foundation' && data.status === 'decided' && (
     <PatternAgent kind={data.kind} id={entry.id} locale={locale} />
   )}
-  {data.parts.map((part) => (
-    <>
-      <div lang={contentLang} set:html={part.html} />
-      <PatternPreviews
-        kind={data.kind}
-        id={entry.id}
-        previews={part.previews}
-        contentLang={contentLang}
-      />
-    </>
-  ))}
-  {data.parts.some((part) => part.previews.length > 0) && <PreviewZoom />}
+  <div lang={contentLang} set:html={data.html} />
+  {staged && <PreviewZoom />}
 </StarlightPage>

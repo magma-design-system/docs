@@ -58,7 +58,7 @@ export const collections = {
     }),
   }),
   // What magma ships in agents/patterns/, one page each: the domains of the
-  // design language under Foundation, the patterns, the building blocks.
+  // design language, the patterns, the building blocks.
   patterns: defineCollection({
     loader: patternsLoader(),
     schema: z.object({
@@ -68,21 +68,18 @@ export const collections = {
       title: z.string(),
       need: z.string(),
       principle: z.string(),
-      // The body in parts, each followed by the previews of the section it
-      // ends with: the cases after Cases, the rules after Always true, the
-      // situations of a block after Situations.
-      parts: z.array(
-        guide.extend({
-          previews: z.array(
-            z.object({
-              id: z.string(),
-              of: z.enum(['case', 'rule', 'situation']),
-              try: z.string(),
-              height: z.number().optional(),
-              wholePage: z.boolean(),
-              markup: z.string(),
-            }),
-          ),
+      // The body, and the previews the stage at the top of the page runs: the
+      // cases, then the rules that are always true, then the situations of a
+      // block.
+      ...guide.shape,
+      previews: z.array(
+        z.object({
+          id: z.string(),
+          of: z.enum(['case', 'rule', 'situation']),
+          try: z.string(),
+          height: z.number().optional(),
+          wholePage: z.boolean(),
+          markup: z.string(),
         }),
       ),
     }),
