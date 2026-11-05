@@ -34,7 +34,12 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: a page with `draft: true` is left out (none today).
+- A production build is not dev: a page with `draft: true` is left out (none today). A page
+  that builds can still fail in dev: on a route of our own (`StarlightPage`), a component
+  whose output puts something in the head (Starlight's `Code`, expressive-code) runs before
+  `StarlightPage` sets `Astro.locals.starlightRoute`, and reading the route there throws
+  (`locals.starlightRoute is not defined`, a 500). Pass the locale as a prop from the route
+  (`PatternAgent.astro`), and open a page of each route on a dev server too.
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):

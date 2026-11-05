@@ -54,7 +54,7 @@ const headings = data.parts
 
 <StarlightPage frontmatter={{ title, description: data.need }} headings={headings}>
   {data.kind !== 'foundation' && data.status === 'decided' && (
-    <PatternAgent kind={data.kind} id={entry.id} />
+    <PatternAgent kind={data.kind} id={entry.id} locale={locale} />
   )}
   {data.parts.map((part) => (
     <>

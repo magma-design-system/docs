@@ -14,11 +14,16 @@ interface Props {
   kind: 'pattern' | 'block';
   /** The id of the pattern or the block. */
   id: string;
+  /**
+   * The locale of the page, from its route. Not `starlightRoute`: the code
+   * block puts its styles in the head, so in dev Astro runs this component
+   * before StarlightPage has set the route, and reading it throws.
+   */
+  locale: string | undefined;
 }
 
-const { kind, id } = Astro.props;
-const { t, starlightRoute } = Astro.locals;
-const { locale } = starlightRoute;
+const { kind, id, locale } = Astro.props;
+const { t } = Astro.locals;
 // Astro escapes the text of the code block: i18next does not need to.
 const prompt = t(`${kind}.agent.prompt`, { id, interpolation: { escapeValue: false } });
 ---
