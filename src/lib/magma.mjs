@@ -45,7 +45,7 @@ function scalar(frontmatter, key) {
 /**
  * @typedef {{
  *   id: string,
- *   kind: 'foundation' | 'pattern' | 'block',
+ *   kind: 'design-language' | 'pattern' | 'block',
  *   group?: string,
  *   status: 'decided' | 'candidate',
  *   title: string,
@@ -58,6 +58,24 @@ function scalar(frontmatter, key) {
 /** @type {MagmaPattern[] | undefined} */
 let patterns;
 
+/**
+ * The kind of a file as the site reads it, by the kind the file writes. A
+ * domain of the design language is `design-language` since
+ * https://github.com/magma-design-system/magma/issues/1253, named after what
+ * the file is; magma 2.11 and before write `foundation`, after the Foundation
+ * item of this site, where the domains were to go before they got a section of
+ * their own. Both are read as `design-language` until Magma's next major, as
+ * its docs/PATTERNS.md ("A domain of the design language") says; any other
+ * kind fails the build.
+ * @type {Map<string, MagmaPattern['kind']>}
+ */
+const KINDS = new Map([
+  ['design-language', 'design-language'],
+  ['foundation', 'design-language'],
+  ['pattern', 'pattern'],
+  ['block', 'block'],
+]);
+
 /** `agents/patterns/` of the installed magma, beside its AGENTS.md. */
 function patternsFolder() {
   return path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
@@ -66,7 +84,8 @@ function patternsFolder() {
 /**
  * The patterns the installed magma ships, `agents/patterns/<id>.md` beside the
  * package's AGENTS.md, of three kinds: the domains of the design language
- * (`kind: foundation`, https://github.com/magma-design-system/magma/issues/1189),
+ * (`kind: design-language`, https://github.com/magma-design-system/magma/issues/1189;
+ * `foundation` in magma 2.11 and before, KINDS),
  * the building blocks (`block`) and the patterns (`pattern`), decided or
  * candidates, needs Magma knows with no default yet. Each with its id (the
  * file name), the scalars the navigation needs, its frontmatter and its body
@@ -87,9 +106,10 @@ export function loadPatterns() {
     const match = FRONTMATTER.exec(source);
     if (!match) throw new Error(`magma ships agents/patterns/${name} without a frontmatter`);
     const id = name.slice(0, -'.md'.length);
-    const kind = scalar(match[1], 'kind');
-    if (kind !== 'foundation' && kind !== 'pattern' && kind !== 'block')
-      throw new Error(`magma ships agents/patterns/${name} of the unknown kind ${kind}`);
+    const written = scalar(match[1], 'kind');
+    const kind = KINDS.get(written ?? '');
+    if (!kind)
+      throw new Error(`magma ships agents/patterns/${name} of the unknown kind ${written}`);
     patterns.push({
       id,
       kind,
@@ -106,7 +126,7 @@ export function loadPatterns() {
 
 /** The domains of the design language the installed magma ships (loadPatterns()). */
 export function loadDomains() {
-  return loadPatterns().filter((pattern) => pattern.kind === 'foundation');
+  return loadPatterns().filter((pattern) => pattern.kind === 'design-language');
 }
 
 /**

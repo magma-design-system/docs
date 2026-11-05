@@ -21,7 +21,7 @@ export const STORYBOOK = loadComponentDocs().storybook;
 
 /**
  * The domains of the design language, the rules of composition Magma ships as
- * files (`agents/patterns/<id>.md`, `kind: foundation`): the section Design
+ * files (`agents/patterns/<id>.md`, `kind: design-language`): the section Design
  * language, after Foundation. The order is the one of the domains in
  * https://github.com/magma-design-system/magma/issues/1189, rhythm and density
  * first, the two the patterns show the missing rules of most. `icon` is an
@@ -66,7 +66,7 @@ export const PATTERN_GROUPS = [
 
 /** The section of the site of a kind of pattern, as the first segment of its address. */
 export const PATTERN_SECTIONS = {
-  foundation: 'design-language',
+  'design-language': 'design-language',
   pattern: 'patterns',
   block: 'blocks',
 };

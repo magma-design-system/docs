@@ -37,7 +37,8 @@ const { locale } = Astro.params;
 const { t } = Astro.locals;
 // A domain is named in the language of the page, as the navigation has it; a
 // pattern or a block by its title, as the package writes it.
-const title = data.kind === 'foundation' ? t(`nav.design-language.${entry.id}` as any) : data.title;
+const title =
+  data.kind === 'design-language' ? t(`nav.design-language.${entry.id}` as any) : data.title;
 // What comes from the Magma packages is in English only (the header says so).
 const contentLang = locale ? 'en' : undefined;
 const staged = data.previews.length > 0;
@@ -61,7 +62,7 @@ const headings = [
       contentLang={contentLang}
     />
   )}
-  {data.kind !== 'foundation' && data.status === 'decided' && (
+  {data.kind !== 'design-language' && data.status === 'decided' && (
     <PatternAgent kind={data.kind} id={entry.id} locale={locale} />
   )}
   <div lang={contentLang} set:html={data.html} />
