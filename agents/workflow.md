@@ -131,7 +131,7 @@ A new author, step by step:
   `github-pages` environment deploys from `production` only.
 - **Publish check**, on a production build of `main` before opening that pull request, and on
   the live site after the deploy:
-  - Design language, Building blocks and Patterns: a page per domain, block and pattern the
+  - The design language (in Foundation), Building blocks and Patterns: a page per domain, block and pattern the
     installed `magma` ships, each opening with its stage when it has previews
     (`/example/pattern/<id>/<case>/`, the picker and `?preview=<id>`), and the gallery of their
     landing pages with the image of the first preview of each, light and dark with the mode.

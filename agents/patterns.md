@@ -69,7 +69,7 @@ builds a pattern with the components of the project from the case `get_pattern` 
   inline code of the body that is the id of a preview gets an `mds-link` inside, to
   `?preview=<id>#try` (`linkPreviews()`).
 - One route for the three kinds, `src/pages/[...locale]/[section]/[id].astro`:
-  `/design-language/<id>/` for a domain, `/patterns/<id>/`, `/blocks/<id>/` (`PATTERN_SECTIONS` in
+  `/foundation/<id>/` for a domain, `/patterns/<id>/`, `/blocks/<id>/` (`PATTERN_SECTIONS` in
   `src/lib/nav.mjs`). The working case first, the reasons after (plan/CONTENT_STRUCTURE.md,
   2026-11-05): the need in one line, then the stage (`PatternStage.astro`, heading `try`), then,
   for a decided pattern or block, the card "With an AI agent" (`PatternAgent.astro`: the prompt
@@ -102,9 +102,10 @@ builds a pattern with the components of the project from the case `get_pattern` 
   (`PatternGallery.astro`): the media of the card, the title, the need, the id, the badge of a
   candidate; `src/route-data.ts` adds the headings of the groups to the table of contents. What
   a pattern or a block is comes after the gallery.
-- The domains have their own section, Design language (`DOMAINS`, `shippedDomains()`): a flat
-  navigation in the order of `DOMAINS`, each named in the language of the page
-  (`nav.design-language.<id>`), and the same gallery on its landing page, in one grid. Density
+- The domains are a group of Foundation, Design language (`DOMAINS`, `shippedDomains()`): its
+  landing page first (`foundation/design-language.mdx`), then the domains in the order of
+  `DOMAINS`, each named in the language of the page (`nav.design-language.<id>`); the landing
+  page shows the same gallery, in one grid. Density
   ships no preview: its card shows its icon, and its page has no stage.
 - The media of a card is the image of the first preview, two `mds-img` switched by Magma's
   `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded), on a transparent

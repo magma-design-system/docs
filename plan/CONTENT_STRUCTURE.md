@@ -6,28 +6,27 @@ Decided on 2026-10-08.
 
 ## Navigation (12 rail items)
 
-| Rail                | Pages                                                                                                         | Source                              |
-| ------------------- | ------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                     | deck                                |
-| Foundation          | Values, Design principles, Accessibility, Ecology, Content (voice and tone, grammar, naming)                  | deck + new writing                  |
-| Design language     | The domains of composition: rhythm, density, actions, titles, surfaces, widths and alignment                  | `agents/patterns/` of magma         |
-| Building blocks     | Recurring sections of a page made of components (page header, filter bar, ...): structure and layout, no data | written here, see `DIRECTION.md`    |
-| Patterns            | Solutions to recurring tasks (confirm an action, ...): behavior first, with code in HTML, React and Angular   | written here, see `DIRECTION.md`    |
-| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                  |
-| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin                 | `AGENTS.md`, `agents/*.md` of magma |
-| Components          | One page per component                                                                                        | `magma/dist/documentation.json`     |
-| Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma)    | `design-tokens`, `styles`           |
-| Icons               | Library, semantic dictionary                                                                                  | `svg-icons`, `icons`                |
-| Brands / Assets     | Logos, illustrations, avatars                                                                                 | `identity`                          |
-| Community           | Support, feature requests, contributions, training                                                            | deck + Magma GitHub issue templates |
+| Rail                | Pages                                                                                                         | Source                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Introduction (home) | What Magma is, Why Magma, Adoption levels                                                                     | deck                                                             |
+| Foundation          | Values, Design principles, Accessibility, Ecology, Design language (the domains of composition), Content      | deck + new writing; the domains from `agents/patterns/` of magma |
+| Building blocks     | Recurring sections of a page made of components (page header, filter bar, ...): structure and layout, no data | written here, see `DIRECTION.md`                                 |
+| Patterns            | Solutions to recurring tasks (confirm an action, ...): behavior first, with code in HTML, React and Angular   | written here, see `DIRECTION.md`                                 |
+| Development         | Install (Vanilla / React / Angular), lint, integrating existing vs new products, versioning and migrations    | deck + `AGENTS.md`                                               |
+| Agentic development | Start a project, working with an agent; guides in the package, MCP server, Claude Code plugin                 | `AGENTS.md`, `agents/*.md` of magma                              |
+| Components          | One page per component                                                                                        | `magma/dist/documentation.json`                                  |
+| Tokens              | Color, type, space, shape, motion, themes; platforms (web, Android, iOS, Flutter); tools (Tailwind, Figma)    | `design-tokens`, `styles`                                        |
+| Icons               | Library, semantic dictionary                                                                                  | `svg-icons`, `icons`                                             |
+| Brands / Assets     | Logos, illustrations, avatars                                                                                 | `identity`                                                       |
+| Community           | Support, feature requests, contributions, training                                                            | deck + Magma GitHub issue templates                              |
 
 Rule: Magma data (components, tokens, icons, brand assets, agent guides) comes only from
 `node_modules`. Guidelines prose (principles, content design, patterns) is written here.
 
 Order (decided 2026-10-24): after Foundation the rail goes from the sections of a page down to
-the values: Building blocks, Patterns, Components, then Tokens and Icons. Design language
-(2026-11-05) stands between Foundation and Building blocks: the rules of composition come before
-the blocks and the patterns that follow them. Building blocks are
+the values: Building blocks, Patterns, Components, then Tokens and Icons. The design language
+(2026-11-05) is a group of Foundation: the rules of composition come before the blocks and the
+patterns that follow them. Building blocks are
 about space (a section of a page), patterns about time (what follows an action), components are
 the parts both are made of; tokens and icons come after, as DIRECTION.md orders by how often
 they are needed. Building blocks and Patterns stood before Components even while they were
@@ -35,8 +34,8 @@ coming soon; since 2026-11-04 their pages are generated from Magma's patterns. S
 and the library (Groups, below).
 
 Groups (decided 2026-10-26, revised 2026-10-28): eleven items in one column had become hard to
-scan, so the rail lists them under three labels. Guidelines: Foundation, Design language,
-Building blocks, Patterns, the guidelines. Development: Development and Agentic development, how a
+scan, so the rail lists them under three labels. Guidelines: Foundation, Building blocks,
+Patterns, the guidelines. Development: Development and Agentic development, how a
 product is built with Magma, by hand or with an agent; it comes right after the guidelines.
 Library: Components, Tokens, Icons, Brand assets, the data that comes from the packages.
 Community stands alone, at the end. Home has no item: the logo and the name of the site, at the
@@ -73,6 +72,15 @@ and Patterns. Under Foundation the group was named Composition, and the words "d
 Magma's name for the domains, appeared nowhere: a reader looking for it did not find it.
 Foundation keeps a line that points to it. Rejected: the group renamed Design language and moved
 first in Foundation, closer to Magma's catalogue (its section Foundation) but still hidden.
+
+Design language as a group of Foundation (decided by vittorio 2026-11-05, superseding the section
+of its own the same day, before it was published): Foundation is the umbrella of the decisions
+Magma stands on, and the design language is one group of it, Design language, between Design and
+Content, at `/foundation/<id>/`. Its landing page, `/foundation/design-language/`, is the first
+item of the group and keeps the gallery. The words "design language" are in the navigation now,
+which was the reason for the section of its own; Building blocks and Patterns stay sections.
+Magma names the kind of the files after it too, `kind: design-language`
+(magma-design-system/magma#1253).
 
 The pages of the patterns, the blocks and the domains (decided 2026-11-05): the working case
 first, the reasons after. Under the title, the need in one line, then a stage that runs one

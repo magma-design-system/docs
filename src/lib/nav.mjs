@@ -2,7 +2,7 @@
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here. After the
-// guidelines (Foundation, design language, building blocks, patterns) come the development
+// guidelines (Foundation, which holds the design language, building blocks, patterns) come the development
 // sections (code, agents), then the library: components, tokens, icons and
 // brand assets.
 import {
@@ -21,8 +21,9 @@ export const STORYBOOK = loadComponentDocs().storybook;
 
 /**
  * The domains of the design language, the rules of composition Magma ships as
- * files (`agents/patterns/<id>.md`, `kind: design-language`): the section Design
- * language, after Foundation. The order is the one of the domains in
+ * files (`agents/patterns/<id>.md`, `kind: design-language`): the group Design
+ * language of Foundation, its pages at `/foundation/<id>/` (vittorio, 2026-11-05:
+ * Foundation is the umbrella, the design language one group of it). The order is the one of the domains in
  * https://github.com/magma-design-system/magma/issues/1189, rhythm and density
  * first, the two the patterns show the missing rules of most. `icon` is an
  * mds-icon slug, collected by iconsauce; the label is the UI string
@@ -64,9 +65,12 @@ export const PATTERN_GROUPS = [
   { id: 'input', icon: 'mi/outline/edit-note' },
 ];
 
-/** The section of the site of a kind of pattern, as the first segment of its address. */
+/**
+ * The section of the site of a kind of pattern, as the first segment of its
+ * address: the domains of the design language are a group of Foundation.
+ */
 export const PATTERN_SECTIONS = {
-  'design-language': 'design-language',
+  'design-language': 'foundation',
   pattern: 'patterns',
   block: 'blocks',
 };
@@ -155,24 +159,23 @@ export const sections = [
           { slug: 'foundation/illustration' },
         ],
       },
+      // The design language: its landing page, written here, then the domains,
+      // generated from the installed magma (src/pages/[...locale]/[section]/[id].astro),
+      // in the order of DOMAINS.
+      {
+        ...sidebarLabel('nav.foundation.design-language'),
+        items: [
+          { slug: 'foundation/design-language', ...sidebarLabel('nav.overview') },
+          ...shippedDomains().map(({ id }) => ({
+            ...sidebarLabel(`nav.design-language.${id}`),
+            link: `/foundation/${id}/`,
+          })),
+        ],
+      },
       {
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
       },
-    ],
-  },
-  {
-    id: 'design-language',
-    group: 'guidelines',
-    icon: 'mi/outline/design-services',
-    // The domains, generated from the installed magma
-    // (src/pages/[...locale]/[section]/[id].astro), in the order of DOMAINS.
-    items: () => [
-      { slug: 'design-language', ...sidebarLabel('nav.overview') },
-      ...shippedDomains().map(({ id }) => ({
-        ...sidebarLabel(`nav.design-language.${id}`),
-        link: `/design-language/${id}/`,
-      })),
     ],
   },
   {
@@ -388,6 +391,7 @@ function componentItems() {
 export const GROUP_ICONS = {
   'nav.foundation.base': 'mi/outline/foundation',
   'nav.foundation.design': 'mi/outline/style',
+  'nav.foundation.design-language': 'mi/outline/design-services',
   'nav.foundation.content': 'mi/outline/record-voice-over',
   ...Object.fromEntries(
     ['patterns', 'blocks'].flatMap((section) =>
