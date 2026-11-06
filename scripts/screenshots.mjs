@@ -7,6 +7,11 @@
 //   npm run screenshots                                  the home, into public/covers/screenshots/
 //   npm run screenshots -- --url http://localhost:4322/docs/it/ --name home-it --only mobile
 //
+// `--viewport` takes the first screen only, as a person sees it on opening the
+// page (an app such as Magma Studio, whose regions scroll on their own), and
+// `--webp <width>` writes a WebP of that width in place of the PNG, for an
+// image the site shows (the Studio band of the home, public/home/).
+//
 // The home keeps its scenes still with reduced motion (DepthScene,
 // ComponentLayers open on Structure, Mia looking ahead), so the script
 // emulates it. Chrome is the one of macOS unless CHROME names another.
@@ -24,6 +29,8 @@ const { values } = parseArgs({
     out: { type: 'string', default: 'public/covers/screenshots' },
     name: { type: 'string', default: 'home' },
     only: { type: 'string' },
+    viewport: { type: 'boolean', default: false },
+    webp: { type: 'string' },
   },
 });
 
@@ -223,9 +230,9 @@ try {
         returnByValue: true,
       });
       const { cssContentSize } = await page.send('Page.getLayoutMetrics');
-      const height = Math.ceil(cssContentSize.height);
+      const height = values.viewport ? shot.height : Math.ceil(cssContentSize.height);
       const png =
-        height * shot.dpr > SURFACE
+        !values.viewport && height * shot.dpr > SURFACE
           ? await stitched(page, shot)
           : Buffer.from(
               (
@@ -237,8 +244,15 @@ try {
               ).data,
               'base64',
             );
-      const file = path.join(values.out, `${values.name}-${shot.name}-${scheme}.png`);
-      await writeFile(file, png);
+      const webp = values.webp && Number(values.webp);
+      const file = path.join(
+        values.out,
+        `${values.name}-${shot.name}-${scheme}.${webp ? 'webp' : 'png'}`,
+      );
+      await writeFile(
+        file,
+        webp ? await sharp(png).resize({ width: webp }).webp({ quality: 82 }).toBuffer() : png,
+      );
       const { cold, theme } = result.value;
       console.log(`${file}${cold ? `, ${cold} components not hydrated` : ''}, ${theme}`);
       page.close();
