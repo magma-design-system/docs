@@ -3,7 +3,10 @@ title: Building block
 description: Le sezioni di una pagina che tornano da un prodotto all'altro - la struttura dell'applicazione, l'intestazione di una pagina, una lista di elementi, i dati di un elemento - fatte di componenti di Magma, come Magma le consegna alle persone e agli agenti AI.
 ---
 
+import PageCards from '../../../../components/PageCards.astro';
 import PatternGallery from '../../../../components/PatternGallery.astro';
+import PatternLayers from '../../../../components/PatternLayers.astro';
+import PatternLevels from '../../../../components/PatternLevels.astro';
 
 Ogni building block è una sezione di pagina che torna da un prodotto all'altro. Aprine uno: si
 parte dalle sue situazioni in funzione, le regioni e le regole vengono dopo.
@@ -27,12 +30,9 @@ inglese.
 
 ## Componenti, block, pattern
 
-- Un **componente** è un singolo elemento di Magma, come un pulsante o un campo: Magma lo
-  consegna pronto, e tu lo importi.
-- Un **building block** mette insieme componenti in una sezione di pagina: riguarda lo spazio.
-- Un **pattern** è la soluzione a un compito che le persone svolgono di continuo: riguarda il
-  tempo - cosa segue un'azione, il caricamento, gli errori, il focus. Usa componenti e building
-  block, e lo applichi invece di importarlo.
+Una schermata si costruisce su tre livelli, ognuno fatto con quello prima:
+
+<PatternLevels />
 
 ## Come si legge un block
 
@@ -47,3 +47,21 @@ volta. **Always true** e **Decisions** funzionano come per un pattern.
 I building block non si progettano in anticipo: nascono dai pattern. Una sezione di pagina
 diventa un block quando torna in due o tre pattern, così si scrive una volta e ogni pagina che
 ne ha bisogno la costruisce allo stesso modo.
+
+## Il livello di un prodotto
+
+Un prodotto può restringere un block come restringe un pattern, in un file del suo repository,
+`magma/patterns/<id>.md`: fissa le scelte aperte del block, come il logo del prodotto nella
+struttura dell'applicazione o gli elementi di una lista mostrati come card, e aggiunge le pagine
+del prodotto come situazioni, ognuna con i valori delle variabili del block. Le regioni e le
+regole che valgono sempre restano come sono, e `get_pattern` applica il livello del progetto in
+cui gira:
+
+<PatternLayers />
+
+<PageCards
+  pages={[
+    { slug: 'ai/design-for-your-product', icon: 'mi/outline/tune' },
+    { slug: 'ai/pattern-api', icon: 'mi/outline/data-object' },
+  ]}
+/>
