@@ -132,3 +132,14 @@ against open issues before filing.
   expression short keeps its promises (2.3.0, still in 2.5.0).
 - Lint: the presets work on `.astro` templates through `astro-eslint-parser`, which
   `agents/lint.md` does not mention (2.6.0, still in 2.8.0).
+- `mds-button`: a pointer click focuses the anchor of its shadow root, which hands the focus to
+  the host with `host.focus()`, without `preventScroll`. A native link clicked does not scroll;
+  this focus scrolls the page to bring the host into view, by half the window when the button
+  sits in a sticky bar under the `scroll-padding-top` of the page. The reading bar holds its
+  buttons in view with a negative scroll margin (`TwoColumnContent.astro`), which it needs for
+  the keyboard focus anyway (2.9.0).
+- `mds-button[href]` with a `NavigationService` handler: a click on the anchor is routed (and a
+  link the handler declines is followed with `location.assign()`) without checking
+  `event.defaultPrevented`, so `preventDefault()` in a click listener on the host, which the
+  component's docs give as the way to cancel the link, no longer cancels it. Read in the code,
+  not needed by the site yet (2.9.0).

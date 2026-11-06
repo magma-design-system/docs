@@ -70,6 +70,11 @@ and states sketch to turn into a page.
   the document on hover (`prefetchAll`), but only finds anchors in the light DOM, so `mds-link`
   and `mds-button[href]` are not prefetched. `prefetch()` from `astro:prefetch` on the
   `pointerover` and `focusin` of those hosts would bring it back.
+- Reading bar and the keyboard: on a page just opened, scrolled to the cards of the first section
+  (Foundation at 1024x768, about 570px down), the first Tab from the anchor to the arrow before
+  scrolled the page up by about 420px in Chromium, with or without the negative scroll margin of
+  the bar's buttons, and not again on the same page. Seen only with the focus put on the anchor
+  by a script first; not understood yet.
 
 ## Languages
 
