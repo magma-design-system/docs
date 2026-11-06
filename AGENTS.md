@@ -69,29 +69,30 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 
 ## Map
 
-| Path                                                 | What                                                                                    |
-| ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `astro.config.mjs`                                   | Starlight setup, the frame overrides, `base: '/docs'`                                   |
-| `src/lib/nav.mjs`                                    | The 11 rail sections and their navigation (Starlight's sidebar), `soon`, drafts         |
-| `src/lib/magma.mjs`                                  | The only door to the Magma packages                                                     |
-| `src/lib/tokens.mjs`, `icons.mjs`, `identity.mjs`    | Data of the Tokens, Icons and Brand assets sections, read from the packages             |
-| `src/lib/changelog.mjs`                              | The releases of the Changelog page, from the CHANGELOG.md of the packages               |
-| `src/lib/covers.mjs`                                 | The covers of `public/covers/` and the generated avatars, for the Media kit             |
-| `src/lib/markdown-text.mjs`, `markdown-tables.mjs`   | Markdown rendered as Magma components; `KIND`, `TEXT`, `READING` for `.astro` pages too |
-| `src/integrations/magma.mjs`                         | Client script on every page, iconsauce icon dump, the Markdown plugins                  |
-| `src/styles/magma.css`                               | Magma's CSS in cascade layer order, Tailwind with Magma's theme, the few site rules     |
-| `src/scripts/magma.ts`                               | Client: component loader, icon path, mode and theme sync                                |
-| `src/components/frame/`                              | Starlight overrides: rail, section navigation, right column, header, footers            |
-| `src/components/`, `src/components/home/`            | Page components; the bands of the home page                                             |
-| `src/loaders/components.ts`, `src/lib/components.ts` | Component pages from `magma/dist/documentation.json`                                    |
-| `src/pages/`                                         | Generated routes: component, icon and brand pages, downloads, favicons, preview iframes |
-| `src/patterns/<id>/`                                 | Pattern code: `example.html`, `react.tsx`, `angular.ts`                                 |
-| `src/previews/`, `src/lib/previews.ts`               | Demos of the component previews, in place of Magma's example; the stage of each one     |
-| `src/content/docs/`                                  | Pages: English at the root, Italian under `it/`                                         |
-| `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login              |
-| `public/covers/`                                     | Covers of the site for other sites and link previews (`og:image`), stable URLs          |
-| `public/previews/`                                   | Images and video of the demos (CC0 or Maggioli's own; sources in architecture.md)       |
-| `plan/`                                              | Decision records and open work                                                          |
+| Path                                                 | What                                                                                           |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `astro.config.mjs`                                   | Starlight setup, the frame overrides, `base: '/docs'`                                          |
+| `src/lib/nav.mjs`                                    | The 12 rail sections and their navigation (Starlight's sidebar)                                |
+| `src/lib/magma.mjs`                                  | The only door to the Magma packages                                                            |
+| `src/lib/tokens.mjs`, `icons.mjs`, `identity.mjs`    | Data of the Tokens, Icons and Brand assets sections, read from the packages                    |
+| `src/lib/changelog.mjs`                              | The releases of the Changelog page, from the CHANGELOG.md of the packages                      |
+| `src/lib/covers.mjs`                                 | The covers of `public/covers/` and the generated avatars, for the Media kit                    |
+| `src/lib/markdown-text.mjs`, `markdown-tables.mjs`   | Markdown rendered as Magma components; `KIND`, `TEXT`, `READING` for `.astro` pages too        |
+| `src/integrations/magma.mjs`                         | Client script on every page, iconsauce icon dump, the Markdown plugins                         |
+| `src/styles/magma.css`                               | Magma's CSS in cascade layer order, Tailwind with Magma's theme, the few site rules            |
+| `src/scripts/magma.ts`                               | Client: component loader, icon path, mode and theme sync                                       |
+| `src/components/frame/`                              | Starlight overrides: rail, section navigation, right column, header, footers                   |
+| `src/components/`, `src/components/home/`            | Page components; the bands of the home page                                                    |
+| `src/loaders/components.ts`, `src/lib/components.ts` | Component pages from `magma/dist/documentation.json`                                           |
+| `src/loaders/patterns.ts`, `src/lib/patterns.ts`     | Domains of the design language, patterns, building blocks: pages from `magma/agents/patterns/` |
+| `src/route-data.ts`                                  | Starlight route middleware: the table of contents of the landing pages with generated groups   |
+| `src/pages/`                                         | Generated routes: component, icon and brand pages, downloads, favicons, preview iframes        |
+| `src/previews/`, `src/lib/previews.ts`               | Demos of the component previews, in place of Magma's example; the stage of each one            |
+| `src/content/docs/`                                  | Pages: English at the root, Italian under `it/`                                                |
+| `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login                     |
+| `public/covers/`                                     | Covers of the site for other sites and link previews (`og:image`), stable URLs                 |
+| `public/previews/`                                   | Images and video of the demos (CC0 or Maggioli's own; sources in architecture.md)              |
+| `plan/`                                              | Decision records and open work                                                                 |
 
 ## Guides
 
@@ -116,9 +117,7 @@ the files it points to that you need:
 
 - choose components from `agents/components.md`, the catalogue;
 - for each component you use, read its `AGENTS.md` and the two usage files beside it,
-  `examples.md` and `mistakes.md` (`pattern.md` and `antipattern.md` before
-  [magma#1169](https://github.com/magma-design-system/magma/issues/1169)), in
-  `dist/collection/components/<tag>/`;
+  `examples.md` and `mistakes.md`, in `dist/collection/components/<tag>/`;
 - color, type and spacing come from Magma's tokens and utilities (`agents/color.md`,
   `agents/typography.md`), never from literal values.
 

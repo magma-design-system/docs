@@ -35,8 +35,10 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 ## Building blocks and Patterns
 
-See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Messages
-and states sketch to turn into a page.
+Generated from the package since Magma 2.10.0 ([agents/patterns.md](../agents/patterns.md)).
+Open: the drawing of components, blocks and patterns, a page on `get_pattern` and the layer
+format, a guide to design for a product, `get_pattern` in `McpTools` and `/magma:pattern-layer`
+on the Claude Code page (#89).
 
 ## Development
 
@@ -70,6 +72,11 @@ and states sketch to turn into a page.
   the document on hover (`prefetchAll`), but only finds anchors in the light DOM, so `mds-link`
   and `mds-button[href]` are not prefetched. `prefetch()` from `astro:prefetch` on the
   `pointerover` and `focusin` of those hosts would bring it back.
+- Reading bar and the keyboard: on a page just opened, scrolled to the cards of the first section
+  (Foundation at 1024x768, about 570px down), the first Tab from the anchor to the arrow before
+  scrolled the page up by about 420px in Chromium, with or without the negative scroll margin of
+  the bar's buttons, and not again on the same page. Seen only with the focus put on the anchor
+  by a script first; not understood yet.
 
 ## Languages
 

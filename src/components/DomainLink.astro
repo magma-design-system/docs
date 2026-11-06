@@ -1,0 +1,25 @@
+---
+// A link to the page of a domain of the design language from a page written
+// here (Typography, Color): a link while the installed magma ships the domain,
+// its text alone before the release that ships it, so no page links to a page
+// that is not built. The text is the slot, in the language of the page.
+import { patternHref } from '../lib/patterns';
+import { shippedDomains } from '../lib/nav.mjs';
+
+interface Props {
+  /** The id of the domain (DOMAINS in src/lib/nav.mjs). */
+  id: string;
+}
+
+const { id } = Astro.props;
+const { locale } = Astro.locals.starlightRoute;
+const shipped = shippedDomains().some((domain) => domain.id === id);
+---
+
+{shipped ? (
+  <mds-link href={patternHref(locale, 'design-language', id)}>
+    <slot />
+  </mds-link>
+) : (
+  <slot />
+)}

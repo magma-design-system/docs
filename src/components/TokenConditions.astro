@@ -1,8 +1,9 @@
 ---
 // What one modifier of the resolver changes (src/lib/tokens.mjs): one column
-// per context of the modifier, one row per token whose value differs between
-// them, in the given mode. The values are computed for each condition, so
-// the swatches are static colors: the page is in one condition only.
+// per context of the modifier, but the ones Magma deprecates, one row per
+// token whose value differs between them, in the given mode. The values are
+// computed for each condition, so the swatches are static colors: the page
+// is in one condition only.
 // Values are copied on click (CopyToClipboard.astro, once per page).
 import Code from './Code.astro';
 import CopyStatus from './CopyStatus.astro';
@@ -20,7 +21,8 @@ interface Props {
 const { modifier, mode = 'light', internal = false } = Astro.props;
 const { t } = Astro.locals;
 
-const contexts = modifiers().find((m) => m.name === modifier)?.contexts ?? [];
+const found = modifiers().find((m) => m.name === modifier);
+const contexts = (found?.contexts ?? []).filter((context) => !found?.deprecated.includes(context));
 const sets = contexts.map((context) => tokenSet({ mode, [modifier]: context }));
 const [first] = sets;
 const rows = [...first.values()]

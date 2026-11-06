@@ -1,0 +1,73 @@
+---
+// A preview of a domain of the design language, a pattern or a building block
+// (a case, a rule or a situation), shown in an iframe on its page
+// (src/components/PatternPreviews.astro) and in the larger view of Enlarge
+// (PreviewZoom.astro): the stage Magma ships
+// (agents/patterns/previews/<id>/<preview>.html), alone on a page with Magma's
+// styles and loader, away from the styles of the site, at
+// /docs/example/<domain, pattern or block>/<id>/<preview>/ (previewHref() in
+// src/lib/patterns.ts). As Magma's render_preview runs it: the words of the
+// stage in Italian, an inset of 600 around it, none for a stage that is a
+// whole page and lays out its own frame (`whole-page`, "The preview of a case"
+// in Magma's docs/PATTERNS.md). Opened on its own, it is the full screen
+// version of the preview.
+import { getCollection } from 'astro:content';
+import '../../../../styles/magma.css';
+
+export async function getStaticPaths() {
+  const patterns = await getCollection('patterns');
+  return patterns.flatMap(({ id, data }) =>
+    data.previews.map((preview) => ({
+      params: {
+        kind: data.kind === 'design-language' ? 'domain' : data.kind,
+        id,
+        preview: preview.id,
+      },
+      props: { markup: preview.markup, wholePage: preview.wholePage },
+    })),
+  );
+}
+
+interface Props {
+  markup: string;
+  wholePage: boolean;
+}
+
+const { markup, wholePage } = Astro.props;
+const { id, preview } = Astro.params;
+---
+
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{`${id}/${preview}`}</title>
+    <script is:inline>
+      // The light or dark mode and the theme of the page around it before the
+      // first paint, as in src/pages/example/[tag].astro.
+      try {
+        const around = parent.document.documentElement;
+        for (const name of around.classList) {
+          if (name.startsWith('pref-mode-')) document.documentElement.classList.add(name);
+        }
+        for (const name of ['data-magma-pref', 'data-theme-name']) {
+          const value = around.getAttribute(name);
+          if (value !== null) document.documentElement.setAttribute(name, value);
+        }
+      } catch {
+        // Opened on its own, or from another site: Magma's default.
+      }
+    </script>
+  </head>
+  <body
+    data-preview
+    class:list={[
+      'm-0 bg-surface-default [&>astro-dev-toolbar]:hidden',
+      wholePage ? 'p-0' : 'p-600',
+    ]}
+  >
+    <Fragment set:html={markup} />
+  </body>
+</html>

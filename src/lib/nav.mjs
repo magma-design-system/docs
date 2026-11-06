@@ -2,11 +2,16 @@
 // astro.config.mjs turns them into Starlight's sidebar, one top-level group per
 // section and in this order; the frame (src/components/frame/) reads the group
 // of the current page from Starlight and the icon from here. After the
-// guidelines (Foundation, building blocks, patterns) come the development
+// guidelines (Foundation, which holds the design language, building blocks, patterns) come the development
 // sections (code, agents), then the library: components, tokens, icons and
 // brand assets.
-import { existsSync, readFileSync } from 'node:fs';
-import { componentTags, componentTaxonomy, loadComponentDocs } from './magma.mjs';
+import {
+  componentTags,
+  componentTaxonomy,
+  loadComponentDocs,
+  loadDomains,
+  loadPatterns,
+} from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
@@ -15,11 +20,107 @@ export const REPOSITORY = 'https://github.com/magma-design-system/magma';
 export const STORYBOOK = loadComponentDocs().storybook;
 
 /**
+ * The domains of the design language, the rules of composition Magma ships as
+ * files (`agents/patterns/<id>.md`, `kind: design-language`): the group Design
+ * language of Foundation, its pages at `/foundation/<id>/` (vittorio, 2026-11-05:
+ * Foundation is the umbrella, the design language one group of it). The order is the one of the domains in
+ * https://github.com/magma-design-system/magma/issues/1189, rhythm and density
+ * first, the two the patterns show the missing rules of most. `icon` is an
+ * mds-icon slug, collected by iconsauce; the label is the UI string
+ * `nav.design-language.<id>`. A domain the installed magma ships and this list
+ * lacks fails the build (src/loaders/patterns.ts): add it here.
+ */
+export const DOMAINS = [
+  { id: 'rhythm', icon: 'mi/outline/format-line-spacing' },
+  { id: 'density', icon: 'mi/outline/density-medium' },
+  { id: 'actions', icon: 'mi/outline/smart-button' },
+  { id: 'titles', icon: 'mi/outline/title' },
+  { id: 'surfaces', icon: 'mi/outline/layers' },
+  { id: 'widths', icon: 'mi/outline/width-normal' },
+];
+
+/**
+ * The domains the installed magma ships, in the order of DOMAINS: none before
+ * the release that ships them.
+ */
+export function shippedDomains() {
+  const shipped = new Set(loadDomains().map((domain) => domain.id));
+  return DOMAINS.filter((domain) => shipped.has(domain.id));
+}
+
+/**
+ * The groups of the patterns and of the building blocks, by the `group` of
+ * their files, in the order of the section navigation and of the landing
+ * pages, the frame of the page first, as in Magma's catalogue: the label is the UI string `nav.<section>.<id>` (`nav.patterns.data`,
+ * `nav.blocks.data`), `icon` an mds-icon slug (collected by iconsauce), for
+ * the heading of the group in the navigation (GROUP_ICONS) and for a card
+ * with no preview. A pattern or a block of a group this list lacks fails the
+ * build (src/loaders/patterns.ts), and so does a group without its UI string:
+ * add them.
+ */
+export const PATTERN_GROUPS = [
+  { id: 'navigation', icon: 'mi/outline/web' },
+  { id: 'messages-and-states', icon: 'mi/outline/chat-bubble-outline' },
+  { id: 'data', icon: 'mi/outline/table-rows' },
+  { id: 'input', icon: 'mi/outline/edit-note' },
+];
+
+/**
+ * The section of the site of a kind of pattern, as the first segment of its
+ * address: the domains of the design language are a group of Foundation.
+ */
+export const PATTERN_SECTIONS = {
+  'design-language': 'foundation',
+  pattern: 'patterns',
+  block: 'blocks',
+};
+
+/**
+ * The patterns (`kind: pattern`) or the building blocks (`block`) the
+ * installed magma ships, by group in the order of PATTERN_GROUPS, the groups
+ * with none left out. In a group, the decided ones first, then the
+ * candidates, each by title.
+ * @param {'pattern' | 'block'} kind
+ */
+export function patternGroups(kind) {
+  const shipped = loadPatterns().filter((pattern) => pattern.kind === kind);
+  return PATTERN_GROUPS.map((group) => ({
+    ...group,
+    patterns: shipped
+      .filter((pattern) => pattern.group === group.id)
+      .sort(
+        (a, b) =>
+          Number(a.status === 'candidate') - Number(b.status === 'candidate') ||
+          a.title.localeCompare(b.title),
+      ),
+  })).filter((group) => group.patterns.length > 0);
+}
+
+/**
+ * The items of the section navigation of Patterns or Building blocks: the
+ * landing page, then a group per topic, each pattern labelled by its title
+ * as the package writes it, in English, as its page. The cards of the landing
+ * page and the page itself say which ones are candidates.
+ * @param {'pattern' | 'block'} kind
+ */
+function patternItems(kind) {
+  const section = PATTERN_SECTIONS[kind];
+  return [
+    { slug: section, ...sidebarLabel('nav.overview') },
+    ...patternGroups(kind).map((group) => ({
+      ...sidebarLabel(`nav.${section}.${group.id}`),
+      items: group.patterns.map((pattern) => ({
+        label: pattern.title,
+        link: `/${section}/${pattern.id}/`,
+      })),
+    })),
+  ];
+}
+
+/**
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).
  * `items` are Starlight sidebar items: the first one is where the rail item links.
  * A landing page titled like its section is labelled Overview in the section navigation.
- * `soon`: a section still being written, whose landing page says what is coming
- * (its pages are drafts, see `published`).
  * `group`: the group of the rail the section is listed under, labelled
  * `frame.sections.<group>`: the guidelines written here, the development of a
  * product with Magma, the library that comes from the packages. The sections
@@ -58,6 +159,19 @@ export const sections = [
           { slug: 'foundation/illustration' },
         ],
       },
+      // The design language: its landing page, written here, then the domains,
+      // generated from the installed magma (src/pages/[...locale]/[section]/[id].astro),
+      // in the order of DOMAINS.
+      {
+        ...sidebarLabel('nav.foundation.design-language'),
+        items: [
+          { slug: 'foundation/design-language', ...sidebarLabel('nav.overview') },
+          ...shippedDomains().map(({ id }) => ({
+            ...sidebarLabel(`nav.design-language.${id}`),
+            link: `/foundation/${id}/`,
+          })),
+        ],
+      },
       {
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],
@@ -68,23 +182,14 @@ export const sections = [
     id: 'blocks',
     group: 'guidelines',
     icon: 'mi/outline/extension',
-    soon: true,
-    items: () => [{ slug: 'blocks', ...sidebarLabel('nav.overview') }],
+    // Generated from the installed magma (src/pages/[...locale]/[section]/[id].astro).
+    items: () => patternItems('block'),
   },
   {
     id: 'patterns',
     group: 'guidelines',
     icon: 'mi/outline/view-quilt',
-    soon: true,
-    // The groups of the landing page, in its order.
-    items: () =>
-      published([
-        { slug: 'patterns', ...sidebarLabel('nav.overview') },
-        {
-          ...sidebarLabel('nav.patterns.data'),
-          items: [{ slug: 'patterns/list-with-filters' }, { slug: 'patterns/record-detail' }],
-        },
-      ]),
+    items: () => patternItems('pattern'),
   },
   {
     id: 'development',
@@ -286,7 +391,13 @@ function componentItems() {
 export const GROUP_ICONS = {
   'nav.foundation.base': 'mi/outline/foundation',
   'nav.foundation.design': 'mi/outline/style',
+  'nav.foundation.design-language': 'mi/outline/design-services',
   'nav.foundation.content': 'mi/outline/record-voice-over',
+  ...Object.fromEntries(
+    ['patterns', 'blocks'].flatMap((section) =>
+      PATTERN_GROUPS.map(({ id, icon }) => [`nav.${section}.${id}`, icon]),
+    ),
+  ),
   'nav.tokens.reference': 'mi/outline/list-alt',
   'nav.tokens.platforms': 'mi/outline/devices',
   'nav.tokens.tools': 'mi/outline/handyman',
@@ -311,39 +422,6 @@ export const GROUP_ICONS = {
   'nav.components.content': 'mi/outline/article',
   'nav.components.preferences': 'mi/outline/tune',
 };
-
-/**
- * Whether the page of a sidebar slug is a draft (`draft: true` in its front
- * matter). Read on use, from astro.config.mjs: once bundled, `import.meta.url`
- * no longer points at src/ (as in i18n.mjs).
- * @param {string} slug
- */
-function isDraft(slug) {
-  for (const extension of ['mdx', 'md']) {
-    const file = new URL(`../content/docs/${slug}.${extension}`, import.meta.url);
-    if (!existsSync(file)) continue;
-    const frontMatter = readFileSync(file, 'utf8').split(/^---$/m)[1] ?? '';
-    return /^draft:\s*true\s*$/m.test(frontMatter);
-  }
-  return false;
-}
-
-/**
- * Sidebar items without the draft pages in a production build, where Starlight
- * leaves them out (a slug to a page that is not built is an error), and without
- * the groups left empty. In dev the drafts stay, to be written and reviewed.
- * @param {any[]} items
- * @returns {any[]}
- */
-function published(items) {
-  if (process.env.NODE_ENV !== 'production') return items;
-  return items.flatMap((item) => {
-    if (item.slug) return isDraft(item.slug) ? [] : [item];
-    if (!item.items) return [item];
-    const kept = published(item.items);
-    return kept.length > 0 ? [{ ...item, items: kept }] : [];
-  });
-}
 
 /** Starlight's `sidebar` config: one group per section, labelled from the UI dictionaries. */
 export function sidebar() {

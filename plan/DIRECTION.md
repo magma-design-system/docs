@@ -102,16 +102,20 @@ summary. The confirmation dialog and the empty and error states, listed as block
 2026-10-24, are patterns: their parts come from a component (`mds-modal`, `mds-zero`), what
 matters is when they appear and what follows.
 
+Online since 2026-11-04: the blocks are Magma's (2.10.0 ships `app-shell`, `page-header`,
+`item-list`, `labels-and-values`) and the site generates their pages
+([agents/patterns.md](../agents/patterns.md)).
+
 ## Patterns section
 
 A rail item between Building blocks and Components. Section navigation mirrors the landing
 groups.
 
-Coming soon (2026-10-15): the section is public only as its landing page, which says what is
-coming (`soon: true` in `src/lib/nav.mjs`, `ComingSoon.astro`, a badge on the home card). The
-pattern pages are drafts (`draft: true`): in dev they are in the section navigation, a
-production build leaves them out, with their live previews (`published` in `nav.mjs`).
-Remove `draft` from a page when it is ready, and `soon` from the section with the first one.
+From 2026-10-15 to 2026-11-04 the section was public only as its landing page, under
+construction, with the pattern pages as drafts. Since Magma 2.10.0 the patterns are Magma's,
+decided and candidates, and the site generates their pages from the package
+([agents/patterns.md](../agents/patterns.md)): the section went online with them. What follows
+is the plan and the first pages written here before, kept as the record of how it started.
 
 - **Overview**: what a pattern is here (the solution to a task, not one component, not a
   section of a page), how to read a page.
@@ -142,7 +146,8 @@ First wave: list with filters, detail, form and validation, empty and error stat
 
 Built (2026-10-15): the section (overview + Data group) and **list with filters**.
 
-- Code lives in this site for now: `src/patterns/<id>/` holds `example.html` (plain
+- Until 2026-11-04 the code lived in this site (removed when the package shipped the
+  patterns, without code in React or Angular): `src/patterns/<id>/` held `example.html` (plain
   HTML, also the live preview at `/example/pattern/<id>/`), `react.tsx` and
   `angular.ts`, read by `src/lib/patterns.ts`. The React and Angular files are left out
   of the site's type check (tsconfig.json); they were checked once with `tsc` (React
@@ -186,7 +191,7 @@ something because it is the same everywhere.
 - **Promotion.** A block or a pattern that comes back in the layers of two or three products is
   proposed for the default, as blocks come out of patterns.
 - **Where they live.** The default is published as a package, so that this site reads it from
-  `node_modules` like the rest (the code of `src/patterns/` moves there). Better as a project of
+  `node_modules` like the rest (done in Magma 2.10.0: files and previews, no framework code). Better as a project of
   the Magma monorepo, like the lint: a change to a component that breaks a block or a pattern
   fails in the same pull request, and they are released together. The product layers live in a
   private repository of the organization (visibility is set per repository, and the

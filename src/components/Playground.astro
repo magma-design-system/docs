@@ -19,10 +19,10 @@
 // components are all in their methods (mds-emoji). The buttons of the
 // methods wait, disabled, until the preview is ready, again after each load
 // (Reset); a control changed before is let go, and shows the value of its prop
-// once it is. A pattern (src/components/PatternPreview.astro) runs its own
-// page on the same stage, with its own texts and without controls or
-// surfaces: a page paints its own; the buttons of the `actions` slot go next
-// to Reset. Next to Reset too, the component's page in Magma's Storybook,
+// once it is. A preview of a pattern (src/components/PatternPreviews.astro)
+// runs its own page on the same stage, with its own texts and without
+// controls or surfaces: a page paints its own; the buttons of the `actions`
+// slot go next to Reset. Next to Reset too, the component's page in Magma's Storybook,
 // with more cases than the preview (storybookPage() in src/lib/magma.mjs).
 import { methodCalls, plainText, propControl, propExample, type Control } from '../lib/controls';
 import { ICON_SLUG, usageIcons } from '../lib/magma.mjs';
