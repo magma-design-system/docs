@@ -3,6 +3,7 @@ title: Typography
 description: Why Magma sets text in four families, when to use each style of the scale, and the fonts to download for design tools and to serve in products.
 ---
 
+import DomainLink from '../../../components/DomainLink.astro';
 import FontFamilies from '../../../components/FontFamilies.astro';
 
 Magma sets text in four families, each with a job, and a short scale of styles within them.
@@ -30,9 +31,12 @@ or reading.
 
 ## Picking a style
 
-- `h1`: the title of the page, once per page.
-- `h2` and `h3`: the sections of a page, and the titles of articles in a list.
-- `h4` to `h6`: subsections, the titles of cards and panels, previews in dense lists.
+- `h3`: the title of a page of an application, written as its `h1`, once per page.
+- `h5`: the title of a section of the page, and of a dialog.
+- `h6`: the title of a part (a card, a panel, an item of an accordion) and of a group of
+  fields.
+- `h1`, `h2` and `h4`: no title of a page of an application takes them; a page to read, such
+  as an article, has no ladder of its own yet.
 - `action`: the text of buttons and other actions.
 - `paragraph`: text that takes time to read, such as descriptions, guides and, with `read`,
   articles.
@@ -46,8 +50,9 @@ or reading.
 Three rules hold for all of them:
 
 - **The tag says the structure, the style says the look.** A section of the page is an
-  `h2` even when it sits in a card and looks like an `h5`: `mds-text` takes the two apart,
-  with `tag` and `typography`. Never skip a heading level to get a smaller size.
+  `h2` and looks like an `h5`: `mds-text` takes the two apart, with `tag` and `typography`.
+  Never skip a heading level to get a smaller size. The style of each title comes from its
+  role, and the rules are in <DomainLink id="titles">Titles</DomainLink>.
 - **Bold sparingly.** A paragraph full of bold has no emphasis left.
 - **Text follows the reader.** The sizes are in `rem`, so they grow with the text size the
   user sets; reading text keeps a line short enough to follow, about 60 to 80 characters.

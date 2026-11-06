@@ -15,7 +15,7 @@ tuo codice non cambia: dipinge con i ruoli, e sono i ruoli a muoversi.
 | Condizione         | Su `<html>`                                             | Componente          |
 | ------------------ | ------------------------------------------------------- | ------------------- |
 | Modalità           | `pref-mode-light`, `pref-mode-dark`, `pref-mode-system` | `mds-pref-mode`     |
-| Tema               | `data-theme-name="cool"` o `"warm"`                     | `mds-pref-theme`    |
+| Tema               | `data-theme-name="editorial"`, nessuno per `business`   | `mds-pref-theme`    |
 | Contrasto          | `pref-contrast-more`                                    | `mds-pref-contrast` |
 | Forma degli angoli | `data-corner-shape="round"` o `"squircle"`              | `mds-pref-theme`    |
 | Profondità         | `data-theme-depth="flat"`                               |                     |
@@ -30,13 +30,17 @@ quelli di questa pagina.
 
 La palette si inverte e i ruoli con lei: il valore scuro di ogni ruolo è nella sua tabella
 in [Colore](../color/). Non scrivere mai varianti `dark:` o media query per la modalità
-scura. Il `dark:` di Tailwind segue solo il sistema, non le classi `pref-mode-*`.
+scura: il `dark:` di Magma segue la stessa modalità, comprese le classi `pref-mode-*` e un
+tema bloccato su uno schema, per una tua scelta in una modalità, mai per correggere un ruolo.
 
 ## Temi e contrasto
 
-Un tema ricolora i ruoli neutri tutti insieme: superfici, wash, bordi, testo, il chip
-invertito, sulla famiglia `porcelain` per `cool` e su `bisque` per `warm`. I ruoli di stato
-non cambiano mai con il tema. La preferenza di contrasto rafforza testo e bordi, e fa della
+Magma ha due temi con nome: `business`, il tema di base dei gestionali, che non chiede
+attributi, ed `editorial`, del lato editoriale. `editorial` ricolora i ruoli neutri tutti
+insieme, superfici, wash, bordi, testo, il chip invertito, sulla famiglia `bisque`, e
+l'accento sul marchio di Maggioli Editore. I ruoli di stato non cambiano mai con il tema.
+`default` (il vecchio nome di `business`), `cool` e `warm` funzionano ancora, deprecati da
+Magma 2.11.0, fino alla prossima major: le tabelle li lasciano fuori. La preferenza di contrasto rafforza testo e bordi, e fa della
 pagina la carta della modalità. Sotto un tema i rafforzamenti sono ripetuti nella famiglia
 del tema, per questo i due vanno insieme.
 

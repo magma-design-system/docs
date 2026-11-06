@@ -5,7 +5,10 @@
 // here from the same choice. src/scripts/magma.ts keeps the two in sync
 // afterwards, PageFrame.astro carries them over when pages change in place.
 // The theme is mds-pref-theme's (`mdsPrefTheme`, `data-theme-name`), which
-// writes it again when it loads, too late for the first paint.
+// writes it again when it loads, too late for the first paint. `business`, the
+// base theme, and `default`, its old name, need no attribute; `cool` and
+// `warm`, deprecated since magma 2.11.0, are kept for who chose them before,
+// until the next major removes them.
 ---
 
 <script is:inline>
@@ -16,7 +19,8 @@
       const stored = localStorage.getItem('mdsPrefMode');
       if (stored === 'light' || stored === 'dark' || stored === 'system') mode = stored;
       const theme = localStorage.getItem('mdsPrefTheme');
-      if (theme === 'cool' || theme === 'warm') root.dataset.themeName = theme;
+      if (theme === 'editorial' || theme === 'cool' || theme === 'warm')
+        root.dataset.themeName = theme;
     } catch {}
     root.setAttribute('data-magma-pref', '');
     root.classList.add(`pref-mode-${mode}`);

@@ -2,7 +2,9 @@
 // Rule: everything is read from node_modules, never from the Magma monorepo.
 // If something is missing here, it is a Magma packaging bug: track it in
 // https://github.com/magma-design-system/docs/issues/1
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
+import path from 'node:path';
 
 const require = createRequire(import.meta.url);
 
@@ -24,6 +26,177 @@ let componentDocs;
 export function loadComponentDocs() {
   componentDocs ??= require(resolveMagma('magma/dist/documentation.json'));
   return componentDocs;
+}
+
+const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
+
+/**
+ * A top-level scalar of a frontmatter, without its quotes: enough for the
+ * navigation, which runs before Astro's YAML parser (src/loaders/patterns.ts
+ * reads the whole frontmatter).
+ * @param {string} frontmatter
+ * @param {string} key
+ */
+function scalar(frontmatter, key) {
+  const value = new RegExp(`^${key}:[ \\t]*(.*?)[ \\t]*$`, 'm').exec(frontmatter)?.[1];
+  return value?.replace(/^(["'])(.*)\1$/, '$2') || undefined;
+}
+
+/**
+ * @typedef {{
+ *   id: string,
+ *   kind: 'design-language' | 'pattern' | 'block',
+ *   group?: string,
+ *   status: 'decided' | 'candidate',
+ *   title: string,
+ *   frontmatter: string,
+ *   body: string,
+ *   previews: Preview[],
+ * }} MagmaPattern
+ */
+
+/** @type {MagmaPattern[] | undefined} */
+let patterns;
+
+/**
+ * The kind of a file as the site reads it, by the kind the file writes. A
+ * domain of the design language is `design-language` since
+ * https://github.com/magma-design-system/magma/issues/1253, named after what
+ * the file is; magma 2.11 and before write `foundation`, after the Foundation
+ * item of this site, where the domains were to go before they got a section of
+ * their own. Both are read as `design-language` until Magma's next major, as
+ * its docs/PATTERNS.md ("A domain of the design language") says; any other
+ * kind fails the build.
+ * @type {Map<string, MagmaPattern['kind']>}
+ */
+const KINDS = new Map([
+  ['design-language', 'design-language'],
+  ['foundation', 'design-language'],
+  ['pattern', 'pattern'],
+  ['block', 'block'],
+]);
+
+/** `agents/patterns/` of the installed magma, beside its AGENTS.md. */
+function patternsFolder() {
+  return path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
+}
+
+/**
+ * The patterns the installed magma ships, `agents/patterns/<id>.md` beside the
+ * package's AGENTS.md, of three kinds: the domains of the design language
+ * (`kind: design-language`, https://github.com/magma-design-system/magma/issues/1189;
+ * `foundation` in magma 2.11 and before, KINDS),
+ * the building blocks (`block`) and the patterns (`pattern`), decided or
+ * candidates, needs Magma knows with no default yet. Each with its id (the
+ * file name), the scalars the navigation needs, its frontmatter and its body
+ * as written, and the previews of its cases, rules or situations, by file
+ * name (readPreviews()). The contract is "The patterns" in Magma's
+ * docs/CONTRACTS.md and its docs/PATTERNS.md. Empty for a version that ships
+ * none (2.9.0 and before).
+ * @returns {MagmaPattern[]}
+ */
+export function loadPatterns() {
+  if (patterns) return patterns;
+  const folder = patternsFolder();
+  patterns = [];
+  if (!existsSync(folder)) return patterns;
+  for (const name of readdirSync(folder).sort()) {
+    if (!name.endsWith('.md')) continue;
+    const source = readFileSync(path.join(folder, name), 'utf8');
+    const match = FRONTMATTER.exec(source);
+    if (!match) throw new Error(`magma ships agents/patterns/${name} without a frontmatter`);
+    const id = name.slice(0, -'.md'.length);
+    const written = scalar(match[1], 'kind');
+    const kind = KINDS.get(written ?? '');
+    if (!kind)
+      throw new Error(`magma ships agents/patterns/${name} of the unknown kind ${written}`);
+    patterns.push({
+      id,
+      kind,
+      group: scalar(match[1], 'group'),
+      status: scalar(match[1], 'status') === 'candidate' ? 'candidate' : 'decided',
+      title: scalar(match[1], 'title') ?? id,
+      frontmatter: match[1],
+      body: source.slice(match[0].length),
+      previews: readPreviews(path.join(folder, 'previews', id)),
+    });
+  }
+  return patterns;
+}
+
+/** The domains of the design language the installed magma ships (loadPatterns()). */
+export function loadDomains() {
+  return loadPatterns().filter((pattern) => pattern.kind === 'design-language');
+}
+
+/**
+ * A preview: `id` is the name of its file, the case, the rule or the
+ * situation it shows, which the loader of its page sets in `of`.
+ * @typedef {{ id: string, of?: 'case' | 'rule' | 'situation', try: string, height?: number, wholePage: boolean, markup: string }} Preview
+ */
+
+/** The schemes Magma renders each preview in, an image each. */
+export const PREVIEW_SCHEMES = /** @type {const} */ (['light', 'dark']);
+
+/** @typedef {(typeof PREVIEW_SCHEMES)[number]} PreviewScheme */
+
+/**
+ * The image of a preview in a scheme, beside its stage:
+ * `agents/patterns/previews/<id>/<preview>.<scheme>.webp`, 1440 x 900 pixels,
+ * the stage laid out at 960 x 600 at 1.5x ("Its images" in Magma's
+ * docs/PATTERNS.md, from magma 2.11.0). readPreviews() checks it is there.
+ * @param {string} id
+ * @param {string} preview
+ * @param {PreviewScheme} scheme
+ */
+export function previewImage(id, preview, scheme) {
+  return path.join(patternsFolder(), 'previews', id, `${preview}.${scheme}.webp`);
+}
+
+// The opening comment of a preview: its keys, one `key: value` per line.
+const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
+
+/**
+ * The previews of a pattern or a domain, from the installed magma
+ * (`agents/patterns/previews/<id>/<case, rule or situation>.html`, "The preview of a
+ * case" in Magma's docs/PATTERNS.md): the stage, what to try in it (required), the
+ * height of an overlay and `whole-page`, a stage with a frame of its own that
+ * takes no inset. None when the folder is missing (a candidate, a domain with
+ * no preview).
+ * Magma's check holds the format; a preview without what to try fails here
+ * too, so the page never shows a still stage with nothing said, and so does
+ * one without its images (previewImage()), which the cards show.
+ * @param {string} folder
+ * @returns {Preview[]}
+ */
+function readPreviews(folder) {
+  if (!existsSync(folder)) return [];
+  return readdirSync(folder)
+    .filter((name) => name.endsWith('.html'))
+    .sort()
+    .map((name) => {
+      const source = readFileSync(path.join(folder, name), 'utf8').replace(/\r\n/g, '\n');
+      const head = PREVIEW_HEAD.exec(source);
+      const keys = Object.fromEntries(
+        (head?.[1] ?? '')
+          .split('\n')
+          .map((line) => /^\s*([a-z-]+):\s*(.*?)\s*$/.exec(line))
+          .filter(Boolean)
+          .map((match) => [match[1], match[2]]),
+      );
+      if (!keys.try) throw new Error(`The preview ${path.join(folder, name)} says nothing to try`);
+      const id = name.slice(0, -'.html'.length);
+      for (const scheme of PREVIEW_SCHEMES)
+        if (!existsSync(path.join(folder, `${id}.${scheme}.webp`)))
+          throw new Error(`The preview ${path.join(folder, name)} has no ${scheme} image`);
+      return {
+        id,
+        try: keys.try,
+        ...(keys.height ? { height: Number(keys.height) } : {}),
+        wholePage: keys['whole-page'] === 'true',
+        markup: head ? source.slice(head[0].length) : source,
+      };
+    });
 }
 
 /**

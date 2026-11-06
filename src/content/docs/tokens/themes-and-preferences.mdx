@@ -15,7 +15,7 @@ changes nothing: it paints with the roles, and the roles move.
 | Condition    | On `<html>`                                             | Component           |
 | ------------ | ------------------------------------------------------- | ------------------- |
 | Mode         | `pref-mode-light`, `pref-mode-dark`, `pref-mode-system` | `mds-pref-mode`     |
-| Named theme  | `data-theme-name="cool"` or `"warm"`                    | `mds-pref-theme`    |
+| Named theme  | `data-theme-name="editorial"`, none for `business`      | `mds-pref-theme`    |
 | Contrast     | `pref-contrast-more`                                    | `mds-pref-contrast` |
 | Corner shape | `data-corner-shape="round"` or `"squircle"`             | `mds-pref-theme`    |
 | Depth        | `data-theme-depth="flat"`                               |                     |
@@ -29,15 +29,19 @@ page.
 ## Dark mode
 
 The palette flips and the roles with it: the dark value of every role is in its table in
-[Color](../color/). Never write `dark:` variants or dark-mode media queries for them.
-Tailwind's `dark:` follows the system only, not the `pref-mode-*` classes.
+[Color](../color/). Never write `dark:` variants or dark-mode media queries for them:
+Magma's `dark:` follows the same mode, the `pref-mode-*` classes and a theme locked to one
+scheme included, for a choice of your own in one mode, never to correct a role.
 
 ## Named themes and contrast
 
-A named theme retints the neutral roles at once: surfaces, washes, borders, text, the
-inverse chip, on the `porcelain` family for `cool` and the `bisque` one for `warm`. The
-status roles never change with the theme. The contrast preference promotes text and
-borders, and turns the page into the paper of the mode. Under a named theme the
+Magma names two themes: `business`, the base theme of the management software, which needs
+no attribute, and `editorial`, of the publishing side. `editorial` retints the neutral roles
+at once, surfaces, washes, borders, text, the inverse chip, on the `bisque` family, and the
+accent on the brand of Maggioli Editore. The status roles never change with the theme.
+`default` (the old name of `business`), `cool` and `warm` still work, deprecated since Magma
+2.11.0, until the next major: the tables leave them out. The contrast preference promotes
+text and borders, and turns the page into the paper of the mode. Under a named theme the
 promotions are restated in the theme's family, so the two go together.
 
 ### In light mode

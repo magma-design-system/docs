@@ -17,6 +17,10 @@
 // The rail is sticky, so its own stacking context: on Magma's header layer,
 // its dropdown and tooltips show over the card (whose sticky columns would
 // paint over them otherwise), under what floats from the content.
+//
+// The mobile header is sticky in the flow (mds-header, since magma 2.10.0):
+// its wrapper leaves no box of its own (`contents`), so it sticks along the
+// whole frame, not inside a box as tall as itself.
 import Search from '@astrojs/starlight/components/Search.astro';
 import Rail from './Rail.astro';
 import SiteFooter from './SiteFooter.astro';
@@ -28,9 +32,9 @@ const hasHero = Boolean(entry.data.hero);
 
 <div
   data-frame
-  class="pt-(--frame-header-height) desktop:grid desktop:min-h-screen desktop:grid-cols-[230px_minmax(0,4fr)] desktop:rail-collapsed:grid-cols-[auto_minmax(0,1fr)]"
+  class="desktop:grid desktop:min-h-screen desktop:grid-cols-[230px_minmax(0,4fr)] desktop:rail-collapsed:grid-cols-[auto_minmax(0,1fr)]"
 >
-  <div data-frame-header class="desktop:hidden print:hidden">
+  <div data-frame-header class="contents desktop:hidden print:hidden">
     <slot name="header" />
   </div>
   <div

@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { componentsLoader } from './loaders/components';
+import { patternsLoader } from './loaders/patterns';
 import en from './content/i18n/en.json';
 
 const documented = z.looseObject({ name: z.string(), docsHtml: z.string() });
@@ -65,6 +66,33 @@ export const collections = {
       dependents: z.array(z.string()),
       dependencies: z.array(z.string()),
       encapsulation: z.string(),
+    }),
+  }),
+  // What magma ships in agents/patterns/, one page each: the domains of the
+  // design language, the patterns, the building blocks.
+  patterns: defineCollection({
+    loader: patternsLoader(),
+    schema: z.object({
+      kind: z.enum(['design-language', 'pattern', 'block']),
+      group: z.string().optional(),
+      status: z.enum(['decided', 'candidate']),
+      title: z.string(),
+      need: z.string(),
+      principle: z.string(),
+      // The body, and the previews the stage at the top of the page runs: the
+      // cases, then the rules that are always true, then the situations of a
+      // block.
+      ...guide.shape,
+      previews: z.array(
+        z.object({
+          id: z.string(),
+          of: z.enum(['case', 'rule', 'situation']),
+          try: z.string(),
+          height: z.number().optional(),
+          wholePage: z.boolean(),
+          markup: z.string(),
+        }),
+      ),
     }),
   }),
 };
