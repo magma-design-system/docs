@@ -127,9 +127,36 @@ builds a pattern with the components of the project from the case `get_pattern` 
   `nav.patterns.<group>` and `nav.blocks.<group>`); a domain `DOMAINS` lacks; a preview of no
   case, rule or situation; a preview without what to try or without its two images.
 
-## Open on the site
+## The drawing, the API and the guide
 
-- The drawing of components, blocks and patterns, a page on the API (`get_pattern`, the layer
-  format) and a guide to design for a product: #89.
-- `get_pattern` in the notes of the MCP tools (`McpTools`) and the skill `/magma:pattern-layer`
-  in the Claude Code page: #89.
+Since #89 (2026-11-06) the site explains the model, not only each file:
+
+- **The drawing**, on both landing pages: `PatternLevels.astro`, a component, a building block
+  and a pattern, each beside a picture of live Magma components on a sunken stage (an inert
+  `role="img"`, as `ComponentLayers.astro` on the home page); and `PatternLayers.astro`, the
+  product's screen on the product's layer on Magma's default, painted with the label palette
+  (a layer is a category; `bg-label-<color>-10/50`, since at full strength the step fills a
+  band with a saturated color in dark mode), also on the guide below. Both lay out by the
+  width of the content column (container queries), not of the window: at 1280px the column
+  is 560px wide, too narrow for a picture beside its words. The block is the `page-header` of one
+  record with its regions outlined, the pattern three values of `message-placement` that lead
+  to `field-error`; the layers follow the open choice `success-toast-duration`. They are the
+  ids, values and choices Magma 2.11.0 and 2.12.0 answer with, written in the components and
+  their UI strings (`pattern.levels.*`, `pattern.layers.*`): when Magma renames one, rename it
+  there.
+- **The API**, `ai/pattern-api.mdx`: each mode of `get_pattern` and the layer format, with what
+  a layer may not do. The answers in the examples were taken from the server of the installed
+  magma (a small Node script speaking JSON-RPC to `magma-mcp --root <folder>` over stdio, with a
+  layer in `<folder>/magma/patterns/`), then shortened; the example layers were checked the
+  same way, with no `layerErrors`. Retake them when `get_pattern` changes. The list of what a
+  layer may not do is `layerErrors()` in `magma/dist/lint/core/patterns.js`. A value outside
+  what an open choice `may` is not checked (2.11.0): `may` is words, so the page says to review
+  it.
+- **The guide**, `ai/design-for-your-product.mdx`: who does what, set up, ask in words, adapt
+  with `/magma:pattern-layer`, check with `get_pattern`, report a need on Magma with the
+  product's `prd-*` label (`agents/reporting.md` of the package). Linked from the landing
+  pages, from `ai/working-with-agents` and from `ai/claude-code`.
+- `McpTools` on the MCP server page has the notes of `get_pattern` and `render_preview`; the
+  page no longer says that no tool writes a file (`render_preview` writes its images in
+  `node_modules/.cache/magma/previews`). The skills of the Claude Code page are the five of
+  the plugin's `projects/claude-plugin/skills/` in the Magma repository, read on GitHub.
