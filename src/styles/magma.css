@@ -10,8 +10,14 @@
   fonts, tokens and base styles sit under Starlight; the site's own styles
   (`components`, also the <style> of the frame), Tailwind's utilities and the
   overrides sit above it, so a utility class beats the site's styles.
+
+  The second statement opens Starlight's first two layers in the order its
+  layers.css gives them: the margins of mds-card below write into
+  `starlight.reset`, and a layer opened here first would otherwise come before
+  `starlight.base`.
 */
 @layer reset, vendor, theme, base, starlight, components, utilities, overrides;
+@layer starlight.base, starlight.reset;
 
 @import 'normalize.css' layer(reset);
 
@@ -57,7 +63,7 @@
   Magma's utilities too: the Examples usage files hold the same markup as
   documentation.json, without the rest of it. So do the previews of the
   patterns, the building blocks and the domains of the design language (their
-  pages run them: src/pages/example/domain/), which Magma lays out with
+  pages run them: src/pages/example/[kind]/), which Magma lays out with
   Tailwind: a class only they use is generated from them.
 */
 @source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/examples.md';
@@ -312,6 +318,22 @@ mds-button[icon='mi/baseline/arrow-forward'] {
   mds-benchmark-bar,
   mds-progress {
     --magma-corner-shape: round;
+  }
+}
+
+/*
+  The same reset takes away the margins mds-card gives its regions through
+  ::slotted() (2.10.0): the media to the edges of the card it touches
+  (rhythm/media-bleed), the footer away from the content (rhythm/content-
+  actions). Magma's hydrated.css hands them back against a reset in `base`,
+  an earlier layer than Starlight's. Declared in Starlight's own layer the tag
+  beats its `*`, and revert-layer hands the margin back to the layers before
+  it, which set none on these tags: the card's rules apply.
+*/
+@layer starlight.reset {
+  mds-card-media,
+  mds-card-footer {
+    margin: revert-layer;
   }
 }
 

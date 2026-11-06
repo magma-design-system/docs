@@ -3,7 +3,7 @@
 // here (Typography, Color): a link while the installed magma ships the domain,
 // its text alone before the release that ships it, so no page links to a page
 // that is not built. The text is the slot, in the language of the page.
-import { domainHref } from '../lib/domains';
+import { patternHref } from '../lib/patterns';
 import { shippedDomains } from '../lib/nav.mjs';
 
 interface Props {
@@ -17,7 +17,7 @@ const shipped = shippedDomains().some((domain) => domain.id === id);
 ---
 
 {shipped ? (
-  <mds-link href={domainHref(locale, id)}>
+  <mds-link href={patternHref(locale, 'foundation', id)}>
     <slot />
   </mds-link>
 ) : (

@@ -30,57 +30,122 @@ export function loadComponentDocs() {
 
 const FRONTMATTER = /^---\n([\s\S]*?)\n---\n?/;
 
-let domains;
+/**
+ * A top-level scalar of a frontmatter, without its quotes: enough for the
+ * navigation, which runs before Astro's YAML parser (src/loaders/patterns.ts
+ * reads the whole frontmatter).
+ * @param {string} frontmatter
+ * @param {string} key
+ */
+function scalar(frontmatter, key) {
+  const value = new RegExp(`^${key}:[ \\t]*(.*?)[ \\t]*$`, 'm').exec(frontmatter)?.[1];
+  return value?.replace(/^(["'])(.*)\1$/, '$2') || undefined;
+}
 
 /**
- * The domains of the design language the installed magma ships: the files of
- * `agents/patterns/` whose frontmatter says `kind: foundation`
- * (https://github.com/magma-design-system/magma/issues/1189), each with its id
- * (the file name), its frontmatter and its body as written. The contract is
- * "The patterns" in Magma's docs/CONTRACTS.md and "A domain of Foundation" in
- * its docs/PATTERNS.md. Empty for a version that ships none (2.9.0 and before):
- * the folder sits beside the package's AGENTS.md. Each with the previews of
- * its cases and its rules, by file name (readPreviews()).
- * @returns {{ id: string, frontmatter: string, body: string, previews: Preview[] }[]}
+ * @typedef {{
+ *   id: string,
+ *   kind: 'foundation' | 'pattern' | 'block',
+ *   group?: string,
+ *   status: 'decided' | 'candidate',
+ *   title: string,
+ *   frontmatter: string,
+ *   body: string,
+ *   previews: Preview[],
+ * }} MagmaPattern
  */
-export function loadDomains() {
-  if (domains) return domains;
-  const folder = path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
-  domains = [];
-  if (!existsSync(folder)) return domains;
+
+/** @type {MagmaPattern[] | undefined} */
+let patterns;
+
+/** `agents/patterns/` of the installed magma, beside its AGENTS.md. */
+function patternsFolder() {
+  return path.join(path.dirname(resolveMagma('magma/AGENTS.md')), 'agents', 'patterns');
+}
+
+/**
+ * The patterns the installed magma ships, `agents/patterns/<id>.md` beside the
+ * package's AGENTS.md, of three kinds: the domains of the design language
+ * (`kind: foundation`, https://github.com/magma-design-system/magma/issues/1189),
+ * the building blocks (`block`) and the patterns (`pattern`), decided or
+ * candidates, needs Magma knows with no default yet. Each with its id (the
+ * file name), the scalars the navigation needs, its frontmatter and its body
+ * as written, and the previews of its cases, rules or situations, by file
+ * name (readPreviews()). The contract is "The patterns" in Magma's
+ * docs/CONTRACTS.md and its docs/PATTERNS.md. Empty for a version that ships
+ * none (2.9.0 and before).
+ * @returns {MagmaPattern[]}
+ */
+export function loadPatterns() {
+  if (patterns) return patterns;
+  const folder = patternsFolder();
+  patterns = [];
+  if (!existsSync(folder)) return patterns;
   for (const name of readdirSync(folder).sort()) {
     if (!name.endsWith('.md')) continue;
     const source = readFileSync(path.join(folder, name), 'utf8');
     const match = FRONTMATTER.exec(source);
-    if (!match || !/^kind:\s*foundation\s*$/m.test(match[1])) continue;
+    if (!match) throw new Error(`magma ships agents/patterns/${name} without a frontmatter`);
     const id = name.slice(0, -'.md'.length);
-    domains.push({
+    const kind = scalar(match[1], 'kind');
+    if (kind !== 'foundation' && kind !== 'pattern' && kind !== 'block')
+      throw new Error(`magma ships agents/patterns/${name} of the unknown kind ${kind}`);
+    patterns.push({
       id,
+      kind,
+      group: scalar(match[1], 'group'),
+      status: scalar(match[1], 'status') === 'candidate' ? 'candidate' : 'decided',
+      title: scalar(match[1], 'title') ?? id,
       frontmatter: match[1],
       body: source.slice(match[0].length),
       previews: readPreviews(path.join(folder, 'previews', id)),
     });
   }
-  return domains;
+  return patterns;
+}
+
+/** The domains of the design language the installed magma ships (loadPatterns()). */
+export function loadDomains() {
+  return loadPatterns().filter((pattern) => pattern.kind === 'foundation');
 }
 
 /**
- * A preview: `id` is the name of its file, the case or the rule it shows,
- * which the loader of its page sets in `of`.
- * @typedef {{ id: string, of?: 'case' | 'rule', try: string, height?: number, wholePage: boolean, markup: string }} Preview
+ * A preview: `id` is the name of its file, the case, the rule or the
+ * situation it shows, which the loader of its page sets in `of`.
+ * @typedef {{ id: string, of?: 'case' | 'rule' | 'situation', try: string, height?: number, wholePage: boolean, markup: string }} Preview
  */
+
+/** The schemes Magma renders each preview in, an image each. */
+export const PREVIEW_SCHEMES = /** @type {const} */ (['light', 'dark']);
+
+/** @typedef {(typeof PREVIEW_SCHEMES)[number]} PreviewScheme */
+
+/**
+ * The image of a preview in a scheme, beside its stage:
+ * `agents/patterns/previews/<id>/<preview>.<scheme>.webp`, 1440 x 900 pixels,
+ * the stage laid out at 960 x 600 at 1.5x ("Its images" in Magma's
+ * docs/PATTERNS.md, from magma 2.11.0). readPreviews() checks it is there.
+ * @param {string} id
+ * @param {string} preview
+ * @param {PreviewScheme} scheme
+ */
+export function previewImage(id, preview, scheme) {
+  return path.join(patternsFolder(), 'previews', id, `${preview}.${scheme}.webp`);
+}
 
 // The opening comment of a preview: its keys, one `key: value` per line.
 const PREVIEW_HEAD = /^\s*<!--([\s\S]*?)-->[ \t]*\n?/;
 
 /**
  * The previews of a pattern or a domain, from the installed magma
- * (`agents/patterns/previews/<id>/<case or rule>.html`, "The preview of a
+ * (`agents/patterns/previews/<id>/<case, rule or situation>.html`, "The preview of a
  * case" in Magma's docs/PATTERNS.md): the stage, what to try in it (required), the
  * height of an overlay and `whole-page`, a stage with a frame of its own that
- * takes no inset. None when the folder is missing (a domain with no preview).
+ * takes no inset. None when the folder is missing (a candidate, a domain with
+ * no preview).
  * Magma's check holds the format; a preview without what to try fails here
- * too, so the page never shows a still stage with nothing said.
+ * too, so the page never shows a still stage with nothing said, and so does
+ * one without its images (previewImage()), which the cards show.
  * @param {string} folder
  * @returns {Preview[]}
  */
@@ -100,8 +165,12 @@ function readPreviews(folder) {
           .map((match) => [match[1], match[2]]),
       );
       if (!keys.try) throw new Error(`The preview ${path.join(folder, name)} says nothing to try`);
+      const id = name.slice(0, -'.html'.length);
+      for (const scheme of PREVIEW_SCHEMES)
+        if (!existsSync(path.join(folder, `${id}.${scheme}.webp`)))
+          throw new Error(`The preview ${path.join(folder, name)} has no ${scheme} image`);
       return {
-        id: name.slice(0, -'.html'.length),
+        id,
         try: keys.try,
         ...(keys.height ? { height: Number(keys.height) } : {}),
         wholePage: keys['whole-page'] === 'true',

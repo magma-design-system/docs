@@ -13,7 +13,7 @@ section", "Building blocks section").
   action, search a list, fill in a form). Its heart is behavior over time (what follows an
   action, state, loading, errors, focus), with the structure it needs: components and blocks.
   It can be as small as a button that opens a dialog or as large as a whole page. It is applied,
-  following its guide and its code in HTML, React and Angular, not imported.
+  following its guide, not imported.
 
 Decided on 2026-10-24: blocks are about space, patterns about time. Before, a pattern was "a
 whole screen or task", and the confirmation dialog and the empty and error states were listed
@@ -32,96 +32,103 @@ person telling the product something, while the group is the product telling the
 happened. That other sense becomes a candidate of its own: **report a problem or give an
 opinion** on a view or a feature (for AI, rating an answer).
 
-## State
+## Where they come from
 
-- Both sections are online only as their landing pages, under construction (`soon: true`).
-- Pattern pages, drafts (`draft: true`, dev only): **List with filters**, **Record detail**.
-- **Messages and states** has a clickable sketch, `src/patterns/feedback/example.html` (the
-  folder keeps its old id until the pattern is written), and no page yet.
+Since Magma 2.10.0 (2026-11-04) the patterns and the building blocks are Magma's, like the
+domains of the design language: `agents/patterns/<id>.md` in `@maggioli-design-system/magma`,
+the frontmatter the data (`kind`, `group`, `status`, variables, cases or regions, always true,
+open choices, situations), the body the text, and a preview for each case, rule or situation in
+`agents/patterns/previews/<id>/<preview>.html`. They are proposed and decided in the Magma
+monorepo (its `docs/PATTERNS.md`, the commands `/pattern-new` and `/pattern-change`); the
+agents read them with `get_pattern`. This site writes none and copies none: it builds a page
+from each file. A pattern that is missing or wrong is an issue on Magma
+([magma.md](magma.md)), with the product's label when a product needs it.
 
-## How a pattern is made
+- **Decided** (2.10.0): the patterns of Messages and states (`message-placement`,
+  `confirm-action`, `empty-state`, `loading`, `error-recovery`) and of Data (`list-with-filters`,
+  `record-detail`); the blocks `app-shell`, `page-header`, `item-list`, `labels-and-values`.
+- **Candidates**: needs Magma knows with no default yet (`choose-items`, `concurrent-editing`,
+  `permissions`, `form-and-validation`, `consent-and-legal`, `notification-center`). Their page
+  holds the need and what the agent does meanwhile.
 
-One topic at a time:
+Before the package shipped them, this site wrote them by hand: List with filters and Record
+detail as draft pages with their code in HTML, React and Angular (`src/patterns/<id>/`), and in
+the pull request #93 (closed without merging on 2026-11-04) a Messages sketch, a Page header
+block and pages split into Guidelines, Code and Mistakes. The table "where a message goes"
+decided here is Magma's `message-placement` now, and List with filters, Record detail and the
+Page header are decided there too. The package ships no code in React or Angular: an agent
+builds a pattern with the components of the project from the case `get_pattern` gives. Evidence from the products
+(file names, screenshots, defects) stays out of this public repository, as out of Magma's.
 
-1. Collect the real cases from Maggioli's products: the screens, situations, data and roles
-   where the need shows up. The products are a catalogue of needs, never the solution to
-   document: most of their screens were not designed with the design system.
-2. Check what Magma already offers: the component guides, their `examples.md`.
-3. Write a proposal with its open questions; the design system team decides.
-4. Build a clickable sketch in `src/patterns/<id>/example.html` and try it.
-5. Write a brief, then the page.
+## How the site shows them
 
-Evidence from the products (file names, screenshots, defects) stays out of this public
-repository. A brief written for this repository describes the problem and the rules only:
-`plan/patterns/<id>.md`, with the sections Problem (when to use it, when not), Parts (required,
-optional, order, how it adapts to the width), Always true (rules for every product: they become
-checks for agents and lint), States (loading, empty, error, partial, disabled, by role),
-Decisions.
+- `loadPatterns()` (`src/lib/magma.mjs`) reads every file and its previews; the collection
+  `patterns` (`src/loaders/patterns.ts`) renders each body without its `h1` and its notes for
+  maintainers, and lists its previews in the order of the page: the cases, the rules that are
+  always true, the situations of a block, each in the order of its list (`PREVIEWED`). Every
+  inline code of the body that is the id of a preview gets an `mds-link` inside, to
+  `?preview=<id>#try` (`linkPreviews()`).
+- One route for the three kinds, `src/pages/[...locale]/[section]/[id].astro`:
+  `/design-language/<id>/` for a domain, `/patterns/<id>/`, `/blocks/<id>/` (`PATTERN_SECTIONS` in
+  `src/lib/nav.mjs`). The working case first, the reasons after (plan/CONTENT_STRUCTURE.md,
+  2026-11-05): the need in one line, then the stage (`PatternStage.astro`, heading `try`), then,
+  for a decided pattern or block, the card "With an AI agent" (`PatternAgent.astro`: the prompt
+  names the id and asks for the values of the variables, as `get_pattern` takes them), then the
+  whole file in English (the Italian page says so). The header says where the page comes from,
+  a candidate has a badge (`PageTitle.astro`).
+- The stage runs one preview at a time on a `PreviewStage.astro`, the first case at the start: an
+  `mds-input-select` lists them all, an `optgroup` for the cases, one for the rules, one for the
+  situations. Picking one sets the frame, its title, what to try, Enlarge (`PreviewZoom.astro`: an
+  `mds-url-view` in the window slot of an `mds-modal`, as wide as `wide`; made on each opening
+  with the absolute address it needs, removed on closing) and Open in a new tab, and keeps the
+  address (`?preview=<id>`), which the page reads on load. A click on an id in the text picks it
+  without the router loading the page again (a listener in the capture phase), and brings the
+  stage into view. `mds-input-select` emits `mdsInputSelectChange` on the `input` event of its
+  select, which the browser fires on a real choice: a script that tests it must dispatch `input`,
+  not `change`. One frame per page: `confirm-action` went from 6 frames and 13,000 px to 1 and
+  9,500 px, the first case from 3,300 px to 460 px from the top.
+- Each preview runs alone at `/docs/example/<domain|pattern|block>/<id>/<preview>/`
+  (`src/pages/example/[kind]/[id]/[preview].astro`), as `render_preview` runs it: the words in
+  Italian, an inset of 600, none for `whole-page`. Magma lays the previews out with Tailwind:
+  `src/styles/magma.css` takes their folder as a `@source`.
+- Its images beside it, `<preview>.light.webp` and `<preview>.dark.webp`
+  (`src/pages/example/[kind]/[id]/[image].webp.ts`, `previewImageHref()` in
+  `src/lib/patterns.ts`), copied as Magma ships them since 2.11.0: the stage laid out at 960 x 600
+  and taken at 1.5x, 1440 x 900 pixels, 8:5 as the cards, made by the render that checks it.
+- Navigation: a group per topic (`PATTERN_GROUPS`, `patternGroups()` in `src/lib/nav.mjs`),
+  Navigation first as in Magma's catalogue, then Messages and states, Data, Input; in a group the
+  decided ones, then the candidates, by title. A pattern is named by its title in English, as
+  its page. The landing pages open with one line and show the same groups as a gallery
+  (`PatternGallery.astro`): the media of the card, the title, the need, the id, the badge of a
+  candidate; `src/route-data.ts` adds the headings of the groups to the table of contents. What
+  a pattern or a block is comes after the gallery.
+- The domains have their own section, Design language (`DOMAINS`, `shippedDomains()`): a flat
+  navigation in the order of `DOMAINS`, each named in the language of the page
+  (`nav.design-language.<id>`), and the same gallery on its landing page, in one grid. Density
+  ships no preview: its card shows its icon, and its page has no stage.
+- The media of a card is the image of the first preview, two `mds-img` switched by Magma's
+  `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded). It sits in the
+  frame of the Brand assets cards (`CardMedia.astro`, shared with `DownloadCard.astro`, since
+  2026-11-06): inset from the edges of the card, rounded, with an inset shadow, on the soft
+  ground of an opaque image. Not the checkerboard: there it tells that a file is transparent,
+  and the previews are opaque. The page of a light preview has nearly the color of that ground
+  (242 against 237), so the image has a radius and a shadow of its own. The card is painted by
+  `--mds-card-background`, not a `bg-*` on each region: `mds-card-media` would keep its own
+  ground, a band around the frame. Without a preview (a candidate, a domain that ships none)
+  the frame holds the icon of its group or of the domain, in a box the size of an image.
+  Decided on 2026-11-04 against running the preview
+  small in an inert frame, as the first version of #101 did: a preview in a card loaded 25 to 58
+  files, 650 to 975 KB, and hydrated its components, where its WebP weighs 1 to 28 KB. The
+  images were asked in [magma#1243](https://github.com/magma-design-system/magma/issues/1243)
+  and ship since 2.11.0.
+- The build fails, rather than leaving a page out of the navigation: a kind other than
+  `foundation`, `pattern` and `block`; a group `PATTERN_GROUPS` lacks (add it, with its UI strings
+  `nav.patterns.<group>` and `nav.blocks.<group>`); a domain `DOMAINS` lacks; a preview of no
+  case, rule or situation; a preview without what to try or without its two images.
 
-## Files of a pattern
+## Open on the site
 
-- `src/patterns/<id>/example.html`: plain HTML and a script, the demo in English. It is also
-  the live preview, `/docs/example/pattern/<id>/` (`src/pages/example/pattern/[id].astro`), built
-  in production only for published pattern pages.
-- `react.tsx` and `angular.ts`: the same screen. They are outside the site's type check
-  (`tsconfig.json`): check them in a scratch project with `tsc` (React 19, strict) and `ngc`
-  (Angular 20 or later, `strictTemplates`).
-- `src/lib/patterns.ts` reads them; `PatternPreview.astro`, `PatternCode.astro` and
-  `PatternComponents.astro` (the components used, read from the example) show them.
-- The page, `src/content/docs/patterns/<id>.mdx` and its Italian twin, in this order: preview,
-  when to use it, anatomy, components, behavior, accessibility, content, mistakes to avoid,
-  code.
-- Patterns connect: the list example opens the detail example (`../record-detail/?id=N`).
-
-## Decided: where a message goes
-
-The rule: **a message goes where the thing it talks about is.**
-
-| Case                                                                                 | Where                                                  | Component                         |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------ | --------------------------------- |
-| A field                                                                              | under the field                                        | `mds-input-field` message         |
-| A part of the page that failed (a list did not load)                                 | in that part, with Try again; what was on screen stays | `mds-banner` error                |
-| An action that failed while its place is open (save in a dialog)                     | in the dialog; what was written stays                  | `mds-banner` error                |
-| An action that succeeded whose place is gone (dialog closed, record deleted, copied) | toast, 5 s, always after create, edit, delete          | `mds-toast` success               |
-| The same, failed                                                                     | a toast that stays, with Try again                     | `mds-toast` error, `duration="0"` |
-| A decision before going on                                                           | dialog                                                 | `mds-modal`                       |
-| The whole application, informative (offline, back online)                            | toast                                                  | `mds-toast`                       |
-| Never                                                                                | internal messages, raw HTTP status text, "coming soon" |                                   |
-
-- Toasts at `bottom-center`, the same in every product, at most three at once: one
-  `mds-toast-region` per application, which lines them up and reads each one out (2.4.0). A
-  toast with an action has no timer and a way to close it (`dismissible`, its hide button); the
-  focus goes back to the page when it closes.
-- Toasts never sit above an open dialog: `showModal()` makes everything outside the dialog
-  inert, and a click on the toast closes the dialog. Anything about a dialog goes into it.
-- To confirm: the whole application with a decision and a deadline (session ending) becomes a
-  strict dialog, also over an open dialog. Agreed first as a toast, changed after the sketch.
-- The Record detail draft shows a toast when an action in its dialog fails: by the third rule
-  it should be a banner in the dialog.
-
-## Open decisions
-
-Proposals, not decided yet:
-
-- **Destructive actions**: an irreversible action always asks, naming the object and the
-  consequence.
-- **Form fields and validation**: always `mds-input-field` with a visible label; validate on
-  submit, then field by field as it changes; never disable submit to signal errors.
-- **Dialog with a form**: `mds-modal` with its own structure (title on top, actions at the
-  bottom, its close button and Escape), two widths.
-- **Paging**: a paginator for tables people work through, "Load more" for browsing results, no
-  automatic infinite scroll.
-- **Loading**: a skeleton for the first load of a region, `await` on the control that started
-  an action, results stay while the next ones load.
-- **Empty states**: `mds-zero` with a way out, never a warning tone.
-- **Permissions**: hide what a role can never do; disable, with the reason, what depends on the
-  state of the record.
-- **AI**: one way to disclose each case (generated content, prompt input, field filled by AI).
-- **Navigation within a page**: `mds-tab` for views of the same object, links for pages.
-- **Page title**: always the `h1`; its size comes from `typography`, not from the level.
-- **Not ready yet**: features that are not ready are not shown.
-
-Proposed order: messages and states (where a message goes, confirmation, empty and error
-states, loading), then forms
-(field, dialog with a form, then the Form and validation pattern), then List with filters with
-row actions, Record detail, search with facets (after a combobox in Magma), AI.
+- The drawing of components, blocks and patterns, a page on the API (`get_pattern`, the layer
+  format) and a guide to design for a product: #89.
+- `get_pattern` in the notes of the MCP tools (`McpTools`) and the skill `/magma:pattern-layer`
+  in the Claude Code page: #89.

@@ -22,13 +22,14 @@ until Magma ships the fix.
 
 Each one cites its issue next to the code. Remove it when the release that fixes it is adopted.
 
-| Issue                                                                | Where                                       | What the site does                                                                                                                                                                                                                                                      |
-| -------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527) | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                |
-| not filed                                                            | `src/components/frame/Header.astro`         | `min-w-0` and `shrink` on the parts `content`, `actions` and `nav` of `mds-header-bar`: Magma's do not shrink, and a long item in the navigation pushes the menu button off a phone screen                                                                              |
-| not filed                                                            | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                             |
-| not filed                                                            | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                          |
-| not filed, listed in docs#1                                          | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line) |
+| Issue                                                                  | Where                                       | What the site does                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                                                             |
+| not filed                                                              | `src/components/frame/Header.astro`         | `min-w-0` and `shrink` on the parts `content`, `actions` and `nav` of `mds-header-bar`: Magma's do not shrink, and a long item in the navigation pushes the menu button off a phone screen                                                                                                                           |
+| not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                                                                          |
+| not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                                                                       |
+| not filed, listed in docs#1                                            | `src/styles/magma.css`                      | Paragraph measure back to 75ch (`base.css` caps `p` at 30ch); title font on `h1`-`h6`; `mds-icon` filled with `currentColor`; `mds-header-bar` margins against Starlight's reset, from the internal `--mds-header-inline-margin-current` (the lint is off on that line)                                              |
+| [magma#1249](https://github.com/magma-design-system/magma/issues/1249) | `src/lib/tokens.mjs`                        | `DEPRECATED_CONTEXTS`: the contexts of `theme` Magma deprecates since design-tokens 15.5.0 (`default`, `cool`, `warm` and their `-contrast-more`), which the resolver names only in the description of the modifier; the tables of `TokenConditions.astro` leave them out. A name the resolver drops fails the build |
 
 ## Open Magma issues that concern the site
 
@@ -44,6 +45,15 @@ dropdown inserted and removed at once no longer throws in Chromium), #1061
 timestamp, the start of the frame, is earlier, so `t` and `easeOutExpo(t)` are negative; also the
 CSS transition of the registered `--mds-radial-progress` runs on top of the JS tween). The site
 no longer shows a progress ring: no workaround left.
+
+Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
+resolver says which contexts of a modifier are deprecated only in its `description`, in words:
+`default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
+the table above). Filed on 2026-11-05 while adopting the cards of 2.10.0 (docs#101): #1250 (since 2.10.0 `mds-card-footer` stacks its row under 380 px of
+container, `actions/stacked`, and stretches what it holds: the single "Read" of the cards of the
+landing pages takes the width of the card with its label in the middle, and the Download
+`mds-button-dropdown` of the brand cards stretches its host, not its two buttons, an empty blue
+bar after them; the site keeps the rule as it is).
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -81,6 +91,10 @@ region keep theirs, which show more), #1147 (not a Magma bug: `mds-header` does 
 its attribute in a re-render; the issue came from a hidden pane that ran no
 `requestAnimationFrame`, see [workflow.md](workflow.md)), #1148 (`storybook` in
 `documentation.json`: the Storybook buttons and links read it).
+
+Closed by 2.11.0, filed on 2026-11-04 from the galleries of Patterns and Building blocks
+(docs#101): #1243 (an image of each preview, light and dark, beside its stage: the cards show
+the one of the first preview, `PatternGallery.astro`).
 
 ## Seen, not filed yet
 

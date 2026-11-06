@@ -34,7 +34,12 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: drafts and previews of draft patterns are left out.
+- A production build is not dev: a page with `draft: true` is left out (none today). A page
+  that builds can still fail in dev: on a route of our own (`StarlightPage`), a component
+  whose output puts something in the head (Starlight's `Code`, expressive-code) runs before
+  `StarlightPage` sets `Astro.locals.starlightRoute`, and reading the route there throws
+  (`locals.starlightRoute is not defined`, a 500). Pass the locale as a prop from the route
+  (`PatternAgent.astro`), and open a page of each route on a dev server too.
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):
@@ -126,9 +131,10 @@ A new author, step by step:
   `github-pages` environment deploys from `production` only.
 - **Publish check**, on a production build of `main` before opening that pull request, and on
   the live site after the deploy:
-  - Building blocks and Patterns exist only as their landing pages, with the "Under
-    construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
-    cards carry the badge.
+  - Design language, Building blocks and Patterns: a page per domain, block and pattern the
+    installed `magma` ships, each opening with its stage when it has previews
+    (`/example/pattern/<id>/<case>/`, the picker and `?preview=<id>`), and the gallery of their
+    landing pages with the image of the first preview of each, light and dark with the mode.
   - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 

@@ -156,11 +156,13 @@ element` does not put a text field in the table. The usage files stay Markdown w
 
 ## Under construction and drafts
 
-- `soon: true` on a section in `nav.mjs`: its landing page shows the "Under construction" banner
-  (`ComingSoon.astro`) and its home card a badge. Today: Building blocks and Patterns.
-- `draft: true` in a page's frontmatter: in the navigation in dev, left out of a production
-  build together with its preview (`published()` in `nav.mjs`).
-- To publish: remove `draft` from the page, and `soon` from the section with its first page.
+No section is under construction and no page is a draft since 2026-11-04, when Building blocks
+and Patterns went online with the patterns of Magma 2.10.0; the mechanism went with them (the
+`soon` flag of a section, `ComingSoon.astro`, the badge of its home card, the filter of the
+drafts in `nav.mjs`). Starlight still leaves a page with `draft: true` out of a production
+build, but a navigation entry that links to it then fails that build: a page that is not ready
+stays out of `nav.mjs` too, or on its branch. To bring the mechanism back, it is in the history
+of `src/lib/nav.mjs`.
 
 ## Words
 

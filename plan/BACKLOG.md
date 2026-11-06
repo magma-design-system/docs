@@ -35,8 +35,10 @@ Open work on the site, by section. Take an item, and move what you learn into `a
 
 ## Building blocks and Patterns
 
-See [agents/patterns.md](../agents/patterns.md): open decisions, proposed order, the Messages
-and states sketch to turn into a page.
+Generated from the package since Magma 2.10.0 ([agents/patterns.md](../agents/patterns.md)).
+Open: the drawing of components, blocks and patterns, a page on `get_pattern` and the layer
+format, a guide to design for a product, `get_pattern` in `McpTools` and `/magma:pattern-layer`
+on the Claude Code page (#89).
 
 ## Development
 

@@ -1,0 +1,169 @@
+---
+// The stage at the top of the page of a domain of the design language, a
+// pattern or a building block (src/pages/[...locale]/[section]/[id].astro):
+// one preview at work before the text, so a developer sees the case running
+// first and reads why after. A picker lists every preview of the page, by
+// what it shows: the cases, the rules that are always true, the situations of
+// a block (src/loaders/patterns.ts). The frame is the stage of the component
+// previews (PreviewStage.astro) on the page of the preview
+// (src/pages/example/[kind]/[id]/[preview].astro), with Enlarge
+// (PreviewZoom.astro, once on the page) and Open in a new tab; under it, what
+// to try, the line the preview says, in English as the package writes it.
+//
+// It starts on the first case, or on the preview of the address
+// (`?preview=<id>`), which the ids written as code in the text link to
+// (linkPreviews() in the loader): the script picks it without loading the
+// page again, keeps the address of the one picked, and takes the stage into
+// view. One frame per page, whatever the number of previews.
+import { previewHref, type PatternKind } from '../lib/patterns';
+import { READING, TEXT } from '../lib/markdown-text.mjs';
+import Heading from './Heading.astro';
+import PreviewStage from './PreviewStage.astro';
+
+type Of = 'case' | 'rule' | 'situation';
+
+interface Props {
+  kind: PatternKind;
+  /** The id of the domain, the pattern or the block. */
+  id: string;
+  previews: Array<{ id: string; of: Of; try: string; height?: number }>;
+  /** The language of what comes from the package, on a page in another one. */
+  contentLang?: string;
+}
+
+const { kind, id, previews, contentLang } = Astro.props;
+const { t } = Astro.locals;
+const tag = `${kind}-${id}`;
+const items = previews.map((preview) => ({
+  ...preview,
+  src: previewHref(kind, id, preview.id),
+  title: t(`pattern.preview.${preview.of}`, { id: preview.id }),
+}));
+const groups = (['case', 'rule', 'situation'] as const)
+  .map((of) => ({ of, items: items.filter((item) => item.of === of) }))
+  .filter((group) => group.items.length > 0);
+const [first] = items;
+---
+
+{/* `try`: the links to the stage name it (linkPreviews() in the loader). */}
+<Heading id="try" text={t('pattern.stage.title')} />
+<div class="not-content my-600 flex flex-col gap-400" data-pattern-stage={tag}>
+  <mds-input-select
+    aria-label={t('pattern.stage.pick')}
+    value={first.id}
+    class="w-full max-w-xs"
+    data-stage-pick
+  >
+    {groups.map((group) => (
+      <optgroup label={t(`pattern.stage.${group.of}`)}>
+        {group.items.map((item) => (
+          <option
+            value={item.id}
+            selected={item.id === first.id}
+            data-src={item.src}
+            data-title={item.title}
+            data-try={item.try}
+            data-height={item.height}
+          >
+            {item.id}
+          </option>
+        ))}
+      </optgroup>
+    ))}
+  </mds-input-select>
+  <PreviewStage tag={tag} src={first.src} title={first.title} height={first.height}>
+    <mds-button
+      slot="actions"
+      data-preview-zoom={first.src}
+      data-preview-zoom-label={first.title}
+      data-stage-zoom
+      label={t('pattern.preview.zoom')}
+      icon="mi/baseline/open-in-full"
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+    <mds-button
+      slot="actions"
+      href={first.src}
+      target="blank"
+      data-stage-open
+      label={t('pattern.preview.open')}
+      icon="mi/baseline/open-in-new"
+      variant="dark"
+      tone="text"
+      size="sm"
+    ></mds-button>
+  </PreviewStage>
+  <mds-text {...READING} tag="p" class={TEXT.paragraph} lang={contentLang} data-stage-try>
+    {first.try}
+  </mds-text>
+</div>
+
+<script>
+  type Select = HTMLElement & { value?: string };
+
+  /** The preview `id` on the stage: its frame, what to try, Enlarge and Open in a new tab. */
+  const show = (stage: HTMLElement, id: string) => {
+    const pick = stage.querySelector<Select>('[data-stage-pick]');
+    const option = pick?.querySelector<HTMLOptionElement>(`option[value="${CSS.escape(id)}"]`);
+    if (!pick || !option) return false;
+    const { src = '', title = '', height = '' } = option.dataset;
+    const tag = stage.dataset.patternStage ?? '';
+    const frame = stage.querySelector<HTMLIFrameElement>(`[data-playground-frame="${tag}"]`);
+    const viewport = stage.querySelector<HTMLElement>(`[data-playground-viewport="${tag}"]`);
+    if (pick.value !== id) pick.value = id;
+    if (frame && frame.getAttribute('src') !== src) {
+      frame.setAttribute('src', src);
+      frame.title = title;
+      if (viewport) viewport.dataset.height = height;
+      // Reset loads the frame again from its `src`, at the starting size of
+      // the preview (PreviewStage.astro).
+      stage.querySelector<HTMLElement>(`[data-playground-reset="${tag}"]`)?.click();
+    }
+    const zoom = stage.querySelector<HTMLElement>('[data-stage-zoom]');
+    zoom?.setAttribute('data-preview-zoom', src);
+    zoom?.setAttribute('data-preview-zoom-label', title);
+    stage.querySelector<HTMLElement>('[data-stage-open]')?.setAttribute('href', src);
+    const text = stage.querySelector<HTMLElement>('[data-stage-try]');
+    if (text) text.textContent = option.dataset.try ?? '';
+    return true;
+  };
+
+  /** The address of the page with the preview `id` on the stage. */
+  const remember = (id: string) => {
+    const url = new URL(location.href);
+    url.searchParams.set('preview', id);
+    history.replaceState(history.state, '', url);
+  };
+
+  const init = () => {
+    const stage = document.querySelector<HTMLElement>('[data-pattern-stage]');
+    if (!stage || stage.dataset.ready) return;
+    stage.dataset.ready = '';
+    const asked = new URLSearchParams(location.search).get('preview');
+    if (asked) show(stage, asked);
+    stage.querySelector('[data-stage-pick]')?.addEventListener('mdsInputSelectChange', (event) => {
+      const { value } = (event as CustomEvent<{ value?: unknown }>).detail ?? {};
+      if (typeof value === 'string' && value && show(stage, value)) remember(value);
+    });
+  };
+
+  // An id of a preview written in the text: the stage shows it, without the
+  // router loading the page again (this listener runs first, in the capture).
+  document.addEventListener(
+    'click',
+    (event) => {
+      const link = (event.target as Element | null)?.closest<HTMLElement>('[data-try-preview]');
+      const stage = document.querySelector<HTMLElement>('[data-pattern-stage]');
+      const id = link?.dataset.tryPreview;
+      if (!link || !stage || !id || !show(stage, id)) return;
+      event.preventDefault();
+      remember(id);
+      document.getElementById('try')?.scrollIntoView({ block: 'start' });
+    },
+    { capture: true },
+  );
+  document.addEventListener('astro:page-load', init);
+  init();
+</script>
