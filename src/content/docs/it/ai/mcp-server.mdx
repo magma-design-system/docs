@@ -8,8 +8,9 @@ import McpTools from '../../../../components/McpTools.astro';
 Magma contiene un server MCP dentro `@maggioli-design-system/magma`, il comando `magma-mcp`.
 Il client dell'agente lo avvia nel progetto, e risponde dalla versione installata lì: i
 componenti e la loro API, i ruoli e i token, le classi del tema Tailwind di Magma, le icone
-che esistono, le sezioni delle guide, e il lint su un frammento di codice prima che sia
-scritto. Legge soltanto: nessuno strumento modifica un file.
+che esistono, le sezioni delle guide, i pattern e i building block, e il lint su un frammento di
+codice prima che sia scritto. Non modifica nessun file del progetto: solo `render_preview`
+scrive, le immagini che disegna, in `node_modules/.cache/magma/previews`.
 
 Una domanda al server costa una risposta breve, dove la stessa domanda alle guide costa un
 file da leggere: i valori di una prop invece della guida del componente, il ruolo per un
@@ -88,16 +89,26 @@ risparmia; gli argomenti che finiscono con `?` sono facoltativi:
     ],
     find_icon: ["Un'icona per significato, o se uno slug esiste", "Un'icona che non si vede"],
     get_guide: ['Una sezione di una guida', 'Leggere tutta la guida'],
+    get_pattern: [
+      'Il caso da seguire per un compito tra più componenti, con il livello del prodotto',
+      'Inventare il flusso, o leggere ogni pattern a mano',
+    ],
     check_markup: ['Se un frammento passa il lint, prima di scriverlo', 'Un lint lanciato dopo'],
     check_setup: [
       'Cosa manca alla configurazione di Magma nel progetto',
       'Controllare a mano i passi di installazione',
     ],
+    render_preview: [
+      "L'immagine di un markup, o dell'anteprima di un caso, con quello che non va",
+      "Descrivere un'interfaccia a parole",
+    ],
   }}
 />
 
 `check_markup` lancia il [lint](../../development/lint/) con ESLint, Stylelint e i parser
-installati nel progetto: configura prima il lint.
+installati nel progetto: configura prima il lint. `get_pattern` risponde in modi diversi a
+seconda degli argomenti: ognuno, e il livello che legge, è nell'[API dei pattern](../pattern-api/).
+`render_preview` ha bisogno di `playwright-core` nel progetto e di Chrome o Edge sulla macchina.
 
 ## Quando l'agente li chiama
 
@@ -106,9 +117,12 @@ La guida `agents/mcp.md` dice all'agente quando usare ogni strumento:
 - prima di scrivere un componente, `find_component`, poi `get_component` e `get_usage`;
 - prima di un colore, una spaziatura o una classe, `list_tokens`, `suggest_role` o
   `explain_class`;
+- prima di un flusso che dice qualcosa alla persona o la fa aspettare o decidere,
+  `get_pattern`; prima dell'intestazione di una pagina, il building block `page-header`;
 - prima di un'icona, `find_icon`;
 - dopo aver scritto, `check_markup`, poi il lint del progetto;
 - dopo l'installazione, o quando qualcosa non si vede, `check_setup`;
+- prima di chiederti di decidere su un'interfaccia, `render_preview`, un'immagine per opzione;
 - quando nessuno strumento risponde a ciò che serve, o una risposta dice che Magma non ha
   nulla (`gap`), te lo dice, va avanti e alla fine propone una issue su Magma per ogni
   risposta mancante: la apre solo se sei d'accordo.
