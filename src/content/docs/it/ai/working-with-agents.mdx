@@ -16,6 +16,19 @@ Aggiungi una pagina con l'elenco dei documenti dell'utente: una tabella con nome
 Nomina un componente solo quando vuoi proprio quello: l'agente ne legge comunque l'API, e un
 nome ricordato a memoria può appartenere a un'altra versione.
 
+## I flussi seguono i pattern
+
+Quando la schermata dice alla persona cosa è successo, chiede prima di un'azione che non si può
+annullare o la fa aspettare, l'agente chiede al server MCP il pattern del compito,
+`get_pattern`, e segue il caso che riceve: la stessa risposta in ogni prodotto. In Claude Code,
+`/magma:ui` lo chiede prima di costruire un flusso, e `/magma:review` controlla ogni flusso
+rispetto al suo caso.
+
+Quello che Magma lascia aperto al prodotto, e le situazioni del suo dominio, si decidono una
+volta nel livello del prodotto, che l'agente riceve con ogni risposta:
+[Progettare per il tuo prodotto](../design-for-your-product/) va dalla configurazione a un
+livello verificato.
+
 ## Controlla quello che ha costruito
 
 Lascia agli strumenti quello che può controllare una regola. Il [lint](../../development/lint/)
@@ -34,7 +47,7 @@ correzione (vedi [Plugin per Claude Code](../claude-code/)). Con un altro agente
 stessa cosa:
 
 ```text title="Prompt" wrap
-Rivedi il codice di interfaccia modificato su questo branch rispetto a Magma: lancia il lint e correggi quello che segnala, poi confronta ogni componente Magma con il suo pattern.md e antipattern.md.
+Rivedi il codice di interfaccia modificato su questo branch rispetto a Magma: lancia il lint e correggi quello che segnala, poi confronta ogni componente Magma con il suo examples.md e mistakes.md.
 ```
 
 ## Dopo un aggiornamento
