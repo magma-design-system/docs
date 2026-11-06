@@ -6,12 +6,13 @@
 // and, under them, a line whose button copies a value (CopyExample.astro;
 // CopyToClipboard.astro once per page): the path of a file in a package, the
 // full URL of an image.
-// The preview is a background image, so it fills mds-card-media whatever the
-// shape of the file: an artwork, transparent, `contain` on the background it
-// is drawn for (dark or white, whatever the mode of the page) as a
-// checkerboard; an image, opaque, `contain` on a soft ground, in a 4:3 box.
+// The preview is a background image, so it fills its frame (CardMedia.astro)
+// whatever the shape of the file: an artwork, transparent, `contain` on the
+// background it is drawn for (dark or white, whatever the mode of the page) as
+// a checkerboard; an image, opaque, `contain` on a soft ground, in a 4:3 box.
 // The cards are surface-overlay: --mds-card-background paints the card and
 // its parts.
+import CardMedia from './CardMedia.astro';
 import CopyExample from './CopyExample.astro';
 
 export interface DownloadLink {
@@ -56,33 +57,24 @@ const raw = { interpolation: { escapeValue: false } };
 ---
 
 <mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
-  <mds-card-media class="p-200">
-    <div
+  <CardMedia
+    ground={preview.kind === 'image' ? 'wash' : preview.dark ? 'dark' : 'white'}
+    class:list={[
+      'size-full min-h-3200',
+      // An image gets a 4:3 box: in the height of a logo a cover is a thumbnail.
+      preview.kind === 'image' && 'aspect-[4/3]',
+    ]}
+  >
+    <span
+      role="img"
+      aria-label={alt}
       class:list={[
-        'relative size-full min-h-3200 overflow-hidden rounded-md inset-shadow-xs',
-        // An image gets a 4:3 box: in the height of a logo a cover is a thumbnail.
-        preview.kind === 'image'
-          ? 'aspect-[4/3] bg-wash-soft'
-          : [
-              // The classic checkerboard, to show that the files are transparent.
-              'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
-              preview.dark
-                ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
-                : 'bg-white [--checker:color-mix(in_oklab,var(--color-neutral-100),var(--color-neutral-200))]',
-            ],
+        'absolute bg-contain bg-center bg-no-repeat',
+        preview.kind === 'image' ? 'inset-300' : 'inset-600',
       ]}
-    >
-      <span
-        role="img"
-        aria-label={alt}
-        class:list={[
-          'absolute bg-contain bg-center bg-no-repeat',
-          preview.kind === 'image' ? 'inset-300' : 'inset-600',
-        ]}
-        style={`background-image: url('${src}')`}
-      ></span>
-    </div>
-  </mds-card-media>
+      style={`background-image: url('${src}')`}
+    ></span>
+  </CardMedia>
   <mds-card-header>
     {detail ? (
       <div class="flex flex-col">

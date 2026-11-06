@@ -12,12 +12,18 @@
 // The media is the image of the first preview, the one Magma ships beside its
 // stage, light or dark as the page (previewImageHref() in src/lib/patterns.ts):
 // a WebP of a few KB, where running the stage in a frame would load a whole
-// page per card. The hidden one is not loaded (`loading` is lazy). Without a
-// preview (a candidate, a domain that ships none) the media is the icon of its
-// group or of the domain, on the neutral surface of mds-card-media.
+// page per card. The hidden one is not loaded (`loading` is lazy). The image
+// is opaque, so it sits in the frame of the Brand assets cards on their soft
+// ground, the one of an image (CardMedia.astro). The page in a light image
+// has nearly the color of that ground: a radius and a shadow draw its edge.
+// Without a preview (a candidate, a domain that ships none) the frame holds
+// the icon of its group or of the domain, in a box the size of an image.
+// The cards are surface-overlay: --mds-card-background paints the card and
+// its parts, where a `bg-*` on each region left the media on its own ground.
 import { getEntry } from 'astro:content';
 import { patternGroups, shippedDomains } from '../lib/nav.mjs';
 import { patternHref, previewImageHref, type PatternKind } from '../lib/patterns';
+import CardMedia from './CardMedia.astro';
 import Code from './Code.astro';
 import Heading from './Heading.astro';
 
@@ -82,19 +88,19 @@ const groups =
     <div class="not-content @container my-600">
       <div class="grid gap-600 @xl:grid-cols-2">
         {items.map((item) => (
-          <mds-card class="bg-surface-overlay">
-            <mds-card-media>
+          <mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
+            <CardMedia ground="wash" class="p-300">
               {item.images ? (
                 <>
                   <mds-img
-                    class="aspect-8/5 [--mds-img-background:transparent] dark:hidden"
+                    class="aspect-8/5 overflow-hidden rounded-sm shadow-sm [--mds-img-background:transparent] dark:hidden"
                     src={item.images.light}
                     alt=""
                     width="1440"
                     height="900"
                   />
                   <mds-img
-                    class="hidden aspect-8/5 [--mds-img-background:transparent] dark:flex"
+                    class="hidden aspect-8/5 overflow-hidden rounded-sm shadow-sm [--mds-img-background:transparent] dark:flex"
                     src={item.images.dark}
                     alt=""
                     width="1440"
@@ -106,8 +112,8 @@ const groups =
                   <mds-icon name={item.icon} class="w-1200 fill-current text-fg-muted" />
                 </div>
               )}
-            </mds-card-media>
-            <mds-card-header class="flex-wrap items-center gap-200 bg-surface-overlay">
+            </CardMedia>
+            <mds-card-header class="flex-wrap items-center gap-200">
               {/* Under the heading of its topic, or right under the h1. */}
               <mds-text typography="h6" tag={id ? 'h3' : 'h2'} lang={item.titleLang}>
                 {item.title}
@@ -116,7 +122,7 @@ const groups =
                 <mds-badge label={t('pattern.candidate')} variant="info" tone="weak" />
               )}
             </mds-card-header>
-            <mds-card-content class="flex flex-col gap-300 bg-surface-overlay">
+            <mds-card-content class="flex flex-col gap-300">
               <mds-text typography="detail" tag="p" lang={contentLang}>
                 {item.need}
               </mds-text>
@@ -127,7 +133,7 @@ const groups =
                 <Code>{item.id}</Code>
               </mds-text>
             </mds-card-content>
-            <mds-card-footer class="bg-surface-overlay">
+            <mds-card-footer>
               <mds-button
                 href={item.href}
                 type="a"

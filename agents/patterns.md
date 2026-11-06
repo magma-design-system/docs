@@ -107,9 +107,16 @@ builds a pattern with the components of the project from the case `get_pattern` 
   (`nav.design-language.<id>`), and the same gallery on its landing page, in one grid. Density
   ships no preview: its card shows its icon, and its page has no stage.
 - The media of a card is the image of the first preview, two `mds-img` switched by Magma's
-  `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded), on a transparent
-  background over the neutral surface of `mds-card-media` while it loads. Without a preview (a
-  candidate, a domain that ships none) the media is the icon of its group or of the domain. Decided on 2026-11-04 against running the preview
+  `dark:` variant as `Logo.astro` does (the hidden one is lazy, so not loaded). It sits in the
+  frame of the Brand assets cards (`CardMedia.astro`, shared with `DownloadCard.astro`, since
+  2026-11-06): inset from the edges of the card, rounded, with an inset shadow, on the soft
+  ground of an opaque image. Not the checkerboard: there it tells that a file is transparent,
+  and the previews are opaque. The page of a light preview has nearly the color of that ground
+  (242 against 237), so the image has a radius and a shadow of its own. The card is painted by
+  `--mds-card-background`, not a `bg-*` on each region: `mds-card-media` would keep its own
+  ground, a band around the frame. Without a preview (a candidate, a domain that ships none)
+  the frame holds the icon of its group or of the domain, in a box the size of an image.
+  Decided on 2026-11-04 against running the preview
   small in an inert frame, as the first version of #101 did: a preview in a card loaded 25 to 58
   files, 650 to 975 KB, and hydrated its components, where its WebP weighs 1 to 28 KB. The
   images were asked in [magma#1243](https://github.com/magma-design-system/magma/issues/1243)
