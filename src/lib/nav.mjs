@@ -17,8 +17,9 @@ export const STORYBOOK = loadComponentDocs().storybook;
  * Magma Studio, where a theme is made in the browser: published from Magma's
  * main beside Storybook, linked from here with an address of its own
  * (https://github.com/magma-design-system/magma/issues/693, "On the site").
- * The packages do not give its address. Its pages are addressed by the hash:
- * `#/theme`, `#/colors/palette`.
+ * The packages do not give its address, written here until they do, beside
+ * Storybook's (https://github.com/magma-design-system/magma/issues/1294). Its
+ * pages are addressed by the hash: `#/theme`, `#/colors/palette`.
  */
 export const STUDIO = 'https://magma-design-system.github.io/magma/studio/';
 
