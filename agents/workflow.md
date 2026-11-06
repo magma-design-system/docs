@@ -123,6 +123,11 @@ A new author, step by step:
   request bumps them together, as a person does (Upgrading Magma, below). Nothing stops a red
   Renovate pull request: no status check is required on `main`, so GitHub merges it as soon as
   its checks end, whatever their result (2.9.0 and the two updates after it merged red).
+  A second way to the same red: a Renovate pull request that changes `package.json` and not
+  `package-lock.json`. `npm ci` then stops on EUSAGE ("lock file not in sync"). #100, #103 and
+  #104 (tailwindcss, Starlight, astro) merged this way between 2026-11-03 and 11-06; earlier ones of
+  the same packages had carried the lockfile. Before a branch from `main`, if `npm ci` stops
+  on EUSAGE, `npm install` and commit the lockfile alone, in a pull request of its own.
 
 ## Publishing
 
