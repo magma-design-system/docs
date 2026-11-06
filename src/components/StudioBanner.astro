@@ -1,0 +1,34 @@
+---
+// The way to Magma Studio from a page about themes, as mds-banner: a theme
+// of your own is made there, in the browser. `page` is the page of the
+// Studio it opens, by its hash (`#/theme`, `#/colors/palette`); its root
+// otherwise. In a new tab, as the other links to the Studio.
+import UiText from './UiText.astro';
+import { STUDIO } from '../lib/nav.mjs';
+import { TEXT } from '../lib/markdown-text.mjs';
+
+interface Props {
+  page?: string;
+}
+
+const { page = '' } = Astro.props;
+const { t } = Astro.locals;
+---
+
+<mds-banner variant="primary" icon="mi/baseline/palette" headline={t('studio.banner.headline')}>
+  <mds-text typography="detail" class={TEXT.block}>
+    <UiText text={t('studio.banner.text')} />
+  </mds-text>
+  <mds-button
+    slot="action"
+    href={`${STUDIO}${page}`}
+    target="blank"
+    type="a"
+    variant="primary"
+    tone="strong"
+    icon="mi/baseline/open-in-new"
+    icon-position="right"
+  >
+    {t('studio.open')}
+  </mds-button>
+</mds-banner>

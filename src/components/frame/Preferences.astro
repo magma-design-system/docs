@@ -1,7 +1,8 @@
 ---
-// Repository and Storybook links, light/dark mode, theme and language: at the
-// bottom of the rail and in the mobile menu (the search is at their top,
-// SearchField.astro). Mode, theme and language are Magma's own preference
+// Repository, Storybook and Magma Studio links, light/dark mode, theme and
+// language: at the bottom of the rail and in the mobile menu (the search is at
+// their top, SearchField.astro). The Studio, the newest, carries a badge that
+// says so. Mode, theme and language are Magma's own preference
 // components, in the panel that groups them (mds-pref); src/scripts/magma.ts
 // makes Starlight follow the mode.
 //
@@ -12,7 +13,7 @@
 // button here or from its icon in the collapsed rail; in the menu it is shown
 // as it is, below the links.
 import { locales } from '../../lib/i18n.mjs';
-import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK, STUDIO } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
 
 const { t, starlightRoute } = Astro.locals;
@@ -58,6 +59,19 @@ const themes = [
       tone="text"
       size="sm"
     ></mds-button>
+    <div class="flex items-center gap-200">
+      <mds-button
+        href={STUDIO}
+        target="blank"
+        type="a"
+        icon="mi/baseline/palette"
+        label={t('frame.studio')}
+        variant="dark"
+        tone="text"
+        size="sm"
+      ></mds-button>
+      <mds-badge label={t('new.title')} variant="blue" tone="strong" />
+    </div>
     <mds-button
       id="preferences-trigger"
       class="in-data-[preferences=menu]:hidden"

@@ -1,7 +1,9 @@
 ---
 // The opening of a page with a `hero` in its frontmatter (the home page),
-// replacing Starlight's: the Magma mark, the title, the tagline and the
-// actions, centered on a wash of the blue of the mark and of a violet,
+// replacing Starlight's: the news of the moment (`announcement` in the
+// frontmatter, src/content.config.ts: a badge and a sentence, a link to the
+// page or the band that tells it), the Magma mark, the title, the tagline and
+// the actions, centered on a wash of the blue of the mark and of a violet,
 // fainter in dark mode, where the label palette turns deep. The title keeps
 // the id Starlight gives the <h1>. Actions: `primary` is the strong button
 // with an arrow, `secondary` the weak one, `minimal` a text button; their
@@ -16,6 +18,7 @@ import Logo from './Logo.astro';
 
 const { entry } = Astro.locals.starlightRoute;
 const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
+const { announcement } = entry.data;
 
 const TONES = { primary: 'strong', secondary: 'weak', minimal: 'text' } as const;
 ---
@@ -30,6 +33,25 @@ const TONES = { primary: 'strong', secondary: 'weak', minimal: 'text' } as const
     class="absolute inset-0 -z-10 bg-radial-[at_90%_10%] from-label-violet-10 via-transparent to-transparent mask-b-from-50% dark:from-label-violet-10/40"
   ></div>
   <div class="mx-auto flex max-w-3xl flex-col items-center gap-600 text-center">
+    {announcement && (
+      <a
+        href={announcement.link}
+        class="mb-400 flex items-center gap-300 rounded-full bg-surface-overlay py-200 ps-200 pe-400 text-start no-underline shadow-sm transition-cosmetic focus-bounce hover:shadow-outline"
+      >
+        <mds-badge label={announcement.badge} variant="blue" tone="strong" class="shrink-0" />
+        <mds-text typography="detail" class="text-fg-default">
+          {announcement.text}
+        </mds-text>
+        <mds-icon
+          name={
+            announcement.link.startsWith('#')
+              ? 'mi/baseline/arrow-downward'
+              : 'mi/baseline/arrow-forward'
+          }
+          class="w-400 shrink-0 text-fg-muted"
+        />
+      </a>
+    )}
     <Logo class="size-2000" />
     <mds-text id="_top" typography="h1" tag="h1" class="block">
       {title}

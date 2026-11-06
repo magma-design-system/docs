@@ -1,11 +1,13 @@
 ---
 // A band of the home page: a centered heading with its lead, then the slot,
 // then, when given, a button to the page that tells more (`href`, labelled
-// `action`, relative to the page). The `before` slot goes above the heading,
-// in its column (the mascot of the agents band). With an `aside` slot, the
-// heading and the lead sit on its left, aligned to the start, once the band
-// is wide enough for both (centered above it before). `not-content`: the band
-// sets its own space, Starlight would add 1rem.
+// `action`, relative to the page; `external` opens it in a new tab). The
+// `before` slot goes above the heading, in its column (the mascot of the
+// agents band), `badge` right above the heading (what is new). With an `aside`
+// slot, the heading and the lead sit on its left, aligned to the start, once
+// the band is wide enough for both (centered above it before), and the button
+// goes under the lead. `not-content`: the band sets its own space, Starlight
+// would add 1rem.
 interface Props {
   /** Id of the heading, for links to the band. */
   id: string;
@@ -13,10 +15,25 @@ interface Props {
   lead?: string;
   href?: string;
   action?: string;
+  /** The page of `href` is another site: a new tab. */
+  external?: boolean;
+  /** A word above the heading, as mds-badge: what is new. */
+  badge?: string;
 }
 
-const { id, title, lead, href, action } = Astro.props;
+const { id, title, lead, href, action, external = false, badge } = Astro.props;
 const aside = Astro.slots.has('aside');
+const button = href && {
+  href,
+  type: 'a',
+  target: external ? 'blank' : undefined,
+  label: action,
+  icon: external ? 'mi/baseline/open-in-new' : 'mi/baseline/arrow-forward',
+  'icon-position': 'right',
+  variant: 'primary',
+  tone: 'weak',
+  size: 'lg',
+};
 ---
 
 <section class:list={['not-content mt-2400', aside && '@container']} aria-labelledby={id}>
@@ -34,6 +51,7 @@ const aside = Astro.slots.has('aside');
       ]}
     >
       <slot name="before" />
+      {badge && <mds-badge label={badge} variant="blue" tone="strong" />}
       <mds-text id={id} typography="h2" tag="h2" class="block scroll-mt-600">
         {title}
       </mds-text>
@@ -42,22 +60,14 @@ const aside = Astro.slots.has('aside');
           {lead}
         </mds-text>
       )}
+      {aside && button && <mds-button class="mt-400 self-center @5xl:self-start" {...button} />}
     </div>
     <slot name="aside" />
   </div>
   <slot />
-  {href && (
+  {!aside && button && (
     <div class="mt-800 flex justify-center">
-      <mds-button
-        href={href}
-        type="a"
-        label={action}
-        icon="mi/baseline/arrow-forward"
-        icon-position="right"
-        variant="primary"
-        tone="weak"
-        size="lg"
-      />
+      <mds-button {...button} />
     </div>
   )}
 </section>

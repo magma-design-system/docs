@@ -3,12 +3,13 @@
 // icon of the section (src/lib/nav.mjs) in a label color of its own, its
 // name, and the description of its landing page in the language of the page
 // (the components landing is generated: its description is a UI string).
-// The home section itself is left out; Storybook closes the grid, opening in
-// a new tab.
+// The home section itself is left out; Storybook and Magma Studio close the
+// grid, opening in a new tab, the Studio with the badge of what is new
+// (`fresh`).
 import type { ThemeFullVariantAvatarType } from '@maggioli-design-system/magma';
 import { getEntry } from 'astro:content';
 import { localePrefix } from '../../lib/frame';
-import { STORYBOOK, sections } from '../../lib/nav.mjs';
+import { STORYBOOK, STUDIO, sections } from '../../lib/nav.mjs';
 
 /** The label color of each section. */
 const VARIANTS: Record<string, ThemeFullVariantAvatarType> = {
@@ -43,6 +44,7 @@ const pages = await Promise.all(
         description: entry?.data.description ?? t('components.description'),
         href: `${localePrefix(locale)}/${id}/`,
         external: false,
+        fresh: false,
       };
     }),
 );
@@ -56,13 +58,23 @@ const cards = [
     description: t('home.storybook.description'),
     href: STORYBOOK,
     external: true,
+    fresh: false,
+  },
+  {
+    icon: 'mi/baseline/palette',
+    variant: 'violet' as const,
+    title: t('frame.studio'),
+    description: t('home.studio.description'),
+    href: STUDIO,
+    external: true,
+    fresh: true,
   },
 ];
 ---
 
 <div class="not-content @container">
   <div class="grid gap-600 @2xl:grid-cols-2 @4xl:grid-cols-3 @6xl:grid-cols-4">
-    {cards.map(({ icon, variant, title, description, href, external }) => {
+    {cards.map(({ icon, variant, title, description, href, external, fresh }) => {
       const action = external ? t('home.storybook.open') : t('cards.open');
       return (
         <mds-card class="bg-surface-overlay">
@@ -76,6 +88,9 @@ const cards = [
               <mds-text typography="h6" tag="h3">
                 {title}
               </mds-text>
+              {fresh && (
+                <mds-badge slot="detail" variant="blue" tone="strong" label={t('new.title')} />
+              )}
             </mds-entity>
           </mds-card-header>
           <mds-card-content class="grow bg-surface-overlay">
