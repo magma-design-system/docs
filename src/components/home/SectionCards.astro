@@ -4,12 +4,13 @@
 // name, and the description of its landing page in the language of the page
 // (the components landing is generated: its description is a UI string),
 // with a badge under the name of the sections still being written (`soon`).
-// The home section itself is left out; Storybook closes the grid, opening in
-// a new tab.
+// The home section itself is left out; Storybook and Magma Studio close the
+// grid, opening in a new tab, the Studio with the badge of what is new
+// (`fresh`).
 import type { ThemeFullVariantAvatarType } from '@maggioli-design-system/magma';
 import { getEntry } from 'astro:content';
 import { localePrefix } from '../../lib/frame';
-import { STORYBOOK, sections } from '../../lib/nav.mjs';
+import { STORYBOOK, STUDIO, sections } from '../../lib/nav.mjs';
 
 /** The label color of each section. */
 const VARIANTS: Record<string, ThemeFullVariantAvatarType> = {
@@ -45,6 +46,7 @@ const pages = await Promise.all(
         href: `${localePrefix(locale)}/${id}/`,
         external: false,
         soon: soon ?? false,
+        fresh: false,
       };
     }),
 );
@@ -59,13 +61,24 @@ const cards = [
     href: STORYBOOK,
     external: true,
     soon: false,
+    fresh: false,
+  },
+  {
+    icon: 'mi/baseline/palette',
+    variant: 'violet' as const,
+    title: t('frame.studio'),
+    description: t('home.studio.description'),
+    href: STUDIO,
+    external: true,
+    soon: false,
+    fresh: true,
   },
 ];
 ---
 
 <div class="not-content @container">
   <div class="grid gap-600 @2xl:grid-cols-2 @4xl:grid-cols-3 @6xl:grid-cols-4">
-    {cards.map(({ icon, variant, title, description, href, external, soon }) => {
+    {cards.map(({ icon, variant, title, description, href, external, soon, fresh }) => {
       const action = external ? t('home.storybook.open') : t('cards.open');
       return (
         <mds-card class="bg-surface-overlay">
@@ -81,6 +94,9 @@ const cards = [
               </mds-text>
               {soon && (
                 <mds-badge slot="detail" variant="info" tone="weak" label={t('soon.title')} />
+              )}
+              {fresh && (
+                <mds-badge slot="detail" variant="blue" tone="strong" label={t('new.title')} />
               )}
             </mds-entity>
           </mds-card-header>

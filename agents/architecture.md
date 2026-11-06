@@ -47,8 +47,8 @@ Starlight's components listed in `astro.config.mjs` are replaced by
   Below 64rem: the mobile header (`Header`) with everything in its menu. The right column stands
   next to the content from 80rem (`wide`); below, it opens in a dropdown (`TwoColumnContent`).
 - `Rail`: brand, search field (`SearchField`, a button that opens Pagefind), the sections in
-  their groups (`SectionLinks`, `groups` of `frameNav()`), repository and Storybook links, and a
-  Preferences button that opens `mds-pref` (mode, language, theme: `Preferences`) in an
+  their groups (`SectionLinks`, `groups` of `frameNav()`), repository, Storybook and Magma Studio
+  links (see Magma Studio below), and a Preferences button that opens `mds-pref` (mode, language, theme: `Preferences`) in an
   `mds-dropdown`. Collapsible to icons with tooltips; the state is in `localStorage`
   (`magma-docs:rail`).
 - `Sidebar` / `SectionNav` / `SectionEntries`: the section navigation, from Starlight's sidebar.
@@ -128,6 +128,36 @@ groups of the rail are `RAIL_GROUP_ICONS`. The structure and its reasons are in
 | Development         | Installation (`FrameworkTabs.astro`, choice kept in `magma-docs:framework`; `MagmaVersions.astro`), Lint (`LintRules.astro`: the rules and their severity per preset, from the ESLint and Stylelint plugins of magma, `lintRules()` in `src/lib/magma.mjs`), Versions and migrations.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Agentic development | Written here (MDX): Start a project, Working with an agent, Guides in the package, MCP server, Claude Code plugin. The tool table of the MCP server is `McpTools.astro`: the tools and their arguments from `magma/dist/lint/mcp/tools.json` (`mcpTools()` in `src/lib/magma.mjs`), what to ask each one in the page.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Community           | Channels (`Channel.astro`), Contributing, Code of conduct, About.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+## Magma Studio
+
+Magma Studio, where a theme is made in the browser, is an app of the Magma repository published
+beside Storybook, at an address of its own (`STUDIO` in [`src/lib/nav.mjs`](../src/lib/nav.mjs);
+the packages do not give it, while `documentation.json` gives Storybook's). Mounting it in a page
+of this site, with its header and without the side columns, is a later step of
+[magma#693](https://github.com/magma-design-system/magma/issues/693) ("On the site"). Its pages
+are addressed by the hash (`#/theme`, `#/colors/palette`). The site sends people there from:
+
+- the hero of the home: `announcement` in the frontmatter of `index.mdx` (a field of the docs
+  schema, `src/content.config.ts`; `Hero.astro` shows it above the mark), a badge and a sentence
+  that lead to the band below;
+- the band `#studio` of the home (`HomeSection` with `aside`, `external` and `badge`): the
+  picture is `StudioShot.astro`, the Theme section as it opens, light and dark,
+  `public/home/studio-desktop-<scheme>.webp`;
+- the last card of the home grid (`SectionCards`), beside Storybook;
+- the rail (an icon when collapsed) and the mobile menu (`Rail`, `Preferences`), the resources of
+  `SiteFooter`, the Channels page (Community) and the Themes and preferences page of Tokens
+  (`StudioBanner.astro`, which opens `#/theme`).
+
+The badge "New" (`new.title`) is on the hero, the band, the card and the rail: take it away from
+all four when the Studio is no longer the news, or move them to the next one. The pictures go
+stale as the Studio changes: take them again from the published Studio, light and dark, the
+first screen only, at 1440 css px (no build needed):
+
+```sh
+npm run screenshots -- --url 'https://magma-design-system.github.io/magma/studio/#/theme' \
+  --name studio --only desktop --viewport --webp 1440 --out public/home
+```
 
 ## Changelog
 

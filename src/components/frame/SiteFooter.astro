@@ -6,7 +6,7 @@
 // (.github/ISSUE_TEMPLATE); the problems of this site go to its own issues.
 import { localePrefix } from '../../lib/frame';
 import { magmaVersion } from '../../lib/magma.mjs';
-import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK, STUDIO } from '../../lib/nav.mjs';
 import Brand from './Brand.astro';
 
 const { t, starlightRoute } = Astro.locals;
@@ -19,6 +19,7 @@ const columns = [
     id: 'resources',
     links: [
       { key: 'storybook', href: STORYBOOK },
+      { key: 'studio', href: STUDIO },
       { key: 'github', href: REPOSITORY },
       { key: 'npm', href: 'https://www.npmjs.com/org/maggioli-design-system' },
       { key: 'figma', href: local('tokens/figma/') },

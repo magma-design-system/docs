@@ -22,8 +22,19 @@ const uiStrings = z.object(
   >,
 );
 
+// Beyond Starlight's frontmatter: the news the hero of a page opens with
+// (src/components/frame/Hero.astro), a badge and a sentence leading to it.
+const announcement = z.object({
+  badge: z.string(),
+  text: z.string(),
+  link: z.string(),
+});
+
 export const collections = {
-  docs: defineCollection({ loader: docsLoader(), schema: docsSchema() }),
+  docs: defineCollection({
+    loader: docsLoader(),
+    schema: docsSchema({ extend: z.object({ announcement: announcement.optional() }) }),
+  }),
   i18n: defineCollection({ loader: i18nLoader(), schema: i18nSchema({ extend: uiStrings }) }),
   // The people who write the pages, by GitHub login: the name and role shown
   // in the page footer (src/components/frame/Footer.astro), and the emails of

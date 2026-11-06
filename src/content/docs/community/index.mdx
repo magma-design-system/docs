@@ -1,13 +1,14 @@
 ---
 title: Channels
-description: Where to ask about Magma, follow how it changes and try its components.
+description: Where to ask about Magma, follow how it changes, try its components and make a theme of your own.
 ---
 
 import Channel from '../../../components/Channel.astro';
 import Channels from '../../../components/Channels.astro';
 import PageCards from '../../../components/PageCards.astro';
+import { STUDIO } from '../../../lib/nav.mjs';
 
-Where to ask about Magma, follow how it changes and try its components:
+Where to ask about Magma, follow how it changes, try its components and make a theme of your own:
 
 <Channels>
 <Channel
@@ -53,6 +54,21 @@ from the controls, see the events it sends and check its accessibility. It also 
 type scale, the icons and the test pages of colors and surfaces. The link opens Acme
 Console, an application screen built with Magma followed by the whole component library,
 in light and dark mode.
+
+</Channel>
+<Channel
+  name="Magma Studio"
+  kind="Themes"
+  icon="mi/baseline/palette"
+  variant="violet"
+  href={STUDIO}
+  action="Open Magma Studio"
+>
+
+Where a theme of your own is made, in the browser and with nothing to install. Add your
+colors and Magma solves each one into the steps of light and dark mode, judges the contrast
+of every pair while you edit, and shows the theme on the screen of a product, in light,
+dark or both side by side. When it is right, download its tokens.
 
 </Channel>
 </Channels>

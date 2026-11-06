@@ -1,6 +1,6 @@
 ---
 // Desktop rail: brand, the search (SearchField.astro), the sections and
-// the actions (repository, Storybook, preferences). Collapsed, it narrows to
+// the actions (repository, Storybook, Magma Studio, preferences). Collapsed, it narrows to
 // icons: the button that expands it again, the logo below it, then the search,
 // the sections and the actions, each named by its tooltip (relation="label").
 // The state is kept in localStorage and restored before the first paint
@@ -10,7 +10,7 @@
 // The preferences open in a dropdown next to the button that asks for them,
 // in either form of the rail (Preferences.astro moves them in and out).
 import { localePrefix } from '../../lib/frame';
-import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK, STUDIO } from '../../lib/nav.mjs';
 import Brand from './Brand.astro';
 import Logo from './Logo.astro';
 import Preferences from './Preferences.astro';
@@ -39,6 +39,12 @@ const actions = [
     icon: 'mi/baseline/auto-stories',
     label: t('frame.storybook'),
     attributes: { type: 'a', href: STORYBOOK, target: 'blank' },
+  },
+  {
+    id: 'rail-studio',
+    icon: 'mi/baseline/palette',
+    label: t('frame.studio'),
+    attributes: { type: 'a', href: STUDIO, target: 'blank' },
   },
   {
     id: 'rail-preferences',

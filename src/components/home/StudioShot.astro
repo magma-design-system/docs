@@ -1,0 +1,34 @@
+---
+// The picture of Magma Studio in its band of the home page: the Theme section
+// as it opens, at 1440 by 900 css px, taken from the published Studio by
+// scripts/screenshots.mjs into public/home/ (agents/architecture.md, Home
+// page). The light picture in light mode; in dark mode the dark one, the
+// Studio as it opens under a dark system: its frame dark, the scene of the
+// product still light. A picture only: the button of the band opens the
+// Studio.
+interface Props {
+  /** What the picture shows, for screen readers. */
+  alt: string;
+}
+
+const { alt } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const SCHEMES = [
+  { scheme: 'light', class: 'dark:hidden' },
+  { scheme: 'dark', class: 'hidden dark:block' },
+];
+---
+
+<div class="overflow-hidden rounded-xl border border-border-muted shadow-2xl">
+  {SCHEMES.map(({ scheme, class: visible }) => (
+    <img
+      src={`${base}home/studio-desktop-${scheme}.webp`}
+      alt={alt}
+      width="1440"
+      height="900"
+      loading="lazy"
+      decoding="async"
+      class:list={['block h-auto w-full', visible]}
+    />
+  ))}
+</div>

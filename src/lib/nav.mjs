@@ -13,6 +13,14 @@ import { sidebarLabel } from './i18n.mjs';
 export const REPOSITORY = 'https://github.com/magma-design-system/magma';
 /** The published Storybook, as the installed Magma gives it. */
 export const STORYBOOK = loadComponentDocs().storybook;
+/**
+ * Magma Studio, where a theme is made in the browser: published from Magma's
+ * main beside Storybook, linked from here with an address of its own
+ * (https://github.com/magma-design-system/magma/issues/693, "On the site").
+ * The packages do not give its address. Its pages are addressed by the hash:
+ * `#/theme`, `#/colors/palette`.
+ */
+export const STUDIO = 'https://magma-design-system.github.io/magma/studio/';
 
 /**
  * `icon` is an mds-icon slug, collected by iconsauce (iconsauce.config.mjs).

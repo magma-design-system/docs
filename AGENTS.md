@@ -91,6 +91,7 @@ Before running them, know the traps (details in [agents/workflow.md](agents/work
 | `src/content/i18n/`, `src/content/authors.json`      | UI strings per locale; names and roles of the page footer, by GitHub login              |
 | `public/covers/`                                     | Covers of the site for other sites and link previews (`og:image`), stable URLs          |
 | `public/previews/`                                   | Images and video of the demos (CC0 or Maggioli's own; sources in architecture.md)       |
+| `public/home/`                                       | Pictures of the home bands: Magma Studio, from the published Studio                     |
 | `plan/`                                              | Decision records and open work                                                          |
 
 ## Guides
