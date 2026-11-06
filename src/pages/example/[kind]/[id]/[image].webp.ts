@@ -14,7 +14,7 @@ export function getStaticPaths() {
     previews.flatMap((preview) =>
       PREVIEW_SCHEMES.map((scheme) => ({
         params: {
-          kind: kind === 'foundation' ? 'domain' : kind,
+          kind: kind === 'design-language' ? 'domain' : kind,
           id,
           image: `${preview.id}.${scheme}`,
         },

@@ -17,7 +17,7 @@ const shipped = shippedDomains().some((domain) => domain.id === id);
 ---
 
 {shipped ? (
-  <mds-link href={patternHref(locale, 'foundation', id)}>
+  <mds-link href={patternHref(locale, 'design-language', id)}>
     <slot />
   </mds-link>
 ) : (

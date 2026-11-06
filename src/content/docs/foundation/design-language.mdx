@@ -8,7 +8,7 @@ import PatternGallery from '../../../components/PatternGallery.astro';
 Each domain answers one question about setting components together on a screen. Open one: it
 starts with its cases at work, and the rules come after.
 
-<PatternGallery kind="foundation" />
+<PatternGallery kind="design-language" />
 
 ## What the design language is
 
@@ -19,7 +19,7 @@ every product, so that two screens made by two teams read as one product.
 
 Each domain is one of those questions: rhythm and density for space, actions for the weight of
 what the person can do, titles, surfaces, widths and alignment. The
-[building blocks](../blocks/) and the [patterns](../patterns/) follow these rules, and the
+[building blocks](../../blocks/) and the [patterns](../../patterns/) follow these rules, and the
 screens of a product follow them too.
 
 ## Reading a domain
@@ -34,11 +34,11 @@ with the case it falls in; **Decisions** says when each rule was decided and why
 
 An agent reads the same files. It asks the Magma MCP server for the rule of its context with
 `get_pattern`, or for a whole domain with `get_guide` and its id (`rhythm`). How to set the agent
-up is in [Agentic development](../ai/).
+up is in [Agentic development](../../ai/).
 
 ## Where they come from
 
 The domains ship with Magma, in the package `@maggioli-design-system/magma`, beside the
 patterns. Each page here is generated from the file of its domain, and it is written in English.
-The decisions they rest on, the principles, accessibility, color and type, are in
-[Foundation](../foundation/).
+The decisions they rest on, the principles, accessibility, color and type, are the other pages
+of [Foundation](../).

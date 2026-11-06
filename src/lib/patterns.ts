@@ -17,7 +17,7 @@ export function patternHref(locale: string | undefined, kind: PatternKind, id: s
 
 /** The folder of the previews of a pattern: /docs/example/<domain, pattern or block>/<id>/. */
 function previewFolder(kind: PatternKind, id: string): string {
-  const segment = kind === 'foundation' ? 'domain' : kind;
+  const segment = kind === 'design-language' ? 'domain' : kind;
   return `${import.meta.env.BASE_URL.replace(/\/?$/, '/')}example/${segment}/${id}/`;
 }
 

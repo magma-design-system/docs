@@ -62,7 +62,7 @@ export const collections = {
   patterns: defineCollection({
     loader: patternsLoader(),
     schema: z.object({
-      kind: z.enum(['foundation', 'pattern', 'block']),
+      kind: z.enum(['design-language', 'pattern', 'block']),
       group: z.string().optional(),
       status: z.enum(['decided', 'candidate']),
       title: z.string(),

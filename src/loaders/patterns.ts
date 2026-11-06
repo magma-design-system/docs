@@ -59,7 +59,7 @@ function linkPreviews(html: string, ids: Set<string>): string {
 
 /**
  * What the installed magma ships in `agents/patterns/`: the domains of the
- * design language (`kind: foundation`), the patterns and the building blocks,
+ * design language (`kind: design-language`), the patterns and the building blocks,
  * one page each in the section of its kind
  * (src/pages/[...locale]/[section]/[id].astro): the whole file as Magma ships
  * it to the agents, and its previews, which the stage at the top of the page
@@ -79,7 +79,9 @@ export function patternsLoader(): Loader {
       const domains = new Set(DOMAINS.map(({ id }) => id));
       const groups = new Set(PATTERN_GROUPS.map(({ id }) => id));
       const homeless = shipped.filter((pattern) =>
-        pattern.kind === 'foundation' ? !domains.has(pattern.id) : !groups.has(pattern.group ?? ''),
+        pattern.kind === 'design-language'
+          ? !domains.has(pattern.id)
+          : !groups.has(pattern.group ?? ''),
       );
       if (homeless.length)
         throw new Error(
@@ -133,7 +135,7 @@ export function patternsLoader(): Loader {
       }
       const count = (kind: string) => shipped.filter((pattern) => pattern.kind === kind).length;
       logger.info(
-        `Loaded from magma ${count('foundation')} domains of the design language, ${count('pattern')} patterns, ${count('block')} building blocks`,
+        `Loaded from magma ${count('design-language')} domains of the design language, ${count('pattern')} patterns, ${count('block')} building blocks`,
       );
     },
   };

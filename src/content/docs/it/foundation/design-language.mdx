@@ -8,7 +8,7 @@ import PatternGallery from '../../../../components/PatternGallery.astro';
 Ogni dominio risponde a una domanda su come mettere insieme i componenti in una schermata.
 Aprine uno: si parte dai suoi casi in funzione, le regole vengono dopo.
 
-<PatternGallery kind="foundation" />
+<PatternGallery kind="design-language" />
 
 ## Che cos'è il linguaggio di design
 
@@ -20,7 +20,7 @@ prodotto.
 
 Ogni dominio è una di queste domande: ritmo e densità per lo spazio, azioni per il peso di quello
 che la persona può fare, titoli, superfici, larghezze e allineamento. I
-[building block](../blocks/) e i [pattern](../patterns/) seguono queste regole, e le seguono
+[building block](../../blocks/) e i [pattern](../../patterns/) seguono queste regole, e le seguono
 anche le schermate di un prodotto.
 
 ## Come si legge un dominio
@@ -35,11 +35,11 @@ caso in cui ricade; **Decisions** dice quando è stata decisa ogni regola e perc
 
 Un agente legge gli stessi file. Chiede al server MCP di Magma la regola del suo contesto con
 `get_pattern`, o un dominio intero con `get_guide` e il suo id (`rhythm`). Come preparare
-l'agente è in [Sviluppo agentico](../ai/).
+l'agente è in [Sviluppo agentico](../../ai/).
 
 ## Da dove vengono
 
 I domini arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`, accanto ai pattern.
 Ogni pagina qui è generata dal file del suo dominio, ed è scritta in inglese. Le decisioni su cui
-poggiano, i principi, l'accessibilità, il colore e la tipografia, sono nei
-[Fondamenti](../foundation/).
+poggiano, i principi, l'accessibilità, il colore e la tipografia, sono le altre
+pagine dei [Fondamenti](../).

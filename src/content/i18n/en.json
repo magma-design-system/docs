@@ -24,7 +24,7 @@
   "nav.components.structure": "Structure",
   "nav.components.content": "Content",
   "nav.components.preferences": "Preferences",
-  "nav.design-language": "Design language",
+  "nav.foundation.design-language": "Design language",
   "nav.design-language.rhythm": "Rhythm",
   "nav.design-language.density": "Density",
   "nav.design-language.actions": "Actions",
