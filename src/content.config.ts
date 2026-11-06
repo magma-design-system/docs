@@ -4,6 +4,7 @@ import { z } from 'astro/zod';
 import { docsLoader, i18nLoader } from '@astrojs/starlight/loaders';
 import { docsSchema, i18nSchema } from '@astrojs/starlight/schema';
 import { componentsLoader } from './loaders/components';
+import { domainsLoader } from './loaders/domains';
 import en from './content/i18n/en.json';
 
 const documented = z.looseObject({ name: z.string(), docsHtml: z.string() });
@@ -54,6 +55,31 @@ export const collections = {
       dependents: z.array(z.string()),
       dependencies: z.array(z.string()),
       encapsulation: z.string(),
+    }),
+  }),
+  // The domains of the design language, one page each under Foundation.
+  domains: defineCollection({
+    loader: domainsLoader(),
+    schema: z.object({
+      title: z.string(),
+      need: z.string(),
+      principle: z.string(),
+      // The body in parts, each followed by the previews of the section it
+      // ends with: the cases after Cases, the rules after Always true.
+      parts: z.array(
+        guide.extend({
+          previews: z.array(
+            z.object({
+              id: z.string(),
+              of: z.enum(['case', 'rule']),
+              try: z.string(),
+              height: z.number().optional(),
+              wholePage: z.boolean(),
+              markup: z.string(),
+            }),
+          ),
+        }),
+      ),
     }),
   }),
 };

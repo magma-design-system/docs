@@ -55,12 +55,13 @@
 /*
   The examples the component previews run (src/pages/example/[tag].astro) use
   Magma's utilities too: the Examples usage files hold the same markup as
-  documentation.json, without the rest of it. pattern.md is their name before
-  https://github.com/magma-design-system/magma/issues/1169: drop it with the
-  last version that ships it.
+  documentation.json, without the rest of it. So do the previews of the
+  patterns, the building blocks and the domains of the design language (their
+  pages run them: src/pages/example/domain/), which Magma lays out with
+  Tailwind: a class only they use is generated from them.
 */
 @source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/examples.md';
-@source '../../node_modules/@maggioli-design-system/magma/dist/collection/components/*/pattern.md';
+@source '../../node_modules/@maggioli-design-system/magma/agents/patterns/previews';
 
 /*
   The variant of the site: `rail-collapsed` follows the state of the rail

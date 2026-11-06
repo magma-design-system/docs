@@ -6,7 +6,7 @@
 // sections (code, agents), then the library: components, tokens, icons and
 // brand assets.
 import { existsSync, readFileSync } from 'node:fs';
-import { componentTags, componentTaxonomy, loadComponentDocs } from './magma.mjs';
+import { componentTags, componentTaxonomy, loadComponentDocs, loadDomains } from './magma.mjs';
 import { IDENTITY_GROUPS } from './identity.mjs';
 import { sidebarLabel } from './i18n.mjs';
 
@@ -30,6 +30,34 @@ export const STORYBOOK = loadComponentDocs().storybook;
  * `rail: false`: a section with no item in the rail and in the menu: Home,
  * which the logo and the name of the site above them link to (Brand.astro).
  */
+/**
+ * The domains of the design language, the rules of composition Magma ships as
+ * files (`agents/patterns/<id>.md`, `kind: foundation`): the group Composition
+ * of Foundation. The order is the one of the domains in
+ * https://github.com/magma-design-system/magma/issues/1189, rhythm and density
+ * first, the two the patterns show the missing rules of most. `icon` is an
+ * mds-icon slug, collected by iconsauce; the label is the UI string
+ * `nav.foundation.<id>`. A domain the installed magma ships and this list
+ * lacks fails the build (src/loaders/domains.ts): add it here.
+ */
+export const DOMAINS = [
+  { id: 'rhythm', icon: 'mi/outline/format-line-spacing' },
+  { id: 'density', icon: 'mi/outline/density-medium' },
+  { id: 'actions', icon: 'mi/outline/smart-button' },
+  { id: 'titles', icon: 'mi/outline/title' },
+  { id: 'surfaces', icon: 'mi/outline/layers' },
+  { id: 'widths', icon: 'mi/outline/width-normal' },
+];
+
+/**
+ * The domains the installed magma ships, in the order of DOMAINS: none before
+ * the release that ships them, so the group Composition is left out.
+ */
+export function shippedDomains() {
+  const shipped = new Set(loadDomains().map((domain) => domain.id));
+  return DOMAINS.filter((domain) => shipped.has(domain.id));
+}
+
 export const sections = [
   {
     id: 'home',
@@ -58,6 +86,19 @@ export const sections = [
           { slug: 'foundation/illustration' },
         ],
       },
+      // The domains of the design language, generated from the installed magma
+      // (src/pages/[...locale]/foundation/[domain].astro).
+      ...(shippedDomains().length
+        ? [
+            {
+              ...sidebarLabel('nav.foundation.composition'),
+              items: shippedDomains().map(({ id }) => ({
+                ...sidebarLabel(`nav.foundation.${id}`),
+                link: `/foundation/${id}/`,
+              })),
+            },
+          ]
+        : []),
       {
         ...sidebarLabel('nav.foundation.content'),
         items: [{ slug: 'foundation/voice-and-tone' }, { slug: 'foundation/inclusive-language' }],

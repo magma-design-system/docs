@@ -8,6 +8,11 @@
 // parts; Magma's own do not shrink) to give the bar the room left. Below
 // `tablet` the bar takes the room of the logo and the name of the site while
 // the page is being read.
+//
+// The header stands in the flow (magma 2.10.0), the margins of its bar
+// included; the page starts where it started when the header was fixed,
+// --frame-header-height from the top (magma.css), and the bar overlaps it by
+// a margin, so the two margins are given back.
 import Brand from './Brand.astro';
 import DocsNav from './DocsNav.astro';
 import SearchField from './SearchField.astro';
@@ -15,7 +20,13 @@ import SectionLinks from './SectionLinks.astro';
 import SectionNav from './SectionNav.astro';
 ---
 
-<mds-header appearance="inline" menu="all" nav="all" data-frame-menu>
+<mds-header
+  appearance="inline"
+  menu="all"
+  nav="all"
+  data-frame-menu
+  class="-mb-[calc(var(--mds-header-inline-margin-mobile)*2)] tablet:-mb-[calc(var(--mds-header-inline-margin)*2)]"
+>
   <mds-header-bar class="group/header bg-surface-overlay [&::part(content)]:min-w-0 [&::part(actions)]:min-w-0 [&::part(actions)]:grow [&::part(actions)]:gap-300 [&::part(actions)]:justify-end [&::part(nav)]:min-w-0 [&::part(nav)]:shrink [&::part(nav)]:grow">
     <Brand />
   </mds-header-bar>
