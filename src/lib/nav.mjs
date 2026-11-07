@@ -227,11 +227,20 @@ export const sections = [
       { slug: 'ai', ...sidebarLabel('nav.overview') },
       {
         ...sidebarLabel('nav.ai.start'),
-        items: [{ slug: 'ai/start-a-project' }, { slug: 'ai/working-with-agents' }],
+        items: [
+          { slug: 'ai/start-a-project' },
+          { slug: 'ai/working-with-agents' },
+          { slug: 'ai/design-for-your-product' },
+        ],
       },
       {
         ...sidebarLabel('nav.ai.tools'),
-        items: [{ slug: 'ai/guides' }, { slug: 'ai/mcp-server' }, { slug: 'ai/claude-code' }],
+        items: [
+          { slug: 'ai/guides' },
+          { slug: 'ai/mcp-server' },
+          { slug: 'ai/pattern-api' },
+          { slug: 'ai/claude-code' },
+        ],
       },
     ],
   },

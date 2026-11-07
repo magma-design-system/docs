@@ -1,0 +1,382 @@
+---
+title: API dei pattern
+description: 'Cosa risponde get_pattern, lo strumento del server MCP di Magma per i pattern e i building block, a ogni domanda, e il formato del livello che un prodotto tiene nel suo repository, ognuno con un esempio.'
+---
+
+I pattern e i building block arrivano a un agente attraverso uno strumento del
+[server MCP](../mcp-server/), `get_pattern`, e un prodotto li adatta con un file per pattern, il
+suo livello. Questa pagina è il riferimento di entrambi, per chi scrive un livello o verifica
+quello che ha costruito un agente. Le risposte degli esempi vengono dal server, accorciate: quelle
+vere hanno più campi. I dati restano in inglese, come li consegna il pacchetto.
+
+## get_pattern
+
+`get_pattern` accetta quattro argomenti, tutti facoltativi, e quelli che passi scelgono la
+domanda. Legge soltanto: i file di Magma in `node_modules` e i livelli del progetto in
+`magma/patterns/`.
+
+| Argomenti          | Risponde con                              |
+| ------------------ | ----------------------------------------- |
+| nessuno            | `patterns`, `layerErrors`                 |
+| `need`             | `patterns`, oppure `gap`                  |
+| `id`               | `pattern`                                 |
+| `id` + `situation` | `answer`, oppure `candidates` e `missing` |
+| `id` + `section`   | `text`                                    |
+
+Un `id` che Magma non ha è un errore che elenca gli id che ha. Un id che Magma ha rinominato
+risponde ancora, con quello vecchio in `renamedFrom`.
+
+### L'elenco, e gli errori dei livelli
+
+Senza argomenti, il server elenca tutto quello che consegna: prima i domini del linguaggio di
+design (kind `design-language`, `foundation` fino a Magma 2.11), poi i building block (kind
+`block`) e i pattern (kind `pattern`). Ognuno dice se è `decided` o `candidate`, e il livello da
+cui viene.
+
+```json title="Argomenti"
+{}
+```
+
+```json title="Risposta"
+{
+  "patterns": [
+    {
+      "id": "page-header",
+      "title": "Page header",
+      "group": "navigation",
+      "kind": "block",
+      "status": "decided",
+      "layer": "magma",
+      "need": "The person sees at once what the page holds or is about, where they are, and what they can do with it."
+    },
+    {
+      "id": "notification-center",
+      "title": "Notification center",
+      "group": "messages-and-states",
+      "kind": "pattern",
+      "status": "candidate",
+      "layer": "magma",
+      "need": "The person comes back to the outcomes that arrived while they were elsewhere, and to what they still have to act on."
+    }
+  ],
+  "layerErrors": [
+    "magma/patterns/message-placement.md: narrows toast-position: message-placement has no open choice toast-position (success-toast-duration, message-wording)"
+  ]
+}
+```
+
+`layerErrors` c'è solo quando un file in `magma/patterns/` è sbagliato: una riga per errore, con
+il file e cosa correggere. Un livello con un errore non viene applicato: finché non è corretto,
+ogni risposta sul suo pattern è il default di Magma. È la verifica da fare dopo aver scritto un
+livello.
+
+### I pattern per un bisogno
+
+Con `need`, il compito a parole, il server risponde con fino a cinque pattern, il più vicino per
+primo.
+
+```json title="Argomenti"
+{ "need": "tell the user a save failed" }
+```
+
+```json title="Risposta"
+{
+  "patterns": [
+    {
+      "id": "error-recovery",
+      "title": "When something fails",
+      "kind": "pattern",
+      "status": "decided"
+    },
+    {
+      "id": "message-placement",
+      "title": "Where a message goes",
+      "kind": "pattern",
+      "status": "decided"
+    }
+  ]
+}
+```
+
+Quando nessuno dei pattern che trova è deciso, o non ne trova nessuno, la risposta contiene
+`gap`: Magma non ha ancora niente per quel bisogno. L'agente te lo dice, va avanti con una scelta
+sua, e alla fine propone una issue su Magma
+([Progettare per il tuo prodotto](../design-for-your-product/#segnala-quello-che-nessun-pattern-copre)).
+
+```json title="Argomenti"
+{ "need": "rotate a 3D model" }
+```
+
+```json title="Risposta"
+{
+  "patterns": [],
+  "gap": "Magma has nothing for this. If it should, tell the user, and at the end of the task propose an issue on Magma: get_guide reporting, section \"A tool or an answer the MCP server is missing\"."
+}
+```
+
+### Un pattern, con il livello del progetto
+
+Con `id`, tutto il pattern: le variabili con i loro valori, i casi, le combinazioni che non
+possono capitare (`not-applicable`), le regole che valgono sempre, le scelte aperte, le
+situazioni e i nomi delle sezioni. Il livello del progetto è già applicato: una scelta che fissa
+ha il suo `value` e `narrowed-by`, una situazione che aggiunge ha `layer`, e `layers` elenca i
+due.
+
+```json title="Argomenti"
+{ "id": "message-placement" }
+```
+
+```json title="Risposta"
+{
+  "pattern": {
+    "id": "message-placement",
+    "kind": "pattern",
+    "status": "decided",
+    "variables": {
+      "about": {
+        "values": ["field", "region", "action", "application"],
+        "means": "what the message talks about"
+      },
+      "outcome": { "values": ["success", "failure", "partial", "info"], "means": "what happened" }
+    },
+    "always-true": [
+      {
+        "id": "toast-action-stays",
+        "rule": "A toast with an action has duration=\"0\" and dismissible."
+      }
+    ],
+    "open-choices": [
+      {
+        "id": "success-toast-duration",
+        "default": "5000 ms",
+        "may": "choose up to 8000 ms",
+        "value": 8000,
+        "narrowed-by": "example-backoffice"
+      },
+      {
+        "id": "message-wording",
+        "default": "the texts under Content",
+        "may": "write its own, in its voice"
+      }
+    ],
+    "situations": [
+      { "situation": "A link is copied", "case": "action-done-elsewhere" },
+      {
+        "situation": "A request is assigned to another office",
+        "case": "action-done-elsewhere",
+        "layer": "example-backoffice"
+      }
+    ],
+    "layers": ["magma", "example-backoffice"],
+    "sections": ["When to use it", "Cases", "Behaviour over time", "Always true", "Decisions"]
+  }
+}
+```
+
+Un candidato non ha ancora casi: la sua risposta contiene solo il bisogno, con `gap`. L'agente ti
+dice quale scelta ha fatto al suo posto, e perché.
+
+### Il caso per una situazione
+
+Con `id` e `situation`, i valori delle variabili che conosci, l'unico caso da seguire: dove va il
+messaggio, i componenti da usare (`use`) e l'anteprima che Magma consegna per quel caso.
+L'anteprima contiene il markup dello stage, cosa provarci e i percorsi delle sue immagini, chiara
+e scura, da mostrare dove lo stage non può girare. Quando il caso si appoggia a regole del
+linguaggio di design, `rules` le dà con il loro testo; altri esempi del caso sono in `examples`.
+
+```json title="Argomenti"
+{
+  "id": "message-placement",
+  "situation": { "about": "action", "outcome": "failure", "place": "on-screen", "timing": "now" }
+}
+```
+
+```json title="Risposta"
+{
+  "id": "message-placement",
+  "answer": {
+    "kind": "case",
+    "id": "action-failed-in-place",
+    "where": "in its place, right above the row of actions of the dialog; what was written stays",
+    "use": ["mds-banner variant=error tone=strong"],
+    "preview": {
+      "try": "Press Salva: the error shows right above the row of the dialog, what was written stays, and the focus stays on Salva, the way to try again.",
+      "images": {
+        "light": ".../previews/message-placement/action-failed-in-place.light.webp",
+        "dark": ".../previews/message-placement/action-failed-in-place.dark.webp"
+      },
+      "markup": "<mds-button id=\"open\">Modifica azienda</mds-button> ..."
+    }
+  }
+}
+```
+
+Quando i valori non bastano a indicare un caso, la risposta elenca in `candidates` i casi ancora
+possibili, e in `missing` le variabili da stabilire, con i loro valori e cosa significano.
+L'agente te le chiede, o le ricava dalla schermata, e chiede di nuovo.
+
+```json title="Argomenti"
+{ "id": "message-placement", "situation": { "about": "action", "outcome": "failure" } }
+```
+
+```json title="Risposta"
+{
+  "id": "message-placement",
+  "candidates": [
+    {
+      "kind": "case",
+      "id": "action-failed-in-place",
+      "use": ["mds-banner variant=error tone=strong"]
+    },
+    {
+      "kind": "case",
+      "id": "action-failed-elsewhere",
+      "use": ["mds-toast variant=error duration=0 dismissible"]
+    },
+    { "kind": "case", "id": "action-later", "use": ["mds-toast duration=0 dismissible"] }
+  ],
+  "missing": [
+    {
+      "variable": "place",
+      "values": ["on-screen", "off-screen"],
+      "means": "is the thing it talks about on screen when the message comes"
+    },
+    {
+      "variable": "timing",
+      "values": ["now", "later"],
+      "means": "later: the outcome comes after the person moved on"
+    }
+  ]
+}
+```
+
+Un building block risponde con le regioni da disporre, nell'ordine della pagina, ognuna con
+quando compare, cosa contiene e i componenti da usare: `answer.kind` è `regions`.
+
+```json title="Argomenti"
+{ "id": "page-header", "situation": { "level": "nested", "subject": "item" } }
+```
+
+```json title="Risposta"
+{
+  "id": "page-header",
+  "answer": {
+    "kind": "regions",
+    "regions": [
+      {
+        "id": "back",
+        "when": { "level": "nested" },
+        "use": ["mds-button href icon variant=dark tone=text size=sm"]
+      },
+      { "id": "title", "required": true, "use": ["mds-text typography=page tag=h1"] },
+      { "id": "status", "when": { "subject": "item" }, "use": ["mds-badge"] }
+    ]
+  }
+}
+```
+
+### Una sezione del testo
+
+Con `id` e `section`, una sezione del testo del file, in Markdown: i nomi sono in `sections` del
+pattern.
+
+```json title="Argomenti"
+{ "id": "message-placement", "section": "Behaviour over time" }
+```
+
+```json title="Risposta"
+{
+  "id": "message-placement",
+  "section": "Behaviour over time",
+  "text": "- A toast never takes the focus: the region reads it out.\n- Its timer stops while the pointer or the focus is on it.\n..."
+}
+```
+
+## Il livello di un prodotto
+
+Un prodotto adatta un pattern o un building block nel suo repository, un file per ognuno, con il
+suo nome: `magma/patterns/<id>.md`, sotto la radice del progetto, dove gira il server MCP. Il
+livello fissa le scelte aperte che il pattern lascia ai prodotti e aggiunge le situazioni del
+prodotto, ognuna con il caso in cui ricade. Il resto resta di Magma.
+
+```md title="magma/patterns/message-placement.md"
+---
+id: message-placement
+extends: magma:message-placement
+layer: example-backoffice
+narrows:
+  success-toast-duration: 8000
+situations:
+  - situation: A request is assigned to another office
+    case: action-done-elsewhere
+  - situation: A document gets its protocol number, which the toast offers to copy
+    case: action-done-elsewhere
+    note: with Copy in it, the toast stays until it is closed (toast-action-stays)
+---
+
+# Where a message goes, in Example Backoffice
+
+## Why
+
+- `success-toast-duration`, 8000: the operators read the toast between two phone calls, and
+  five seconds were not enough. (2026-11-06)
+```
+
+| Campo        | Cosa contiene                                                      |
+| ------------ | ------------------------------------------------------------------ |
+| `id`         | L'id del pattern di Magma, il nome del file                        |
+| `extends`    | `magma:<id>`                                                       |
+| `layer`      | Il nome del prodotto, mai `magma`                                  |
+| `narrows`    | `<scelta aperta>: <valore>`, solo per le scelte aperte del pattern |
+| `situations` | Le situazioni del prodotto, con le sue parole                      |
+
+Ogni situazione è una `situation`, a parole, con uno tra:
+
+- `case`, il caso del pattern in cui ricade, o un elenco di casi, e una `note` facoltativa;
+- `use`, l'id di un altro pattern, quando è quello a rispondere;
+- per un building block, i valori delle sue variabili, come li danno le situazioni del block.
+
+Il corpo è Markdown libero, per le persone: sotto `## Why`, una riga per scelta, con il motivo e
+la data. Chi cambierà il livello la legge per prima.
+
+Il livello di un building block ha gli stessi campi:
+
+```md title="magma/patterns/page-header.md"
+---
+id: page-header
+extends: magma:page-header
+layer: example-backoffice
+situations:
+  - situation: A request opened from the list of an office
+    level: nested
+    subject: item
+---
+```
+
+### Cosa non può fare un livello
+
+Un livello restringe, non scavalca mai. `get_pattern` segnala in `layerErrors`, e non applica il
+livello, quando un file:
+
+- restringe una regola che vale sempre: vale in ogni prodotto;
+- restringe qualcosa che non è una scelta aperta del pattern, o restringe un candidato, che non
+  ha ancora niente da restringere;
+- associa una situazione a un caso che il pattern non ha: un livello non aggiunge casi e non ne
+  cambia;
+- estende un pattern che Magma non ha, o ha un `id` diverso da quello che estende;
+- ha un campo diverso dai cinque sopra, o `layer: magma`;
+- estende un pattern che un altro file della cartella estende già: un livello per pattern.
+
+Un valore non viene confrontato con quello che la scelta consente (`may`): rivedilo come rivedi
+il codice. Quello che un prodotto vuole cambiare in un caso o in una regola che vale sempre si
+chiede a Magma, come spiega la
+[guida per progettare per il tuo prodotto](../design-for-your-product/#segnala-quello-che-nessun-pattern-copre).
+
+### Un pattern del prodotto
+
+Un bisogno che nessun pattern di Magma copre, e che il prodotto non può aspettare, può avere un
+pattern suo nella stessa cartella: un file con la forma di quelli di Magma, leggine uno in
+`node_modules/@maggioli-design-system/magma/agents/patterns/`, con il `layer` del prodotto, senza
+`extends`, e un id che Magma non ha. `get_pattern` lo verifica come Magma verifica i suoi: il
+formato, i casi, i componenti della release installata. Un pattern che torna in due o tre
+prodotti è quello da proporre a Magma.

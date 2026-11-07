@@ -1,0 +1,115 @@
+---
+title: Progettare per il tuo prodotto
+description: 'Dalla configurazione a un livello verificato: come chi progetta un prodotto ottiene i pattern di Magma attraverso un agente, li adatta al prodotto, e chiede a Magma quello che non coprono.'
+---
+
+import PatternLayers from '../../../../components/PatternLayers.astro';
+
+Un [pattern](../../patterns/) è uguale in ogni prodotto: Magma ne decide i casi e le regole che
+valgono sempre. Quello che lascia aperto, come quanto resta un messaggio o cosa dice, e le
+situazioni del tuo dominio, li decidi tu. Non li scrivi in una pagina che l'agente potrebbe non
+leggere mai: li scrivi in un file del prodotto, il suo livello, che l'agente riceve ogni volta
+che chiede a Magma il pattern.
+
+<PatternLayers />
+
+## Chi fa cosa
+
+- **Il team del prodotto** è il proprietario del livello: decide le scelte aperte e le
+  situazioni, rivede il file come codice e lo committa con il codice.
+- **I maintainer di Magma** sono i proprietari dei default: i pattern, i loro casi e le regole
+  che valgono sempre. Li propongono e li cambiano nel repository di Magma, con comandi loro che
+  il plugin non ha.
+- **L'agente** chiede `get_pattern` prima di costruire un flusso, e segue il caso che riceve, con
+  il livello del prodotto applicato. Dove Magma non ha un default, ti dice quale scelta ha fatto,
+  e perché.
+
+## Configura
+
+1. Magma installato nel prodotto: [Iniziare un progetto](../start-a-project/).
+2. In Claude Code, il [plugin di Magma](../claude-code/), registrato per il team: avvia il server
+   MCP e aggiunge la skill `/magma:pattern-layer`.
+3. In un altro client, come VS Code o Cursor, il [server MCP](../mcp-server/) `magma-mcp`: tutto
+   quello che segue funziona allo stesso modo, senza le skill del plugin.
+
+## Chiedi a parole
+
+Descrivi la schermata e cosa succede, come la racconteresti a chi lavora con te. L'agente trova
+il pattern per il bisogno, ti chiede i valori delle variabili che non può ricavare dalla schermata,
+e risponde con il caso: dove va il messaggio, quali componenti, quali regole valgono.
+
+```text title="Prompt" wrap
+Quando il salvataggio dei dati di una richiesta non riesce, cosa deve vedere la persona? Chiedi a Magma con get_pattern e mostrami il caso, i suoi componenti e le sue regole prima di scrivere codice.
+```
+
+In Claude Code, la skill `/magma:ui` chiede `get_pattern` da sola prima di costruire un flusso che
+dice qualcosa alla persona o la fa aspettare o decidere. Per vedere un caso prima di decidere,
+chiedi all'agente di disegnarlo: `render_preview` disegna l'anteprima che Magma consegna per quel
+caso, chiara o scura, alle larghezze che chiedi. La pagina di ogni pattern su questo sito esegue
+le stesse anteprime.
+
+## Adattalo con /magma:pattern-layer
+
+Quando il prodotto vuole fissare una scelta una volta per tutte, o far rispondere le sue
+situazioni, quello è il suo livello. In Claude Code:
+
+```text title="Claude Code"
+/magma:pattern-layer message-placement
+```
+
+La skill:
+
+- legge il pattern con `get_pattern`, con il livello del prodotto se esiste già: cambia quel
+  file, e non ne scrive mai un secondo;
+- ti fa una domanda alla volta: per ogni scelta aperta, il default di Magma, che ti consiglia, o
+  un valore entro quello che la scelta consente; poi le situazioni del prodotto, con le tue
+  parole, ognuna associata al caso che `get_pattern` dà per lei;
+- scrive `magma/patterns/<id>.md`, con una riga sotto `## Why` per ogni scelta: il motivo e la
+  data;
+- verifica il file, come nel passo successivo, e ti dice cosa ha scritto.
+
+Non committa niente: rivedi il file e committalo con il codice, come ogni modifica al prodotto.
+Un desiderio che cambia un caso o una regola che vale sempre non è un livello: la skill lo dice,
+e propone una issue su Magma. Il formato del file, e cosa non può fare un livello, sono
+nell'[API dei pattern](../pattern-api/#il-livello-di-un-prodotto). Con un altro agente, chiedi la
+stessa cosa:
+
+```text title="Prompt" wrap
+Adatta il pattern di Magma message-placement a questo prodotto: scrivi magma/patterns/message-placement.md come descrive la sezione "A product's layer" di node_modules/@maggioli-design-system/magma/agents/patterns.md, chiedendomi ogni scelta aperta e ogni situazione del prodotto, poi verificalo con get_pattern.
+```
+
+## Verificalo
+
+Un livello con un errore non viene applicato: l'agente continua a ricevere il default di Magma, e
+niente nel codice lo mostra. Tre domande a `get_pattern` dicono che il livello funziona:
+
+1. senza argomenti: la risposta non ha `layerErrors`;
+2. con l'id: ogni scelta che il livello fissa ha `narrowed-by`, ogni situazione che aggiunge ha
+   `layer`;
+3. con l'id e i valori di una situazione del prodotto: il caso è quello a cui il livello la
+   associa.
+
+`/magma:pattern-layer` le fa prima di finire. Rifalle dopo aver modificato il file a mano, e
+dopo un aggiornamento di Magma, che può cambiare un caso o una scelta che il livello nomina:
+`layerErrors` dice quale.
+
+```text title="Prompt" wrap
+Verifica i livelli di Magma di questo progetto: chiama get_pattern senza argomenti e correggi ogni riga di layerErrors in magma/patterns/.
+```
+
+## Segnala quello che nessun pattern copre
+
+Quando `get_pattern` risponde con `gap`, o copre il bisogno solo un candidato, Magma non ha
+ancora un default. L'agente te lo dice, fa una scelta e ti dice quale, e alla fine del lavoro
+propone una issue su Magma: la apre solo quando sei d'accordo, perché il repository di Magma è
+pubblico. La issue va su `magma-design-system/magma` con l'etichetta del tuo prodotto, `prd-` e il
+suo nome breve; se il prodotto non ne ha ancora una, la issue la propone e i maintainer la
+aggiungono. I passi sono nella guida `agents/reporting.md` del pacchetto.
+
+```text title="Prompt" wrap
+Nessun pattern di Magma copre la scelta dei membri di un gruppo da una lista lunga. Proponi una issue su Magma, seguendo node_modules/@maggioli-design-system/magma/agents/reporting.md, con l'etichetta di questo prodotto, e mostramela prima di aprirla.
+```
+
+Se il prodotto non può aspettare, può tenere un pattern suo nella stessa cartella, con la forma
+di quelli di Magma; quando lo stesso bisogno torna in due o tre prodotti, il pattern si propone
+a Magma ([API dei pattern](../pattern-api/#un-pattern-del-prodotto)).

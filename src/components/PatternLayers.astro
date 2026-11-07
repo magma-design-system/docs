@@ -1,0 +1,78 @@
+---
+// The drawing of the layers of a pattern (#89), on the landing pages of
+// Patterns and Building blocks and on the guide to design for a product: the
+// product's screen on the product's layer on Magma's default, top to bottom,
+// each wider than the one above it, as get_pattern applies them. Each layer
+// says where it lives, whose it is, what it holds, and an example, all on the
+// open choice `success-toast-duration` of `message-placement` (5000 ms by
+// default, up to 8000), the one of the example layer in Magma's
+// `agents/patterns.md`, "A product's layer". A layer is a category, so it is
+// painted with the label palette, which follows the mode by itself; its
+// lightest step at half strength, since at full strength it fills a band with
+// a saturated color in dark mode.
+import UiText from './UiText.astro';
+
+const { t } = Astro.locals;
+
+/** Top to bottom; `inset`: how far in from the edges, where the content column has room. */
+const LAYERS = [
+  {
+    id: 'screen',
+    inset: '@lg:mx-1200',
+    color: 'bg-label-lime-10/50 border-label-lime-06',
+    title: 'text-label-lime-03',
+  },
+  {
+    id: 'layer',
+    inset: '@lg:mx-600',
+    color: 'bg-label-orange-10/50 border-label-orange-06',
+    title: 'text-label-orange-03',
+  },
+  {
+    id: 'magma',
+    inset: '',
+    color: 'bg-label-blue-10/50 border-label-blue-06',
+    title: 'text-label-blue-03',
+  },
+] as const;
+---
+
+<figure class="not-content @container grid gap-400 my-600">
+  <ul class="grid list-none gap-200 px-0">
+    {LAYERS.map(({ id, inset, color, title }) => (
+      <li
+        class:list={[
+          'grid gap-300 rounded-2xl border p-500 @2xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]',
+          inset,
+          color,
+        ]}
+      >
+        <div class="grid content-start gap-100">
+          <mds-text typography="h6" tag="h3" class={title}>
+            {t(`pattern.layers.${id}` as never)}
+          </mds-text>
+          <mds-text typography="caption" tag="p">
+            <UiText text={t(`pattern.layers.${id}.where` as never)} />
+          </mds-text>
+          <mds-text typography="caption" tag="p" class="text-fg-muted">
+            {t(`pattern.layers.${id}.who` as never)}
+          </mds-text>
+        </div>
+        <div class="grid content-start gap-200">
+          <mds-text typography="detail" tag="p" class="block">
+            {t(`pattern.layers.${id}.text` as never)}
+          </mds-text>
+          <mds-text typography="caption" tag="p">
+            <strong>{t('pattern.layers.example')}</strong>:{' '}
+            <UiText text={t(`pattern.layers.${id}.example` as never)} />
+          </mds-text>
+        </div>
+      </li>
+    ))}
+  </ul>
+  <figcaption>
+    <mds-text typography="caption" tag="p" class="block text-center text-fg-muted">
+      {t('pattern.layers.caption')}
+    </mds-text>
+  </figcaption>
+</figure>

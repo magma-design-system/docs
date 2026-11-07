@@ -3,7 +3,10 @@ title: Patterns
 description: Solutions to the tasks people carry out again and again - learning what happened, deciding before an action that cannot be undone, searching a long list - the same in every product, as Magma ships them to people and to AI agents.
 ---
 
+import PageCards from '../../../components/PageCards.astro';
 import PatternGallery from '../../../components/PatternGallery.astro';
+import PatternLayers from '../../../components/PatternLayers.astro';
+import PatternLevels from '../../../components/PatternLevels.astro';
 
 Each pattern solves a task that people carry out in every product. Open one: it starts with
 its cases at work, and the rules come after.
@@ -23,6 +26,12 @@ error.
 The patterns ship with Magma, in the package `@maggioli-design-system/magma`. Each page here is
 generated from the file of its pattern, the same file an AI agent reads, and it is written in
 English.
+
+## Components, blocks, patterns
+
+A screen is made at three levels, each one built with the one before it:
+
+<PatternLevels />
 
 ## Reading a pattern
 
@@ -48,11 +57,23 @@ the Magma team.
 An agent does not read these pages: it asks the Magma MCP server for the pattern, `get_pattern`,
 with the values of the variables it knows, and gets back the one case to follow and its rules.
 The page of each pattern has a prompt to give it. How to set the agent up is in
-[Agentic development](../ai/).
+[Agentic development](../ai/); what `get_pattern` answers, question by question, is in the
+[Pattern API](../ai/pattern-api/).
 
 ## The layer of a product
 
 A product can narrow a pattern without copying it. A file in its own repository,
 `magma/patterns/<id>.md`, fixes the open choices and adds the situations of the product; the
-rules that are always true stay as they are. `get_pattern` applies the layer of the project it
-runs in.
+cases and the rules that are always true stay as they are. `get_pattern` applies the layer of
+the project it runs in, so the agent of a product gets the answer of that product:
+
+<PatternLayers />
+
+How to write a layer and check it, and where to ask for what no pattern covers:
+
+<PageCards
+  pages={[
+    { slug: 'ai/design-for-your-product', icon: 'mi/outline/tune' },
+    { slug: 'ai/pattern-api', icon: 'mi/outline/data-object' },
+  ]}
+/>

@@ -8,8 +8,9 @@ import McpTools from '../../../components/McpTools.astro';
 Magma ships an MCP server inside `@maggioli-design-system/magma`, the `magma-mcp` command.
 The agent's client starts it in the project, and it answers from the version installed there:
 the components and their API, the roles and the tokens, the classes of Magma's Tailwind theme,
-the icons that exist, the sections of the guides, and the lint on a snippet before it is
-written. It only reads: no tool changes a file.
+the icons that exist, the sections of the guides, the patterns and the building blocks, and the
+lint on a snippet before it is written. It changes no file of the project: only
+`render_preview` writes, the images it draws, in `node_modules/.cache/magma/previews`.
 
 A question to the server costs a short answer, where the same question to the guides costs a
 file to read: the values of one prop instead of the guide of the component, the role for
@@ -80,6 +81,10 @@ the arguments that end in `?` are optional:
     ],
     find_icon: ['An icon by meaning, or whether a slug exists', 'An icon that renders nothing'],
     get_guide: ['One section of a guide', 'Reading the whole guide'],
+    get_pattern: [
+      'The case to follow for a task across components, with the layer of the product',
+      'Inventing the flow, or reading each pattern by hand',
+    ],
     check_markup: [
       'Whether a snippet passes the lint, before it is written',
       'A lint run after the fact',
@@ -88,11 +93,18 @@ the arguments that end in `?` are optional:
       'What the Magma setup of the project misses',
       'Checking the install steps by hand',
     ],
+    render_preview: [
+      'An image of markup, or of the preview of a case, with what in it is not right',
+      'Describing an interface in words',
+    ],
   }}
 />
 
 `check_markup` runs the [lint](../../development/lint/) with the ESLint, Stylelint and
-parsers installed in the project: set the lint up first.
+parsers installed in the project: set the lint up first. `get_pattern` answers in several ways,
+depending on its arguments: each one, and the layer it reads, is in the
+[Pattern API](../pattern-api/). `render_preview` needs `playwright-core` in the project and Chrome
+or Edge on the machine.
 
 ## When the agent calls them
 
@@ -100,9 +112,12 @@ The guide `agents/mcp.md` tells the agent when to reach for each tool:
 
 - before writing a component, `find_component`, then `get_component` and `get_usage`;
 - before a color, a spacing or a class, `list_tokens`, `suggest_role` or `explain_class`;
+- before a flow that tells the person something or makes them wait or decide, `get_pattern`;
+  before the head of a page, the building block `page-header`;
 - before an icon, `find_icon`;
 - after writing, `check_markup`, then the lint of the project;
 - after the setup, or when something does not render, `check_setup`;
+- before asking you to decide on an interface, `render_preview`, one image per option;
 - when no tool answers what the task needs, or an answer says Magma has nothing for it
   (`gap`), it tells you, carries on, and at the end proposes an issue on Magma for each
   missing answer: it opens one only once you agree.

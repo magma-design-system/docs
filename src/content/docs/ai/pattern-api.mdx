@@ -1,0 +1,378 @@
+---
+title: Pattern API
+description: 'What get_pattern, the tool of the Magma MCP server for patterns and building blocks, answers to each question, and the format of the layer a product keeps in its repository, each with an example.'
+---
+
+The patterns and the building blocks reach an agent through one tool of the
+[MCP server](../mcp-server/), `get_pattern`, and a product adapts them with one file per
+pattern, its layer. This page is the reference of both, for whoever writes a layer or checks
+what an agent built. The answers in the examples come from the server, shortened: the real
+ones carry more fields.
+
+## get_pattern
+
+`get_pattern` takes four arguments, all optional, and the ones you give choose the question.
+It only reads: the files of Magma in `node_modules`, and the layers of the project in
+`magma/patterns/`.
+
+| Arguments          | It answers with                         |
+| ------------------ | --------------------------------------- |
+| none               | `patterns`, `layerErrors`               |
+| `need`             | `patterns`, or `gap`                    |
+| `id`               | `pattern`                               |
+| `id` + `situation` | `answer`, or `candidates` and `missing` |
+| `id` + `section`   | `text`                                  |
+
+An `id` Magma does not have is an error that lists the ids it has. An id Magma renamed still
+answers, with the old one in `renamedFrom`.
+
+### The list, and the errors of the layers
+
+With no arguments, the server lists everything it ships: the domains of the design language
+first (kind `design-language`, `foundation` up to Magma 2.11), then the building blocks (kind
+`block`) and the patterns (kind `pattern`). Each one says whether it is `decided` or a
+`candidate`, and the layer it comes from.
+
+```json title="Arguments"
+{}
+```
+
+```json title="Answer"
+{
+  "patterns": [
+    {
+      "id": "page-header",
+      "title": "Page header",
+      "group": "navigation",
+      "kind": "block",
+      "status": "decided",
+      "layer": "magma",
+      "need": "The person sees at once what the page holds or is about, where they are, and what they can do with it."
+    },
+    {
+      "id": "notification-center",
+      "title": "Notification center",
+      "group": "messages-and-states",
+      "kind": "pattern",
+      "status": "candidate",
+      "layer": "magma",
+      "need": "The person comes back to the outcomes that arrived while they were elsewhere, and to what they still have to act on."
+    }
+  ],
+  "layerErrors": [
+    "magma/patterns/message-placement.md: narrows toast-position: message-placement has no open choice toast-position (success-toast-duration, message-wording)"
+  ]
+}
+```
+
+`layerErrors` is there only when a file in `magma/patterns/` is wrong: one line per error, with
+the file and what to fix. A layer with an error is not applied: until it is fixed, every answer
+about its pattern is Magma's default. This is the check to run after writing a layer.
+
+### The patterns for a need
+
+With `need`, the task in words, the server answers with up to five patterns, the closest first.
+
+```json title="Arguments"
+{ "need": "tell the user a save failed" }
+```
+
+```json title="Answer"
+{
+  "patterns": [
+    {
+      "id": "error-recovery",
+      "title": "When something fails",
+      "kind": "pattern",
+      "status": "decided"
+    },
+    {
+      "id": "message-placement",
+      "title": "Where a message goes",
+      "kind": "pattern",
+      "status": "decided"
+    }
+  ]
+}
+```
+
+When none of the patterns it finds is decided, or it finds none, the answer carries `gap`: Magma
+has nothing for the need yet. The agent tells you, carries on with a choice of its own, and at
+the end proposes an issue on Magma ([Design for your product](../design-for-your-product/#report-what-no-pattern-covers)).
+
+```json title="Arguments"
+{ "need": "rotate a 3D model" }
+```
+
+```json title="Answer"
+{
+  "patterns": [],
+  "gap": "Magma has nothing for this. If it should, tell the user, and at the end of the task propose an issue on Magma: get_guide reporting, section \"A tool or an answer the MCP server is missing\"."
+}
+```
+
+### A pattern, with the layer of the project
+
+With `id`, the whole pattern: its variables with their values, its cases, the combinations
+that cannot happen (`not-applicable`), the rules that are always true, the open choices, the
+situations and the names of its sections. The layer of the project is already applied: a
+choice it fixes carries its `value` and `narrowed-by`, a situation it adds carries `layer`, and
+`layers` lists the two.
+
+```json title="Arguments"
+{ "id": "message-placement" }
+```
+
+```json title="Answer"
+{
+  "pattern": {
+    "id": "message-placement",
+    "kind": "pattern",
+    "status": "decided",
+    "variables": {
+      "about": {
+        "values": ["field", "region", "action", "application"],
+        "means": "what the message talks about"
+      },
+      "outcome": { "values": ["success", "failure", "partial", "info"], "means": "what happened" }
+    },
+    "always-true": [
+      {
+        "id": "toast-action-stays",
+        "rule": "A toast with an action has duration=\"0\" and dismissible."
+      }
+    ],
+    "open-choices": [
+      {
+        "id": "success-toast-duration",
+        "default": "5000 ms",
+        "may": "choose up to 8000 ms",
+        "value": 8000,
+        "narrowed-by": "example-backoffice"
+      },
+      {
+        "id": "message-wording",
+        "default": "the texts under Content",
+        "may": "write its own, in its voice"
+      }
+    ],
+    "situations": [
+      { "situation": "A link is copied", "case": "action-done-elsewhere" },
+      {
+        "situation": "A request is assigned to another office",
+        "case": "action-done-elsewhere",
+        "layer": "example-backoffice"
+      }
+    ],
+    "layers": ["magma", "example-backoffice"],
+    "sections": ["When to use it", "Cases", "Behaviour over time", "Always true", "Decisions"]
+  }
+}
+```
+
+A candidate has no cases yet: its answer holds the need only, with `gap`. The agent tells you
+which choice it made instead, and why.
+
+### The case for a situation
+
+With `id` and `situation`, the values of the variables you know, the one case to follow: where
+the message goes, the components to `use`, and the preview Magma ships for it. The preview
+holds the markup of the stage, what to try in it, and the paths of its light and dark images,
+to show where the stage cannot run. When the case relies on rules of the design language,
+`rules` gives them with their text; other examples of the case are in `examples`.
+
+```json title="Arguments"
+{
+  "id": "message-placement",
+  "situation": { "about": "action", "outcome": "failure", "place": "on-screen", "timing": "now" }
+}
+```
+
+```json title="Answer"
+{
+  "id": "message-placement",
+  "answer": {
+    "kind": "case",
+    "id": "action-failed-in-place",
+    "where": "in its place, right above the row of actions of the dialog; what was written stays",
+    "use": ["mds-banner variant=error tone=strong"],
+    "preview": {
+      "try": "Press Salva: the error shows right above the row of the dialog, what was written stays, and the focus stays on Salva, the way to try again.",
+      "images": {
+        "light": ".../previews/message-placement/action-failed-in-place.light.webp",
+        "dark": ".../previews/message-placement/action-failed-in-place.dark.webp"
+      },
+      "markup": "<mds-button id=\"open\">Modifica azienda</mds-button> ..."
+    }
+  }
+}
+```
+
+When the values are not enough to tell one case, the answer lists the cases that are still
+possible in `candidates`, and in `missing` the variables to settle, with their values and what
+they mean. The agent asks you, or reads them from the screen, and asks again.
+
+```json title="Arguments"
+{ "id": "message-placement", "situation": { "about": "action", "outcome": "failure" } }
+```
+
+```json title="Answer"
+{
+  "id": "message-placement",
+  "candidates": [
+    {
+      "kind": "case",
+      "id": "action-failed-in-place",
+      "use": ["mds-banner variant=error tone=strong"]
+    },
+    {
+      "kind": "case",
+      "id": "action-failed-elsewhere",
+      "use": ["mds-toast variant=error duration=0 dismissible"]
+    },
+    { "kind": "case", "id": "action-later", "use": ["mds-toast duration=0 dismissible"] }
+  ],
+  "missing": [
+    {
+      "variable": "place",
+      "values": ["on-screen", "off-screen"],
+      "means": "is the thing it talks about on screen when the message comes"
+    },
+    {
+      "variable": "timing",
+      "values": ["now", "later"],
+      "means": "later: the outcome comes after the person moved on"
+    }
+  ]
+}
+```
+
+A building block answers with the regions to lay out, in the order of the page, each with
+when it shows, what it holds and the components to use: `answer.kind` is `regions`.
+
+```json title="Arguments"
+{ "id": "page-header", "situation": { "level": "nested", "subject": "item" } }
+```
+
+```json title="Answer"
+{
+  "id": "page-header",
+  "answer": {
+    "kind": "regions",
+    "regions": [
+      {
+        "id": "back",
+        "when": { "level": "nested" },
+        "use": ["mds-button href icon variant=dark tone=text size=sm"]
+      },
+      { "id": "title", "required": true, "use": ["mds-text typography=page tag=h1"] },
+      { "id": "status", "when": { "subject": "item" }, "use": ["mds-badge"] }
+    ]
+  }
+}
+```
+
+### One section of the text
+
+With `id` and `section`, one section of the text of the file, in Markdown: the names are in
+`sections` of the pattern.
+
+```json title="Arguments"
+{ "id": "message-placement", "section": "Behaviour over time" }
+```
+
+```json title="Answer"
+{
+  "id": "message-placement",
+  "section": "Behaviour over time",
+  "text": "- A toast never takes the focus: the region reads it out.\n- Its timer stops while the pointer or the focus is on it.\n..."
+}
+```
+
+## The layer of a product
+
+A product adapts a pattern or a building block in its own repository, one file each, named
+after it: `magma/patterns/<id>.md`, under the root of the project, where the MCP server runs.
+The layer fixes the open choices the pattern leaves to the products and adds the situations of
+the product, each with the case it falls in. The rest stays Magma's.
+
+```md title="magma/patterns/message-placement.md"
+---
+id: message-placement
+extends: magma:message-placement
+layer: example-backoffice
+narrows:
+  success-toast-duration: 8000
+situations:
+  - situation: A request is assigned to another office
+    case: action-done-elsewhere
+  - situation: A document gets its protocol number, which the toast offers to copy
+    case: action-done-elsewhere
+    note: with Copy in it, the toast stays until it is closed (toast-action-stays)
+---
+
+# Where a message goes, in Example Backoffice
+
+## Why
+
+- `success-toast-duration`, 8000: the operators read the toast between two phone calls, and
+  five seconds were not enough. (2026-11-06)
+```
+
+| Field        | What it holds                                                      |
+| ------------ | ------------------------------------------------------------------ |
+| `id`         | The id of the Magma pattern, the name of the file                  |
+| `extends`    | `magma:<id>`                                                       |
+| `layer`      | The name of the product, never `magma`                             |
+| `narrows`    | `<open choice>: <value>`, for the open choices of the pattern only |
+| `situations` | The situations of the product, in its own words                    |
+
+Each situation is a `situation`, in words, with one of:
+
+- `case`, the case of the pattern it falls in, or a list of them, and an optional `note`;
+- `use`, the id of another pattern, when that one answers it;
+- for a building block, the values of its variables, as the situations of the block give them.
+
+The body is free Markdown, for people: under `## Why`, one line per choice, with its reason and
+its date. Whoever changes the layer next reads it first.
+
+The layer of a building block has the same fields:
+
+```md title="magma/patterns/page-header.md"
+---
+id: page-header
+extends: magma:page-header
+layer: example-backoffice
+situations:
+  - situation: A request opened from the list of an office
+    level: nested
+    subject: item
+---
+```
+
+### What a layer may not do
+
+A layer narrows, it never overrides. `get_pattern` reports in `layerErrors`, and leaves the
+layer out, when a file:
+
+- narrows a rule that is always true: it holds in every product;
+- narrows something that is not an open choice of the pattern, or narrows a candidate, which
+  has nothing to narrow yet;
+- maps a situation to a case the pattern does not have: a layer adds no cases and changes none;
+- extends a pattern Magma does not have, or has an `id` other than the one it extends;
+- has a field other than the five above, or `layer: magma`;
+- extends a pattern that another file of the folder extends already: one layer per pattern.
+
+A value is not checked against what the choice `may`: review it as you review code. What a
+product needs changed in a case or in a rule that is always true is asked of Magma, as the
+[guide to design for your product](../design-for-your-product/#report-what-no-pattern-covers)
+explains.
+
+### A pattern of the product's own
+
+A need that no Magma pattern covers, and that the product cannot wait for, can get a pattern of
+its own in the same folder: a file in the shape of Magma's ones, read one in
+`node_modules/@maggioli-design-system/magma/agents/patterns/`, with the product's `layer`, no
+`extends`, and an id Magma does not have. `get_pattern` checks it as Magma checks its own: the
+format, the cases, the components of the installed release. A pattern that comes back in two
+or three products is the one to propose to Magma.

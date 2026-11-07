@@ -3,7 +3,10 @@ title: Pattern
 description: Soluzioni ai compiti che le persone svolgono di continuo - sapere cosa è successo, decidere prima di un'azione che non si può annullare, cercare in una lista lunga - uguali in ogni prodotto, come Magma le consegna alle persone e agli agenti AI.
 ---
 
+import PageCards from '../../../../components/PageCards.astro';
 import PatternGallery from '../../../../components/PatternGallery.astro';
+import PatternLayers from '../../../../components/PatternLayers.astro';
+import PatternLevels from '../../../../components/PatternLevels.astro';
 
 Ogni pattern risolve un compito che le persone svolgono in ogni prodotto. Aprine uno: si parte
 dai suoi casi in funzione, le regole vengono dopo.
@@ -23,6 +26,12 @@ mentre aspetta, cosa segue un errore.
 I pattern arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`. Ogni pagina qui è
 generata dal file del suo pattern, lo stesso file che legge un agente AI, ed è scritta in
 inglese.
+
+## Componenti, block, pattern
+
+Una schermata si costruisce su tre livelli, ognuno fatto con quello prima:
+
+<PatternLevels />
 
 ## Come si legge un pattern
 
@@ -48,10 +57,23 @@ scrivi perché, e proponilo al team di Magma.
 Un agente non legge queste pagine: chiede il pattern al server MCP di Magma, `get_pattern`, con i
 valori delle variabili che conosce, e riceve l'unico caso da seguire e le sue regole. La pagina
 di ogni pattern ha un prompt da dargli. Come preparare l'agente è spiegato in
-[Sviluppo agentico](../ai/).
+[Sviluppo agentico](../ai/); cosa risponde `get_pattern`, domanda per domanda, è nella pagina
+[API dei pattern](../ai/pattern-api/).
 
 ## Il livello di un prodotto
 
 Un prodotto può restringere un pattern senza copiarlo. Un file nel suo repository,
-`magma/patterns/<id>.md`, fissa le scelte aperte e aggiunge le situazioni del prodotto; le regole
-che valgono sempre restano come sono. `get_pattern` applica il livello del progetto in cui gira.
+`magma/patterns/<id>.md`, fissa le scelte aperte e aggiunge le situazioni del prodotto; i casi e
+le regole che valgono sempre restano come sono. `get_pattern` applica il livello del progetto in
+cui gira, così l'agente di un prodotto riceve la risposta di quel prodotto:
+
+<PatternLayers />
+
+Come scrivere un livello e verificarlo, e dove chiedere quello che nessun pattern copre:
+
+<PageCards
+  pages={[
+    { slug: 'ai/design-for-your-product', icon: 'mi/outline/tune' },
+    { slug: 'ai/pattern-api', icon: 'mi/outline/data-object' },
+  ]}
+/>
