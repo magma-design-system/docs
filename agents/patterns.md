@@ -150,8 +150,8 @@ Since #89 (2026-11-06) the site explains the model, not only each file:
   layer in `<folder>/magma/patterns/`), then shortened; the example layers were checked the
   same way, with no `layerErrors`. Retake them when `get_pattern` changes. The list of what a
   layer may not do is `layerErrors()` in `magma/dist/lint/core/patterns.js`. A value outside
-  what an open choice `may` is not checked (2.11.0): `may` is words, so the page says to review
-  it.
+  what an open choice `may` is not checked (2.11.0, 2.12.0): `may` is words, so the page says to
+  review it.
 - **The guide**, `ai/design-for-your-product.mdx`: who does what, set up, ask in words, adapt
   with `/magma:pattern-layer`, check with `get_pattern`, report a need on Magma with the
   product's `prd-*` label (`agents/reporting.md` of the package). Linked from the landing
