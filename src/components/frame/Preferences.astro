@@ -1,7 +1,8 @@
 ---
-// Repository and Storybook links, light/dark mode, theme and language: at the
-// bottom of the rail and in the mobile menu (the search is at their top,
-// SearchField.astro). Mode, theme and language are Magma's own preference
+// Repository, Storybook and Magma Studio links, light/dark mode, theme and
+// language: at the bottom of the rail and in the mobile menu (the search is at
+// their top, SearchField.astro). The Studio, the newest, carries a badge that
+// says so. Mode, theme and language are Magma's own preference
 // components, in the panel that groups them (mds-pref); src/scripts/magma.ts
 // makes Starlight follow the mode.
 //
@@ -12,7 +13,7 @@
 // button here or from its icon in the collapsed rail; in the menu it is shown
 // as it is, below the links.
 import { locales } from '../../lib/i18n.mjs';
-import { REPOSITORY, STORYBOOK } from '../../lib/nav.mjs';
+import { REPOSITORY, STORYBOOK, STUDIO } from '../../lib/nav.mjs';
 import { localePrefix } from '../../lib/frame';
 
 const { t, starlightRoute } = Astro.locals;
@@ -24,14 +25,15 @@ const languages = Object.entries(locales).map(([key, { lang }]) => ({
   href: `${localePrefix(key === 'root' ? undefined : key)}${path}`,
 }));
 
-// Magma's named themes (magma/agents/theming.md): `default` is the base theme,
-// the others retint the neutral roles (surfaces, wash, borders, text) with
-// their family. The swatch of an item is the wash of its family; the dots on
-// it (accent and status colors) are the same in every theme.
+// Magma's named themes (magma/agents/theming.md): `business`, the base theme
+// of the management software, and `editorial`, of the publishing side, which
+// retints the neutral roles with the `bisque` family and the accent with the
+// brand of Maggioli Editore. Each item shows the theme it names, from the
+// preview themes.css publishes. `default`, `cool` and `warm` are deprecated
+// since magma 2.11.0: not offered (ThemeProvider.astro still applies them).
 const themes = [
-  { name: 'default', family: 'neutral', label: t('frame.theme.default') },
-  { name: 'cool', family: 'porcelain', label: t('frame.theme.cool') },
-  { name: 'warm', family: 'bisque', label: t('frame.theme.warm') },
+  { name: 'business', label: t('frame.theme.business') },
+  { name: 'editorial', label: t('frame.theme.editorial') },
 ];
 ---
 
@@ -57,6 +59,19 @@ const themes = [
       tone="text"
       size="sm"
     ></mds-button>
+    <div class="flex items-center gap-200">
+      <mds-button
+        href={STUDIO}
+        target="blank"
+        type="a"
+        icon="mi/baseline/palette"
+        label={t('frame.studio')}
+        variant="dark"
+        tone="text"
+        size="sm"
+      ></mds-button>
+      <mds-badge label={t('new.title')} variant="blue" tone="strong" />
+    </div>
     <mds-button
       id="preferences-trigger"
       class="in-data-[preferences=menu]:hidden"
@@ -82,12 +97,8 @@ const themes = [
       </mds-pref-language>
       <mds-pref-mode class="relative w-full" size="sm"></mds-pref-mode>
       <mds-pref-theme class="relative w-full" size="sm">
-        {themes.map(({ name, family, label }) => (
-          <mds-pref-theme-item
-            name={name}
-            label={label}
-            style={`--mds-pref-theme-item-color-background: rgb(var(--tone-${family}-09))`}
-          />
+        {themes.map(({ name, label }) => (
+          <mds-pref-theme-item name={name} label={label} />
         ))}
       </mds-pref-theme>
     </mds-pref>

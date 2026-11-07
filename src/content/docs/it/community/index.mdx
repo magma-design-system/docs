@@ -1,13 +1,14 @@
 ---
 title: Canali
-description: Dove fare domande su Magma, seguire come cambia e provare i suoi componenti.
+description: Dove fare domande su Magma, seguire come cambia, provare i suoi componenti e creare un tema tutto tuo.
 ---
 
 import Channel from '../../../../components/Channel.astro';
 import Channels from '../../../../components/Channels.astro';
 import PageCards from '../../../../components/PageCards.astro';
+import { STUDIO } from '../../../../lib/nav.mjs';
 
-Dove fare domande su Magma, seguire come cambia e provare i suoi componenti:
+Dove fare domande su Magma, seguire come cambia, provare i suoi componenti e creare un tema tutto tuo:
 
 <Channels>
 <Channel
@@ -53,6 +54,21 @@ le proprietà dai controlli, guarda gli eventi che invia e verifica l'accessibil
 Contiene anche la scala tipografica, le icone e le pagine di test di colori e superfici. Il
 link apre Acme Console, una schermata d'applicazione costruita con Magma seguita
 dall'intera libreria di componenti, in modalità chiara e scura.
+
+</Channel>
+<Channel
+  name="Magma Studio"
+  kind="Temi"
+  icon="mi/baseline/palette"
+  variant="violet"
+  href={STUDIO}
+  action="Apri Magma Studio"
+>
+
+Dove si crea un tema tutto tuo, nel browser e senza installare nulla. Aggiungi i tuoi
+colori e Magma risolve ognuno nei passi della modalità chiara e della scura, giudica il
+contrasto di ogni coppia mentre modifichi e mostra il tema sulla schermata di un prodotto,
+in chiaro, in scuro o in entrambi affiancati. Quando va bene, scarica i suoi token.
 
 </Channel>
 </Channels>

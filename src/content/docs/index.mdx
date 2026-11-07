@@ -10,6 +10,10 @@ head:
       property: og:title
       content: Magma Design System
 template: splash
+announcement:
+  badge: New
+  text: 'Magma Studio: make a theme of your own, in the browser'
+  link: '#studio'
 hero:
   tagline: The design system of Maggioli Group. Standard web components that work in any framework, design decisions kept in tokens, and guides that AI agents read straight from the package.
   actions:
@@ -33,7 +37,9 @@ import Level from '../../components/home/Level.astro';
 import Levels from '../../components/home/Levels.astro';
 import Mascot from '../../components/home/Mascot.astro';
 import SectionCards from '../../components/home/SectionCards.astro';
+import StudioShot from '../../components/home/StudioShot.astro';
 import { apiCounts } from '../../lib/magma.mjs';
+import { STUDIO } from '../../lib/nav.mjs';
 
 export const api = apiCounts();
 
@@ -181,6 +187,21 @@ export class SubscribeComponent {
 
 </Fragment>
 </FrameworkTabs>
+</HomeSection>
+
+<HomeSection
+  id="studio"
+  title="Make Magma yours"
+  lead="Magma Studio makes a theme of your own in the browser, with nothing to install: your colors solved for light and dark mode, their contrast checked while you edit, the theme on the screen of a product, ready to download as tokens."
+  badge="New"
+  href={STUDIO}
+  action="Open Magma Studio"
+  external
+>
+  <StudioShot
+    slot="aside"
+    alt="Magma Studio, the Theme section: the screen of a product drawn with the theme being made, and above it the switches of light and dark mode and of more contrast."
+  />
 </HomeSection>
 
 <HomeSection

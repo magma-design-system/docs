@@ -1,0 +1,153 @@
+---
+// The gallery of the landing page of Design language, Building blocks or
+// Patterns: what the installed magma ships of that kind, in the order of the
+// section navigation. The patterns and the blocks by topic (patternGroups() in
+// src/lib/nav.mjs), each topic under a heading that the table of contents
+// lists (src/route-data.ts); the domains in one grid (DOMAINS), named in the
+// language of the page as the navigation names them. One card each: its media,
+// its title (a pattern or a block as the package writes it, in English), its
+// need, in English, and its id, which an agent and a product's layer use. A
+// candidate, a need Magma knows with no default yet, has a badge.
+//
+// The media is the image of the first preview, the one Magma ships beside its
+// stage, light or dark as the page (previewImageHref() in src/lib/patterns.ts):
+// a WebP of a few KB, where running the stage in a frame would load a whole
+// page per card. The hidden one is not loaded (`loading` is lazy). The image
+// is opaque, so it sits in the frame of the Brand assets cards on their soft
+// ground, the one of an image (CardMedia.astro). The page in a light image
+// has nearly the color of that ground: a radius and a shadow draw its edge.
+// Without a preview (a candidate, a domain that ships none) the frame holds
+// the icon of its group or of the domain, in a box the size of an image.
+// The cards are surface-overlay: --mds-card-background paints the card and
+// its parts, where a `bg-*` on each region left the media on its own ground.
+import { getEntry } from 'astro:content';
+import { patternGroups, shippedDomains } from '../lib/nav.mjs';
+import { patternHref, previewImageHref, type PatternKind } from '../lib/patterns';
+import CardMedia from './CardMedia.astro';
+import Code from './Code.astro';
+import Heading from './Heading.astro';
+
+interface Props {
+  kind: PatternKind;
+}
+
+const { kind } = Astro.props;
+const { t, starlightRoute } = Astro.locals;
+const { locale } = starlightRoute;
+// What comes from the Magma packages is in English only.
+const contentLang = locale ? 'en' : undefined;
+
+/** A card: the pattern, block or domain `id`, with its title and the icon for no preview. */
+const card = async (id: string, title: string, titleLang: string | undefined, icon: string) => {
+  const entry = await getEntry('patterns', id);
+  if (!entry) throw new Error(`PatternGallery: no pattern ${id}`);
+  const [first] = entry.data.previews;
+  return {
+    id,
+    title,
+    titleLang,
+    icon,
+    candidate: entry.data.status === 'candidate',
+    need: entry.data.need,
+    href: patternHref(locale, kind, id),
+    images: first && {
+      light: previewImageHref(kind, id, first.id, 'light'),
+      dark: previewImageHref(kind, id, first.id, 'dark'),
+    },
+  };
+};
+
+const groups =
+  kind === 'design-language'
+    ? [
+        {
+          id: undefined,
+          label: undefined,
+          items: await Promise.all(
+            shippedDomains().map(({ id, icon }) =>
+              card(id, t(`nav.design-language.${id}` as any), undefined, icon),
+            ),
+          ),
+        },
+      ]
+    : await Promise.all(
+        patternGroups(kind).map(async (group) => ({
+          id: group.id,
+          label: t(`nav.${kind === 'block' ? 'blocks' : 'patterns'}.${group.id}` as any),
+          items: await Promise.all(
+            group.patterns.map(({ id, title }) => card(id, title, contentLang, group.icon)),
+          ),
+        })),
+      );
+---
+
+{groups.map(({ id, label, items }) => (
+  <>
+    {id && label && <Heading id={id} text={label} />}
+    {/* `not-content`: Starlight would put 1rem above every card but the first. */}
+    <div class="not-content @container my-600">
+      <div class="grid gap-600 @xl:grid-cols-2">
+        {items.map((item) => (
+          <mds-card class="[--mds-card-background:rgb(var(--magma-surface-overlay))]">
+            <CardMedia ground="wash" class="p-300">
+              {item.images ? (
+                <>
+                  <mds-img
+                    class="aspect-8/5 overflow-hidden rounded-sm shadow-sm [--mds-img-background:transparent] dark:hidden"
+                    src={item.images.light}
+                    alt=""
+                    width="1440"
+                    height="900"
+                  />
+                  <mds-img
+                    class="hidden aspect-8/5 overflow-hidden rounded-sm shadow-sm [--mds-img-background:transparent] dark:flex"
+                    src={item.images.dark}
+                    alt=""
+                    width="1440"
+                    height="900"
+                  />
+                </>
+              ) : (
+                <div aria-hidden="true" class="grid aspect-8/5 w-full place-items-center">
+                  <mds-icon name={item.icon} class="w-1200 fill-current text-fg-muted" />
+                </div>
+              )}
+            </CardMedia>
+            <mds-card-header class="flex-wrap items-center gap-200">
+              {/* Under the heading of its topic, or right under the h1. */}
+              <mds-text typography="h6" tag={id ? 'h3' : 'h2'} lang={item.titleLang}>
+                {item.title}
+              </mds-text>
+              {item.candidate && (
+                <mds-badge label={t('pattern.candidate')} variant="info" tone="weak" />
+              )}
+            </mds-card-header>
+            <mds-card-content class="flex flex-col gap-300">
+              <mds-text typography="detail" tag="p" lang={contentLang}>
+                {item.need}
+              </mds-text>
+              <mds-text typography="detail" tag="p">
+                <mds-text typography="detail" tag="span" class="text-fg-muted">
+                  {t('pattern.id')}:
+                </mds-text>{' '}
+                <Code>{item.id}</Code>
+              </mds-text>
+            </mds-card-content>
+            <mds-card-footer>
+              <mds-button
+                href={item.href}
+                type="a"
+                label={t('cards.open')}
+                aria-label={`${t('cards.open')}: ${item.title}`}
+                icon="mi/baseline/arrow-forward"
+                icon-position="right"
+                variant="primary"
+                tone="text"
+              />
+            </mds-card-footer>
+          </mds-card>
+        ))}
+      </div>
+    </div>
+  </>
+))}

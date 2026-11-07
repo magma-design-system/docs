@@ -16,6 +16,17 @@ Add a page with the list of the user's documents: a table with name, date and si
 Name a component only when you want that one: the agent reads its API anyway, and a name
 from memory may belong to another version.
 
+## Flows follow the patterns
+
+When the screen tells the person what happened, asks before an action that cannot be undone or
+makes them wait, the agent asks the MCP server for the pattern of the task, `get_pattern`, and
+follows the case it gets back: the same answer in every product. In Claude Code, `/magma:ui`
+asks before it builds a flow, and `/magma:review` checks each flow against its case.
+
+What Magma leaves open to the product, and the situations of its domain, are decided once in
+the product's layer, which the agent gets with every answer:
+[Design for your product](../design-for-your-product/) goes from the setup to a checked layer.
+
 ## Check what it built
 
 Leave to the tools what a rule can check. The [lint](../../development/lint/) finds a value
@@ -32,7 +43,7 @@ files, then checks these with the MCP server and reports each finding with its f
 [Claude Code plugin](../claude-code/)). With another agent, ask for the same:
 
 ```text title="Prompt" wrap
-Review the UI code changed on this branch against Magma: run the lint and fix what it reports, then compare each Magma component with its pattern.md and antipattern.md.
+Review the UI code changed on this branch against Magma: run the lint and fix what it reports, then compare each Magma component with its examples.md and mistakes.md.
 ```
 
 ## After an update

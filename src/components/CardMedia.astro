@@ -1,0 +1,39 @@
+---
+// The media of a card that shows a file: a frame inset from the edges of the
+// card, with rounded corners and an inset shadow, on the ground the file needs.
+// A transparent artwork is drawn on the background it is made for (dark or
+// white, whatever the mode of the page) as a checkerboard, which tells that
+// the file is transparent; an opaque image on a soft ground. The cards of
+// files to download (DownloadCard.astro) and the gallery of patterns, blocks
+// and domains (PatternGallery.astro) share it.
+// mds-card takes its media to the edges of the card; `p-200` brings the frame
+// back in. The size of the frame comes from `class`, its content from the slot.
+
+interface Props {
+  /** The ground: a dark or white checkerboard for an artwork, a soft wash for an image. */
+  ground: 'dark' | 'white' | 'wash';
+  class?: string;
+}
+
+const { ground, class: className } = Astro.props;
+---
+
+<mds-card-media class="p-200">
+  <div
+    class:list={[
+      'relative overflow-hidden rounded-md inset-shadow-xs',
+      ground === 'wash'
+        ? 'bg-wash-soft'
+        : [
+            // The classic checkerboard, to show that the files are transparent.
+            'bg-[conic-gradient(var(--checker)_25%,transparent_0_50%,var(--checker)_0_75%,transparent_0)] bg-[length:1rem_1rem]',
+            ground === 'dark'
+              ? 'bg-neutral-900 [--checker:var(--color-neutral-800)]'
+              : 'bg-white [--checker:color-mix(in_oklab,var(--color-neutral-100),var(--color-neutral-200))]',
+          ],
+      className,
+    ]}
+  >
+    <slot />
+  </div>
+</mds-card-media>

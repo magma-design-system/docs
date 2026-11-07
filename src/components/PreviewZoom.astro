@@ -1,0 +1,38 @@
+---
+// A preview of a pattern, larger: the buttons "Enlarge" of the stages
+// (PatternPreviews.astro, `data-preview-zoom` with the address of the
+// preview and `data-preview-zoom-label` with its name) open it in an
+// mds-url-view, in the window slot of an mds-modal, as wide as Magma's
+// `wide` breakpoint (a class on the window wins over the width of a dialog).
+// One per page. The view is made on each opening with the absolute address,
+// which mds-url-view needs to name the page, and removed on closing, so no
+// frame keeps running behind the page; its close button closes the modal.
+---
+
+<mds-modal data-preview-zoom-modal></mds-modal>
+
+<script>
+  document.addEventListener('click', (event) => {
+    const button = (event.target as Element | null)?.closest<HTMLElement>('[data-preview-zoom]');
+    const modal = document.querySelector<HTMLElement & { opened?: boolean }>(
+      'mds-modal[data-preview-zoom-modal]',
+    );
+    if (!button || !modal) return;
+    const label = button.dataset.previewZoomLabel ?? '';
+    const view = document.createElement('mds-url-view');
+    view.setAttribute('slot', 'window');
+    view.setAttribute('src', new URL(button.dataset.previewZoom ?? '', location.href).href);
+    view.setAttribute('label', label);
+    view.setAttribute('icon', 'mi/outline/view-quilt');
+    view.setAttribute('loading', 'eager');
+    view.className = 'w-full max-w-screen-wide';
+    modal.replaceChildren(view);
+    modal.setAttribute('aria-label', label);
+    modal.opened = true;
+  });
+
+  document.addEventListener('mdsModalClose', (event) => {
+    const modal = event.target as Element | null;
+    if (modal?.matches('mds-modal[data-preview-zoom-modal]')) modal.replaceChildren();
+  });
+</script>

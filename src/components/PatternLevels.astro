@@ -1,0 +1,150 @@
+---
+// The drawing of a component, a building block and a pattern, on the landing
+// pages of Patterns and Building blocks (#89): one row each, what it is beside
+// a picture of it made of live Magma components on a sunken stage. The
+// component is a button; the block is the header of the page of one record
+// (`page-header` with `level: nested`, `subject: item`), each region outlined
+// with its id in the order of the page; the pattern is three values of the
+// situation that lead to one case of `message-placement` (`field-error`) and
+// the component it names. The ids, the values and the case are the ones
+// get_pattern answers with in Magma 2.11.0 and 2.12.0: rename them here when
+// the package does. Each picture is one image for screen readers, its
+// components inert, as ComponentLayers.astro on the home page. The colors are
+// roles (the stage, the text) and the label palette for the outlines of the
+// regions: they follow the mode, the contrast and the theme.
+import Code from './Code.astro';
+
+const { t } = Astro.locals;
+
+/** The outline of a region of the block and the flag with its id, on the label palette. */
+const REGION = 'relative rounded-md p-200 outline-1 outline-dashed outline-label-violet-06';
+const FLAG =
+  'absolute -top-250 left-200 whitespace-nowrap rounded-md px-100 shadow-none bg-label-violet-10 text-label-violet-03';
+
+/** The situation of the pattern: the values get_pattern takes, then the case it answers with. */
+const VALUES = [
+  ['about', 'field'],
+  ['outcome', 'failure'],
+  ['place', 'on-screen'],
+];
+const CASE = 'field-error';
+
+/** Side by side when the content column has room, the picture under its words otherwise. */
+const ROW = 'grid gap-400 @2xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] @2xl:items-center';
+const STAGE = 'flex min-h-3200 items-center justify-center rounded-2xl bg-surface-sunken p-600';
+---
+
+<div class="not-content @container my-600">
+  <ol class="grid list-none gap-800 px-0">
+    <li class={ROW}>
+      <div class="grid gap-200">
+        <mds-text typography="h5" tag="h3">
+          {t('pattern.levels.component')}
+        </mds-text>
+        <mds-text typography="detail" tag="p" class="block">
+          {t('pattern.levels.component.text')}
+        </mds-text>
+      </div>
+      <div role="img" aria-label={t('pattern.levels.component.picture')} class={STAGE}>
+        <div inert class="grid justify-items-center gap-300">
+          <mds-button>{t('pattern.levels.component.save')}</mds-button>
+          <Code>mds-button</Code>
+        </div>
+      </div>
+    </li>
+    <li class={ROW}>
+      <div class="grid gap-200">
+        <mds-text typography="h5" tag="h3">
+          {t('pattern.levels.block')}
+        </mds-text>
+        <mds-text typography="detail" tag="p" class="block">
+          {t('pattern.levels.block.text')}
+        </mds-text>
+      </div>
+      <div role="img" aria-label={t('pattern.levels.block.picture')} class={STAGE}>
+        <div inert class="grid w-full gap-600 pt-200">
+          <div class:list={[REGION, 'justify-self-start']}>
+            <mds-text typography="hack" tag="code" class={FLAG}>
+              back
+            </mds-text>
+            <mds-button variant="dark" tone="text" size="sm" icon="mi/outline/arrow-back">
+              {t('pattern.levels.block.back')}
+            </mds-button>
+          </div>
+          <div class="flex flex-wrap items-end justify-between gap-600">
+            <div class="grid gap-600">
+              <div class="flex flex-wrap items-center gap-600">
+                <div class={REGION}>
+                  <mds-text typography="hack" tag="code" class={FLAG}>
+                    title
+                  </mds-text>
+                  <mds-text typography="h5" tag="p">
+                    {t('pattern.levels.block.title')}
+                  </mds-text>
+                </div>
+                <div class={REGION}>
+                  <mds-text typography="hack" tag="code" class={FLAG}>
+                    status
+                  </mds-text>
+                  <mds-badge variant="info">{t('pattern.levels.block.status')}</mds-badge>
+                </div>
+              </div>
+              <div class={REGION}>
+                <mds-text typography="hack" tag="code" class={FLAG}>
+                  summary
+                </mds-text>
+                <mds-text typography="caption" tag="p" class="text-fg-muted">
+                  {t('pattern.levels.block.summary')}
+                </mds-text>
+              </div>
+            </div>
+            <div class:list={[REGION, 'flex gap-200']}>
+              <mds-text typography="hack" tag="code" class={FLAG}>
+                actions
+              </mds-text>
+              <mds-button variant="dark" tone="outline" size="sm">
+                {t('pattern.levels.block.edit')}
+              </mds-button>
+              <mds-button size="sm">{t('pattern.levels.block.approve')}</mds-button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </li>
+    <li class={ROW}>
+      <div class="grid gap-200">
+        <mds-text typography="h5" tag="h3">
+          {t('pattern.levels.pattern')}
+        </mds-text>
+        <mds-text typography="detail" tag="p" class="block">
+          {t('pattern.levels.pattern.text')}
+        </mds-text>
+      </div>
+      <div role="img" aria-label={t('pattern.levels.pattern.picture')} class={STAGE}>
+        <div inert class="grid w-full justify-items-center gap-300">
+          <div class="flex flex-wrap justify-center gap-200">
+            {VALUES.map(([name, value]) => (
+              <Code>{`${name}: ${value}`}</Code>
+            ))}
+          </div>
+          <mds-icon name="mi/outline/arrow-downward" class="w-600 fill-current text-fg-muted" />
+          <div class="flex items-center gap-200">
+            <mds-text typography="caption" tag="span" class="text-fg-muted">
+              {t('pattern.levels.pattern.case')}
+            </mds-text>
+            <Code>{CASE}</Code>
+          </div>
+          <mds-icon name="mi/outline/arrow-downward" class="w-600 fill-current text-fg-muted" />
+          <mds-input-field
+            label={t('pattern.levels.pattern.label')}
+            message={t('pattern.levels.pattern.message')}
+            variant="error"
+            class="w-full max-w-xs"
+          >
+            <mds-input type="email" />
+          </mds-input-field>
+        </div>
+      </div>
+    </li>
+  </ol>
+</div>

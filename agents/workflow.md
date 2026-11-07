@@ -34,7 +34,12 @@ Then open http://localhost:4440/docs/. Notes:
 - A symlinked `node_modules` breaks the Vite build ("No cached compile metadata"): run `npm ci`.
 - The first build dumps about 17,000 icons into `public/svg/` and can take minutes; the next
   ones skip the copy.
-- A production build is not dev: drafts and previews of draft patterns are left out.
+- A production build is not dev: a page with `draft: true` is left out (none today). A page
+  that builds can still fail in dev: on a route of our own (`StarlightPage`), a component
+  whose output puts something in the head (Starlight's `Code`, expressive-code) runs before
+  `StarlightPage` sets `Astro.locals.starlightRoute`, and reading the route there throws
+  (`locals.starlightRoute is not defined`, a 500). Pass the locale as a prop from the route
+  (`PatternAgent.astro`), and open a page of each route on a dev server too.
 - `astro check` must end with 0 errors: CI runs it before the build.
 
 In a browser driven by an agent (a hidden or embedded pane):
@@ -118,6 +123,11 @@ A new author, step by step:
   request bumps them together, as a person does (Upgrading Magma, below). Nothing stops a red
   Renovate pull request: no status check is required on `main`, so GitHub merges it as soon as
   its checks end, whatever their result (2.9.0 and the two updates after it merged red).
+  A second way to the same red: a Renovate pull request that changes `package.json` and not
+  `package-lock.json`. `npm ci` then stops on EUSAGE ("lock file not in sync"). #100, #103 and
+  #104 (tailwindcss, Starlight, astro) merged this way between 2026-11-03 and 11-06; earlier ones of
+  the same packages had carried the lockfile. Before a branch from `main`, if `npm ci` stops
+  on EUSAGE, `npm install` and commit the lockfile alone, in a pull request of its own.
 
 ## Publishing
 
@@ -126,9 +136,10 @@ A new author, step by step:
   `github-pages` environment deploys from `production` only.
 - **Publish check**, on a production build of `main` before opening that pull request, and on
   the live site after the deploy:
-  - Building blocks and Patterns exist only as their landing pages, with the "Under
-    construction" banner; no pattern page and no `/example/pattern/<id>/` is built; their home
-    cards carry the badge.
+  - The design language (in Foundation), Building blocks and Patterns: a page per domain, block and pattern the
+    installed `magma` ships, each opening with its stage when it has previews
+    (`/example/pattern/<id>/<case>/`, the picker and `?preview=<id>`), and the gallery of their
+    landing pages with the image of the first preview of each, light and dark with the mode.
   - No placeholder text, no dev-only page.
   - The Magma version in the site footer is the one in `package.json`.
 

@@ -1,0 +1,113 @@
+---
+title: Design for your product
+description: 'From the setup to a checked layer: how the designer of a product gets the Magma patterns through an agent, adapts them to the product, and asks Magma for what they do not cover.'
+---
+
+import PatternLayers from '../../../components/PatternLayers.astro';
+
+A [pattern](../../patterns/) is the same in every product: Magma decides its cases and the rules
+that are always true. What it leaves open, such as how long a message stays or what it says,
+and the situations of your domain are yours to decide. You do not write them on a page that the
+agent may never read: you write them in a file of the product, its layer, which the agent gets
+every time it asks Magma for the pattern.
+
+<PatternLayers />
+
+## Who does what
+
+- **The product's team** owns the layer: it decides the open choices and the situations, reviews
+  the file as code and commits it with the code.
+- **The Magma maintainers** own the defaults: the patterns, their cases and the rules that are
+  always true. They propose and change them in the Magma repository, with commands of their own
+  that the plugin does not have.
+- **The agent** asks `get_pattern` before it builds a flow, and follows the case it gets back,
+  with the layer of the product applied. Where Magma has no default, it tells you which choice it
+  made, and why.
+
+## Set up
+
+1. Magma installed in the product: [Start a project](../start-a-project/).
+2. In Claude Code, the [Magma plugin](../claude-code/), registered for the team: it starts the
+   MCP server and adds the skill `/magma:pattern-layer`.
+3. In another client, such as VS Code or Cursor, the [MCP server](../mcp-server/) `magma-mcp`:
+   everything below works the same, without the skills of the plugin.
+
+## Ask in words
+
+Describe the screen and what happens on it, as you would to a colleague. The agent finds the
+pattern for the need, asks you the values of its variables that it cannot read from the screen,
+and answers with the case: where the message goes, which components, which rules hold.
+
+```text title="Prompt" wrap
+When saving the details of a request fails, what should the person see? Ask Magma with get_pattern and show me the case, its components and its rules before writing any code.
+```
+
+In Claude Code, the skill `/magma:ui` asks `get_pattern` by itself before it builds a flow that
+tells the person something or makes them wait or decide. To see a case before you decide, ask
+the agent to render it: `render_preview` draws the preview Magma ships for the case, light or
+dark, at the widths you ask for. The page of each pattern on this site runs the same previews.
+
+## Adapt it with /magma:pattern-layer
+
+When the product wants a choice fixed for good, or its own situations answered, that is its
+layer. In Claude Code:
+
+```text title="Claude Code"
+/magma:pattern-layer message-placement
+```
+
+The skill:
+
+- reads the pattern with `get_pattern`, with the layer of the product if there is one already:
+  it changes that file, and never writes a second one;
+- asks you one question at a time: for each open choice, Magma's default, which it recommends,
+  or a value within what the choice allows; then the situations of the product, in your words,
+  each mapped to the case `get_pattern` gives for it;
+- writes `magma/patterns/<id>.md`, with a line under `## Why` for each choice: its reason and
+  the date;
+- checks the file, as in the next step, and reports what it wrote.
+
+It commits nothing: review the file and commit it with the code, like any change to the
+product. A wish that changes a case or a rule that is always true is not a layer: the skill says
+so, and proposes an issue on Magma. The format of the file, and what a layer may not do, are in
+the [Pattern API](../pattern-api/#the-layer-of-a-product). With another agent, ask for the same:
+
+```text title="Prompt" wrap
+Adapt the Magma pattern message-placement to this product: write magma/patterns/message-placement.md as the section "A product's layer" of node_modules/@maggioli-design-system/magma/agents/patterns.md describes, asking me about each open choice and each situation of the product, then check it with get_pattern.
+```
+
+## Check it
+
+A layer with an error is not applied: the agent keeps getting Magma's default, and nothing in
+the code shows it. Three questions to `get_pattern` tell that the layer works:
+
+1. with no arguments: the answer has no `layerErrors`;
+2. with the id: each choice the layer fixes carries `narrowed-by`, each situation it adds
+   carries `layer`;
+3. with the id and the values of a situation of the product: the case is the one the layer maps
+   it to.
+
+`/magma:pattern-layer` asks them before it ends. Ask them again after you edit the file by
+hand, and after an update of Magma, which may change a case or a choice the layer names:
+`layerErrors` says which.
+
+```text title="Prompt" wrap
+Check the Magma layers of this project: call get_pattern with no arguments and fix every line of layerErrors in magma/patterns/.
+```
+
+## Report what no pattern covers
+
+When `get_pattern` answers with `gap`, or only a candidate covers the need, Magma has no default
+for it yet. The agent tells you, makes a choice and says which one, and at the end of the task
+proposes an issue on Magma: it opens it only once you agree, since the Magma repository is
+public. The issue goes to `magma-design-system/magma` with the label of your product, `prd-` and
+its short name; if the product has none yet, the issue proposes one and the maintainers add it.
+The steps are in the guide `agents/reporting.md` of the package.
+
+```text title="Prompt" wrap
+No Magma pattern covers choosing the members of a group from a long list. Propose an issue on Magma, following node_modules/@maggioli-design-system/magma/agents/reporting.md, with the label of this product, and show it to me before opening it.
+```
+
+If the product cannot wait, it can keep a pattern of its own in the same folder, in the shape of
+Magma's ones; once the same need comes back in two or three products, the pattern is proposed
+to Magma ([Pattern API](../pattern-api/#a-pattern-of-the-products-own)).

@@ -1,36 +1,67 @@
 ---
 title: Building block
-description: Le sezioni di una pagina che tornano di continuo - l'intestazione di una pagina, una barra di filtri, il riepilogo dei risultati - fatte di componenti Magma, con la loro struttura e il loro layout.
+description: Le sezioni di una pagina che tornano da un prodotto all'altro - la struttura dell'applicazione, l'intestazione di una pagina, una lista di elementi, i dati di un elemento - fatte di componenti di Magma, come Magma le consegna alle persone e agli agenti AI.
 ---
 
-import ComingSoon from '../../../../components/ComingSoon.astro';
+import PageCards from '../../../../components/PageCards.astro';
+import PatternGallery from '../../../../components/PatternGallery.astro';
+import PatternLayers from '../../../../components/PatternLayers.astro';
+import PatternLevels from '../../../../components/PatternLevels.astro';
 
-<ComingSoon text="I building block sono in scrittura, insieme ai primi pattern da cui nascono." />
+Ogni building block è una sezione di pagina che torna da un prodotto all'altro. Aprine uno: si
+parte dalle sue situazioni in funzione, le regioni e le regole vengono dopo.
+
+<PatternGallery kind="block" />
+
+## Che cos'è un building block
 
 Una pagina è fatta di sezioni, e molte tornano da un prodotto all'altro. Un building block è una
-di queste sezioni, fatta di componenti Magma e sempre nella stessa disposizione: l'intestazione
-di una pagina con il titolo e le azioni, una barra di filtri, il riepilogo dei risultati, una
-sezione di un form, una barra di azioni.
+di queste sezioni, fatta di componenti di Magma e disposta sempre allo stesso modo: la struttura
+dell'applicazione intorno a ogni pagina, l'intestazione di una pagina con il titolo e le azioni,
+una lista di elementi, le etichette e i valori di un elemento.
 
-Un building block non contiene dati né logica di business. Le sue regole riguardano struttura e
-layout: quali parti ha e quali sono facoltative, in che ordine vengono, come si adatta alla
-larghezza dello schermo. Quello che succede quando lo si usa riguarda i [pattern](../patterns/).
+Un building block riguarda lo spazio: quali regioni ha, quando compare ognuna, in che ordine
+vengono e come si adattano alla larghezza. Quello che succede nel tempo - un messaggio,
+un'attesa, un errore - appartiene ai [pattern](../patterns/), che usano i block.
 
-## Componenti, building block, pattern
+I building block arrivano con Magma, nel pacchetto `@maggioli-design-system/magma`. Ogni pagina
+qui è generata dal file del suo block, lo stesso file che legge un agente AI, ed è scritta in
+inglese.
 
-- Un **componente** è un elemento Magma, come un pulsante o un campo: Magma lo fornisce pronto,
-  e lo si importa.
-- Un **building block** mette insieme dei componenti in una sezione di una pagina: riguarda lo
-  spazio.
-- Un **pattern** è la soluzione a un compito che le persone svolgono di continuo: riguarda il
-  tempo - cosa segue un'azione, dove vive lo stato, il caricamento, gli errori, il focus. Usa
-  componenti e building block, e lo si applica invece di importarlo.
+## Componenti, block, pattern
 
-## Da dove nascono
+Una schermata si costruisce su tre livelli, ognuno fatto con quello prima:
 
-I building block non si progettano a tavolino: nascono dai pattern. Una sezione di una pagina
-diventa un building block quando torna in due o tre pattern, così si scrive una volta e ogni
-pagina che ne ha bisogno la costruisce allo stesso modo.
+<PatternLevels />
 
-Ogni building block avrà la sua pagina: le parti, le regole che valgono sempre, come si adatta
-alla larghezza, i componenti di cui è fatto e il suo codice.
+## Come si legge un block
+
+Un block parte da poche variabili della pagina: se sta in cima all'applicazione o al suo
+interno, se mostra un elemento o un insieme. Invece dei casi ha delle **regioni** (Regions),
+nell'ordine della pagina, ognuna con quando compare; **Layout** dice come si dispongono a ogni
+larghezza. Le **Situations** sono pagine reali, che lo stage in cima alla pagina esegue una alla
+volta. **Always true** e **Decisions** funzionano come per un pattern.
+
+## Da dove vengono
+
+I building block non si progettano in anticipo: nascono dai pattern. Una sezione di pagina
+diventa un block quando torna in due o tre pattern, così si scrive una volta e ogni pagina che
+ne ha bisogno la costruisce allo stesso modo.
+
+## Il livello di un prodotto
+
+Un prodotto può restringere un block come restringe un pattern, in un file del suo repository,
+`magma/patterns/<id>.md`: fissa le scelte aperte del block, come il logo del prodotto nella
+struttura dell'applicazione o gli elementi di una lista mostrati come card, e aggiunge le pagine
+del prodotto come situazioni, ognuna con i valori delle variabili del block. Le regioni e le
+regole che valgono sempre restano come sono, e `get_pattern` applica il livello del progetto in
+cui gira:
+
+<PatternLayers />
+
+<PageCards
+  pages={[
+    { slug: 'ai/design-for-your-product', icon: 'mi/outline/tune' },
+    { slug: 'ai/pattern-api', icon: 'mi/outline/data-object' },
+  ]}
+/>
