@@ -72,9 +72,9 @@ the site), #1125 (shadow tokens read as CSS in `list_tokens` and `explain_class`
 `suggest_role` keeps the utility of the class it gets), #1126 (`no-internal-tokens` reads the
 custom properties of Tailwind classes, `[--mds-*:...]` and `bg-(--mds-*)`, and of `@apply`: it
 then found `CopyStatus.astro` reading an internal one, #1139 below), #1127
-(`dist/lint/mcp/tools.json`, the answer of `tools/list`: the tool table of the MCP server page
-reads it; the Stylelint rules have `meta.description`, and the `url` of every rule links the
-installed release).
+(`tools.json`, the answer of `tools/list`: the tool table of the MCP server page reads it, from
+`dist/mcp/` since 2.12.0, where the server is a project of its own, #1244; the Stylelint rules
+have `meta.description`, and the `url` of every rule links the installed release).
 
 Closed by 2.8.0, filed on 2026-10-25 from the component previews (docs#79) and from the lint on
 the site: #1139 (`--mds-table-row-actions-background` is public and read-only:
