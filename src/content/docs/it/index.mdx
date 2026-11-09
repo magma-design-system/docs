@@ -12,7 +12,7 @@ head:
 template: splash
 announcement:
   badge: Novità
-  text: 'Magma Studio: crea un tema tutto tuo, nel browser'
+  text: 'Magma Studio: il tema del tuo prodotto, leggibile da tutti'
   link: '#studio'
 hero:
   tagline: Il design system del Gruppo Maggioli. Web component standard che funzionano in ogni framework, decisioni di design raccolte nei token e guide che gli agenti AI leggono direttamente dal pacchetto.
@@ -48,66 +48,39 @@ export const api = apiCounts();
 <HomeStats />
 
 <HomeSection
-  id="built-to-scale"
-  title="Fatto per crescere"
-  lead="Un solo sistema per prodotti costruiti in modi diversi, da team diversi, a velocità diverse."
+  id="agents"
+  title="Fatto per lavorare con gli agenti AI"
+  lead="Gli agenti sviluppano con Magma come fa il tuo team: dalle guide della versione che hai installato. Installa il pacchetto, poi chiedi."
+  href="ai/"
+  action="Sviluppo agentico"
 >
-  <Features>
-    <Feature
-      icon="mi/outline/layers"
-      title="Una libreria, ogni framework"
-      description="Custom element standard che funzionano in ogni framework."
-      text="Compilati una volta sola, da un solo sorgente, funzionano così come sono in JavaScript e in qualunque template. I wrapper per React e Angular, generati da quel sorgente e rilasciati insieme, aggiungono tipi, eventi e form nel modo che ogni framework si aspetta."
-      href="development/installation/"
-      action="Installa Magma"
-    />
-    <Feature
-      icon="mi/outline/integration-instructions"
-      title="Solo standard web"
-      description="Quello che funziona in un file HTML funziona in ogni framework."
-      text="Le opzioni sono attributi HTML che prendono stringhe, numeri e booleani, non array, oggetti o callback che solo un framework sa passare. I contenuti vanno negli slot e nei componenti figli, gli eventi sono eventi DOM."
-      stat={{
-        value: api.attributes,
-        total: api.properties,
-        label: 'proprietà sono attributi semplici',
-      }}
-      href="development/"
-      action="Leggi le regole"
-    />
-    <Feature
-      icon="mi/outline/stairs"
-      title="Un livello alla volta"
-      description="Token, stili, componenti e wrapper: si prende solo quello che serve."
-      text="Ogni livello funziona da solo: un prodotto prende quello che il suo stack, le sue scadenze e i suoi utenti permettono, e sale quando può."
-      href="#adoption"
-      action="Vedi i livelli"
-    />
-    <Feature
-      icon="mi/outline/auto-awesome"
-      variant="ai"
-      title="Pronto per gli agenti AI"
-      description="L'agente lavora con la versione che hai installato, non con quello che ricorda."
-      text="I pacchetti contengono guide scritte per gli agenti di sviluppo, un server MCP che risponde dalla versione installata e un lint che controlla il risultato. Il modello resta per le scelte che chiedono giudizio: quello che è meccanico non costa token."
-      href="ai/"
-      action="Lavora con gli agenti"
-    />
-    <Feature
-      icon="mi/outline/accessibility-new"
-      title="Accessibile e adattivo"
-      description="Progettato per WCAG 2.x AA e per le preferenze di ogni utente."
-      text="Modalità chiara e scura, contrasto più alto, movimento ridotto, basso consumo e temi sono già inclusi: le preferenze si impostano una volta sulla pagina e ogni componente le segue."
-      href="foundation/accessibility/"
-      action="Accessibilità"
-    />
-    <Feature
-      icon="mi/outline/palette"
-      title="Una sola fonte per le decisioni di design"
-      description="Una decisione cambiata una volta arriva a ogni prodotto."
-      text="Colori, tipografia, spazi e movimento vivono nei design token, pubblicati per CSS, Tailwind, SCSS, JavaScript e DTCG, per Figma come variabili e per iOS, Android e Flutter. Ogni prodotto riceve le modifiche con il suo prossimo aggiornamento."
-      href="tokens/"
-      action="Scopri i token"
-    />
-  </Features>
+<Mascot slot="before" />
+
+<AgentNames />
+
+<FrameworkTabs>
+<Fragment slot="vanilla">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+<Fragment slot="react">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma-react/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+<Fragment slot="angular">
+
+```text title="Prompt" wrap
+Read node_modules/@maggioli-design-system/magma-angular/AGENTS.md and follow it to install Magma into this project.
+```
+
+</Fragment>
+</FrameworkTabs>
 </HomeSection>
 
 <HomeSection
@@ -192,7 +165,7 @@ export class SubscribeComponent {
 <HomeSection
   id="studio"
   title="Fai tuo Magma"
-  lead="Magma Studio crea un tema tutto tuo nel browser, senza installare nulla: i tuoi colori risolti per la modalità chiara e per la scura, il contrasto verificato mentre modifichi, il tema sulla schermata di un prodotto, pronto da scaricare come token."
+  lead="Magma Studio dà forma al tema del tuo prodotto nel browser, senza installare nulla. Indichi quanto contrasto serve al testo e sceglie i colori che lo rispettano, in ogni tema e in entrambe le modalità, giudicando ogni coppia mentre modifichi. Guarda il tema sulla schermata di un prodotto, poi portalo via come token per il tuo codice e per Figma."
   badge="Novità"
   href={STUDIO}
   action="Apri Magma Studio"
@@ -200,7 +173,7 @@ export class SubscribeComponent {
 >
   <StudioShot
     slot="aside"
-    alt="Magma Studio, la sezione Theme: la schermata di un prodotto disegnata con il tema in lavorazione e, sopra, gli interruttori della modalità chiara e scura e del contrasto maggiore."
+    alt="La pagina iniziale di Magma Studio: il tema del tuo prodotto, leggibile da tutti, e ciò che lo studio fa; accanto, la finestra di dialogo di un prodotto di cui lo studio ha riportato testo, icona e azioni sopra le loro soglie di contrasto."
   />
 </HomeSection>
 
@@ -242,39 +215,66 @@ export class SubscribeComponent {
 </HomeSection>
 
 <HomeSection
-  id="agents"
-  title="Fatto per lavorare con gli agenti AI"
-  lead="Gli agenti sviluppano con Magma come fa il tuo team: dalle guide della versione che hai installato. Installa il pacchetto, poi chiedi."
-  href="ai/"
-  action="Sviluppo agentico"
+  id="built-to-scale"
+  title="Fatto per crescere"
+  lead="Un solo sistema per prodotti costruiti in modi diversi, da team diversi, a velocità diverse."
 >
-<Mascot slot="before" />
-
-<AgentNames />
-
-<FrameworkTabs>
-<Fragment slot="vanilla">
-
-```text title="Prompt" wrap
-Read node_modules/@maggioli-design-system/magma/AGENTS.md and follow it to install Magma into this project.
-```
-
-</Fragment>
-<Fragment slot="react">
-
-```text title="Prompt" wrap
-Read node_modules/@maggioli-design-system/magma-react/AGENTS.md and follow it to install Magma into this project.
-```
-
-</Fragment>
-<Fragment slot="angular">
-
-```text title="Prompt" wrap
-Read node_modules/@maggioli-design-system/magma-angular/AGENTS.md and follow it to install Magma into this project.
-```
-
-</Fragment>
-</FrameworkTabs>
+  <Features>
+    <Feature
+      icon="mi/outline/layers"
+      title="Una libreria, ogni framework"
+      description="Custom element standard che funzionano in ogni framework."
+      text="Compilati una volta sola, da un solo sorgente, funzionano così come sono in JavaScript e in qualunque template. I wrapper per React e Angular, generati da quel sorgente e rilasciati insieme, aggiungono tipi, eventi e form nel modo che ogni framework si aspetta."
+      href="development/installation/"
+      action="Installa Magma"
+    />
+    <Feature
+      icon="mi/outline/integration-instructions"
+      title="Solo standard web"
+      description="Quello che funziona in un file HTML funziona in ogni framework."
+      text="Le opzioni sono attributi HTML che prendono stringhe, numeri e booleani, non array, oggetti o callback che solo un framework sa passare. I contenuti vanno negli slot e nei componenti figli, gli eventi sono eventi DOM."
+      stat={{
+        value: api.attributes,
+        total: api.properties,
+        label: 'proprietà sono attributi semplici',
+      }}
+      href="development/"
+      action="Leggi le regole"
+    />
+    <Feature
+      icon="mi/outline/stairs"
+      title="Un livello alla volta"
+      description="Token, stili, componenti e wrapper: si prende solo quello che serve."
+      text="Ogni livello funziona da solo: un prodotto prende quello che il suo stack, le sue scadenze e i suoi utenti permettono, e sale quando può."
+      href="#adoption"
+      action="Vedi i livelli"
+    />
+    <Feature
+      icon="mi/outline/auto-awesome"
+      variant="ai"
+      title="Pronto per gli agenti AI"
+      description="L'agente lavora con la versione che hai installato, non con quello che ricorda."
+      text="I pacchetti contengono guide scritte per gli agenti di sviluppo, un server MCP che risponde dalla versione installata e un lint che controlla il risultato. Il modello resta per le scelte che chiedono giudizio: quello che è meccanico non costa token."
+      href="ai/"
+      action="Lavora con gli agenti"
+    />
+    <Feature
+      icon="mi/outline/accessibility-new"
+      title="Accessibile e adattivo"
+      description="Progettato per WCAG 2.x AA e per le preferenze di ogni utente."
+      text="Modalità chiara e scura, contrasto più alto, movimento ridotto, basso consumo e temi sono già inclusi: le preferenze si impostano una volta sulla pagina e ogni componente le segue."
+      href="foundation/accessibility/"
+      action="Accessibilità"
+    />
+    <Feature
+      icon="mi/outline/palette"
+      title="Una sola fonte per le decisioni di design"
+      description="Una decisione cambiata una volta arriva a ogni prodotto."
+      text="Colori, tipografia, spazi e movimento vivono nei design token, pubblicati per CSS, Tailwind, SCSS, JavaScript e DTCG, per Figma come variabili e per iOS, Android e Flutter. Ogni prodotto riceve le modifiche con il suo prossimo aggiornamento."
+      href="tokens/"
+      action="Scopri i token"
+    />
+  </Features>
 </HomeSection>
 
 <HomeSection
