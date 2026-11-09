@@ -54,8 +54,8 @@
   "nav.community.about": "About",
 
   "new.title": "New",
-  "studio.banner.headline": "A theme of your own",
-  "studio.banner.text": "Magma Studio makes one in the browser, with nothing to install: start from a theme Magma ships or from your own colors, check the contrast as you edit, see the theme on the screen of a product, and download its tokens.",
+  "studio.banner.headline": "The theme of your product",
+  "studio.banner.text": "Magma Studio shapes it in the browser, with nothing to install: set how much contrast the text needs and it picks the colors that meet it, in every theme and in both modes. Try the theme on the screen of a product under each of these preferences, then download its tokens.",
   "studio.open": "Open Magma Studio",
   "cards.open": "Read",
   "fonts.weights": "Weights",
@@ -478,7 +478,7 @@
   "home.layers.read": "Read",
   "home.storybook.description": "Every component in action: its variants and states, its props in the controls, its events and its accessibility checks.",
   "home.storybook.open": "Open",
-  "home.studio.description": "A theme of your own, made in the browser: your colors solved for light and dark, their contrast checked as you edit, the result on a product screen.",
+  "home.studio.description": "The theme of your product, made in the browser: you set the contrast the text needs, it picks the colors that meet it, in every theme, light and dark.",
   "home.levels.fits": "Fits when",
 
   "frame.siteFooter.resources": "Resources",
