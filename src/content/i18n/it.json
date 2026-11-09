@@ -54,8 +54,8 @@
   "nav.community.about": "Informazioni",
 
   "new.title": "Novità",
-  "studio.banner.headline": "Un tema tutto tuo",
-  "studio.banner.text": "Magma Studio lo crea nel browser, senza installare nulla: parti da un tema di Magma o dai tuoi colori, verifica il contrasto mentre modifichi, guarda il tema sulla schermata di un prodotto e scarica i suoi token.",
+  "studio.banner.headline": "Il tema del tuo prodotto",
+  "studio.banner.text": "Magma Studio gli dà forma nel browser, senza installare nulla: indichi quanto contrasto serve al testo e sceglie i colori che lo rispettano, in ogni tema e in entrambe le modalità. Prova il tema sulla schermata di un prodotto con ciascuna di queste preferenze, poi scarica i suoi token.",
   "studio.open": "Apri Magma Studio",
   "cards.open": "Leggi",
   "fonts.weights": "Pesi",
@@ -476,7 +476,7 @@
   "home.layers.read": "Leggi",
   "home.storybook.description": "Ogni componente in azione: le varianti e gli stati, le props nei controlli, gli eventi e i controlli di accessibilità.",
   "home.storybook.open": "Apri",
-  "home.studio.description": "Un tema tutto tuo, creato nel browser: i tuoi colori risolti per la modalità chiara e per la scura, il contrasto verificato mentre modifichi, il risultato su una schermata di prodotto.",
+  "home.studio.description": "Il tema del tuo prodotto, creato nel browser: indichi il contrasto che serve al testo, sceglie i colori che lo rispettano, in ogni tema, chiaro e scuro.",
   "home.levels.fits": "Quando serve",
 
   "frame.siteFooter.resources": "Risorse",
