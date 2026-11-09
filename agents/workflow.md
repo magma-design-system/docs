@@ -125,7 +125,8 @@ A new author, step by step:
   its checks end, whatever their result (2.9.0 and the two updates after it merged red).
   A second way to the same red: a Renovate pull request that changes `package.json` and not
   `package-lock.json`. `npm ci` then stops on EUSAGE ("lock file not in sync"). #100, #103 and
-  #104 (tailwindcss, Starlight, astro) merged this way between 2026-11-03 and 11-06; earlier ones of
+  #104 (tailwindcss, Starlight, astro) merged this way between 2026-11-03 and 11-06, #112
+  (tailwindcss 4.3.5) on 11-07; earlier ones of
   the same packages had carried the lockfile. Before a branch from `main`, if `npm ci` stops
   on EUSAGE, `npm install` and commit the lockfile alone, in a pull request of its own.
 
