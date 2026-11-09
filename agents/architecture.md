@@ -137,19 +137,24 @@ groups of the rail are `RAIL_GROUP_ICONS`. The structure and its reasons are in
 
 ## Magma Studio
 
-Magma Studio, where a theme is made in the browser, is an app of the Magma repository published
-beside Storybook, at an address of its own (`STUDIO` in [`src/lib/nav.mjs`](../src/lib/nav.mjs);
+Magma Studio, where a product shapes its theme in the browser, is an app of the Magma repository
+published beside Storybook, at an address of its own (`STUDIO` in
+[`src/lib/nav.mjs`](../src/lib/nav.mjs);
 the packages do not give it, while `documentation.json` gives Storybook's:
 [magma#1294](https://github.com/magma-design-system/magma/issues/1294)). Mounting it in a page
 of this site, with its header and without the side columns, is a later step of
 [magma#693](https://github.com/magma-design-system/magma/issues/693) ("On the site"). Its pages
-are addressed by the hash (`#/theme`, `#/colors/palette`). The site sends people there from:
+are addressed by the hash (`#/theme`, `#/colors/palette`). Its root opens the start page,
+`#/start` (since 2026-11-09): what the Studio is for, how the work goes, and at which level each
+change is made (color, role, theme, product, composition). The texts of the site about the
+Studio follow that page: when it changes, read it again and update them all (hero, band, card,
+Channels, banner, in both languages). The site sends people there from:
 
 - the hero of the home: `announcement` in the frontmatter of `index.mdx` (a field of the docs
   schema, `src/content.config.ts`; `Hero.astro` shows it above the mark), a badge and a sentence
   that lead to the band below;
 - the band `#studio` of the home (`HomeSection` with `aside`, `external` and `badge`): the
-  picture is `StudioShot.astro`, the Theme section as it opens, light and dark,
+  picture is `StudioShot.astro`, the start page as it opens, light and dark,
   `public/home/studio-desktop-<scheme>.webp`;
 - the last card of the home grid (`SectionCards`), beside Storybook;
 - the rail (an icon when collapsed) and the mobile menu (`Rail`, `Preferences`), the resources of
@@ -159,10 +164,11 @@ are addressed by the hash (`#/theme`, `#/colors/palette`). The site sends people
 The badge "New" (`new.title`) is on the hero, the band, the card and the rail: take it away from
 all four when the Studio is no longer the news, or move them to the next one. The pictures go
 stale as the Studio changes: take them again from the published Studio, light and dark, the
-first screen only, at 1440 css px (no build needed):
+first screen only, at 1440 css px (no build needed). With reduced motion, which the script
+emulates, the demo of the start page shows its last state, the contrast gate passed:
 
 ```sh
-npm run screenshots -- --url 'https://magma-design-system.github.io/magma/studio/#/theme' \
+npm run screenshots -- --url 'https://magma-design-system.github.io/magma/studio/#/start' \
   --name studio --only desktop --viewport --webp 1440 --out public/home
 ```
 
