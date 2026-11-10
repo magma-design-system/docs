@@ -50,11 +50,18 @@ no longer shows a progress ring: no workaround left.
 Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
 resolver says which contexts of a modifier are deprecated only in its `description`, in words:
 `default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
-the table above). Filed on 2026-11-05 while adopting the cards of 2.10.0 (docs#101): #1250 (since 2.10.0 `mds-card-footer` stacks its row under 380 px of
-container, `actions/stacked`, and stretches what it holds: the single "Read" of the cards of the
-landing pages takes the width of the card with its label in the middle, and the Download
-`mds-button-dropdown` of the brand cards stretches its host, not its two buttons, an empty blue
-bar after them; the site keeps the rule as it is).
+the table above). Filed on 2026-11-05 while adopting the cards of 2.10.0 (docs#101): #1250
+(since 2.10.0 `mds-card-footer` stacks its row under 380 px of container, `actions/stacked`, and
+stretches what it holds: the single "Read" of the cards of the landing pages takes the width of
+the card with its label in the middle, still open; the site keeps the rule as it is). Its second
+case, the Download `mds-button-dropdown` of the brand cards, whose host is stretched and not its
+two buttons (an empty blue bar after them: 107 + 36 px of buttons in a footer of 288), became
+#1313, closed by #1315 on 2026-11-07 (`flex-grow: 1` on the main action) after the release of
+2.12.0: the bar stays online until the site adopts the next release, with no workaround in the
+meantime. Filed on 2026-11-10 while checking those footers: #1340 (`mds-button-group` has the
+same shape: stretched by a stacked row, its members keep their own width at the start of the
+row, 57 + 59 px in a footer of 272; the proposal is the `flex-grow: 1` of #1315 on its members).
+The site has no `mds-button-group`.
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
