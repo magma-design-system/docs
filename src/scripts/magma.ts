@@ -1,6 +1,6 @@
 // Client-side setup of Magma, injected into every page by src/integrations/magma.mjs.
 import { defineCustomElements } from '@maggioli-design-system/magma/loader';
-import { IconsSetService } from '@maggioli-design-system/magma/services';
+import { IconsSetService } from '@maggioli-design-system/magma';
 import type { TransitionBeforePreparationEvent } from 'astro:transitions/client';
 
 // Where mds-icon fetches `<slug>.svg` from: iconsauce copies every slug the
