@@ -141,7 +141,7 @@ Since #89 (2026-11-06) the site explains the model, not only each file:
   is 560px wide, too narrow for a picture beside its words. The block is the `page-header` of one
   record with its regions outlined, the pattern three values of `message-placement` that lead
   to `field-error`; the layers follow the open choice `success-toast-duration`. They are the
-  ids, values and choices Magma 2.11.0 and 2.12.0 answer with, written in the components and
+  ids, values and choices Magma 2.11.0 to 2.13.0 answer with, written in the components and
   their UI strings (`pattern.levels.*`, `pattern.layers.*`): when Magma renames one, rename it
   there.
 - **The API**, `ai/pattern-api.mdx`: each mode of `get_pattern` and the layer format, with what
@@ -150,7 +150,7 @@ Since #89 (2026-11-06) the site explains the model, not only each file:
   layer in `<folder>/magma/patterns/`), then shortened; the example layers were checked the
   same way, with no `layerErrors`. Retake them when `get_pattern` changes. The list of what a
   layer may not do is `layerErrors()` in `magma/dist/lint/core/patterns.js`. A value outside
-  what an open choice `may` is not checked (2.11.0, 2.12.0): `may` is words, so the page says to
+  what an open choice `may` is not checked (2.11.0 to 2.13.0): `may` is words, so the page says to
   review it.
 - **The guide**, `ai/design-for-your-product.mdx`: who does what, set up, ask in words, adapt
   with `/magma:pattern-layer`, check with `get_pattern`, report a need on Magma with the

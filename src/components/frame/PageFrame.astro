@@ -85,7 +85,7 @@ const hasHero = Boolean(entry.data.hero);
     type TransitionBeforePreparationEvent,
     type TransitionBeforeSwapEvent,
   } from 'astro:transitions/client';
-  import { NavigationService } from '@maggioli-design-system/magma/services';
+  import { NavigationService } from '@maggioli-design-system/magma';
 
   const PERSIST = 'data-astro-transition-persist';
 
@@ -148,7 +148,6 @@ const hasHero = Boolean(entry.data.hero);
     // which one is current changes. Other links (another section, another
     // component, the table of contents of a page) make a new column.
     scrolled.clear();
-    const copies: Element[] = [];
     for (const column of next.querySelectorAll(`[${PERSIST}]`)) {
       const kept = document.querySelector(`[${PERSIST}="${column.getAttribute(PERSIST)}"]`);
       if (!kept) continue;
@@ -173,20 +172,7 @@ const hasHero = Boolean(entry.data.hero);
           scrolled.set(element, [element.scrollTop, element.scrollLeft]);
         }
       }
-      copies.push(column);
     }
-
-    // The router puts the new page in, then the kept columns in place of
-    // their copies: for that moment the copies are on the page, and their
-    // components start loading for nothing. mds-dropdown (magma 2.5.0; no
-    // longer mds-tooltip) then throws, taken off the page before it has loaded
-    // (https://github.com/magma-design-system/magma/issues/527). Emptied once
-    // every listener has read the new page, right before the swap.
-    const swap = (event as TransitionBeforeSwapEvent).swap;
-    (event as TransitionBeforeSwapEvent).swap = () => {
-      for (const copy of copies) copy.replaceChildren();
-      swap();
-    };
   });
 
   type MagmaElement = HTMLElement & { componentOnReady?(): Promise<unknown> };

@@ -24,8 +24,6 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 
 | Issue                                                                  | Where                                       | What the site does                                                                                                                                                                                                                                                                                                   |
 | ---------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [magma#527](https://github.com/magma-design-system/magma/issues/527)   | `src/components/frame/PageFrame.astro`      | Empties the copies of the kept columns before the router swaps them, or `mds-dropdown` throws (`mds-tooltip` no longer does since 2.4.0)                                                                                                                                                                             |
-| [magma#1294](https://github.com/magma-design-system/magma/issues/1294) | `src/lib/nav.mjs`                           | `STUDIO`, the address of Magma Studio, written by hand: `documentation.json` gives Storybook's (`storybook`) and not the studio's                                                                                                                                                                                    |
 | not filed                                                              | `src/components/frame/Header.astro`         | `min-w-0` and `shrink` on the parts `content`, `actions` and `nav` of `mds-header-bar`: Magma's do not shrink, and a long item in the navigation pushes the menu button off a phone screen                                                                                                                           |
 | not filed                                                              | `src/components/DownloadCard.astro`         | Placement and click handling of the `mds-button-dropdown` menus (see below)                                                                                                                                                                                                                                          |
 | not filed                                                              | `src/components/home/ComponentLayers.astro` | `gap-0` on the `mds-input-switch` named only for screen readers: the host keeps its gap before a label nobody sees (see below)                                                                                                                                                                                       |
@@ -34,34 +32,14 @@ Each one cites its issue next to the code. Remove it when the release that fixes
 
 ## Open Magma issues that concern the site
 
-As of Magma 2.9.0: #527 (fixed in `mds-tooltip` since 2.4.0; `mds-dropdown` still calls, in its
-`disconnectedCallback`, the floating controller that only `componentDidLoad` creates, though a
-dropdown inserted and removed at once no longer throws in Chromium), #1061
-(next major: the t-shirt names out of the spacing scale; until then the logical size utilities,
-`inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that name, while `w-`,
-`min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0), and the epic #693
-(theme studio, for the Themes and preferences page). Filed on 2026-10-28: #1177
-(`mds-radial-progress` steps back before it moves when `progress` changes in an event handler:
-`animateTo()` takes `start = performance.now()`, and the first `requestAnimationFrame`
-timestamp, the start of the frame, is earlier, so `t` and `easeOutExpo(t)` are negative; also the
-CSS transition of the registered `--mds-radial-progress` runs on top of the JS tween). The site
-no longer shows a progress ring: no workaround left.
-
-Filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101): #1249 (the DTCG
+As of Magma 2.13.0: #1061 (next major: the t-shirt names out of the spacing scale; until then the
+logical size utilities, `inline-xs`, `min-inline-xs`, `max-inline-xs`, read the spacing of that
+name, while `w-`, `min-w-`, `max-w-` and `basis-` read the container since styles 17.3.0).
+#1249, filed on 2026-11-04 while adopting the named themes of 2.11.0 (docs#101: the DTCG
 resolver says which contexts of a modifier are deprecated only in its `description`, in words:
-`default`, `cool` and `warm` of `theme`; the site copies them into `DEPRECATED_CONTEXTS`, see
-the table above). Filed on 2026-11-05 while adopting the cards of 2.10.0 (docs#101): #1250
-(since 2.10.0 `mds-card-footer` stacks its row under 380 px of container, `actions/stacked`, and
-stretches what it holds: the single "Read" of the cards of the landing pages takes the width of
-the card with its label in the middle, still open; the site keeps the rule as it is). Its second
-case, the Download `mds-button-dropdown` of the brand cards, whose host is stretched and not its
-two buttons (an empty blue bar after them: 107 + 36 px of buttons in a footer of 288), became
-#1313, closed by #1315 on 2026-11-07 (`flex-grow: 1` on the main action) after the release of
-2.12.0: the bar stays online until the site adopts the next release, with no workaround in the
-meantime. Filed on 2026-11-10 while checking those footers: #1340 (`mds-button-group` has the
-same shape: stretched by a stacked row, its members keep their own width at the start of the
-row, 57 + 59 px in a footer of 272; the proposal is the `flex-grow: 1` of #1315 on its members).
-The site has no `mds-button-group`.
+`default`, `cool` and `warm` of `theme`), was closed on 2026-11-10 as superseded by Magma 3
+(#1334), which drops those themes: `DEPRECATED_CONTEXTS` (see the table above) stays until the
+site moves to Magma 3, and goes then, with nothing left to filter.
 
 Closed by 2.4.0 and 2.5.0, adopted together: #790, #820, #821, #823, #824, #829, #830, #944,
 #951 (`mds-toast-region`), #952 (the hide button of `mds-toast`), #955, #956, #957 (`@example`
@@ -103,6 +81,20 @@ its attribute in a re-render; the issue came from a hidden pane that ran no
 Closed by 2.11.0, filed on 2026-11-04 from the galleries of Patterns and Building blocks
 (docs#101): #1243 (an image of each preview, light and dark, beside its stage: the cards show
 the one of the first preview, `PatternGallery.astro`).
+
+Closed by 2.13.0 (with styles 17.7.1), adopted on 2026-11-12: #527 (`mds-dropdown` and
+`mds-tooltip` taken off the page before they load no longer throw, #1343: `PageFrame.astro` no
+longer empties the copies of the kept columns before the swap; the rail and the right column,
+each with an `mds-dropdown`, stay kept with no error), #1294 (`studio` at the top of
+`documentation.json`, beside `storybook`: `STUDIO` in `src/lib/nav.mjs` reads it), #1177
+(`mds-radial-progress` no longer steps back; the site shows no ring), #1250 (since 2.10.0
+`mds-card-footer` stretched a single action in a stacked row: the "Read" of the landing cards
+and the Download of the brand cards keep their own width, at the end of the footer), #1313 (by
+#1315: a stretched `mds-button-dropdown` gives its width to the main action), #1340 (the same
+for the members of `mds-button-group`; the site has none). The services are imported from the
+package root since 2.13.0 (`@maggioli-design-system/magma`, the same file as `/services`): the
+site follows. #693, the epic of the theme studio, closed on 2026-11-09; mounting the Studio in a
+page of the site stays a later step ([architecture.md](architecture.md), "Magma Studio").
 
 ## Seen, not filed yet
 
