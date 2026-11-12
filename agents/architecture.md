@@ -139,8 +139,8 @@ groups of the rail are `RAIL_GROUP_ICONS`. The structure and its reasons are in
 
 Magma Studio, where a product shapes its theme in the browser, is an app of the Magma repository
 published beside Storybook, at an address of its own (`STUDIO` in
-[`src/lib/nav.mjs`](../src/lib/nav.mjs);
-the packages do not give it, while `documentation.json` gives Storybook's:
+[`src/lib/nav.mjs`](../src/lib/nav.mjs), read from `studio` at the top of
+`documentation.json` since Magma 2.13.0, beside `storybook`:
 [magma#1294](https://github.com/magma-design-system/magma/issues/1294)). Mounting it in a page
 of this site, with its header and without the side columns, is a later step of
 [magma#693](https://github.com/magma-design-system/magma/issues/693) ("On the site"). Its pages

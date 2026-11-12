@@ -21,13 +21,13 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "0.4.7",
+    "@astrojs/markdown-satteri": "0.4.9",
     "@astrojs/starlight": "0.42.10",
     "@fontsource/karla": "5.3.0",
     "@fontsource/merriweather": "5.3.0",
     "@fontsource/roboto": "5.3.0",
     "@fontsource/roboto-mono": "5.3.0",
-    "@iconsauce/core": "2.0.3",
+    "@iconsauce/core": "2.0.4",
     "@iconsauce/material-icons": "1.0.3",
     "@iconsauce/mdi-svg": "1.1.0",
     "@iconsauce/mgg-icons": "1.2.0",
@@ -35,13 +35,13 @@
     "@maggioli-design-system/design-tokens": "16.0.0",
     "@maggioli-design-system/icons": "1.95.0",
     "@maggioli-design-system/identity": "2.2.0",
-    "@maggioli-design-system/magma": "2.12.0",
-    "@maggioli-design-system/magma-angular": "2.12.0",
-    "@maggioli-design-system/magma-react": "2.12.0",
-    "@maggioli-design-system/styles": "17.7.0",
+    "@maggioli-design-system/magma": "2.13.0",
+    "@maggioli-design-system/magma-angular": "2.13.0",
+    "@maggioli-design-system/magma-react": "2.13.0",
+    "@maggioli-design-system/styles": "17.7.1",
     "@maggioli-design-system/svg-icons": "4.6.0",
     "@tailwindcss/vite": "4.3.5",
-    "astro": "7.4.7",
+    "astro": "7.4.11",
     "normalize.css": "8.0.1",
     "sharp": "0.35.5",
     "tailwindcss": "4.3.5"
@@ -51,10 +51,10 @@
     "@html-eslint/parser": "0.68.0",
     "astro-eslint-parser": "3.2.0",
     "eslint": "10.14.0",
-    "prettier": "3.9.10",
+    "prettier": "3.10.1",
     "prettier-plugin-astro": "1.1.2",
     "stylelint": "17.16.0",
     "typescript": "6.0.3",
-    "typescript-eslint": "8.72.1"
+    "typescript-eslint": "8.72.2"
   }
 }
