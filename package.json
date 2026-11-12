@@ -38,7 +38,7 @@
     "@maggioli-design-system/magma": "2.12.0",
     "@maggioli-design-system/magma-angular": "2.12.0",
     "@maggioli-design-system/magma-react": "2.12.0",
-    "@maggioli-design-system/styles": "17.7.0",
+    "@maggioli-design-system/styles": "17.7.1",
     "@maggioli-design-system/svg-icons": "4.6.0",
     "@tailwindcss/vite": "4.3.5",
     "astro": "7.4.11",
