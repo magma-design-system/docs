@@ -121,10 +121,28 @@ against open issues before filing.
   in 2.5.0).
 - `mds-breadcrumb` has no links; Magma has no description list, no ordered list and no code
   block component.
-- `mds-button[href]` has no `download`, nor has `mds-link` (2.5.0): the Figma files of
-  `FigmaDownloads.astro` stay native `<a download>`.
+- `mds-button[href]` has no `download`, nor has `mds-link` (2.5.0, still in 2.14.0): the
+  Figma files of `FigmaDownloads.astro` and the files of `PlatformFiles.astro` stay native
+  `<a download>`.
 - `mds-link` takes text only in its slot (2.5.0, by design): a link around inline code goes
   inside the code instead ([writing.md](writing.md), "Links").
+- No list for items other than text (2.14.0): `mds-list-item` draws an icon and a text, nothing
+  else. A list of links, cards or chips stays a native `ul` with `list-none`: the navigation of
+  the frame (`NavList.astro`, `SectionLinks.astro`, `TableOfContents.astro`), the columns of
+  `SiteFooter.astro`, the layers of a pattern (`PatternLayers.astro`), the agents of the home
+  page (`AgentNames.astro`). The `ol` of `PatternLevels.astro` and `home/Levels.astro` are the
+  missing ordered list above.
+- No link for a block (2.14.0): `mds-link` takes text only and `mds-button[href]` brings the
+  look of a button. The logo and name of the site (`Brand.astro`), the logo of the collapsed
+  rail (`Rail.astro`) and the announcement of the hero (`Hero.astro`) stay native `<a>`, styled
+  with Magma's utilities.
+- `mds-img` has no `decoding`, and its host has no height until it hydrates and draws its `img`
+  (2.14.0): `width` and `height` do not give it the ratio a native `img` takes from them. The
+  picture of the Studio (`home/StudioShot.astro`) lost `decoding="async"` when it became
+  `mds-img`, and keeps its room with `aspect-16/10`.
+- `mds-url-view` frames a remote page with a header and a close button, for a modal (2.14.0):
+  the stage of a preview (`PreviewStage.astro`) keeps a native `<iframe>`, which its handles
+  resize.
 - `--mds-elevation-*` and `--depth` break the naming convention (`--magma-*` for globals) and
   come from `styles/dist/css/theme.css`, which is not in the documented import order (2.2.0,
   still in styles 17.3.0).

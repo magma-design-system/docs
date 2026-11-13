@@ -3,7 +3,8 @@
 // section navigation (SectionEntries.astro) and the right column
 // (DocsNav.astro): its items are NavLink.astro, its groups NavHeading.astro.
 // The labels are titles, written as they must read: mds-button would
-// uppercase their first letter (iOS).
+// uppercase their first letter (iOS). A native `ul`: mds-list-item holds an
+// icon and a text, not a link (agents/magma.md, Seen, not filed yet).
 interface Props {
   /** The id of the heading that names the list. */
   labelledby?: string;
