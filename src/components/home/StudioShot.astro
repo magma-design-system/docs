@@ -5,7 +5,10 @@
 // Magma Studio). The light picture in light mode; in dark mode the dark one,
 // the Studio as it opens under a dark system: its frame dark, the dialog of
 // the product still light. A picture only: the button of the band opens the
-// Studio.
+// Studio. mds-img is as wide as the frame; `block aspect-16/10` (1440 by 900)
+// keeps its room before it hydrates and draws its img: until then it is an
+// inline element, which no aspect ratio sizes. It has no `decoding`
+// (agents/magma.md, Seen, not filed yet).
 interface Props {
   /** What the picture shows, for screen readers. */
   alt: string;
@@ -21,14 +24,13 @@ const SCHEMES = [
 
 <div class="overflow-hidden rounded-xl border border-border-muted shadow-2xl">
   {SCHEMES.map(({ scheme, class: visible }) => (
-    <img
+    <mds-img
       src={`${base}home/studio-desktop-${scheme}.webp`}
       alt={alt}
       width="1440"
       height="900"
       loading="lazy"
-      decoding="async"
-      class:list={['block h-auto w-full', visible]}
+      class:list={['block aspect-16/10', visible]}
     />
   ))}
 </div>
