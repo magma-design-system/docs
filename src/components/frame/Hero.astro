@@ -36,7 +36,7 @@ const TONES = { primary: 'strong', secondary: 'weak', minimal: 'text' } as const
     {announcement && (
       <a
         href={announcement.link}
-        class="mb-400 flex items-center gap-300 rounded-full bg-surface-overlay py-200 ps-200 pe-400 text-start no-underline shadow-sm transition-cosmetic focus-bounce hover:shadow-outline"
+        class="mb-400 flex items-center gap-300 rounded-full bg-surface-overlay py-200 ps-200 pe-400 text-start no-underline shadow-sm transition-cosmetic focus-bounce hover:shadow-outline-weak"
       >
         <mds-badge label={announcement.badge} variant="blue" tone="strong" class="shrink-0" />
         <mds-text typography="detail" class="text-fg-default">
