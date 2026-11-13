@@ -126,8 +126,9 @@ const actions = [
       <mds-tooltip target="#rail-expand" relation="label" placement="right" disable-auto-placement>
         {t('frame.rail.expand')}
       </mds-tooltip>
+      {/* A native link around the logo, as in Brand.astro. */}
       <a
-        class="flex rounded-lg p-200 transition-cosmetic focus-bounce hover:bg-surface-muted hover:shadow-outline"
+        class="flex rounded-lg p-200 transition-cosmetic focus-bounce hover:bg-surface-muted hover:shadow-outline-weak"
         href={`${localePrefix(starlightRoute.locale)}/`}
         aria-label={`Magma ${t('frame.brand.description')}`}
       >

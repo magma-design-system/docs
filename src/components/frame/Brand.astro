@@ -1,7 +1,9 @@
 ---
 // Logo and name of the site, linking to the home page of the current locale.
 // In the mobile header, below `tablet`, the reading bar takes its room while
-// the page is read (Header.astro).
+// the page is read (Header.astro). A native `a` around the logo and the name:
+// mds-link takes text only and mds-button[href] has the look of a button
+// (agents/magma.md, Seen, not filed yet).
 import { localePrefix } from '../../lib/frame';
 import Logo from './Logo.astro';
 
@@ -9,7 +11,7 @@ const { t, starlightRoute } = Astro.locals;
 ---
 
 <a
-  class="flex min-w-0 items-center gap-300 rounded-lg focus-bounce text-fg-default no-underline p-200 pr-300 hover:bg-surface-muted transition-cosmetic hover:shadow-outline max-tablet:group-has-data-reading/header:hidden"
+  class="flex min-w-0 items-center gap-300 rounded-lg focus-bounce text-fg-default no-underline p-200 pr-300 hover:bg-surface-muted transition-cosmetic hover:shadow-outline-weak max-tablet:group-has-data-reading/header:hidden"
   href={`${localePrefix(starlightRoute.locale)}/`}
   tabindex={0}
 >
