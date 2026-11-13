@@ -1,0 +1,117 @@
+---
+// The cursor of a preview: four corners that follow the pointer and, over a
+// Magma component the stage writes (an mds-* of its own markup, never one
+// inside the shadow DOM of another), frame it and name its tag, so the stage
+// shows what it is built of. Only with a pointer that hovers (a mouse, a
+// trackpad); decorative, so hidden from assistive technology and never in the
+// way of a click. The native cursor stays: a component sets its own inside its
+// shadow DOM (the pointer of mds-button), which a page cannot reach without
+// piercing it. A popover, so it can stand above the top layer of an open
+// mds-modal. Placed by src/pages/example/[kind]/[id]/[preview].astro.
+//
+// The maintainer's choices on 2026-11-13, from the options rendered on
+// confirm-action/ask-first: the accent for the corners, and the tag on a plate
+// of the same accent, which reads on any ground (the backdrop of a dialog, a
+// dark component); monospaced, without the plate of code that `snippet` draws
+// on its default `code` tag.
+---
+
+<div
+  data-preview-cursor
+  popover="manual"
+  aria-hidden="true"
+  class="pointer-events-none fixed inset-auto top-0 left-0 m-0 size-400 overflow-visible border-0 bg-transparent p-0 opacity-0 transition-[translate,width,height,opacity] duration-(--duration-300) ease-(--ease-out-expo) motion-reduced:transition-none"
+>
+  <span class="absolute -top-200 -left-200 size-300 border-t-2 border-l-2 border-accent-emphasis"></span>
+  <span class="absolute -top-200 -right-200 size-300 border-t-2 border-r-2 border-accent-emphasis"></span>
+  <span class="absolute -bottom-200 -left-200 size-300 border-b-2 border-l-2 border-accent-emphasis"></span>
+  <span class="absolute -right-200 -bottom-200 size-300 border-r-2 border-b-2 border-accent-emphasis"></span>
+  <mds-text
+    data-preview-cursor-label
+    typography="snippet"
+    tag="span"
+    class="absolute top-full -right-200 mt-400 hidden rounded-(--radius-3xs) bg-accent-emphasis px-150 py-25 whitespace-nowrap text-accent-on-emphasis"
+  ></mds-text>
+</div>
+
+<script>
+  const cursor = document.querySelector<HTMLElement>('[data-preview-cursor]');
+  const label = cursor?.querySelector<HTMLElement>('[data-preview-cursor-label]');
+  // a mouse or a trackpad: a touch screen has no pointer to follow
+  const hovering = matchMedia('(hover: hover) and (pointer: fine)');
+
+  if (cursor && label) {
+    let target: Element | undefined;
+    let x = 0;
+    let y = 0;
+    let modals = 0;
+    cursor.showPopover();
+    // the size of the frame with nothing under it, from its classes
+    const idle = cursor.offsetWidth;
+
+    // The innermost Magma component of the markup of the stage under the
+    // pointer: the path crosses the shadow roots, whose components are parts
+    // of the one that holds them, not of the stage.
+    const componentAt = (event: Event) =>
+      event
+        .composedPath()
+        .find(
+          (node): node is Element =>
+            node instanceof Element &&
+            node.localName.startsWith('mds-') &&
+            node.getRootNode() === document,
+        );
+
+    // An mds-modal shows its dialog in the top layer, where the order is the
+    // order of showing: shown again after it, the frame stands above it. Done
+    // only when a modal opens, since showing it again skips the transition.
+    const raise = () => {
+      const open = document.querySelectorAll('mds-modal[opened]').length;
+      if (open > modals) {
+        cursor.hidePopover();
+        cursor.showPopover();
+      }
+      modals = open;
+    };
+
+    const place = () => {
+      const box = target?.isConnected ? target.getBoundingClientRect() : undefined;
+      if (box?.width && box.height) {
+        cursor.style.translate = `${box.left}px ${box.top}px`;
+        cursor.style.width = `${box.width}px`;
+        cursor.style.height = `${box.height}px`;
+      } else {
+        cursor.style.translate = `${x - idle / 2}px ${y - idle / 2}px`;
+        cursor.style.width = '';
+        cursor.style.height = '';
+      }
+    };
+
+    document.addEventListener(
+      'pointermove',
+      (event) => {
+        if (event.pointerType !== 'mouse' || !hovering.matches) return;
+        x = event.clientX;
+        y = event.clientY;
+        raise();
+        const next = componentAt(event);
+        if (next !== target) {
+          target = next;
+          label.textContent = next ? `<${next.localName}>` : '';
+          label.classList.toggle('hidden', !next);
+        }
+        cursor.classList.remove('opacity-0');
+        place();
+      },
+      { passive: true },
+    );
+    // out of the page (of its frame, on the page of the pattern)
+    document.addEventListener('pointerout', (event) => {
+      if (event.relatedTarget) return;
+      target = undefined;
+      cursor.classList.add('opacity-0');
+    });
+    addEventListener('scroll', place, { capture: true, passive: true });
+    addEventListener('resize', place, { passive: true });
+  }
+</script>

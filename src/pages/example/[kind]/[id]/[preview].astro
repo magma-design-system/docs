@@ -10,8 +10,10 @@
 // stage in Italian, an inset of 600 around it, none for a stage that is a
 // whole page and lays out its own frame (`whole-page`, "The preview of a case"
 // in Magma's docs/PATTERNS.md). Opened on its own, it is the full screen
-// version of the preview.
+// version of the preview. Its cursor frames the components of the stage and
+// names them (PreviewCursor.astro).
 import { getCollection } from 'astro:content';
+import PreviewCursor from '../../../../components/PreviewCursor.astro';
 import '../../../../styles/magma.css';
 
 export async function getStaticPaths() {
@@ -69,5 +71,6 @@ const { id, preview } = Astro.params;
     ]}
   >
     <Fragment set:html={markup} />
+    <PreviewCursor />
   </body>
 </html>
