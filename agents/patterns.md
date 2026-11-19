@@ -93,9 +93,13 @@ builds a pattern with the components of the project from the case `get_pattern` 
   `src/styles/magma.css` takes their folder as a `@source`.
 - Its cursor (`PreviewCursor.astro`, 2026-11-13): four corners follow the pointer with an ease,
   and over a component the stage writes they frame it and name its tag on a plate,
-  `<mds-button>`. It lives in the page of the preview, so it works in the frame of the page,
-  in Enlarge and in a tab of its own. The innermost `mds-*` of the markup under the pointer,
-  never one inside the shadow DOM of another (`getRootNode() === document`). Only with a
+  `<mds-button>`. The plate stays in the page, which clips what goes past its edge (the frame of
+  the stage): under the frame at its right corner, above it when the page ends under it, at the
+  bottom of the page over the frame when the component is as tall as the page, and never past
+  the left or the right edge (2026-11-19). It lives in the page of the preview, so it works in
+  the frame of the page, in Enlarge and in a tab of its own. The innermost `mds-*` of the
+  markup under the pointer, never one inside the shadow DOM of another
+  (`getRootNode() === document`). Only with a
   pointer that hovers; `aria-hidden`, `pointer-events: none`, no transition with reduced
   motion. The native cursor stays: a component sets its own inside its shadow DOM
   (`mds-button`), which the page cannot reach without piercing it. A popover, shown again
