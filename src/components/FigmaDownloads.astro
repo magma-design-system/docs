@@ -1,8 +1,7 @@
 ---
 // The Figma files of design-tokens to download (src/pages/downloads/[file].ts):
-// what each one holds, how many variables, its size. Native links with
-// `download`: neither mds-link nor mds-button[href] can ask for a download
-// (agents/magma.md).
+// what each one holds, how many variables, its size. Each file is an
+// mds-link with `download` (Magma 2.15.0): a click saves it, named as it is.
 import Code from './Code.astro';
 import { FIGMA_FILES, figmaFileInfo } from '../lib/tokens.mjs';
 import { magmaVersion } from '../lib/magma.mjs';
@@ -39,9 +38,9 @@ const CELL = 'whitespace-nowrap';
       <mds-table-row>
         <mds-table-cell class={CELL}>
           <mds-text typography="detail" tag="span" class="whitespace-nowrap">
-            <a href={row.href} download={row.file}>
+            <mds-link href={row.href} download={row.file}>
               {row.file}
-            </a>
+            </mds-link>
           </mds-text>
         </mds-table-cell>
         <mds-table-cell class={CELL}>

@@ -4,6 +4,10 @@
 // and this site), then the logo and the Magma version the site documents.
 // The issue links open the templates of the Magma repository
 // (.github/ISSUE_TEMPLATE); the problems of this site go to its own issues.
+// The links are mds-link in the muted color of the column (`inherit`), with
+// a faint underline (`weak`) that takes the whole color under the pointer.
+// Each column is a native `ul` of links.
+// Reported: https://github.com/magma-design-system/magma/issues/1408
 import { localePrefix } from '../../lib/frame';
 import { magmaVersion } from '../../lib/magma.mjs';
 import { REPOSITORY, STORYBOOK, STUDIO } from '../../lib/nav.mjs';
@@ -71,14 +75,11 @@ const columns = [
         <ul aria-labelledby={`site-footer-${id}`} class="m-0 flex list-none flex-col gap-300 p-0">
           {links.map(({ key, href }) => (
             <li class="flex">
-              <a
-                href={href}
-                class="rounded-sm text-fg-muted no-underline focus-zoom hover:text-fg-default hover:underline"
-              >
-                <mds-text typography="detail">
+              <mds-text typography="detail" class="text-fg-muted">
+                <mds-link href={href} variant="inherit" tone="weak">
                   {t(`frame.siteFooter.${id}.${key}` as never)}
-                </mds-text>
-              </a>
+                </mds-link>
+              </mds-text>
             </li>
           ))}
         </ul>

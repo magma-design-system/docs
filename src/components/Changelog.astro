@@ -57,7 +57,9 @@ const parts = (text: string) => text.split(/\(#(\d+)\)/);
         <time datetime={date}>{day}</time>
       </mds-text>
       <mds-text typography="detail">
-        <a href={href}>{t('changelog.release', { tag, interpolation: { escapeValue: false } })}</a>
+        <mds-link href={href}>
+          {t('changelog.release', { tag, interpolation: { escapeValue: false } })}
+        </mds-link>
       </mds-text>
       {breaking && (
         <mds-badge
@@ -84,19 +86,21 @@ const parts = (text: string) => text.split(/\(#(\d+)\)/);
                   class="me-200 align-middle"
                 />
               )}
-              {scopes.map((scope) =>
-                components.has(scope) ? (
-                  <a href={`${localePrefix(locale)}/components/${scope}/`} class="me-100">
-                    <Code class="whitespace-nowrap">{scope}</Code>
-                  </a>
-                ) : (
-                  <Code class="me-100 whitespace-nowrap">{scope}</Code>
-                ),
-              )}{' '}
+              {scopes.map((scope) => (
+                <Code class="me-100 whitespace-nowrap">
+                  {components.has(scope) ? (
+                    <mds-link href={`${localePrefix(locale)}/components/${scope}/`}>
+                      {scope}
+                    </mds-link>
+                  ) : (
+                    scope
+                  )}
+                </Code>
+              ))}{' '}
               {parts(text).map((part, i) =>
                 i % 2 === 1 ? (
                   <>
-                    (<a href={`${REPOSITORY}/pull/${part}`}>#{part}</a>)
+                    (<mds-link href={`${REPOSITORY}/pull/${part}`}>#{part}</mds-link>)
                   </>
                 ) : (
                   part

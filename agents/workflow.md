@@ -78,8 +78,8 @@ WebSocket (Node's global `WebSocket`): `browsingContext.create`, `script.evaluat
   is a commit of its own ([writing.md](writing.md)).
 - `npm run format:check` before pushing (CI does not run it).
 - Pull request to `main`. CI (`.github/workflows/deploy.yml`, job `build`: `npm ci`,
-  `astro check`, build) must be green; the job `authors` is a signal (below). Maintainers
-  review and merge; agents never merge.
+  `astro check`, `npm run lint`, build) must be green; the job `authors` is a signal (below).
+  Maintainers review and merge; agents never merge.
 - **Merging**: content pull requests are merged with "Create a merge commit", which keeps the
   author of each commit: the page footer shows them. A squash merge would make the pull
   request's author the author of every page it touches, the others only `Co-authored-by`

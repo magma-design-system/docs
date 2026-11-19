@@ -1,8 +1,8 @@
 ---
 // The files of design-tokens for one native platform, to download
 // (src/pages/downloads/[platform]/[file].ts): what each one holds, how many
-// colors, its size. Native links with `download`: neither mds-link nor
-// mds-button[href] can ask for a download (agents/magma.md).
+// colors, its size. Each file is an mds-link with `download` (Magma 2.15.0):
+// a click saves it, named as it is.
 import Code from './Code.astro';
 import UiText from './UiText.astro';
 import { PLATFORM_FILES, platformFileInfo } from '../lib/tokens.mjs';
@@ -46,9 +46,9 @@ const CELL = 'whitespace-nowrap';
       <mds-table-row>
         <mds-table-cell class={CELL}>
           <mds-text typography="detail" tag="span" class="whitespace-nowrap">
-            <a href={row.href} download={row.file}>
+            <mds-link href={row.href} download={row.file}>
               {row.file}
-            </a>
+            </mds-link>
           </mds-text>
         </mds-table-cell>
         <mds-table-cell class={CELL}>

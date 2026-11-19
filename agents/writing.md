@@ -80,8 +80,9 @@ you.
 - **Same tab**: Markdown links open in the same tab, external ones too, as they did as `<a>`.
   With `target="blank"` the component adds the "opens in a new tab" notice itself: never write
   it in the text.
-- **Downloads** stay a native `<a download>`: `mds-link` has no `download`
-  ([magma.md](magma.md)).
+- **Downloads** are `mds-link` with `download` (since Magma 2.15.0), its value the name of the
+  saved file: `<mds-link href="..." download="colors.xml">colors.xml</mds-link>`. The file must
+  be on the origin of the site; a download never goes to the router.
 - Plain clicks go through Astro's router (`NavigationService`, in `PageFrame.astro`); a click
   with a modifier, or the middle button, stays with the browser and opens a new tab.
 
