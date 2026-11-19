@@ -91,6 +91,21 @@ builds a pattern with the components of the project from the case `get_pattern` 
   (`src/pages/example/[kind]/[id]/[preview].astro`), as `render_preview` runs it: the words in
   Italian, an inset of 600, none for `whole-page`. Magma lays the previews out with Tailwind:
   `src/styles/magma.css` takes their folder as a `@source`.
+- Its cursor (`PreviewCursor.astro`, 2026-11-13): four corners follow the pointer with an ease,
+  and over a component the stage writes they frame it and name its tag on a plate,
+  `<mds-button>`. It lives in the page of the preview, so it works in the frame of the page,
+  in Enlarge and in a tab of its own. The innermost `mds-*` of the markup under the pointer,
+  never one inside the shadow DOM of another (`getRootNode() === document`). Only with a
+  pointer that hovers; `aria-hidden`, `pointer-events: none`, no transition with reduced
+  motion. The native cursor stays: a component sets its own inside its shadow DOM
+  (`mds-button`), which the page cannot reach without piercing it. A popover, shown again
+  when an `mds-modal` opens: the dialog is in the top layer, stacked in the order of showing,
+  and showing it again skips the transition, so only then. The maintainer chose the accent
+  for the corners and the tag on a plate of the accent, readable on the backdrop of a dialog,
+  from three colours and three labels rendered on `confirm-action/ask-first`; `snippet` with
+  `tag="span"`, since its default `code` tag draws a plate of code. Next: the role of each
+  part once Magma ships it ({ role, use } of a case and the `data-stage` marker of the
+  stage, magma#1396).
 - Its images beside it, `<preview>.light.webp` and `<preview>.dark.webp`
   (`src/pages/example/[kind]/[id]/[image].webp.ts`, `previewImageHref()` in
   `src/lib/patterns.ts`), copied as Magma ships them since 2.11.0: the stage laid out at 960 x 600
