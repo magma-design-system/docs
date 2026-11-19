@@ -31,6 +31,10 @@ jobs:
           cache: npm
       - name: Type check
         run: npm ci && npm run check
+      # Magma's ESLint and Stylelint presets, strict (eslint.config.js,
+      # stylelint.config.mjs): an error fails the pull request.
+      - name: Lint
+        run: npm run lint
       - name: Build
         uses: withastro/action@v6
         with:

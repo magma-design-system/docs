@@ -49,8 +49,10 @@ const SURFACES: Surface[] = ['sunken', 'muted', 'default', 'raised', 'overlay'];
   tall as the example until a handle is dragged or moved with the arrow keys:
   the one at its right sets the width, the one under it the height (window
   splitters: focusable separators with their value). Magma has no resize
-  handle. The handles sit on the stage, not on the frame: the stage has its
-  padding only at the top and at the left, their strips make the other two.
+  handle. The frame is a native iframe: mds-url-view adds a header and a close
+  button, for a page shown in a modal (agents/magma.md, Seen, not filed yet).
+  The handles sit on the stage, not on the frame: the stage has its padding
+  only at the top and at the left, their strips make the other two.
   With the example on surface-sunken too, the stage takes wash-base, so that
   the frame does not blend into it: a step darker in light, lighter in dark,
   where nothing is below sunken (the script sets `data-surface` on it). The

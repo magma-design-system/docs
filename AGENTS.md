@@ -50,13 +50,14 @@ links or personal data.
 
 Node >= 24 (`.nvmrc`), npm only.
 
-| Command          | What it does                                              |
-| ---------------- | --------------------------------------------------------- |
-| `npm ci`         | Install                                                   |
-| `npm run dev`    | Dev server at http://localhost:4321/docs/                 |
-| `npm run check`  | `astro check`: types; CI fails on any error               |
-| `npm run build`  | Static build into `dist/`, as CI and the deploy do        |
-| `npm run format` | Prettier (the Magma monorepo config); `format:check` only |
+| Command          | What it does                                                        |
+| ---------------- | ------------------------------------------------------------------- |
+| `npm ci`         | Install                                                             |
+| `npm run dev`    | Dev server at http://localhost:4321/docs/                           |
+| `npm run check`  | `astro check`: types; CI fails on any error                         |
+| `npm run lint`   | Magma's ESLint and Stylelint presets, strict; CI fails on any error |
+| `npm run build`  | Static build into `dist/`, as CI and the deploy do                  |
+| `npm run format` | Prettier (the Magma monorepo config); `format:check` only           |
 
 Before running them, know the traps (details in [agents/workflow.md](agents/workflow.md)):
 
