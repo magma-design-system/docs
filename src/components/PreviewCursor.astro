@@ -7,7 +7,9 @@
 // way of a click. The native cursor stays: a component sets its own inside its
 // shadow DOM (the pointer of mds-button), which a page cannot reach without
 // piercing it. A popover, so it can stand above the top layer of an open
-// mds-modal. Placed by src/pages/example/[kind]/[id]/[preview].astro.
+// mds-modal. Its tag stays in the page: under the frame, above it at the
+// bottom of the page, over it when the component is as tall as the page.
+// Placed by src/pages/example/[kind]/[id]/[preview].astro.
 //
 // The maintainer's choices on 2026-11-13, from the options rendered on
 // confirm-action/ask-first: the accent for the corners, and the tag on a plate
@@ -74,12 +76,43 @@
       modals = open;
     };
 
+    // The tag stands under the frame, at its right corner. Where the page
+    // ends under it (a component at the bottom of the stage, which clips
+    // what goes past its edge) it moves above the frame; where there is no
+    // room above either (a component as tall as the page) it stays at the
+    // bottom of the page, over the frame. It never passes the left or the
+    // right edge. It keeps from the edges the distance the corners stand out
+    // of the frame, and from the frame its own margin, both read from its
+    // classes.
+    const BELOW = ['top-full', 'mt-400'];
+    const ABOVE = ['bottom-full', 'mb-400'];
+    const fit = (box: DOMRect) => {
+      label.classList.remove(...ABOVE);
+      label.classList.add(...BELOW);
+      label.style.translate = '';
+      const style = getComputedStyle(label);
+      const gap = parseFloat(style.marginTop);
+      const edge = -parseFloat(style.right);
+      const { offsetWidth: width, offsetHeight: height } = label;
+      let top = box.bottom + gap;
+      if (top + height > innerHeight - edge && box.top - gap - height >= edge) {
+        label.classList.remove(...BELOW);
+        label.classList.add(...ABOVE);
+        top = box.top - gap - height;
+      }
+      const dy = Math.max(edge - top, Math.min(0, innerHeight - edge - top - height));
+      const right = box.right + edge;
+      const dx = Math.max(edge - (right - width), Math.min(0, innerWidth - edge - right));
+      if (dx || dy) label.style.translate = `${dx}px ${dy}px`;
+    };
+
     const place = () => {
       const box = target?.isConnected ? target.getBoundingClientRect() : undefined;
       if (box?.width && box.height) {
         cursor.style.translate = `${box.left}px ${box.top}px`;
         cursor.style.width = `${box.width}px`;
         cursor.style.height = `${box.height}px`;
+        fit(box);
       } else {
         cursor.style.translate = `${x - idle / 2}px ${y - idle / 2}px`;
         cursor.style.width = '';
